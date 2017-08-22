@@ -1,5 +1,8 @@
 FairyGUI-cocos
 ====
 
-这里是FairyGUI的cocos-2dx SDK仓库，还在准备中。如果你希望FairyGUI尽快推出cocos-2dx支持，请点星！
+这里是FairyGUI的cocos-2dx SDK仓库，还在准备中。
+如果你希望FairyGUI尽快推出cocos-2dx支持，请点星！
+欢迎进开发群讨论：301605979
+
 官方网站： [www.fairygui.com](http://www.fairygui.com/)
