@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{54af7a7f-66fe-4e82-ba42-582a129bd551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\event">
+      <UniqueIdentifier>{f34b5fe2-f149-44e1-aa6e-376abebe114f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gears">
+      <UniqueIdentifier>{8c826c4f-47db-4a49-90b0-d9890b0ca94f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\display">
+      <UniqueIdentifier>{82bbe519-3c2a-4535-871e-43133803f715}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{d84c7903-4100-475f-8a09-1f39f343bbb4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Classes\GButton.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GComboBox.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GComponent.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GGraph.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GGroup.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GImage.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GLabel.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GList.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GMovieClip.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GProgressBar.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GRichTextField.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GRoot.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GScrollBar.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GSlider.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GTextField.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GTextInput.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PackageItem.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PopupMenu.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\RelationItem.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Relations.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ScrollPane.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Transition.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\UIConfig.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\UIObjectFactory.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\UIPackage.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Window.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Controller.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\FairyGUI.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\FairyGUIMacros.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\display\ScissorClipNode.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\event\InputEvent.h">
+      <Filter>src\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\event\InputProcessor.h">
+      <Filter>src\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\event\UIEventDispatcher.h">
+      <Filter>src\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\event\EventContext.h">
+      <Filter>src\event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearBase.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearColor.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearDisplay.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearIcon.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearLook.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearSize.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearText.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearXY.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearAnimation.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\ToolSet.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\ByteArray.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Classes\GComboBox.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GComponent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GGraph.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GGroup.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GImage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GLabel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GList.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GMovieClip.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GProgressBar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GRichTextField.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GRoot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GScrollBar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GSlider.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GTextField.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GTextInput.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\PackageItem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\PopupMenu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\RelationItem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Relations.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ScrollPane.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Transition.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\UIConfig.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\UIObjectFactory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\UIPackage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Window.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Controller.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GButton.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\ScissorClipNode.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\event\InputEvent.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\event\InputProcessor.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\event\UIEventDispatcher.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\event\EventContext.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearColor.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearDisplay.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearIcon.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearLook.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearSize.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearText.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearXY.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearAnimation.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearBase.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\ToolSet.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\ByteArray.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
