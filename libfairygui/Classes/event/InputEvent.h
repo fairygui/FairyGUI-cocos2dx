@@ -15,8 +15,9 @@ public:
     ~InputEvent();
 
     GObject* getTarget() { return _target; }
-    const int getX() { return _x; }
-    const int getY() { return _y; }
+    const int getX() { return _pos.x; }
+    const int getY() { return _pos.y; }
+    const cocos2d::Vec2& getPosition() { return _pos; }
     cocos2d::Touch* getTouch() { return _touch; }
     int getTouchId() { return _touch->getID(); }
     int isDoubleClick() { return _clickCount == 2; }
@@ -25,8 +26,7 @@ public:
 private:
     GObject* _target;
     cocos2d::Touch* _touch;
-    int _x;
-    int _y;
+    cocos2d::Vec2 _pos;
     int _clickCount;
     int _button;
 

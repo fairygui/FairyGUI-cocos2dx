@@ -55,8 +55,8 @@ TouchInfo* InputProcessor::getTouch(int touchId, bool createIfNotExisits)
 
 void InputProcessor::updateRecentInput(TouchInfo* touch)
 {
-    _recentInput._x = (int)touch->pos.x;
-    _recentInput._y = (int)(GRoot::getInstance()->getHeight() - touch->pos.y);
+    _recentInput._pos.x = (int)touch->pos.x;
+    _recentInput._pos.y = (int)(GRoot::getInstance()->getHeight() - touch->pos.y);
     _recentInput._target = touch->target;
     _recentInput._clickCount = touch->clickCount;
     _recentInput._button = touch->button;
@@ -119,11 +119,11 @@ void InputProcessor::handleRollOver(TouchInfo* touch)
     }
 }
 
-void InputProcessor::addTouchEndMonitor(int touchId, UIEventDispatcher * target)
+void InputProcessor::addTouchMonitor(int touchId, UIEventDispatcher * target)
 {
     TouchInfo* ti = getTouch(touchId, false);
-    if (ti && ti->touchEndMonitors.getIndex(target) == -1)
-        ti->touchEndMonitors.pushBack(target);
+    if (ti && ti->touchMonitors.getIndex(target) == -1)
+        ti->touchMonitors.pushBack(target);
 }
 
 
@@ -230,6 +230,15 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
     if (ti->lastRollOver != ti->target)
         handleRollOver(ti);
 
+    if (ti->touchMonitors.size() > 0)
+    {
+        for (auto it = ti->touchMonitors.begin(); it != ti->touchMonitors.end(); ++it)
+        {
+            if (*it != target)
+                (*it)->dispatchEvent(UIEventType::TouchMove, false);
+        }
+    }
+
     target->bubbleEvent(UIEventType::TouchMove, this);
 }
 
@@ -249,15 +258,15 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
 
     updateRecentInput(ti);
 
-    if (ti->touchEndMonitors.size() > 0)
+    if (ti->touchMonitors.size() > 0)
     {
-        for (auto it = ti->touchEndMonitors.begin(); it != ti->touchEndMonitors.end(); ++it)
+        for (auto it = ti->touchMonitors.begin(); it != ti->touchMonitors.end(); ++it)
         {
             if (*it != target)
                 (*it)->dispatchEvent(UIEventType::TouchEnd, false);
         }
     }
-    target->bubbleEvent(UIEventType::TouchMove, this);
+    target->bubbleEvent(UIEventType::TouchEnd, this);
 
     target = clickTest(ti);
     if (target)
@@ -309,7 +318,7 @@ TouchInfo::~TouchInfo()
     downTargets.clear();
     if (lastRollOver)
         CC_SAFE_RELEASE(lastRollOver);
-    touchEndMonitors.clear();
+    touchMonitors.clear();
 }
 
 void TouchInfo::reset()
@@ -327,7 +336,7 @@ void TouchInfo::reset()
     if (lastRollOver)
         CC_SAFE_RELEASE(lastRollOver);
     clickCancelled = false;
-    touchEndMonitors.clear();
+    touchMonitors.clear();
 }
 
 NS_FGUI_END

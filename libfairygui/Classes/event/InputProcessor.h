@@ -19,7 +19,7 @@ public:
 
     static InputEvent* getRecentInput() { return &_recentInput; }
 
-    void addTouchEndMonitor(int touchId, UIEventDispatcher* target);
+    void addTouchMonitor(int touchId, UIEventDispatcher* target);
 
 private:
     bool onTouchBegan(cocos2d::Touch * touch, cocos2d::Event *);
@@ -63,7 +63,7 @@ public:
     GObject* target;
     cocos2d::Vector<GObject*> downTargets;
     GObject* lastRollOver;
-    cocos2d::Vector<UIEventDispatcher*> touchEndMonitors;
+    cocos2d::Vector<UIEventDispatcher*> touchMonitors;
 };
 
 

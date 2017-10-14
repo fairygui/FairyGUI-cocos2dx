@@ -54,6 +54,7 @@ public:
     float getY() { return _y; };
     void setY(float value);
     void setPosition(float xv, float yv);
+    cocos2d::Vec2 getPosition() { return cocos2d::Vec2(_x, _y); }
 
     bool getPixelSnapping() { return _pixelSnapping; }
     void setPixelSnapping(bool value);
@@ -92,6 +93,8 @@ public:
 
     bool onStage();
 
+    cocos2d::Vec2 globalToLocal(const cocos2d::Vec2& pt);
+
     Relations* relations() { return _relations; }
     void addRelation(GObject* target, RelationType relationType);
     void addRelation(GObject* target, RelationType relationType, bool usePercent);
@@ -108,6 +111,8 @@ public:
 
     virtual const std::string& getIcon();
     virtual void setIcon(const std::string& text);
+
+    std::string getResourceURL();
 
     bool inContainer();
     void makeFullScreen();

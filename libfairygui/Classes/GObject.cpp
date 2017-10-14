@@ -319,6 +319,18 @@ bool GObject::onStage()
     return p == GRoot::getInstance();
 }
 
+Vec2 GObject::globalToLocal(const Vec2 & pt)
+{
+    Vec2 pt2 = pt;
+    pt2.y = GRoot::getInstance()->getHeight() - pt2.y;
+    pt2 = _displayObject->convertToNodeSpace(pt2);
+    if (dynamic_cast<GComponent*>(this))
+        pt2.y = -pt2.y;
+    else
+        pt2.y = _displayObject->getContentSize().height - pt2.y;
+    return pt2;
+}
+
 void GObject::addRelation(GObject * target, RelationType relationType)
 {
     _relations->add(target, relationType, false);
@@ -441,6 +453,14 @@ const std::string& GObject::getText()
 
 void GObject::setIcon(const std::string & text)
 {
+}
+
+std::string GObject::getResourceURL()
+{
+    if (packageItem != nullptr)
+        return "ui://" + packageItem->owner->getId() + packageItem->id;
+    else
+        return STD_STRING_EMPTY;
 }
 
 const std::string & GObject::getIcon()

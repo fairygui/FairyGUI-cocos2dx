@@ -3,12 +3,63 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GScrollBar::GScrollBar()
+using namespace tinyxml2;
+
+GScrollBar::GScrollBar() :
+    _grip(nullptr),
+    _arrowButton1(nullptr),
+    _arrowButton2(nullptr),
+    _bar(nullptr),
+    _target(nullptr),
+    _vertical(false),
+    _scrollPerc(0),
+    _fixedGripSize(false),
+    _touchId(0)
 {
 }
 
 GScrollBar::~GScrollBar()
 {
+
+}
+
+void GScrollBar::setScrollPane(ScrollPane * target, bool vertical)
+{
+    _target = target;
+    _vertical = vertical;
+}
+
+void GScrollBar::setDisplayPerc(float value)
+{
+    if (_vertical)
+    {
+        if (!_fixedGripSize)
+            _grip->setHeight(floor(value * _bar->getHeight()));
+        _grip->setY(round(_bar->getY()+ (_bar->getHeight() - _grip->getHeight()) * _scrollPerc));
+    }
+    else
+    {
+        if (!_fixedGripSize)
+            _grip->setWidth(floor(value * _bar->getWidth()));
+        _grip->setX(round(_bar->getX() + (_bar->getWidth() - _grip->getWidth()) * _scrollPerc));
+    }
+}
+
+void GScrollBar::setScrollPerc(float value)
+{
+    _scrollPerc = value;
+    if (_vertical)
+        _grip->setY(round(_bar->getY() + (_bar->getHeight() - _grip->getHeight()) * _scrollPerc));
+    else
+        _grip->setX(round(_bar->getX() + (_bar->getWidth() - _grip->getWidth()) * _scrollPerc));
+}
+
+float GScrollBar::getMinSize()
+{
+    if (_vertical)
+        return (_arrowButton1 != nullptr ? _arrowButton1->getHeight() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getHeight() : 0);
+    else
+        return (_arrowButton1 != nullptr ? _arrowButton1->getWidth() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getWidth() : 0);
 
 }
 
@@ -18,6 +69,123 @@ bool GScrollBar::init()
         return false;
 
     return true;
+}
+
+void GScrollBar::constructFromXML(tinyxml2::XMLElement * xml)
+{
+    xml = xml->FirstChildElement("ScrollBar");
+    if (xml != nullptr)
+        _fixedGripSize = xml->BoolAttribute("fixedGripSize");
+
+    _grip = getChild("grip");
+    if (_grip == nullptr)
+    {
+        CCLOGWARN("FairyGUI: %s should define grip", this->getResourceURL().c_str());
+        return;
+    }
+
+    _bar = getChild("bar");
+    if (_bar == nullptr)
+    {
+        CCLOGWARN("FairyGUI: %s should define bar", this->getResourceURL().c_str());
+        return;
+    }
+
+    _arrowButton1 = getChild("arrow1");
+    _arrowButton2 = getChild("arrow2");
+
+    _grip->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onGripTouchBegin, this));
+    _grip->addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GScrollBar::onGripTouchEnd, this));
+    this->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onTouchBegin, this));
+
+    if (_arrowButton1 != nullptr)
+        _arrowButton1->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onArrowButton1Click, this));
+    if (_arrowButton2 != nullptr)
+        _arrowButton1->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onArrowButton2Click, this));
+}
+
+void GScrollBar::onTouchBegin(EventContext * context)
+{
+    context->stopPropagation();
+
+    InputEvent* evt = context->getInput();
+    Vec2 pt = _grip->globalToLocal(evt->getPosition());
+    if (_vertical)
+    {
+        if (pt.y < 0)
+            _target->scrollUp(4, false);
+        else
+            _target->scrollDown(4, false);
+    }
+    else
+    {
+        if (pt.x < 0)
+            _target->scrollLeft(4, false);
+        else
+            _target->scrollRight(4, false);
+    }
+}
+
+void GScrollBar::onGripTouchBegin(EventContext * context)
+{
+    if (_bar == nullptr)
+        return;
+
+    context->stopPropagation();
+    InputEvent* evt = context->getInput();
+    _touchId = evt->getTouchId();
+
+    _dragOffset = globalToLocal(evt->getPosition()) - _grip->getPosition();
+
+    context->captureTouch();
+}
+
+void GScrollBar::onGripTouchMove(EventContext * context)
+{
+    InputEvent* evt = context->getInput();
+    if (_touchId != evt->getTouchId())
+        return;
+
+    Vec2 pt = globalToLocal(evt->getPosition());
+
+    if (_vertical)
+    {
+        float curY = pt.y - _dragOffset.y;
+        float diff = _bar->getHeight() - _grip->getHeight();
+        if (diff == 0)
+            _target->setPercY(0);
+        else
+            _target->setPercY((curY - _bar->getY()) / diff);
+    }
+    else
+    {
+        float curX = pt.x - _dragOffset.x;
+        float diff = _bar->getWidth() - _grip->getWidth();
+        if (diff == 0)
+            _target->setPercX(0);
+        else
+            _target->setPercX((curX - _bar->getX()) / diff);
+    }
+}
+
+void GScrollBar::onArrowButton1Click(EventContext * context)
+{
+    context->stopPropagation();
+
+    if (_vertical)
+        _target->scrollUp();
+    else
+        _target->scrollLeft();
+}
+
+void GScrollBar::onArrowButton2Click(EventContext * context)
+{
+    context->stopPropagation();
+
+    if (_vertical)
+        _target->scrollDown();
+    else
+        _target->scrollRight();
 }
 
 NS_FGUI_END
