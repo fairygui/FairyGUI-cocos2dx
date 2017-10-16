@@ -4,24 +4,9 @@
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
 #include "EventContext.h"
+#include "UIEventType.h"
 
 NS_FGUI_BEGIN
-
-enum UIEventType
-{
-    TouchBegin,
-    TouchMove,
-    TouchEnd,
-    Click,
-
-    RollOver,
-    RollOut,
-
-    PositionChange,
-    SizeChange,
-
-    StatusChange
-};
 
 typedef std::function<void(EventContext* context)> EventCallback;
 
@@ -31,22 +16,22 @@ public:
     UIEventDispatcher();
     ~UIEventDispatcher();
 
-    uint32_t addEventListener(UIEventType eventType, const EventCallback& callback, uint32_t callbackId = 0);
-    void removeEventListener(UIEventType eventType, uint32_t callbackId);
+    uint32_t addEventListener(int eventType, const EventCallback& callback, uint32_t callbackId = 0);
+    void removeEventListener(int eventType, uint32_t callbackId);
     void removeEventListeners();
-    bool hasEventListener(UIEventType eventType);
+    bool hasEventListener(int eventType);
 
-    void dispatchEvent(UIEventType eventType, void* data = nullptr);
-    void bubbleEvent(UIEventType eventType, void* data = nullptr);
+    void dispatchEvent(int eventType, void* data = nullptr);
+    void bubbleEvent(int eventType, void* data = nullptr);
 
 private:
-    void doDispatch(UIEventType eventType, EventContext* context);
-    void doBubble(UIEventType eventType, EventContext* context);
+    void doDispatch(int eventType, EventContext* context);
+    void doBubble(int eventType, EventContext* context);
 
     struct EventCallbackItem
     {
         EventCallback callback;
-        UIEventType eventType;
+        int eventType;
         uint32_t id;
     };
     std::vector<EventCallbackItem> _callbacks;

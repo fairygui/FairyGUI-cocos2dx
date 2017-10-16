@@ -15,7 +15,7 @@ UIEventDispatcher::~UIEventDispatcher()
 
 }
 
-uint32_t UIEventDispatcher::addEventListener(UIEventType eventType, const EventCallback& callback, uint32_t callbackId)
+uint32_t UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, uint32_t callbackId)
 {
     if (callbackId == 0)
     {
@@ -34,7 +34,7 @@ uint32_t UIEventDispatcher::addEventListener(UIEventType eventType, const EventC
     return item.id;
 }
 
-void UIEventDispatcher::removeEventListener(UIEventType eventType, uint32_t callbackId)
+void UIEventDispatcher::removeEventListener(int eventType, uint32_t callbackId)
 {
     for (auto it = _callbacks.begin(); it != _callbacks.end(); ++it)
     {
@@ -61,7 +61,7 @@ void UIEventDispatcher::removeEventListeners()
         _callbacks.clear();
 }
 
-bool UIEventDispatcher::hasEventListener(UIEventType eventType)
+bool UIEventDispatcher::hasEventListener(int eventType)
 {
     for (auto it = _callbacks.cbegin(); it != _callbacks.cend(); ++it)
     {
@@ -71,7 +71,7 @@ bool UIEventDispatcher::hasEventListener(UIEventType eventType)
     return false;
 }
 
-void UIEventDispatcher::dispatchEvent(UIEventType eventType, void* data)
+void UIEventDispatcher::dispatchEvent(int eventType, void* data)
 {
     if (_count == 0)
         return;
@@ -84,7 +84,7 @@ void UIEventDispatcher::dispatchEvent(UIEventType eventType, void* data)
     doDispatch(eventType, &context);
 }
 
-void UIEventDispatcher::bubbleEvent(UIEventType eventType, void* data)
+void UIEventDispatcher::bubbleEvent(int eventType, void* data)
 {
     EventContext context;
     context._inputEvent = InputProcessor::getRecentInput();
@@ -93,7 +93,7 @@ void UIEventDispatcher::bubbleEvent(UIEventType eventType, void* data)
     doBubble(eventType, &context);
 }
 
-void UIEventDispatcher::doDispatch(UIEventType eventType, EventContext* context)
+void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 {
     _dispatching++;
 
@@ -108,7 +108,7 @@ void UIEventDispatcher::doDispatch(UIEventType eventType, EventContext* context)
             context->_touchEndCapture = false;
             it->callback(context);
             if (context->_touchEndCapture && eventType == UIEventType::TouchBegin)
-                ((InputProcessor*)context->_data)->addTouchEndMonitor(context->getInput()->getTouchId(), this);
+                ((InputProcessor*)context->_data)->addTouchMonitor(context->getInput()->getTouchId(), this);
         }
     }
     release();
@@ -116,7 +116,7 @@ void UIEventDispatcher::doDispatch(UIEventType eventType, EventContext* context)
     _dispatching--;
 }
 
-void UIEventDispatcher::doBubble(UIEventType eventType, EventContext* context)
+void UIEventDispatcher::doBubble(int eventType, EventContext* context)
 {
     if (_count > 0)
     {

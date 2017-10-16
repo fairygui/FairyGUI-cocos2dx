@@ -159,6 +159,9 @@
     <ClInclude Include="..\Classes\utils\ByteArray.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\event\UIEventType.h">
+      <Filter>src\event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">

@@ -31,6 +31,7 @@ public:
     static GComponent::OverflowType parseOverflowType(const char*p);
     static GComponent::ScrollType parseScrollType(const char*p);
     static GComponent::ScrollBarDisplayType parseScrollBarDisplayType(const char*p);
+    static ProgressTitleType parseProgressTitleType(const char*p);
 };
 
 

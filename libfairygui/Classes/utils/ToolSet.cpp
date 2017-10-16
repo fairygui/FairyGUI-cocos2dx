@@ -340,4 +340,24 @@ GComponent::ScrollBarDisplayType ToolSet::parseScrollBarDisplayType(const char *
     }
 }
 
+ProgressTitleType ToolSet::parseProgressTitleType(const char * p)
+{
+    if (!p)
+        return ProgressTitleType::TitleTypePercent;
+
+    switch (hash_(p))
+    {
+    case "percent"_hash:
+        return ProgressTitleType::TitleTypePercent;
+    case "valueAndmax"_hash:
+        return ProgressTitleType::TitleTypeValueAndMax;
+    case "value"_hash:
+        return ProgressTitleType::TitleTypeValue;
+    case "max"_hash:
+        return ProgressTitleType::TitleTypeMax;
+    default:
+        return ProgressTitleType::TitleTypePercent;
+    }
+}
+
 NS_FGUI_END

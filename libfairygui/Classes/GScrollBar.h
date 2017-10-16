@@ -27,7 +27,6 @@ protected:
 private:
     void onTouchBegin(EventContext* context);
     void onGripTouchBegin(EventContext* context);
-    void onGripTouchEnd(EventContext* context);
     void onGripTouchMove(EventContext* context);
     void onArrowButton1Click(EventContext* context);
     void onArrowButton2Click(EventContext* context);
@@ -43,7 +42,6 @@ private:
     bool _fixedGripSize;
 
     cocos2d::Vec2 _dragOffset;
-    int _touchId;
 };
 
 NS_FGUI_END

@@ -17,6 +17,7 @@
     <ClInclude Include="..\Classes\event\InputEvent.h" />
     <ClInclude Include="..\Classes\event\InputProcessor.h" />
     <ClInclude Include="..\Classes\event\UIEventDispatcher.h" />
+    <ClInclude Include="..\Classes\event\UIEventType.h" />
     <ClInclude Include="..\Classes\FairyGUI.h" />
     <ClInclude Include="..\Classes\FairyGUIMacros.h" />
     <ClInclude Include="..\Classes\GButton.h" />

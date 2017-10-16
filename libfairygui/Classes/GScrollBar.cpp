@@ -13,8 +13,7 @@ GScrollBar::GScrollBar() :
     _target(nullptr),
     _vertical(false),
     _scrollPerc(0),
-    _fixedGripSize(false),
-    _touchId(0)
+    _fixedGripSize(false)
 {
 }
 
@@ -60,7 +59,6 @@ float GScrollBar::getMinSize()
         return (_arrowButton1 != nullptr ? _arrowButton1->getHeight() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getHeight() : 0);
     else
         return (_arrowButton1 != nullptr ? _arrowButton1->getWidth() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getWidth() : 0);
-
 }
 
 bool GScrollBar::init()
@@ -95,7 +93,6 @@ void GScrollBar::constructFromXML(tinyxml2::XMLElement * xml)
     _arrowButton2 = getChild("arrow2");
 
     _grip->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onGripTouchBegin, this));
-    _grip->addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GScrollBar::onGripTouchEnd, this));
     this->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onTouchBegin, this));
 
     if (_arrowButton1 != nullptr)
@@ -132,21 +129,14 @@ void GScrollBar::onGripTouchBegin(EventContext * context)
         return;
 
     context->stopPropagation();
-    InputEvent* evt = context->getInput();
-    _touchId = evt->getTouchId();
-
-    _dragOffset = globalToLocal(evt->getPosition()) - _grip->getPosition();
-
     context->captureTouch();
+
+    _dragOffset = globalToLocal(context->getInput()->getPosition()) - _grip->getPosition();
 }
 
 void GScrollBar::onGripTouchMove(EventContext * context)
 {
-    InputEvent* evt = context->getInput();
-    if (_touchId != evt->getTouchId())
-        return;
-
-    Vec2 pt = globalToLocal(evt->getPosition());
+    Vec2 pt = globalToLocal(context->getInput()->getPosition());
 
     if (_vertical)
     {

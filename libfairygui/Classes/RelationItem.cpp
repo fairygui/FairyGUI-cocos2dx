@@ -1,6 +1,7 @@
 #include "RelationItem.h"
 #include "GComponent.h"
 #include "GGroup.h"
+#include "event/UIEventType.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
