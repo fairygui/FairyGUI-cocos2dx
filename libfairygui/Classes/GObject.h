@@ -64,6 +64,7 @@ public:
     float getHeight();
     void setHeight(float value) { setSize(_rawWidth, value); }
     void setSize(float wv, float hv, bool ignorePivot = false);
+    cocos2d::Size getSize() { return cocos2d::Size(getWidth(), getHeight()); }
     void center(bool restraint = false);
     float getActualWidth() { return this->_width * _scaleX; }
     float getActualHeight() { return this->_height * _scaleY; }
@@ -127,6 +128,7 @@ public:
 
     virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera);
 
+    static GObject* draggingObject;
     bool _underConstruct;
     bool _gearLocked;
 

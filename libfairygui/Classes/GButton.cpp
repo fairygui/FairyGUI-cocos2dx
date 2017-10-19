@@ -7,7 +7,7 @@ USING_NS_CC;
 using namespace tinyxml2;
 
 GButton::GButton() :
-    _mode(ButtonMode::Common),
+    _mode(ButtonMode::BM_COMMON),
     _titleObject(nullptr),
     _iconObject(nullptr),
     _buttonController(nullptr),
@@ -44,7 +44,7 @@ void GButton::setIcon(const std::string & value)
 
 void GButton::setSelected(bool value)
 {
-    if (_mode == ButtonMode::Common)
+    if (_mode == ButtonMode::BM_COMMON)
         return;
 
     if (_selected != value)
@@ -69,7 +69,7 @@ void GButton::setSelected(bool value)
                 if (_relatedController->autoRadioGroupDepth)
                     getParent()->adjustRadioGroupDepth(this, _relatedController);
             }
-            else if (_mode == ButtonMode::Check && _relatedController->getSelectedPageId().compare(_relatedPageId) == 0)
+            else if (_mode == ButtonMode::BM_CHECK && _relatedController->getSelectedPageId().compare(_relatedPageId) == 0)
                 _relatedController->setOppositePageId(_relatedPageId);
         }
     }
@@ -101,7 +101,7 @@ void GButton::constructFromXML(tinyxml2::XMLElement * xml)
     if (_iconObject != nullptr)
         _icon = _iconObject->getIcon();
 
-    if (_mode == ButtonMode::Common)
+    if (_mode == ButtonMode::BM_COMMON)
         setState(UP);
 
     addEventListener(UIEventType::RollOver, CC_CALLBACK_1(GButton::onRollOver, this));
@@ -132,6 +132,7 @@ void GButton::setup_AfterAdd(tinyxml2::XMLElement * xml)
     p = xml->Attribute("controller");
     if (p)
         _relatedController = getParent()->getController(p);
+
     p = xml->Attribute("page");
     if (p)
         _relatedPageId = p;
@@ -238,7 +239,7 @@ void GButton::onTouchBegin(EventContext* context)
     _down = true;
     context->captureTouch();
 
-    if (_mode == ButtonMode::Common)
+    if (_mode == ButtonMode::BM_COMMON)
     {
         if (isGrayed() && _buttonController != nullptr && _buttonController->hasPage(DISABLED))
             setState(SELECTED_DISABLED);
@@ -252,7 +253,7 @@ void GButton::onTouchEnd(EventContext* context)
     if (_down)
     {
         _down = false;
-        if (_mode == ButtonMode::Common)
+        if (_mode == ButtonMode::BM_COMMON)
         {
             if (isGrayed() && _buttonController != nullptr && _buttonController->hasPage(DISABLED))
                 setState(DISABLED);
@@ -285,7 +286,7 @@ void GButton::onClick(EventContext* context)
     //if (sound != null)
     //	Stage.inst.PlayOneShotSound(sound, soundVolumeScale);
 
-    if (_mode == ButtonMode::Check)
+    if (_mode == ButtonMode::BM_CHECK)
     {
         if (changeStateOnClick)
         {
@@ -293,7 +294,7 @@ void GButton::onClick(EventContext* context)
             dispatchEvent(UIEventType::StatusChange);
         }
     }
-    else if (_mode == ButtonMode::Radio)
+    else if (_mode == ButtonMode::BM_RADIO)
     {
         if (changeStateOnClick && !_selected)
         {

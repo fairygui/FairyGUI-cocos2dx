@@ -22,6 +22,7 @@ public:
     int getTouchId() { return _touch->getID(); }
     int isDoubleClick() { return _clickCount == 2; }
     int getButton() { return _button; }
+    int getMouseWheelDelta() { return 0; }
 
 private:
     GObject* _target;

@@ -80,8 +80,11 @@ void GTextField::setup_BeforeAdd(tinyxml2::XMLElement * xml)
     if (p)
     {
         Color4B shadowColor = ToolSet::convertFromHtmlColor(p);
-        Vec2 offset;
-        ToolSet::getArrayAttribute(xml, "shadowOffset", offset);
+        Vec2 offset(0, 0);
+
+        p = xml->Attribute("shadowOffset");
+        if(p)
+            ToolSet::splitString(p, ',', offset);
         offset.y = -offset.y;
         _label->enableShadow(shadowColor, (cocos2d::Size)offset);
     }

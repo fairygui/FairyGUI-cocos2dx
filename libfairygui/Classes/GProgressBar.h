@@ -7,14 +7,6 @@
 
 NS_FGUI_BEGIN
 
-enum ProgressTitleType
-{
-    TitleTypePercent,
-    TitleTypeValueAndMax,
-    TitleTypeValue,
-    TitleTypeMax
-};
-
 class GProgressBar : public GComponent
 {
 public:

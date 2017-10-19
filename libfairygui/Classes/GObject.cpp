@@ -19,6 +19,7 @@ using namespace std;
 using namespace tinyxml2;
 
 uint32_t GObject::_gInstanceCounter = 0;
+GObject* GObject::draggingObject = nullptr;
 
 GObject::GObject()
     : _x(0.0f),
@@ -63,9 +64,7 @@ GObject::GObject()
     minHeight(0),
     maxHeight(0)
 {
-    stringstream ss;
-    ss << "_n" << (_gInstanceCounter++);
-    id = ss.str();
+    id = "_n" + Value(_gInstanceCounter++).asString();
 
     _relations = new Relations(this);
 
@@ -557,32 +556,51 @@ void GObject::constructFromResource()
 
 void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
 {
-    id = ToolSet::getAttribute(xml, "id");
-    name = ToolSet::getAttribute(xml, "name");
-
     const char *p;
     Vec2 v2;
-    if (ToolSet::getArrayAttribute(xml, "xy", v2, true))
-        setPosition(v2.x, v2.y);
+    Vec4 v4;
 
-    if (ToolSet::getArrayAttribute(xml, "size", v2, true))
+    p = xml->Attribute("id");
+    if (p)
+        id = p;
+
+    p = xml->Attribute("name");
+    if (p)
+        name = p;
+
+
+    p = xml->Attribute("xy");
+    if (p)
     {
+        ToolSet::splitString(p, ',', v2, true);
+        setPosition(v2.x, v2.y);
+    }
+
+    p = xml->Attribute("size");
+    if (p)
+    {
+        ToolSet::splitString(p, ',', v2, true);
         initWidth = v2.x;
         initHeight = v2.y;
         setSize(initWidth, initHeight, true);
     }
 
-    Vec4 v4;
-    if (ToolSet::getArrayAttribute(xml, "restrictSize", v4, true))
+    p = xml->Attribute("restrictSize");
+    if (p)
     {
+        ToolSet::splitString(p, ',', v4, true);
         minWidth = v4.x;
         maxWidth = v4.y;
         minHeight = v4.z;
         maxHeight = v4.w;
     }
 
-    if (ToolSet::getArrayAttribute(xml, "scale", v2))
+    p = xml->Attribute("scale");
+    if (p)
+    {
+        ToolSet::splitString(p, ',', v2);
         setScale(v2.x, v2.y);
+    }
 
     p = xml->Attribute("rotation");
     if (p)

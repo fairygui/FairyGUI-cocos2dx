@@ -213,7 +213,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
 {
     switch (item->type)
     {
-    case PackageItemType::Image:
+    case PackageItemType::IMAGE:
         if (!item->decoded)
         {
             item->decoded = true;
@@ -225,7 +225,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
         }
         return item->spriteFrame;
 
-    case PackageItemType::Atlas:
+    case PackageItemType::ATLAS:
         if (!item->decoded)
         {
             item->decoded = true;
@@ -234,7 +234,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
         }
         return item->texture;
 
-    case PackageItemType::Sound:
+    case PackageItemType::SOUND:
         if (!item->decoded)
         {
             item->decoded = true;
@@ -242,7 +242,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
         }
         return nullptr;// item.audioClip;
 
-    case PackageItemType::Font:
+    case PackageItemType::FONT:
         if (!item->decoded)
         {
             item->decoded = true;
@@ -250,7 +250,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
         }
         return nullptr;// item.bitmapFont;
 
-    case PackageItemType::MovieClip:
+    case PackageItemType::MOVIECLIP:
         if (!item->decoded)
         {
             item->decoded = true;
@@ -258,7 +258,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
         }
         return item->animation;
 
-    case PackageItemType::Component:
+    case PackageItemType::COMPONENT:
         if (!item->decoded)
         {
             item->decoded = true;
@@ -410,52 +410,68 @@ void UIPackage::loadPackage()
     PackageItem* pi;
     XMLElement* cxml = rxml->FirstChildElement();
     Vec2 v2;
+    Vec4 v4;
+    const char *p;
     while (cxml)
     {
         pi = new PackageItem();
         pi->owner = this;
         pi->type = ToolSet::parsePackageItemType(cxml->Name());
         pi->id = cxml->Attribute("id");
-        pi->name = ToolSet::getAttribute(cxml, "name");
+
+        p = cxml->Attribute("name");
+        if (p)
+            pi->name = p;
+
         pi->exported = cxml->BoolAttribute("exported");
-        pi->file = ToolSet::getAttribute(cxml, "file");
-        if (ToolSet::getArrayAttribute(cxml, "size", v2, true))
+
+        p = cxml->Attribute("file");
+        if (p)
+            pi->file = p;
+
+        p = cxml->Attribute("size");
+        if (p)
         {
+            ToolSet::splitString(p, ',', v2, true);
             pi->width = v2.x;
             pi->height = v2.y;
         }
         switch (pi->type)
         {
-        case PackageItemType::Image:
+        case PackageItemType::IMAGE:
         {
-            string scale = ToolSet::getAttribute(cxml, "scale");
-            if (scale == "9grid")
+            p = cxml->Attribute("scale");
+            if (p)
             {
-                ToolSet::splitString(ToolSet::getAttribute(cxml, "scale9grid"), ',', arr);
-                if (arr.size() > 0)
+                if (strcmp(p, "9grid") == 0)
                 {
-                    pi->scale9Grid = new Rect();
-                    pi->scale9Grid->origin.x = atoi(arr[0].c_str());
-                    pi->scale9Grid->origin.y = atoi(arr[1].c_str());
-                    pi->scale9Grid->size.width = atoi(arr[2].c_str());
-                    pi->scale9Grid->size.height = atoi(arr[3].c_str());
+                    p = cxml->Attribute("scale9grid");
+                    if (p)
+                    {
+                        ToolSet::splitString(p, ',', v4, true);
+                        pi->scale9Grid = new Rect();
+                        pi->scale9Grid->origin.x = v4.x;
+                        pi->scale9Grid->origin.y = v4.y;
+                        pi->scale9Grid->size.width = v4.z;
+                        pi->scale9Grid->size.height = v4.w;
 
-                    pi->tileGridIndice = cxml->IntAttribute("gridTile");
+                        pi->tileGridIndice = cxml->IntAttribute("gridTile");
+                    }
                 }
+                else if (strcmp(p, "tile") == 0)
+                    pi->scaleByTile = true;
             }
-            else if (scale == "tile")
-                pi->scaleByTile = true;
             break;
         }
 
-        case PackageItemType::Font:
+        case PackageItemType::FONT:
         {
             //pi.bitmapFont = new BitmapFont(pi);
             //FontManager.RegisterFont(pi.bitmapFont, null);
             break;
         }
 
-        case PackageItemType::Component:
+        case PackageItemType::COMPONENT:
         {
             UIObjectFactory::resolvePackageItemExtension(pi);
             break;
@@ -544,6 +560,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
     int i = 0;
     string spriteId;
     AtlasSprite* sprite;
+    const char* p;
 
     tinyxml2::XMLElement* framesEle = root->FirstChildElement("frames");
     tinyxml2::XMLElement* frameEle = framesEle->FirstChildElement("frame");
@@ -553,9 +570,9 @@ void UIPackage::loadMovieClip(PackageItem * item)
         Rect rect = Rect(atoi(arr[0].c_str()), atoi(arr[1].c_str()), atoi(arr[2].c_str()), atoi(arr[3].c_str()));
         float addDelay = frameEle->IntAttribute("addDelay");
 
-        str = ToolSet::getAttribute(frameEle, "sprite");
-        if (str.size() > 0)
-            spriteId = item->id + "_" + str;
+        p = frameEle->Attribute("sprite");
+        if (p)
+            spriteId = item->id + "_" + string(p);
         else if (rect.size.width != 0)
             spriteId = item->id + "_" + Value(i).asString();
         else
@@ -594,16 +611,18 @@ void UIPackage::loadComponentChildren(PackageItem * item)
 {
     tinyxml2::XMLElement* listNode = item->componentData->RootElement()->FirstChildElement("displayList");
     item->displayList = new vector<DisplayListItem*>();
+    const char *p;
     if (listNode)
     {
         XMLElement* cxml = listNode->FirstChildElement();
         DisplayListItem* di;
         while (cxml)
         {
-            string src = ToolSet::getAttribute(cxml, "src");
-            if (src.size() > 0)
+            p = cxml->Attribute("src");
+            if (p)
             {
-                string pkgId = ToolSet::getAttribute(cxml, "pkg");
+                string src = p;
+                string pkgId = (p = cxml->Attribute("pkg")) ? p : "";
                 UIPackage* pkg;
                 if (pkgId.size() > 0 && pkgId.compare(item->owner->getId()) == 0)
                     pkg = UIPackage::getById(pkgId);

@@ -11,7 +11,7 @@ GSlider::GSlider() :
     canDrag(false),
     _max(100),
     _value(0),
-    _titleType(ProgressTitleType::TitleTypePercent),
+    _titleType(ProgressTitleType::PT_PERCENT),
     _titleObject(nullptr),
     _barObjectH(nullptr),
     _barObjectV(nullptr),
@@ -144,19 +144,19 @@ void GSlider::updateWidthPercent(float percent)
         std::ostringstream oss;
         switch (_titleType)
         {
-        case ProgressTitleType::TitleTypePercent:
+        case ProgressTitleType::PT_PERCENT:
             oss << round(percent * 100) << "%";
             break;
 
-        case ProgressTitleType::TitleTypeValueAndMax:
+        case ProgressTitleType::PT_VALUE_MAX:
             oss << round(_value) << "/" << round(_max);
             break;
 
-        case ProgressTitleType::TitleTypeValue:
+        case ProgressTitleType::PT_VALUE:
             oss << _value;
             break;
 
-        case ProgressTitleType::TitleTypeMax:
+        case ProgressTitleType::PT_MAX:
             oss << _max;
             break;
         }

@@ -10,15 +10,6 @@ NS_FGUI_BEGIN
 class GLoader : public GObject
 {
 public:
-    enum FillType
-    {
-        None,
-        Scale,
-        ScaleMatchHeight,
-        ScaleMatchWidth,
-        ScaleFree
-    };
-
     GLoader();
     ~GLoader();
 

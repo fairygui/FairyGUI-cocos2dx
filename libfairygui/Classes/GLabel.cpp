@@ -50,7 +50,9 @@ void GLabel::setup_AfterAdd(tinyxml2::XMLElement * xml)
     if (!xml)
         return;
 
-    const char*p = xml->Attribute("title");
+    const char *p;
+    
+    p = xml->Attribute("title");
     if (p)
         this->setTitle(p);
 

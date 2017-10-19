@@ -41,21 +41,22 @@ GObject * UIObjectFactory::newObject(PackageItem * pi)
 {
     switch (pi->type)
     {
-    case PackageItemType::Image:
+    case PackageItemType::IMAGE:
         return GImage::create();
 
-    case PackageItemType::MovieClip:
+    case PackageItemType::MOVIECLIP:
         return GMovieClip::create();
 
-    case PackageItemType::Component:
+    case PackageItemType::COMPONENT:
     {
         if (pi->extensionCreator != nullptr)
             return pi->extensionCreator();
 
         tinyxml2::XMLDocument* xml = pi->componentData;
-        string extention = ToolSet::getAttribute(xml->RootElement(), "extention");
-        if (extention.size() > 0)
+        const char *p = xml->RootElement()->Attribute("extention");
+        if (p)
         {
+            std::string extention = p;
             if (extention == "Button")
                 return GButton::create();
             else if (extention == "Label")

@@ -34,10 +34,10 @@ void RelationItem::setTarget(GObject * value)
 
 void RelationItem::add(RelationType relationType, bool usePercent)
 {
-    if (relationType == RelationType::Size)
+    if (relationType == RelationType::Size_Size)
     {
-        add(RelationType::Width, usePercent);
-        add(RelationType::Height, usePercent);
+        add(RelationType::Width_Width, usePercent);
+        add(RelationType::Height_Height, usePercent);
         return;
     }
 
@@ -52,10 +52,10 @@ void RelationItem::add(RelationType relationType, bool usePercent)
 
 void RelationItem::internalAdd(RelationType relationType, bool usePercent)
 {
-    if (relationType == RelationType::Size)
+    if (relationType == RelationType::Size_Size)
     {
-        internalAdd(RelationType::Width, usePercent);
-        internalAdd(RelationType::Height, usePercent);
+        internalAdd(RelationType::Width_Width, usePercent);
+        internalAdd(RelationType::Height_Height, usePercent);
         return;
     }
 
@@ -73,10 +73,10 @@ void RelationItem::internalAdd(RelationType relationType, bool usePercent)
 
 void RelationItem::remove(RelationType relationType)
 {
-    if (relationType == RelationType::Size)
+    if (relationType == RelationType::Size_Size)
     {
-        remove(RelationType::Width);
-        remove(RelationType::Height);
+        remove(RelationType::Width_Width);
+        remove(RelationType::Height_Height);
         return;
     }
 
@@ -179,8 +179,8 @@ void RelationItem::applyOnXYChanged(const RelationDef& info, float dx, float dy)
         _owner->setY(_owner->_y + dy);
         break;
 
-    case RelationType::Width:
-    case RelationType::Height:
+    case RelationType::Width_Width:
+    case RelationType::Height_Height:
         break;
 
     case RelationType::LeftExt_Left:
@@ -316,7 +316,7 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
         _owner->setY(targetY + _target->_height + v - _owner->_rawHeight);
         break;
 
-    case RelationType::Width:
+    case RelationType::Width_Width:
         if (_owner->_underConstruct && _owner == _target->_parent)
             v = _owner->sourceWidth - _target->initWidth;
         else
@@ -328,7 +328,7 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
         else
             _owner->setWidth(_target->_width + v);
         break;
-    case RelationType::Height:
+    case RelationType::Height_Height:
         if (_owner->_underConstruct && _owner == _target->_parent)
             v = _owner->sourceHeight - _target->initHeight;
         else

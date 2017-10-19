@@ -20,6 +20,7 @@
     <ClInclude Include="..\Classes\event\UIEventType.h" />
     <ClInclude Include="..\Classes\FairyGUI.h" />
     <ClInclude Include="..\Classes\FairyGUIMacros.h" />
+    <ClInclude Include="..\Classes\FieldTypes.h" />
     <ClInclude Include="..\Classes\GButton.h" />
     <ClInclude Include="..\Classes\GComboBox.h" />
     <ClInclude Include="..\Classes\GComponent.h" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\Classes\GSlider.h" />
     <ClInclude Include="..\Classes\GTextField.h" />
     <ClInclude Include="..\Classes\GTextInput.h" />
+    <ClInclude Include="..\Classes\Margin.h" />
     <ClInclude Include="..\Classes\PackageItem.h" />
     <ClInclude Include="..\Classes\PopupMenu.h" />
     <ClInclude Include="..\Classes\RelationItem.h" />
@@ -94,6 +96,7 @@
     <ClCompile Include="..\Classes\GSlider.cpp" />
     <ClCompile Include="..\Classes\GTextField.cpp" />
     <ClCompile Include="..\Classes\GTextInput.cpp" />
+    <ClCompile Include="..\Classes\Margin.cpp" />
     <ClCompile Include="..\Classes\PackageItem.cpp" />
     <ClCompile Include="..\Classes\PopupMenu.cpp" />
     <ClCompile Include="..\Classes\RelationItem.cpp" />

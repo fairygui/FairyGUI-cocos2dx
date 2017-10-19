@@ -24,6 +24,8 @@ public:
     void dispatchEvent(int eventType, void* data = nullptr);
     void bubbleEvent(int eventType, void* data = nullptr);
 
+    bool isDispatchingEvent(int eventType);
+
 private:
     void doDispatch(int eventType, EventContext* context);
     void doBubble(int eventType, EventContext* context);
@@ -33,6 +35,7 @@ private:
         EventCallback callback;
         int eventType;
         uint32_t id;
+        int dispatching;
     };
     std::vector<EventCallbackItem> _callbacks;
     int _count;

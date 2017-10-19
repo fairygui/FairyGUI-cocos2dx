@@ -152,7 +152,7 @@ void InputProcessor::setEnd(TouchInfo* touch)
 
     auto now = clock();
 
-    if ((now - touch->lastClickTime) / CLOCKS_PER_SEC < 0.35)
+    if ((now - touch->lastClickTime) / CLOCKS_PER_SEC < 0.35f)
     {
         if (touch->clickCount == 2)
             touch->clickCount = 1;

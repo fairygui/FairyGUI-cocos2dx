@@ -28,6 +28,7 @@ uint32_t UIEventDispatcher::addEventListener(int eventType, const EventCallback&
     item.callback = callback;
     item.eventType = eventType;
     item.id = callbackId;
+    item.dispatching = 0;
     _callbacks.push_back(item);
     _count++;
 
@@ -93,6 +94,16 @@ void UIEventDispatcher::bubbleEvent(int eventType, void* data)
     doBubble(eventType, &context);
 }
 
+bool UIEventDispatcher::isDispatchingEvent(int eventType)
+{
+    for (auto it = _callbacks.begin(); it != _callbacks.end(); ++it)
+    {
+        if (it->eventType == eventType)
+            return it->dispatching > 0;
+    }
+    return false;
+}
+
 void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 {
     _dispatching++;
@@ -105,8 +116,10 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
             _callbacks.erase(it);
         else if (it->eventType == eventType)
         {
+            it->dispatching++;
             context->_touchEndCapture = false;
             it->callback(context);
+            it->dispatching--;
             if (context->_touchEndCapture && eventType == UIEventType::TouchBegin)
                 ((InputProcessor*)context->_data)->addTouchMonitor(context->getInput()->getTouchId(), this);
         }

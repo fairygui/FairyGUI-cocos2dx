@@ -4,6 +4,7 @@
 #include "UIObjectFactory.h"
 #include "Relations.h"
 #include "GGroup.h"
+#include "ScrollPane.h"
 #include "display/ScissorClipNode.h"
 
 NS_FGUI_BEGIN
@@ -17,7 +18,7 @@ GComponent::GComponent()
     _opaque(false),
     _container(nullptr),
     _rootContainer(nullptr),
-    _childrenRenderOrder(ChildrenRenderOrder::Ascent),
+    _childrenRenderOrder(ChildrenRenderOrder::CRO_ASCENT),
     _apexIndex(0),
     _applyingController(nullptr),
     _buildingDisplayList(false),
@@ -34,6 +35,7 @@ GComponent::~GComponent()
     _transitions.clear();
     if (_container != _rootContainer)
         CC_SAFE_RELEASE(_container);
+    CC_SAFE_RELEASE(_scrollPane);
 }
 
 GObject* GComponent::addChild(GObject* child)
@@ -122,7 +124,7 @@ GObject* GComponent::removeChildAt(int index)
     if (child->inContainer())
     {
         _container->removeChild(child->displayObject());
-        if (_childrenRenderOrder == ChildrenRenderOrder::Arch)
+        if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ARCH)
         {
 
         }
@@ -244,7 +246,7 @@ int GComponent::_setChildIndex(GObject* child, int oldIndex, int index)
 
     if (child->inContainer())
     {
-        if (_childrenRenderOrder == ChildrenRenderOrder::Ascent)
+        if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ASCENT)
         {
             int fromIndex = min(index, oldIndex);
             int toIndex = min(max(index, oldIndex), cnt);
@@ -255,7 +257,7 @@ int GComponent::_setChildIndex(GObject* child, int oldIndex, int index)
                     g->displayObject()->setLocalZOrder(i);
             }
         }
-        else if (_childrenRenderOrder == ChildrenRenderOrder::Descent)
+        else if (_childrenRenderOrder == ChildrenRenderOrder::CRO_DESCENT)
         {
             int fromIndex = min(index, oldIndex);
             int toIndex = min(max(index, oldIndex), cnt);
@@ -294,6 +296,11 @@ int GComponent::numChildren()
 void GComponent::addController(Controller* controller)
 {
     _controllers.pushBack(controller);
+}
+
+void GComponent::setMargin(const Margin & value)
+{
+    _margin = value;
 }
 
 Controller* GComponent::getController(const std::string& name)
@@ -366,7 +373,7 @@ void GComponent::adjustRadioGroupDepth(GObject* obj, Controller* c)
     }
 }
 
-void GComponent::setupScroll(const Vec4& scrollBarMargin,
+void GComponent::setupScroll(const Margin& scrollBarMargin,
     ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
     const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
     const std::string& headerRes, const std::string& footerRes)
@@ -376,15 +383,15 @@ void GComponent::setupScroll(const Vec4& scrollBarMargin,
         _container = Node::create();
         _container->retain();
         _rootContainer->addChild(_container);
-        ((ScissorClipNode*)_rootContainer)->setClippingEnabled(true);
     }
 
-    //_scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+    _scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+    _scrollPane->retain();
 }
 
 void GComponent::setupOverflow(OverflowType overflow)
 {
-    if (overflow == OverflowType::OverflowHidden)
+    if (overflow == OverflowType::OF_HIDDEN)
     {
         if (_rootContainer == _container)
         {
@@ -394,9 +401,9 @@ void GComponent::setupOverflow(OverflowType overflow)
             ((ScissorClipNode*)_rootContainer)->setClippingEnabled(true);
         }
 
-        _container->setPosition(_margin.x, -_margin.y);
+        _container->setPosition(_margin.left, -_margin.top);
     }
-    else if (_margin.x != 0 || _margin.y != 0)
+    else if (_margin.left != 0 || _margin.top != 0)
     {
         if (_rootContainer == _container)
         {
@@ -405,7 +412,7 @@ void GComponent::setupOverflow(OverflowType overflow)
             _rootContainer->addChild(_container);
         }
 
-        _container->setPosition(_margin.x, -_margin.y);
+        _container->setPosition(_margin.left, -_margin.top);
     }
 }
 
@@ -414,7 +421,7 @@ void GComponent::handleSizeChanged()
     GObject::handleSizeChanged();
 
     if (_scrollPane != nullptr)
-        ;// scrollPane.OnOwnerSizeChanged();
+        _scrollPane->onOwnerSizeChanged();
 
     /*if (rootContainer.hitArea is PixelHitTest)
     {
@@ -440,7 +447,7 @@ void GComponent::handleControllerChanged(Controller* c)
     GObject::handleControllerChanged(c);
 
     if (_scrollPane != nullptr)
-        ;// scrollPane.HandleControllerChanged(c);
+        _scrollPane->handleControllerChanged(c);
 }
 
 void GComponent::childStateChanged(GObject* child)
@@ -468,11 +475,11 @@ void GComponent::childStateChanged(GObject* child)
     {
         if (child->displayObject()->getParent() == nullptr)
         {
-            if (_childrenRenderOrder == ChildrenRenderOrder::Ascent)
+            if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ASCENT)
             {
                 _container->addChild(child->displayObject(), _children.getIndex(child));
             }
-            else if (_childrenRenderOrder == ChildrenRenderOrder::Descent)
+            else if (_childrenRenderOrder == ChildrenRenderOrder::CRO_DESCENT)
             {
                 _container->addChild(child->displayObject(), cnt - 1 - _children.getIndex(child));
             }
@@ -486,7 +493,7 @@ void GComponent::childStateChanged(GObject* child)
         if (child->displayObject()->getParent() != nullptr)
         {
             _container->removeChild(child->displayObject());
-            if (_childrenRenderOrder == ChildrenRenderOrder::Arch)
+            if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ARCH)
             {
 
             }
@@ -526,7 +533,7 @@ void GComponent::buildNativeDisplayList()
 
     switch (_childrenRenderOrder)
     {
-    case ChildrenRenderOrder::Ascent:
+    case ChildrenRenderOrder::CRO_ASCENT:
     {
         for (int i = 0; i < cnt; i++)
         {
@@ -536,7 +543,7 @@ void GComponent::buildNativeDisplayList()
         }
     }
     break;
-    case ChildrenRenderOrder::Descent:
+    case ChildrenRenderOrder::CRO_DESCENT:
     {
         for (int i = 0; i < cnt; i++)
         {
@@ -547,7 +554,7 @@ void GComponent::buildNativeDisplayList()
     }
     break;
 
-    case ChildrenRenderOrder::Arch:
+    case ChildrenRenderOrder::CRO_ARCH:
     {
         for (int i = 0; i < _apexIndex; i++)
         {
@@ -572,12 +579,18 @@ void GComponent::setBoundsChangedFlag()
         return;
 
     _boundsChanged = true;
+    CALL_LATER(GComponent, doUpdateBounds);
 }
 
 void GComponent::ensureBoundsCorrect()
 {
     if (_boundsChanged)
         updateBounds();
+}
+
+cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
+{
+    return cocos2d::Vec2();
 }
 
 void GComponent::updateBounds()
@@ -623,8 +636,14 @@ void GComponent::updateBounds()
 void GComponent::setBounds(float ax, float ay, float aw, float ah)
 {
     _boundsChanged = false;
-    //if (scrollPane != null)
-    //	scrollPane.SetContentSize(Mathf.RoundToInt(ax + aw), Mathf.RoundToInt(ay + ah));
+    if (_scrollPane != nullptr)
+        _scrollPane->setContentSize(ceil(ax + aw), ceil(ay + ah));
+}
+
+void GComponent::doUpdateBounds()
+{
+    if (_boundsChanged)
+        updateBounds();
 }
 
 GObject* GComponent::hitTest(const Vec2 &pt, const Camera* camera)
@@ -656,18 +675,11 @@ bool GComponent::init()
 {
     _rootContainer = ScissorClipNode::create();
     _rootContainer->retain();
-    ((ScissorClipNode*)_rootContainer)->setVisitCallback(CC_CALLBACK_0(GComponent::visit, this));
 
     _container = _rootContainer;
     _displayObject = _rootContainer;
 
     return true;
-}
-
-void GComponent::visit()
-{
-    if (_boundsChanged)
-        updateBounds();
 }
 
 void GComponent::constructFromResource()
@@ -682,17 +694,20 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     _underConstruct = true;
 
     Vec2 v2;
+    Vec4 v4;
     const char *p;
 
-    ToolSet::getArrayAttribute(xml, "size", v2, true);
+    p = xml->Attribute("size");
+    ToolSet::splitString(p, ',', v2, true);
     initWidth = sourceWidth = v2.x;
     initHeight = sourceHeight = v2.y;
 
     setSize(sourceWidth, sourceHeight);
 
-    Vec4 v4;
-    if (ToolSet::getArrayAttribute(xml, "restrictSize", v4, true))
+    p = xml->Attribute("restrictSize");
+    if (p)
     {
+        ToolSet::splitString(p, ',', v4, true);
         minWidth = v4.x;
         maxWidth = v4.y;
         minHeight = v4.z;
@@ -703,44 +718,54 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     //if (ToolSet::getArrayAttribute(xml, "pivot", f1, f2))
     //	setPivot(f1, f2, xml->BoolAttribute("anchor"));
 
-    _opaque = xml->Attribute("opaque") != "false";
+    p = xml->Attribute("opaque");
+    if (p)
+        _opaque = strcmp(p, "true") == 0;
+    else
+        _opaque = true;
 
     OverflowType overflow;
     p = xml->Attribute("overflow");
     if (p)
         overflow = ToolSet::parseOverflowType(p);
     else
-        overflow = OverflowType::OverflowVisible;
+        overflow = OverflowType::OF_VISIBLE;
 
     p = xml->Attribute("margin");
     if (p)
-        ToolSet::splitString(p, ',', _margin);
+    {
+        ToolSet::splitString(p, ',', v4);
+        _margin.setMargin(v4.z, v4.x, v4.w, v4.y);
+    }
 
-    if (overflow == OverflowType::OverflowScroll)
+    if (overflow == OverflowType::OF_SCROLL)
     {
         ScrollType scroll;
         p = xml->Attribute("scroll");
         if (p)
             scroll = ToolSet::parseScrollType(p);
         else
-            scroll = ScrollType::ScrollVertical;
+            scroll = ScrollType::ST_VERTICAL;
 
         ScrollBarDisplayType scrollBarDisplay;
         p = xml->Attribute("scrollBar");
         if (p)
             scrollBarDisplay = ToolSet::parseScrollBarDisplayType(p);
         else
-            scrollBarDisplay = ScrollBarDisplayType::ScrollBarDisplayDefault;
+            scrollBarDisplay = ScrollBarDisplayType::SBD_DEFAULT;
 
         int scrollBarFlags = xml->IntAttribute("scrollBarFlags");
 
-        Vec4 scrollBarMargin;
+        Margin scrollBarMargin;
         p = xml->Attribute("scrollBarMargin");
         if (p)
-            ToolSet::splitString(p, ',', scrollBarMargin);
+        {
+            ToolSet::splitString(p, ',', v4);
+            scrollBarMargin.setMargin(v4.z, v4.x, v4.w, v4.y);
+        }
 
-        std::string  vtScrollBarRes;
-        std::string hzScrollBarRes;
+        string  vtScrollBarRes;
+        string hzScrollBarRes;
         p = xml->Attribute("scrollBarRes");
         if (p)
             ToolSet::splitString(p, ',', vtScrollBarRes, hzScrollBarRes);
@@ -773,7 +798,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
 
     GObject* child;
 
-    std::vector<DisplayListItem*>& displayList = *packageItem->displayList;
+    vector<DisplayListItem*>& displayList = *packageItem->displayList;
     int childCount = displayList.size();
     for (int i = 0; i < childCount; i++)
     {

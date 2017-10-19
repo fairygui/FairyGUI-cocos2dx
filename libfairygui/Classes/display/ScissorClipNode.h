@@ -21,8 +21,6 @@ public:
     virtual void visit(cocos2d::Renderer *renderer, const cocos2d::Mat4 &parentTransform, uint32_t parentFlags) override;
     virtual void onEnter() override;
 
-    void setVisitCallback(std::function<void(void)> callback) { _visitCallback = callback; }
-
 private:
     const cocos2d::Rect& getClippingRect();
 
@@ -36,8 +34,6 @@ private:
     cocos2d::Rect _clippingRect;
     ScissorClipNode* _clippingParent;
     bool _clippingRectDirty;
-
-    std::function<void(void)> _visitCallback;
 
     cocos2d::CustomCommand _beforeVisitCmdScissor;
     cocos2d::CustomCommand _afterVisitCmdScissor;

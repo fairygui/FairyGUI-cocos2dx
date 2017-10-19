@@ -105,7 +105,6 @@ void ScissorClipNode::onAfterVisitScissor()
     }
 }
 
-
 const Rect& ScissorClipNode::getClippingRect()
 {
     if (_clippingRectDirty)

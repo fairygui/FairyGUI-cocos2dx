@@ -9,7 +9,16 @@ NS_FGUI_BEGIN
 class UIConfig
 {
 public:
-    static const char* defaultFont;
+    static char* defaultFont;
+    static int defaultScrollStep;
+    static float defaultScrollDecelerationRate;
+    static bool defaultScrollTouchEffect;
+    static bool defaultScrollBounceEffect;
+    static ScrollBarDisplayType defaultScrollBarDisplay;
+    static std::string verticalScrollBar;
+    static std::string horizontalScrollBar;
+    static int touchDragSensitivity;
+    static int touchScrollSensitivity;
 };
 
 NS_FGUI_END

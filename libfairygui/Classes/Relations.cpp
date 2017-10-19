@@ -76,11 +76,11 @@ void Relations::addItems(GObject * target, const char * sidePairs)
         switch (c1)
         {
         case 119://width
-            tid = RelationType::Width;
+            tid = RelationType::Width_Width;
             break;
 
         case 104://height
-            tid = RelationType::Height;
+            tid = RelationType::Height_Height;
             break;
 
         case 109://middle

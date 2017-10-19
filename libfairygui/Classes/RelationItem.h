@@ -28,8 +28,8 @@ enum RelationType
     Bottom_Middle,
     Bottom_Bottom,
 
-    Width,
-    Height,
+    Width_Width,
+    Height_Height,
 
     LeftExt_Left,
     LeftExt_Right,
@@ -40,7 +40,7 @@ enum RelationType
     BottomExt_Top,
     BottomExt_Bottom,
 
-    Size
+    Size_Size
 };
 
 class RelationDef

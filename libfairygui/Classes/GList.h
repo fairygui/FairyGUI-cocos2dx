@@ -17,6 +17,9 @@ public:
 
     CREATE_FUNC(GList);
 
+    int getColumnGap() { return 0; }
+    int getLineGap() { return 0; }
+
 protected:
     virtual bool init() override;
 

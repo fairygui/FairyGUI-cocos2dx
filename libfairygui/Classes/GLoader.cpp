@@ -9,7 +9,7 @@ GLoader::GLoader() :
     _autoSize(false),
     _align(TextHAlignment::LEFT),
     _verticalAlign(TextVAlignment::TOP),
-    _fill(FillType::None),
+    _fill(FillType::FT_NONE),
     _updatingLayout(false),
     _contentItem(nullptr),
     _contentWidth(0),
@@ -59,7 +59,7 @@ void GLoader::loadFromPackage()
     {
         _contentItem->load();
 
-        if (_contentItem->type == PackageItemType::Image)
+        if (_contentItem->type == PackageItemType::IMAGE)
         {
             _contentStatus = 1;
             _content->initWithSpriteFrame(_contentItem->spriteFrame);
@@ -68,7 +68,7 @@ void GLoader::loadFromPackage()
             _contentSourceHeight = _contentItem->height;
             updateLayout();
         }
-        else if (_contentItem->type == PackageItemType::MovieClip)
+        else if (_contentItem->type == PackageItemType::MOVIECLIP)
         {
             _contentStatus = 2;
             _contentSourceWidth = _contentItem->width;
@@ -154,18 +154,18 @@ void GLoader::updateLayout()
     }
 
     float sx = 1, sy = 1;
-    if (_fill != FillType::None)
+    if (_fill != FillType::FT_NONE)
     {
         sx = getWidth() / _contentSourceWidth;
         sy = getHeight() / _contentSourceHeight;
 
         if (sx != 1 || sy != 1)
         {
-            if (_fill == FillType::ScaleMatchHeight)
+            if (_fill == FillType::FT_SCALE_MATCH_HEIGHT)
                 sx = sy;
-            else if (_fill == FillType::ScaleMatchWidth)
+            else if (_fill == FillType::FT_SCALE_MATCH_WIDTH)
                 sy = sx;
-            else if (_fill == FillType::Scale)
+            else if (_fill == FillType::FT_SCALE)
             {
                 if (sx > sy)
                     sx = sy;

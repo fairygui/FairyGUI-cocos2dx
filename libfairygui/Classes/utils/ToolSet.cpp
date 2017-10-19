@@ -19,79 +19,64 @@ vector<std::string> &ToolSet::splitString(const string &s, char delim, vector<st
     return elems;
 }
 
-void ToolSet::splitString(const string &s, char delim, cocos2d::Vec2& value)
+void ToolSet::splitString(const string &s, char delim, cocos2d::Vec2& value, bool intType)
 {
     splitString(s, delim, helperArray);
-    value.x = atof(helperArray[0].c_str());
-    value.y = atof(helperArray[1].c_str());
+    if (intType)
+    {
+        value.x = atoi(helperArray[0].c_str());
+        if (helperArray.size() > 1)
+            value.y = atoi(helperArray[1].c_str());
+        else
+            value.y = value.x;
+    }
+    else
+    {
+        value.x = atof(helperArray[0].c_str());
+        if (helperArray.size() > 1)
+            value.y = atof(helperArray[1].c_str());
+        else
+            value.y = value.x;
+    }
 }
 
-void ToolSet::splitString(const string &s, char delim, cocos2d::Vec4& value)
+void ToolSet::splitString(const string &s, char delim, cocos2d::Vec4& value, bool intType)
 {
     splitString(s, delim, helperArray);
-    value.x = atof(helperArray[0].c_str());
-    value.y = atof(helperArray[1].c_str());
-    value.z = atof(helperArray[2].c_str());
-    value.w = atof(helperArray[3].c_str());
+    if (intType)
+    {
+        value.x = atoi(helperArray[0].c_str());
+        if (helperArray.size() > 1)
+        {
+            value.y = atoi(helperArray[1].c_str());
+            value.z = atoi(helperArray[2].c_str());
+            value.w = atoi(helperArray[3].c_str());
+        }
+        else
+            value.y = value.z = value.w = value.x;
+    }
+    else
+    {
+        value.x = atof(helperArray[0].c_str());
+        if (helperArray.size() > 1)
+        {
+            value.y = atof(helperArray[1].c_str());
+            value.z = atof(helperArray[2].c_str());
+            value.w = atof(helperArray[3].c_str());
+        }
+        else
+            value.y = value.z = value.w = value.x;
+    }
 }
 
 void ToolSet::splitString(const std::string & s, char delim, std::string & str1, std::string str2)
 {
-}
-
-string ToolSet::getAttribute(const tinyxml2::XMLElement* ele, const char* name)
-{
-    const tinyxml2::XMLAttribute*  a = ele->FindAttribute(name);
-    if (!a)
-        return "";
-
-    return a->Value();
-}
-
-bool ToolSet::getArrayAttribute(const tinyxml2::XMLElement * ele, const char * name, cocos2d::Vec2& value, bool intType)
-{
-    const tinyxml2::XMLAttribute*  a = ele->FindAttribute(name);
-    if (!a)
-        return false;
-
-    splitString(a->Value(), ',', helperArray);
-    if (intType)
-    {
-        value.x = atoi(helperArray[0].c_str());
-        value.y = atoi(helperArray[1].c_str());
-    }
+    splitString(s, delim, helperArray);
+    str1 = helperArray[0];
+    if (helperArray.size() > 1)
+        str2 = helperArray[1];
     else
-    {
-        value.x = atof(helperArray[0].c_str());
-        value.y = atof(helperArray[1].c_str());
-    }
-
-    return true;
-}
-
-bool ToolSet::getArrayAttribute(const tinyxml2::XMLElement * ele, const char * name, cocos2d::Vec4& value, bool intType)
-{
-    const tinyxml2::XMLAttribute*  a = ele->FindAttribute(name);
-    if (!a)
-        return false;
-
-    splitString(a->Value(), ',', helperArray);
-    if (intType)
-    {
-        value.x = atoi(helperArray[0].c_str());
-        value.y = atoi(helperArray[1].c_str());
-        value.z = atoi(helperArray[2].c_str());
-        value.w = atoi(helperArray[3].c_str());
-    }
-    else
-    {
-        value.x = atof(helperArray[0].c_str());
-        value.y = atof(helperArray[1].c_str());
-        value.z = atof(helperArray[2].c_str());
-        value.w = atof(helperArray[3].c_str());
-    }
-
-    return true;
+        str2 = str1;
 }
 
 ssize_t ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::string str)
@@ -159,26 +144,26 @@ constexpr hash_t operator "" _hash(char const* p, size_t)
 PackageItemType ToolSet::parsePackageItemType(const char* p)
 {
     if (!p)
-        return PackageItemType::Misc;
+        return PackageItemType::MISC;
 
     switch (hash_(p))
     {
     case "image"_hash:
-        return PackageItemType::Image;
+        return PackageItemType::IMAGE;
     case "movieclip"_hash:
-        return PackageItemType::MovieClip;
+        return PackageItemType::MOVIECLIP;
     case "component"_hash:
-        return PackageItemType::Component;
+        return PackageItemType::COMPONENT;
     case "atlas"_hash:
-        return PackageItemType::Atlas;
+        return PackageItemType::ATLAS;
     case "sound"_hash:
-        return PackageItemType::Sound;
+        return PackageItemType::SOUND;
     case "font"_hash:
-        return PackageItemType::Font;
+        return PackageItemType::FONT;
     case "misc"_hash:
-        return PackageItemType::Misc;
+        return PackageItemType::MISC;
     default:
-        return PackageItemType::Misc;
+        return PackageItemType::MISC;
     }
 }
 
@@ -246,117 +231,117 @@ int ToolSet::parseGearIndex(const char* p)
     }
 }
 
-GLoader::FillType ToolSet::parseFillType(const char * p)
+FillType ToolSet::parseFillType(const char * p)
 {
     if (!p)
-        return GLoader::FillType::None;
+        return FillType::FT_NONE;
 
     switch (hash_(p))
     {
     case "none"_hash:
-        return GLoader::FillType::None;
+        return FillType::FT_NONE;
     case "scale"_hash:
-        return GLoader::FillType::Scale;
+        return FillType::FT_SCALE;
     case "scaleMatchHeight"_hash:
-        return GLoader::FillType::ScaleMatchHeight;
+        return FillType::FT_SCALE_MATCH_HEIGHT;
     case "scaleMatchWidth"_hash:
-        return GLoader::FillType::ScaleMatchWidth;
+        return FillType::FT_SCALE_MATCH_WIDTH;
     case "scaleFree"_hash:
-        return GLoader::FillType::ScaleFree;
+        return FillType::FT_SCALE_FREE;
     default:
-        return GLoader::FillType::None;
+        return FillType::FT_NONE;
     }
 }
 
-GButton::ButtonMode ToolSet::parseButtonMode(const char * p)
+ButtonMode ToolSet::parseButtonMode(const char * p)
 {
     if (!p)
-        return GButton::ButtonMode::Common;
+        return ButtonMode::BM_COMMON;
 
     switch (hash_(p))
     {
     case "Check"_hash:
-        return GButton::ButtonMode::Check;
+        return ButtonMode::BM_CHECK;
     case "Radio"_hash:
-        return GButton::ButtonMode::Radio;
+        return ButtonMode::BM_RADIO;
     default:
-        return GButton::ButtonMode::Common;
+        return ButtonMode::BM_COMMON;
     }
 }
 
-GComponent::OverflowType ToolSet::parseOverflowType(const char * p)
+OverflowType ToolSet::parseOverflowType(const char * p)
 {
     if (!p)
-        return GComponent::OverflowType::OverflowVisible;
+        return OverflowType::OF_VISIBLE;
 
     switch (hash_(p))
     {
     case "visible"_hash:
-        return GComponent::OverflowType::OverflowVisible;
+        return OverflowType::OF_VISIBLE;
     case "hidden"_hash:
-        return GComponent::OverflowType::OverflowHidden;
+        return OverflowType::OF_HIDDEN;
     case "scroll"_hash:
-        return GComponent::OverflowType::OverflowScroll;
+        return OverflowType::OF_SCROLL;
     default:
-        return GComponent::OverflowType::OverflowVisible;
+        return OverflowType::OF_VISIBLE;
     }
 }
 
-GComponent::ScrollType ToolSet::parseScrollType(const char * p)
+ScrollType ToolSet::parseScrollType(const char * p)
 {
     if (!p)
-        return GComponent::ScrollType::ScrollHorizontal;
+        return ScrollType::ST_HORIZONTAL;
 
     switch (hash_(p))
     {
     case "horizontal"_hash:
-        return GComponent::ScrollType::ScrollHorizontal;
+        return ScrollType::ST_HORIZONTAL;
     case "vertical"_hash:
-        return GComponent::ScrollType::ScrollVertical;
+        return ScrollType::ST_VERTICAL;
     case "both"_hash:
-        return GComponent::ScrollType::ScrollBoth;
+        return ScrollType::ST_BOTH;
     default:
-        return GComponent::ScrollType::ScrollHorizontal;
+        return ScrollType::ST_HORIZONTAL;
     }
 }
 
-GComponent::ScrollBarDisplayType ToolSet::parseScrollBarDisplayType(const char * p)
+ScrollBarDisplayType ToolSet::parseScrollBarDisplayType(const char * p)
 {
     if (!p)
-        return GComponent::ScrollBarDisplayType::ScrollBarDisplayDefault;
+        return ScrollBarDisplayType::SBD_DEFAULT;
 
     switch (hash_(p))
     {
     case "default"_hash:
-        return GComponent::ScrollBarDisplayType::ScrollBarDisplayDefault;
+        return ScrollBarDisplayType::SBD_DEFAULT;
     case "visible"_hash:
-        return GComponent::ScrollBarDisplayType::ScrollBarDisplayVisible;
+        return ScrollBarDisplayType::SBD_VISIBLE;
     case "auto"_hash:
-        return GComponent::ScrollBarDisplayType::ScrollBarDisplayAuto;
+        return ScrollBarDisplayType::SBD_AUTO;
     case "hidden"_hash:
-        return GComponent::ScrollBarDisplayType::ScrollBarDisplayHidden;
+        return ScrollBarDisplayType::SDB_HIDDEN;
     default:
-        return GComponent::ScrollBarDisplayType::ScrollBarDisplayDefault;
+        return ScrollBarDisplayType::SBD_DEFAULT;
     }
 }
 
 ProgressTitleType ToolSet::parseProgressTitleType(const char * p)
 {
     if (!p)
-        return ProgressTitleType::TitleTypePercent;
+        return ProgressTitleType::PT_PERCENT;
 
     switch (hash_(p))
     {
     case "percent"_hash:
-        return ProgressTitleType::TitleTypePercent;
+        return ProgressTitleType::PT_PERCENT;
     case "valueAndmax"_hash:
-        return ProgressTitleType::TitleTypeValueAndMax;
+        return ProgressTitleType::PT_VALUE_MAX;
     case "value"_hash:
-        return ProgressTitleType::TitleTypeValue;
+        return ProgressTitleType::PT_VALUE;
     case "max"_hash:
-        return ProgressTitleType::TitleTypeMax;
+        return ProgressTitleType::PT_MAX;
     default:
-        return ProgressTitleType::TitleTypePercent;
+        return ProgressTitleType::PT_PERCENT;
     }
 }
 

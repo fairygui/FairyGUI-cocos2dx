@@ -10,13 +10,6 @@ NS_FGUI_BEGIN
 class GButton : public GComponent
 {
 public:
-    enum ButtonMode
-    {
-        Common,
-        Check,
-        Radio
-    };
-
     const std::string UP = "up";
     const std::string DOWN = "down";
     const std::string OVER = "over";

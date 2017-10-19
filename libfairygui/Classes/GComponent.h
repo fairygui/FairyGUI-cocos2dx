@@ -5,48 +5,23 @@
 #include "FairyGUIMacros.h"
 #include "GObject.h"
 #include "Transition.h"
-#include "ScrollPane.h"
+#include "Margin.h"
 
 NS_FGUI_BEGIN
 
 class Controller;
+class ScrollPane;
+class GGroup;
 
 class GComponent : public GObject
 {
 public:
-    enum ChildrenRenderOrder
-    {
-        Ascent,
-        Descent,
-        Arch,
-    };
-
-    enum OverflowType
-    {
-        OverflowVisible,
-        OverflowHidden,
-        OverflowScroll
-    };
-
-    enum ScrollType
-    {
-        ScrollHorizontal,
-        ScrollVertical,
-        ScrollBoth
-    };
-
-    enum ScrollBarDisplayType
-    {
-        ScrollBarDisplayDefault,
-        ScrollBarDisplayVisible,
-        ScrollBarDisplayAuto,
-        ScrollBarDisplayHidden
-    };
-
     GComponent();
     ~GComponent();
 
     CREATE_FUNC(GComponent);
+
+    cocos2d::Node* getContainer() { return _container; }
 
     GObject* addChild(GObject* child);
     GObject* addChildAt(GObject* child, int nIndex);
@@ -66,6 +41,10 @@ public:
     void addController(Controller* controller);
     int getChildCount() { return _children.size(); }
 
+    const Margin& getMargin() { return _margin; }
+    void setMargin(const Margin& value);
+    const cocos2d::Vec2& getAlignOffset() { return _alignOffset; }
+
     Controller* getController(const std::string& name);
     void removeController(Controller* c);
     void applyController(Controller* c);
@@ -73,6 +52,8 @@ public:
 
     void setBoundsChangedFlag();
     void ensureBoundsCorrect();
+
+    virtual cocos2d::Vec2 getSnappingPosition(const cocos2d::Vec2& pt);
 
     virtual bool init() override;
     virtual void constructFromResource() override;
@@ -96,9 +77,7 @@ protected:
     virtual void updateBounds();
     void setBounds(float ax, float ay, float aw, float ah);
 
-    virtual void visit();
-
-    void setupScroll(const cocos2d::Vec4& scrollBarMargin,
+    void setupScroll(const Margin& scrollBarMargin,
         ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
         const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
         const std::string& headerRes, const std::string& footerRes);
@@ -112,7 +91,8 @@ private:
     int getChildIndex(GObject * child);
     int _setChildIndex(GObject* child, int oldIndex, int index);
 
-    void buildNativeDisplayList();
+    CALL_LATER_FUNC(GComponent, doUpdateBounds);
+    CALL_LATER_FUNC(GComponent, buildNativeDisplayList);
 
     cocos2d::Vector<GObject*> _children;
     cocos2d::Vector<Controller*> _controllers;
@@ -122,7 +102,8 @@ private:
     ChildrenRenderOrder _childrenRenderOrder;
     int _apexIndex;
     Controller* _applyingController;
-    cocos2d::Vec4 _margin;
+    Margin _margin;
+    cocos2d::Vec2 _alignOffset;
 
     cocos2d::Node* _container;
     cocos2d::Node* _rootContainer;
