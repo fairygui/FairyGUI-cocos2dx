@@ -22,49 +22,51 @@ public:
         const std::string& footerRes);
     ~ScrollPane();
 
-    GComponent* getOwner() { return _owner; }
-    GComponent* getHeader() { return _header; }
-    GComponent* getFooter() { return _footer; }
+    GComponent* getOwner() const { return _owner; }
+    GComponent* getHeader() const { return _header; }
+    GComponent* getFooter() const { return _footer; }
+    GScrollBar* getVtScrollBar() const { return _vtScrollBar; }
+    GScrollBar* getHzScrollBar() const { return _hzScrollBar; }
 
-    bool isBouncebackEffect() { return _bouncebackEffect; }
+    bool isBouncebackEffect() const { return _bouncebackEffect; }
     void setBouncebackEffect(bool value) { _bouncebackEffect = value; }
 
-    bool isTouchEffect() { return _touchEffect; }
+    bool isTouchEffect() const { return _touchEffect; }
     void setTouchEffect(bool value) { _touchEffect = value; }
 
-    bool isInertiaDisabled() { return _inertiaDisabled; }
+    bool isInertiaDisabled() const { return _inertiaDisabled; }
     void setInertiaDisabled(bool value) { _inertiaDisabled = value; }
 
-    float getScrollStep() { return _scrollStep; }
+    float getScrollStep() const { return _scrollStep; }
     void setScrollStep(float value);
 
-    bool isSnapToItem() { return _snapToItem; }
+    bool isSnapToItem() const { return _snapToItem; }
     void setSnapToItem(bool value) { _snapToItem = value; }
 
-    bool isPageMode() { return _pageMode; }
+    bool isPageMode() const { return _pageMode; }
     void setPageMode(bool value) { _pageMode = value; }
 
-    Controller* getPageController() { return _pageController; }
+    Controller* getPageController() const { return _pageController; }
     void setPageController(Controller* value) { _pageController = value; }
 
-    bool isMouseWheelEnabled() { return _mouseWheelEnabled; }
+    bool isMouseWheelEnabled() const { return _mouseWheelEnabled; }
     void setMouseWheelEnabled(bool value) { _mouseWheelEnabled = value; }
 
-    float getDecelerationRate() { return _decelerationRate; }
+    float getDecelerationRate() const { return _decelerationRate; }
     void setDecelerationRate(float value) { _decelerationRate = value; }
 
-    float getPosX() { return _xPos; }
+    float getPosX() const { return _xPos; }
     void setPosX(float value, bool ani = false);
-    float getPosY() { return _yPos; }
+    float getPosY() const { return _yPos; }
     void setPosY(float value, bool ani = false);
 
-    float getPercX();
+    float getPercX() const;
     void setPercX(float value, bool ani = false);
-    float getPercY();
+    float getPercY() const;
     void setPercY(float value, bool ani = false);
 
-    bool isBottomMost();
-    bool isRightMost();
+    bool isBottomMost() const;
+    bool isRightMost() const;
 
     void scrollLeft(float ratio = 1, bool ani = false);
     void scrollRight(float ratio = 1, bool ani = false);
@@ -74,42 +76,49 @@ public:
     void scrollBottom(bool ani = false);
     void scrollToView(GObject* obj, bool ani = false, bool setFirst = false);
     void scrollToView(const cocos2d::Rect& rect, bool ani = false, bool setFirst = false);
-    bool isChildInView(GObject* obj);
+    bool isChildInView(GObject* obj) const;
 
-    int getPageX();
+    int getPageX() const;
     void setPageX(int value, bool ani = false);
-    int getPageY();
+    int getPageY() const;
     void setPageY(int value, bool ani = false);
 
-    float getScrollingPosX();
-    float getScrollingPosY();
+    float getScrollingPosX() const;
+    float getScrollingPosY() const;
 
-    const cocos2d::Size& getContentSize() { return _contentSize; }
-    const cocos2d::Size& getViewSize() { return _viewSize; }
-    void setViewWidth(float viewWidth);
-    void setViewHeight(float viewHeight);
+    const cocos2d::Size& getContentSize() const { return _contentSize; }
+    const cocos2d::Size& getViewSize() const { return _viewSize; }
 
     void lockHeader(int size);
     void lockFooter(int size);
 
     void cancelDragging();
-    static ScrollPane* draggingPane;
+    static ScrollPane* getDraggingPane() { return _draggingPane; }
 
 private:
+
     void onOwnerSizeChanged();
+    void adjustMaskContainer();
+    void setContentSize(float wv, float hv);
+    void changeContentSizeOnScrolling(float deltaWidth, float deltaHeight, float deltaPosX, float deltaPosY);
+    void setViewWidth(float value);
+    void setViewHeight(float value);
+    void setSize(float wv, float hv);
+    void handleSizeChanged();
+
     void handleControllerChanged(Controller* c);
     void updatePageController();
-    void adjustMaskContainer();
-    void setContentSize(float aWidth, float aHeight);
-    void changeContentSizeOnScrolling(float deltaWidth, float deltaHeight, float deltaPosX, float deltaPosY);
-    void setSize(float aWidth, float aHeight);
-    void handleSizeChanged();
+
+    GObject* hitTest(const cocos2d::Vec2 &pt, const cocos2d::Camera* camera);
+
     void posChanged(bool ani);
     CALL_LATER_FUNC(ScrollPane, refresh);
     void refresh2();
+
     void syncScrollBar(bool end = false);
     void showScrollBar(bool show);
     CALL_LATER_FUNC(ScrollPane, onShowScrollBar);
+
     float getLoopPartSize(float division, int axis);
     bool loopCheckingCurrent();
     void loopCheckingTarget(cocos2d::Vec2& endPos);
@@ -121,9 +130,10 @@ private:
     float updateTargetAndDuration(float pos, int axis);
     void fixDuration(int axis, float oldChange);
     void killTween();
-    void checkRefreshBar();
     void tweenUpdate(float dt);
     float runTween(int axis, float dt);
+
+    void checkRefreshBar();
 
     void onTouchBegin(EventContext* context);
     void onTouchMove(EventContext* context);
@@ -143,16 +153,14 @@ private:
     bool _hScrollNone;
     bool _needRefresh;
     int _refreshBarAxis;
-
     bool _displayOnLeft;
     bool _snapToItem;
     bool _displayInDemand;
     bool _mouseWheelEnabled;
-    bool _pageMode;
-    cocos2d::Size _pageSize;
     bool _inertiaDisabled;
     bool _maskDisabled;
     float _decelerationRate;
+    bool _pageMode;
 
     float _xPos;
     float _yPos;
@@ -160,6 +168,8 @@ private:
     cocos2d::Size _viewSize;
     cocos2d::Size _contentSize;
     cocos2d::Size _overlapSize;
+    cocos2d::Size _pageSize;
+
     cocos2d::Vec2 _containerPos;
     cocos2d::Vec2 _beginTouchPos;
     cocos2d::Vec2 _lastTouchPos;
@@ -172,6 +182,7 @@ private:
     int _aniFlag;
     bool _scrollBarVisible;
     int _loop;
+
     int _headerLockedSize;
     int _footerLockedSize;
 
@@ -191,10 +202,12 @@ private:
     Controller* _pageController;
 
     static int _gestureFlag;
+    static ScrollPane* _draggingPane;
 
     friend class GComponent;
+    friend class GList;
 };
 
 NS_FGUI_END
 
-#endif // __SCROLLPANE_H__
+#endif

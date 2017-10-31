@@ -17,11 +17,13 @@
 #include "GComboBox.h"
 #include "GScrollBar.h"
 #include "GGroup.h"
-#include "tinyxml2/tinyxml2.h"
 
 NS_FGUI_BEGIN
 
-unordered_map<string, UIObjectFactory::GComponentCreator> UIObjectFactory::packageItemExtensions;
+using namespace std;
+
+unordered_map<string, UIObjectFactory::GComponentCreator> UIObjectFactory::_packageItemExtensions;
+UIObjectFactory::GLoaderCreator UIObjectFactory::_loaderCreator;
 
 void UIObjectFactory::setPackageItemExtension(const string& url, GComponentCreator creator)
 {
@@ -34,49 +36,59 @@ void UIObjectFactory::setPackageItemExtension(const string& url, GComponentCreat
     if (pi)
         pi->extensionCreator = creator;
 
-    packageItemExtensions[url] = creator;
+    _packageItemExtensions[url] = creator;
 }
 
 GObject * UIObjectFactory::newObject(PackageItem * pi)
 {
+    GObject *ret = nullptr;
     switch (pi->type)
     {
     case PackageItemType::IMAGE:
-        return GImage::create();
+        ret = GImage::create();
+        break;
 
     case PackageItemType::MOVIECLIP:
-        return GMovieClip::create();
+        ret = GMovieClip::create();
+        break;
 
     case PackageItemType::COMPONENT:
     {
         if (pi->extensionCreator != nullptr)
-            return pi->extensionCreator();
-
-        tinyxml2::XMLDocument* xml = pi->componentData;
-        const char *p = xml->RootElement()->Attribute("extention");
-        if (p)
-        {
-            std::string extention = p;
-            if (extention == "Button")
-                return GButton::create();
-            else if (extention == "Label")
-                return GLabel::create();
-            else if (extention == "ProgressBar")
-                return GProgressBar::create();
-            else if (extention == "Slider")
-                return GSlider::create();
-            else if (extention == "ScrollBar")
-                return GScrollBar::create();
-            else if (extention == "ComboBox")
-                return GComboBox::create();
-            else
-                return GComponent::create();
-        }
+            ret = pi->extensionCreator();
         else
-            return GComponent::create();
+        {
+            tinyxml2::XMLDocument* xml = pi->componentData;
+            const char *p = xml->RootElement()->Attribute("extention");
+            if (p)
+            {
+                std::string extention = p;
+                if (extention == "Button")
+                    ret = GButton::create();
+                else if (extention == "Label")
+                    ret = GLabel::create();
+                else if (extention == "ProgressBar")
+                    ret = GProgressBar::create();
+                else if (extention == "Slider")
+                    ret = GSlider::create();
+                else if (extention == "ScrollBar")
+                    ret = GScrollBar::create();
+                else if (extention == "ComboBox")
+                    ret = GComboBox::create();
+                else
+                    ret = GComponent::create();
+            }
+            else
+                ret = GComponent::create();
+        }
+        break;
     }
     }
-    return nullptr;
+
+    if (ret)
+        ret->_packageItem = pi;
+
+    return ret;
 }
 
 GObject * UIObjectFactory::newObject(const string & type)
@@ -100,19 +112,34 @@ GObject * UIObjectFactory::newObject(const string & type)
     else if (type == "graph")
         return GGraph::create();
     else if (type == "loader")
-        //if (loaderCreator != null)
-        //	return loaderCreator();
-        //else
-        return GLoader::create();
+        if (_loaderCreator != nullptr)
+            return _loaderCreator();
+        else
+            return GLoader::create();
     else
         return nullptr;
 }
 
+void UIObjectFactory::setLoaderExtension(GLoaderCreator creator)
+{
+    _loaderCreator = creator;
+}
+
 void UIObjectFactory::resolvePackageItemExtension(PackageItem * pi)
 {
-    //GComponentCreator creator = packageItemExtensions[UIPackage::URL_PREFIX + pi->owner->getId() + pi->id];
-    //GComponentCreator creator = packageItemExtensions[UIPackage::URL_PREFIX + pi->owner->getName() + "/" + pi->name];
-    //pi.extensionCreator = null;
+    auto it = _packageItemExtensions.find(UIPackage::URL_PREFIX + pi->owner->getId() + pi->id);
+    if (it != _packageItemExtensions.end())
+    {
+        pi->extensionCreator = it->second;
+        return;
+    }
+    it = _packageItemExtensions.find(UIPackage::URL_PREFIX + pi->owner->getName() + "/" + pi->name);
+    if (it != _packageItemExtensions.end())
+    {
+        pi->extensionCreator = it->second;
+        return;
+    }
+    pi->extensionCreator = nullptr;
 }
 
 NS_FGUI_END

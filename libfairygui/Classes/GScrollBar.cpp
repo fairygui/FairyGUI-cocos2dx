@@ -35,7 +35,7 @@ void GScrollBar::setDisplayPerc(float value)
     {
         if (!_fixedGripSize)
             _grip->setHeight(floor(value * _bar->getHeight()));
-        _grip->setY(round(_bar->getY()+ (_bar->getHeight() - _grip->getHeight()) * _scrollPerc));
+        _grip->setY(round(_bar->getY() + (_bar->getHeight() - _grip->getHeight()) * _scrollPerc));
     }
     else
     {
@@ -62,14 +62,6 @@ float GScrollBar::getMinSize()
         return (_arrowButton1 != nullptr ? _arrowButton1->getWidth() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getWidth() : 0);
 }
 
-bool GScrollBar::init()
-{
-    if (!GComponent::init())
-        return false;
-
-    return true;
-}
-
 void GScrollBar::constructFromXML(tinyxml2::XMLElement * xml)
 {
     xml = xml->FirstChildElement("ScrollBar");
@@ -77,29 +69,21 @@ void GScrollBar::constructFromXML(tinyxml2::XMLElement * xml)
         _fixedGripSize = xml->BoolAttribute("fixedGripSize");
 
     _grip = getChild("grip");
-    if (_grip == nullptr)
-    {
-        CCLOGWARN("FairyGUI: %s should define grip", this->getResourceURL().c_str());
-        return;
-    }
-
+    CCASSERT(_grip != nullptr, "FairyGUI: should define grip");
     _bar = getChild("bar");
-    if (_bar == nullptr)
-    {
-        CCLOGWARN("FairyGUI: %s should define bar", this->getResourceURL().c_str());
-        return;
-    }
+    CCASSERT(_bar != nullptr, "FairyGUI: should define bar");
 
     _arrowButton1 = getChild("arrow1");
     _arrowButton2 = getChild("arrow2");
 
     _grip->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onGripTouchBegin, this));
+    _grip->addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GScrollBar::onGripTouchMove, this));
     this->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onTouchBegin, this));
 
     if (_arrowButton1 != nullptr)
         _arrowButton1->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onArrowButton1Click, this));
     if (_arrowButton2 != nullptr)
-        _arrowButton1->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onArrowButton2Click, this));
+        _arrowButton2->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onArrowButton2Click, this));
 }
 
 void GScrollBar::onTouchBegin(EventContext * context)

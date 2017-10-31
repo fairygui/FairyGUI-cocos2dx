@@ -23,11 +23,10 @@ protected:
     void init() override;
 
 private:
-    std::unordered_map<std::string, cocos2d::Vec2> _storage;
-    cocos2d::Vec2 _default;
-    cocos2d::Vec2 _tweenTarget;
+    std::unordered_map<std::string, std::string> _storage;
+    std::string _default;
 };
 
 NS_FGUI_END
 
-#endif // __GEARTEXT_H__
+#endif

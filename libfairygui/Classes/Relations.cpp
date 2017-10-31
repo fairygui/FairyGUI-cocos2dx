@@ -5,7 +5,8 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 using namespace tinyxml2;
 
-Relations::Relations(GObject* owner) :handling(nullptr)
+Relations::Relations(GObject* owner) :
+    handling(nullptr)
 {
     _owner = owner;
 }
@@ -76,11 +77,11 @@ void Relations::addItems(GObject * target, const char * sidePairs)
         switch (c1)
         {
         case 119://width
-            tid = RelationType::Width_Width;
+            tid = RelationType::Width;
             break;
 
         case 104://height
-            tid = RelationType::Height_Height;
+            tid = RelationType::Height;
             break;
 
         case 109://middle
@@ -223,17 +224,21 @@ void Relations::addItems(GObject * target, const char * sidePairs)
 
 void Relations::remove(GObject * target, RelationType relationType)
 {
-    for (auto it = _items.begin(); it != _items.end(); ++it)
+    for (auto it = _items.begin(); it != _items.end(); )
     {
         if ((*it)->getTarget() == target)
         {
             (*it)->remove(relationType);
             if ((*it)->isEmpty())
             {
-                _items.erase(it);
                 delete (*it);
+                it = _items.erase(it);
             }
+            else
+                it++;
         }
+        else
+            it++;
     }
 }
 
@@ -250,13 +255,15 @@ bool Relations::contains(GObject * target)
 
 void Relations::clearFor(GObject * target)
 {
-    for (auto it = _items.begin(); it != _items.end(); ++it)
+    for (auto it = _items.begin(); it != _items.end(); )
     {
         if ((*it)->getTarget() == target)
         {
-            _items.erase(it);
             delete (*it);
+            it = _items.erase(it);
         }
+        else
+            it++;
     }
 }
 

@@ -24,6 +24,9 @@ protected:
     void init() override;
 
 private:
+    void onTweenUpdate(const cocos2d::Vec4& v, bool a, bool b);
+    void onTweenComplete();
+
     std::unordered_map<std::string, cocos2d::Vec4> _storage;
     cocos2d::Vec4 _default;
     cocos2d::Vec4 _tweenTarget;
@@ -31,4 +34,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __GEARSIZE_H__
+#endif

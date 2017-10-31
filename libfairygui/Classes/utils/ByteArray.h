@@ -6,22 +6,16 @@
 //
 //
 
-#ifndef __JT_BYTEARRAY_H_
-#define __JT_BYTEARRAY_H_
-
+#ifndef __BYTEARRAY_H_
+#define __BYTEARRAY_H_
 
 #include "cocos2d.h"
-USING_NS_CC;
-
 #include <string>
-using namespace std;
 
-class ByteArray : public Ref
+class ByteArray
 {
 public:
     static ByteArray* create(int len, int endian = ENDIAN_LITTLE);
-
-
     static ByteArray* createWithBuffer(char* buffer, int len, int endian = ENDIAN_LITTLE);
 
     static int checkCPUEndian();
@@ -47,8 +41,8 @@ public:
     long long readLongLong();
     void writeLongLong(long long value);
 
-    string readString(int len);
-    void writeString(string value);
+    std::string readString(int len);
+    void writeString(const std::string& value);
 
     char readByte();
     void writeByte(char value);
@@ -82,4 +76,4 @@ private:
     short _flag;
 };
 
-#endif // __JT_BYTEARRAY_H_
+#endif

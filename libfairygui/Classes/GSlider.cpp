@@ -11,7 +11,7 @@ GSlider::GSlider() :
     canDrag(false),
     _max(100),
     _value(0),
-    _titleType(ProgressTitleType::PT_PERCENT),
+    _titleType(ProgressTitleType::PERCENT),
     _titleObject(nullptr),
     _barObjectH(nullptr),
     _barObjectV(nullptr),
@@ -58,79 +58,6 @@ void GSlider::setValue(double value)
     }
 }
 
-void GSlider::setup_AfterAdd(tinyxml2::XMLElement * xml)
-{
-    GComponent::setup_AfterAdd(xml);
-
-    xml = xml->FirstChildElement("Slider");
-    if (xml != nullptr)
-    {
-        int tmp;
-        if (xml->QueryIntAttribute("value", &tmp) == 0)
-            _value = tmp;
-
-        if (xml->QueryIntAttribute("max", &tmp) == 0)
-            _max = tmp;
-    }
-    update();
-}
-
-bool GSlider::init()
-{
-    if (!GComponent::init())
-        return false;
-
-    return true;
-}
-
-void GSlider::constructFromXML(tinyxml2::XMLElement * xml)
-{
-    xml = xml->FirstChildElement("Slider");
-    CCASSERT(xml, "type mismatch");
-
-    const char *p;
-    p = xml->Attribute("titleType");
-    if (p)
-        _titleType = ToolSet::parseProgressTitleType(p);
-    _reverse = xml->BoolAttribute("reverse");
-
-    _titleObject = getChild("title");
-    _barObjectH = getChild("bar");
-    _barObjectV = getChild("bar_v");
-    _gripObject = getChild("grip");
-
-    if (_barObjectH != nullptr)
-    {
-        _barMaxWidth = _barObjectH->getWidth();
-        _barMaxWidthDelta = getWidth() - _barMaxWidth;
-        _barStartX = _barObjectH->getX();
-    }
-    if (_barObjectV != nullptr)
-    {
-        _barMaxHeight = _barObjectV->getHeight();
-        _barMaxHeightDelta = getHeight() - _barMaxHeight;
-        _barStartY = _barObjectV->getY();
-    }
-
-    if (_gripObject != nullptr)
-        _gripObject->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GSlider::onGripTouchBegin, this));
-
-    addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GSlider::onTouchBegin, this));
-}
-
-void GSlider::handleSizeChanged()
-{
-    GComponent::handleSizeChanged();
-
-    if (_barObjectH != nullptr)
-        _barMaxWidth = getWidth() - _barMaxWidthDelta;
-    if (_barObjectV != nullptr)
-        _barMaxHeight = getHeight() - _barMaxHeightDelta;
-
-    if (!_underConstruct)
-        update();
-}
-
 void GSlider::update()
 {
     float percent = MIN(_value / _max, 1);
@@ -144,19 +71,19 @@ void GSlider::updateWidthPercent(float percent)
         std::ostringstream oss;
         switch (_titleType)
         {
-        case ProgressTitleType::PT_PERCENT:
+        case ProgressTitleType::PERCENT:
             oss << round(percent * 100) << "%";
             break;
 
-        case ProgressTitleType::PT_VALUE_MAX:
+        case ProgressTitleType::VALUE_MAX:
             oss << round(_value) << "/" << round(_max);
             break;
 
-        case ProgressTitleType::PT_VALUE:
+        case ProgressTitleType::VALUE:
             oss << _value;
             break;
 
-        case ProgressTitleType::PT_MAX:
+        case ProgressTitleType::MAX:
             oss << _max;
             break;
         }
@@ -215,6 +142,75 @@ void GSlider::updateWidthPercent(float percent)
     }
 }
 
+
+void GSlider::handleSizeChanged()
+{
+    GComponent::handleSizeChanged();
+
+    if (_barObjectH != nullptr)
+        _barMaxWidth = getWidth() - _barMaxWidthDelta;
+    if (_barObjectV != nullptr)
+        _barMaxHeight = getHeight() - _barMaxHeightDelta;
+
+    if (!_underConstruct)
+        update();
+}
+
+void GSlider::constructFromXML(tinyxml2::XMLElement * xml)
+{
+    xml = xml->FirstChildElement("Slider");
+    CCASSERT(xml, "type mismatch");
+
+    const char *p;
+    p = xml->Attribute("titleType");
+    if (p)
+        _titleType = ToolSet::parseProgressTitleType(p);
+    _reverse = xml->BoolAttribute("reverse");
+
+    _titleObject = getChild("title");
+    _barObjectH = getChild("bar");
+    _barObjectV = getChild("bar_v");
+    _gripObject = getChild("grip");
+
+    if (_barObjectH != nullptr)
+    {
+        _barMaxWidth = _barObjectH->getWidth();
+        _barMaxWidthDelta = getWidth() - _barMaxWidth;
+        _barStartX = _barObjectH->getX();
+    }
+    if (_barObjectV != nullptr)
+    {
+        _barMaxHeight = _barObjectV->getHeight();
+        _barMaxHeightDelta = getHeight() - _barMaxHeight;
+        _barStartY = _barObjectV->getY();
+    }
+
+    if (_gripObject != nullptr)
+    {
+        _gripObject->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GSlider::onGripTouchBegin, this));
+        _gripObject->addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GSlider::onGripTouchMove, this));
+    }
+
+    addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GSlider::onTouchBegin, this));
+}
+
+void GSlider::setup_AfterAdd(tinyxml2::XMLElement * xml)
+{
+    GComponent::setup_AfterAdd(xml);
+
+    xml = xml->FirstChildElement("Slider");
+    if (xml != nullptr)
+    {
+        int tmp;
+        if (xml->QueryIntAttribute("value", &tmp) == 0)
+            _value = tmp;
+
+        if (xml->QueryIntAttribute("max", &tmp) == 0)
+            _max = tmp;
+    }
+    update();
+}
+
 void GSlider::onTouchBegin(EventContext * context)
 {
     if (!changeOnClick)
@@ -240,7 +236,7 @@ void GSlider::onTouchBegin(EventContext * context)
     if (newValue != _value)
     {
         _value = newValue;
-        dispatchEvent(UIEventType::SliderChange);
+        dispatchEvent(UIEventType::Changed);
     }
     updateWidthPercent(percent);
 }
@@ -260,7 +256,7 @@ void GSlider::onGripTouchMove(EventContext * context)
     if (!canDrag)
         return;
 
-    Vec2 pt = _gripObject->globalToLocal(context->getInput()->getPosition());
+    Vec2 pt = globalToLocal(context->getInput()->getPosition());
 
     float deltaX = pt.x - _clickPos.x;
     float deltaY = pt.y - _clickPos.y;
@@ -284,7 +280,7 @@ void GSlider::onGripTouchMove(EventContext * context)
     if (newValue != _value)
     {
         _value = newValue;
-        dispatchEvent(UIEventType::SliderChange);
+        dispatchEvent(UIEventType::Changed);
     }
     updateWidthPercent(percent);
 }

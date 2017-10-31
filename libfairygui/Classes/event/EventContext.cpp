@@ -8,7 +8,8 @@ EventContext::EventContext() :
     _data(nullptr),
     _inputEvent(nullptr),
     _isStopped(false),
-    _touchEndCapture(false)
+    _defaultPrevented(false),
+    _touchCapture(0)
 {
 }
 

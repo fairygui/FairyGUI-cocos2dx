@@ -3,7 +3,6 @@
 
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
-#include "tinyxml2/tinyxml2.h"
 
 NS_FGUI_BEGIN
 
@@ -16,7 +15,7 @@ public:
     GearBase(GObject* owner);
     ~GearBase();
 
-    Controller* getController() { return _controller; }
+    Controller* getController() const { return _controller; }
     void setController(Controller* value);
 
     virtual void updateFromRelations(float dx, float dy);
@@ -27,11 +26,18 @@ public:
 
     static bool disableAllTweenEffect;
     bool tween;
-    //Ease easeType;
+    cocos2d::tweenfunc::TweenType easeType;
     float tweenTime;
     float delay;
 
 protected:
+    enum ActionTag
+    {
+        XY_ACTION = 0xCC2100,
+        SIZE_ACTION,
+        LOOK_ACTION,
+        COLOR_ACTION
+    };
     virtual void addStatus(const std::string&  pageId, const std::string& value);
     virtual void init();
 
@@ -42,4 +48,4 @@ protected:
 
 NS_FGUI_END
 
-#endif // __GEARBASE_H__
+#endif

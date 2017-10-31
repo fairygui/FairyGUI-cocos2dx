@@ -2,7 +2,6 @@
 #define __PACKAGEITEM_H__
 
 #include "cocos2d.h"
-#include "tinyxml2/tinyxml2.h"
 #include "FairyGUIMacros.h"
 
 NS_FGUI_BEGIN
@@ -41,6 +40,8 @@ public:
 
     //movieclip
     cocos2d::Animation* animation;
+    float delayPerUnit;
+    float repeatDelay;
 
     //component
     tinyxml2::XMLDocument* componentData;
@@ -49,9 +50,6 @@ public:
 
     //font
     //BitmapFont bitmapFont;
-
-    //sound
-    //AudioClip audioClip;
 };
 
 class DisplayListItem
@@ -68,4 +66,4 @@ public:
 
 NS_FGUI_END
 
-#endif // __PACKAGEITEM_H__
+#endif

@@ -17,4 +17,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __POPUPMENU_H__
+#endif

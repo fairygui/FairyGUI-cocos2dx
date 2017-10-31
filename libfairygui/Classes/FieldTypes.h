@@ -5,7 +5,7 @@
 
 NS_FGUI_BEGIN
 
-enum PackageItemType
+enum class PackageItemType
 {
     IMAGE,
     MOVIECLIP,
@@ -16,57 +16,104 @@ enum PackageItemType
     MISC
 };
 
-enum ButtonMode
+enum class ButtonMode
 {
-    BM_COMMON,
-    BM_CHECK,
-    BM_RADIO
+    COMMON,
+    CHECK,
+    RADIO
 };
 
-enum ChildrenRenderOrder
+enum class ChildrenRenderOrder
 {
-    CRO_ASCENT,
-    CRO_DESCENT,
-    CRO_ARCH,
+    ASCENT,
+    DESCENT,
+    ARCH,
 };
 
-enum OverflowType
+enum class OverflowType
 {
-    OF_VISIBLE,
-    OF_HIDDEN,
-    OF_SCROLL
+    VISIBLE,
+    HIDDEN,
+    SCROLL
 };
 
-enum ScrollType
+enum class ScrollType
 {
-    ST_HORIZONTAL,
-    ST_VERTICAL,
-    ST_BOTH
+    HORIZONTAL,
+    VERTICAL,
+    BOTH
 };
 
 enum ScrollBarDisplayType
 {
-    SBD_DEFAULT,
-    SBD_VISIBLE,
-    SBD_AUTO,
-    SDB_HIDDEN
+    DEFAULT,
+    VISIBLE,
+    AUTO,
+    HIDDEN
 };
 
-enum FillType
+enum class LoaderFillType
 {
-    FT_NONE,
-    FT_SCALE,
-    FT_SCALE_MATCH_HEIGHT,
-    FT_SCALE_MATCH_WIDTH,
-    FT_SCALE_FREE
+    NONE,
+    SCALE,
+    SCALE_MATCH_HEIGHT,
+    SCALE_MATCH_WIDTH,
+    SCALE_FREE
 };
 
-enum ProgressTitleType
+enum class ProgressTitleType
 {
-    PT_PERCENT,
-    PT_VALUE_MAX,
-    PT_VALUE,
-    PT_MAX
+    PERCENT,
+    VALUE_MAX,
+    VALUE,
+    MAX
+};
+
+enum class ListLayoutType
+{
+    SINGLE_COLUMN,
+    SINGLE_ROW,
+    FLOW_HORIZONTAL,
+    FLOW_VERTICAL,
+    PAGINATION
+};
+
+enum class ListSelectionMode
+{
+    SINGLE,
+    MULTIPLE,
+    MULTIPLE_SINGLECLICK,
+    NONE
+};
+
+enum class GroupLayoutType
+{
+    NONE,
+    HORIZONTAL,
+    VERTICAL
+};
+
+enum class PopupDirection
+{
+    AUTO,
+    UP,
+    DOWN
+};
+
+enum class TextAutoSize
+{
+    NONE,
+    BOTH,
+    HEIGHT,
+    SHRINK
+};
+
+enum class FlipType
+{
+    NONE,
+    HORIZONTAL,
+    VERTICAL,
+    BOTH
 };
 
 NS_FGUI_END

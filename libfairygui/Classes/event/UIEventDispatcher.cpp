@@ -2,11 +2,10 @@
 #include "GComponent.h"
 #include "InputProcessor.h"
 
+USING_NS_CC;
 NS_FGUI_BEGIN
 
-int UIEventDispatcher::_gCallbackCounter = 0;
-
-UIEventDispatcher::UIEventDispatcher() :_count(0), _dispatching(0)
+UIEventDispatcher::UIEventDispatcher() :_dispatching(0)
 {
 }
 
@@ -15,39 +14,44 @@ UIEventDispatcher::~UIEventDispatcher()
 
 }
 
-uint32_t UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, uint32_t callbackId)
+void UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, int tag)
 {
-    if (callbackId == 0)
+    if (tag != Node::INVALID_TAG)
     {
-        _gCallbackCounter++;
-        if (_gCallbackCounter > 0x0EEEEEEE)
-            _gCallbackCounter = 0;
-        callbackId = _gCallbackCounter;
+        for (auto it = _callbacks.begin(); it != _callbacks.end(); it++)
+        {
+            if (it->eventType == eventType && it->tag == tag)
+            {
+                it->callback = callback;
+                return;
+            }
+        }
     }
+
     EventCallbackItem item;
     item.callback = callback;
     item.eventType = eventType;
-    item.id = callbackId;
+    item.tag = tag;
     item.dispatching = 0;
     _callbacks.push_back(item);
-    _count++;
-
-    return item.id;
 }
 
-void UIEventDispatcher::removeEventListener(int eventType, uint32_t callbackId)
+void UIEventDispatcher::removeEventListener(int eventType, int tag)
 {
-    for (auto it = _callbacks.begin(); it != _callbacks.end(); ++it)
+    for (auto it = _callbacks.begin(); it != _callbacks.end(); )
     {
-        if (it->eventType == eventType && it->id == callbackId)
+        if (it->eventType == eventType && (it->tag == tag || tag == Node::INVALID_TAG))
         {
             if (_dispatching > 0)
+            {
                 it->callback = nullptr;
+                it++;
+            }
             else
-                _callbacks.erase(it);
-            _count--;
-            break;
+                it = _callbacks.erase(it);
         }
+        else
+            it++;
     }
 }
 
@@ -62,20 +66,20 @@ void UIEventDispatcher::removeEventListeners()
         _callbacks.clear();
 }
 
-bool UIEventDispatcher::hasEventListener(int eventType)
+bool UIEventDispatcher::hasEventListener(int eventType, int tag) const
 {
     for (auto it = _callbacks.cbegin(); it != _callbacks.cend(); ++it)
     {
-        if (it->eventType == eventType && it->callback != nullptr)
+        if (it->eventType == eventType && (it->tag == tag || tag == Node::INVALID_TAG) && it->callback != nullptr)
             return true;
     }
     return false;
 }
 
-void UIEventDispatcher::dispatchEvent(int eventType, void* data)
+bool UIEventDispatcher::dispatchEvent(int eventType, void* data)
 {
-    if (_count == 0)
-        return;
+    if (_callbacks.size() == 0)
+        return false;
 
     EventContext context;
     context._sender = this;
@@ -83,15 +87,19 @@ void UIEventDispatcher::dispatchEvent(int eventType, void* data)
     context._data = data;
 
     doDispatch(eventType, &context);
+
+    return context._defaultPrevented;
 }
 
-void UIEventDispatcher::bubbleEvent(int eventType, void* data)
+bool UIEventDispatcher::bubbleEvent(int eventType, void* data)
 {
     EventContext context;
     context._inputEvent = InputProcessor::getRecentInput();
     context._data = data;
 
     doBubble(eventType, &context);
+
+    return context._defaultPrevented;
 }
 
 bool UIEventDispatcher::isDispatchingEvent(int eventType)
@@ -110,19 +118,31 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 
     retain();
     context->_sender = this;
-    for (auto it = _callbacks.begin(); it != _callbacks.end(); ++it)
+    int cnt = _callbacks.size(); //dont use iterator, because new item would be added in callback.
+    for (int i = 0; i < cnt; i++)
+    {
+        EventCallbackItem& ci = _callbacks[i];
+        if (ci.eventType == eventType && ci.callback != nullptr)
+        {
+            ci.dispatching++;
+            context->_touchCapture = 0;
+            ci.callback(context);
+            ci.dispatching--;
+            if (context->_touchCapture != 0)
+            {
+                if (context->_touchCapture == 1 && eventType == UIEventType::TouchBegin)
+                    ((InputProcessor*)context->_data)->addTouchMonitor(context->getInput()->getTouchId(), this);
+                else if (context->_touchCapture == 2)
+                    ((InputProcessor*)context->_data)->removeTouchMonitor(this);
+            }
+        }
+    }
+    for (auto it = _callbacks.begin(); it != _callbacks.end(); )
     {
         if (it->callback == nullptr)
-            _callbacks.erase(it);
-        else if (it->eventType == eventType)
-        {
-            it->dispatching++;
-            context->_touchEndCapture = false;
-            it->callback(context);
-            it->dispatching--;
-            if (context->_touchEndCapture && eventType == UIEventType::TouchBegin)
-                ((InputProcessor*)context->_data)->addTouchMonitor(context->getInput()->getTouchId(), this);
-        }
+            it = _callbacks.erase(it);
+        else
+            it++;
     }
     release();
 
@@ -131,7 +151,7 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 
 void UIEventDispatcher::doBubble(int eventType, EventContext* context)
 {
-    if (_count > 0)
+    if (!_callbacks.empty())
     {
         context->_isStopped = false;
         doDispatch(eventType, context);

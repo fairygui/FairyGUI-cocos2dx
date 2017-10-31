@@ -8,25 +8,34 @@
 
 NS_FGUI_BEGIN
 
-class GImage : public GObject
+class GImage : public GObject, public IColorGear
 {
-public:
-
 public:
     GImage();
     ~GImage();
 
-    virtual void constructFromResource() override;
-
     CREATE_FUNC(GImage);
 
+    FlipType getFlip() const;
+    void setFlip(FlipType value);
+
+    const cocos2d::Color3B& getColor() const { return _content->getColor(); }
+    void setColor(const cocos2d::Color3B& value);
+
+    virtual void constructFromResource() override;
+
+    cocos2d::Color4B cg_getColor() const override;
+    void cg_setColor(const cocos2d::Color4B& value) override;
+
 protected:
-    virtual bool init() override;
+    virtual void handleInit() override;
+    virtual void handleSizeChanged() override;
+    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
 
 private:
-    cocos2d::ui::Scale9Sprite* _content;
+    cocos2d::Sprite* _content;
 };
 
 NS_FGUI_END
 
-#endif // __GIMAGE_H__
+#endif

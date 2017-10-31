@@ -24,11 +24,15 @@ protected:
     void init() override;
 
 private:
+    void onTweenUpdate(const cocos2d::Vec2& v);
+    void onTweenComplete();
+
     std::unordered_map<std::string, cocos2d::Vec2> _storage;
     cocos2d::Vec2 _default;
     cocos2d::Vec2 _tweenTarget;
+    
 };
 
 NS_FGUI_END
 
-#endif // __GEARXY_H__
+#endif

@@ -62,6 +62,17 @@ bool HelloWorld::init()
 
     this->addChild(GRoot::getInstance()->displayObject());
 
+#ifdef CC_PLATFORM_PC
+    //cocos2dx在PC上用系统字体没有描边功能，这里用个ttf字体作为测试
+    UIConfig::registerFont(UIConfig::defaultFont, "fonts/DroidSansFallback.ttf");
+
+    //demo中有用到一个单独定义字体的文本
+    UIConfig::registerFont(u8"微软雅黑", "Microsoft YaHei");
+#endif
+
+    UIConfig::verticalScrollBar = "ui://Basics/ScrollBar_VT";
+    UIConfig::horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
+
     UIPackage::addPackage("Basics");
     _view = UIPackage::createObject("Basics", "Main")->asCom();
     GRoot::getInstance()->addChild(_view);
@@ -107,8 +118,118 @@ void HelloWorld::runDemo(EventContext* context)
     _demoContainer->addChild(obj);
     _cc->setSelectedIndex(1);
     _backBtn->setVisible(true);
+
+    if (type == "Depth")
+        playDepth();
+    else if (type == "Window")
+        playWindow();
+    else if (type == "Drag&Drop")
+        playDragDrop();
 }
 
+void HelloWorld::playWindow()
+{
+    GComponent* obj = _demoObjects.at("Window");
+    if (_winA == nullptr)
+    {
+        _winA = Window1::create();
+        _winA->retain();
+
+        _winB = Window2::create();
+        _winB->retain();
+
+        obj->getChild("n0")->addClickListener([this](EventContext*)
+        {
+            _winA->show();
+        });
+
+        obj->getChild("n1")->addClickListener([this](EventContext*)
+        {
+            _winB->show();
+        });
+    }
+}
+
+Vec2 startPos;
+void HelloWorld::playDepth()
+{
+    GComponent* obj = _demoObjects.at("Depth");
+    GComponent* testContainer = obj->getChild("n22")->asCom();
+    GObject* fixedObj = testContainer->getChild("n0");
+    fixedObj->setSortingOrder(100);
+    fixedObj->setDraggable(true);
+
+    int numChildren = testContainer->numChildren();
+    int i = 0;
+    while (i < numChildren)
+    {
+        GObject* child = testContainer->getChildAt(i);
+        if (child != fixedObj)
+        {
+            testContainer->removeChildAt(i);
+            numChildren--;
+        }
+        else
+            i++;
+    }
+    startPos = fixedObj->getPosition();
+
+    obj->getChild("btn0")->addClickListener([obj](EventContext*)
+    {
+        GGraph* graph = GGraph::create();
+        startPos.x += 10;
+        startPos.y += 10;
+        graph->setPosition(startPos.x, startPos.y);
+        graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::RED);
+        obj->getChild("n22")->asCom()->addChild(graph);
+    }, (int)this);
+
+    obj->getChild("btn1")->addClickListener([obj](EventContext*)
+    {
+        GGraph* graph = GGraph::create();
+        startPos.x += 10;
+        startPos.y += 10;
+        graph->setPosition(startPos.x, startPos.y);
+        graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::GREEN);
+        graph->setSortingOrder(200);
+        obj->getChild("n22")->asCom()->addChild(graph);
+    }, (int)this);
+}
+
+void HelloWorld::playDragDrop()
+{
+    GComponent* obj = _demoObjects.at("Drag&Drop");
+    obj->getChild("a")->setDraggable(true);
+
+    GButton* b = obj->getChild("b")->asButton();
+    b->setDraggable(true);
+    b->addEventListener(UIEventType::DragStart, [b](EventContext* context)
+    {
+        //Cancel the original dragging, and start a new one with a agent.
+        context->preventDefault();
+
+        DragDropManager::getInstance()->startDrag(b->getIcon(), (void*)b->getIcon().c_str(),
+            context->getInput()->getTouchId());
+    });
+
+    GButton* c = obj->getChild("c")->asButton();
+    c->setIcon("");
+    c->addEventListener(UIEventType::Drop, [c](EventContext* context)
+    {
+        c->setIcon((char*)context->getData());
+    });
+
+    GObject* bounds = obj->getChild("n7");
+    Rect rect = bounds->transformRect(Rect(Vec2::ZERO, bounds->getSize()), GRoot::getInstance());
+
+    //---!!Because at this time the container is on the right side of the stage and beginning to move to left(transition), so we need to caculate the final position
+    rect.origin.x -= obj->getParent()->getX();;
+    //----
+
+    GButton* d = obj->getChild("d")->asButton();
+    d->setDraggable(true);
+    d->setDragBounds(rect);
+}
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {

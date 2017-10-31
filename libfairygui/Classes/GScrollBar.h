@@ -21,7 +21,6 @@ public:
     float getMinSize();
 
 protected:
-    virtual bool init() override;
     virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
 
 private:
@@ -46,4 +45,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __GSCROLLBAR_H__
+#endif

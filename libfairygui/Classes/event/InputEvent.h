@@ -19,21 +19,26 @@ public:
     const int getY() { return _pos.y; }
     const cocos2d::Vec2& getPosition() { return _pos; }
     cocos2d::Touch* getTouch() { return _touch; }
-    int getTouchId() { return _touch->getID(); }
+    int getTouchId() { return _touchId; }
     int isDoubleClick() { return _clickCount == 2; }
-    int getButton() { return _button; }
-    int getMouseWheelDelta() { return 0; }
+    cocos2d::EventMouse::MouseButton getButton() { return _button; }
+    int getMouseWheelDelta() { return _mouseWheelDelta; }
+
+    bool isShift() { return false; }
+    bool isCtrl() { return false; }
 
 private:
     GObject* _target;
     cocos2d::Touch* _touch;
     cocos2d::Vec2 _pos;
+    int _touchId;
     int _clickCount;
-    int _button;
+    int _mouseWheelDelta;
+    cocos2d::EventMouse::MouseButton _button;
 
     friend class InputProcessor;
 };
 
 NS_FGUI_END
 
-#endif // __INPUTEVENT_H__
+#endif

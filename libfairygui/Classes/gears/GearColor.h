@@ -9,6 +9,16 @@ NS_FGUI_BEGIN
 
 class GObject;
 
+class IColorGear
+{
+public:
+    virtual cocos2d::Color4B cg_getColor() const = 0;
+    virtual void cg_setColor(const cocos2d::Color4B& value) = 0;
+
+    virtual cocos2d::Color4B cg_getOutlineColor() const { return cocos2d::Color4B(0, 0, 0, 0); };
+    virtual void cg_setOutlineColor(const cocos2d::Color4B& value) {};
+};
+
 class GearColor : public GearBase
 {
 public:
@@ -23,10 +33,24 @@ protected:
     void init() override;
 
 private:
-    std::unordered_map<std::string, cocos2d::Vec2> _storage;
-    cocos2d::Vec2 _default;
+    void onTweenUpdate(const cocos2d::Vec4& v);
+    void onTweenComplete();
+
+    class GearColorValue
+    {
+    public:
+        cocos2d::Color4B color;
+        cocos2d::Color4B outlineColor;
+
+        GearColorValue();
+        GearColorValue(const cocos2d::Color4B& color, const cocos2d::Color4B& outlineColor);
+    };
+
+    std::unordered_map<std::string, GearColorValue> _storage;
+    GearColorValue _default;
+    cocos2d::Vec4 _tweenTarget;
 };
 
 NS_FGUI_END
 
-#endif // __GEARCOLOR_H__
+#endif

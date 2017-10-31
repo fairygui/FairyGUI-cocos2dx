@@ -6,7 +6,8 @@ using namespace std;
 
 vector<string> helperArray;
 
-vector<std::string> &ToolSet::splitString(const string &s, char delim, vector<string> &elems) {
+void ToolSet::splitString(const string &s, char delim, vector<string> &elems)
+{
     elems.clear();
     stringstream ss(s);
     string item;
@@ -15,8 +16,6 @@ vector<std::string> &ToolSet::splitString(const string &s, char delim, vector<st
     }
     if (s.back() == delim)
         elems.push_back(cocos2d::STD_STRING_EMPTY);
-
-    return elems;
 }
 
 void ToolSet::splitString(const string &s, char delim, cocos2d::Vec2& value, bool intType)
@@ -79,7 +78,7 @@ void ToolSet::splitString(const std::string & s, char delim, std::string & str1,
         str2 = str1;
 }
 
-ssize_t ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::string str)
+ssize_t ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::string& str)
 {
     auto iter = std::find(arr.begin(), arr.end(), str);
     if (iter != arr.end())
@@ -112,6 +111,7 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
     }
 }
 
+#pragma warning(once:4307) 
 
 typedef std::uint64_t hash_t;
 
@@ -231,118 +231,330 @@ int ToolSet::parseGearIndex(const char* p)
     }
 }
 
-FillType ToolSet::parseFillType(const char * p)
+LoaderFillType ToolSet::parseFillType(const char * p)
 {
     if (!p)
-        return FillType::FT_NONE;
+        return LoaderFillType::NONE;
 
     switch (hash_(p))
     {
     case "none"_hash:
-        return FillType::FT_NONE;
+        return LoaderFillType::NONE;
     case "scale"_hash:
-        return FillType::FT_SCALE;
+        return LoaderFillType::SCALE;
     case "scaleMatchHeight"_hash:
-        return FillType::FT_SCALE_MATCH_HEIGHT;
+        return LoaderFillType::SCALE_MATCH_HEIGHT;
     case "scaleMatchWidth"_hash:
-        return FillType::FT_SCALE_MATCH_WIDTH;
+        return LoaderFillType::SCALE_MATCH_WIDTH;
     case "scaleFree"_hash:
-        return FillType::FT_SCALE_FREE;
+        return LoaderFillType::SCALE_FREE;
     default:
-        return FillType::FT_NONE;
+        return LoaderFillType::NONE;
     }
 }
 
 ButtonMode ToolSet::parseButtonMode(const char * p)
 {
     if (!p)
-        return ButtonMode::BM_COMMON;
+        return ButtonMode::COMMON;
 
     switch (hash_(p))
     {
     case "Check"_hash:
-        return ButtonMode::BM_CHECK;
+        return ButtonMode::CHECK;
     case "Radio"_hash:
-        return ButtonMode::BM_RADIO;
+        return ButtonMode::RADIO;
     default:
-        return ButtonMode::BM_COMMON;
+        return ButtonMode::COMMON;
     }
 }
 
 OverflowType ToolSet::parseOverflowType(const char * p)
 {
     if (!p)
-        return OverflowType::OF_VISIBLE;
+        return OverflowType::VISIBLE;
 
     switch (hash_(p))
     {
     case "visible"_hash:
-        return OverflowType::OF_VISIBLE;
+        return OverflowType::VISIBLE;
     case "hidden"_hash:
-        return OverflowType::OF_HIDDEN;
+        return OverflowType::HIDDEN;
     case "scroll"_hash:
-        return OverflowType::OF_SCROLL;
+        return OverflowType::SCROLL;
     default:
-        return OverflowType::OF_VISIBLE;
+        return OverflowType::VISIBLE;
     }
 }
 
 ScrollType ToolSet::parseScrollType(const char * p)
 {
     if (!p)
-        return ScrollType::ST_HORIZONTAL;
+        return ScrollType::HORIZONTAL;
 
     switch (hash_(p))
     {
     case "horizontal"_hash:
-        return ScrollType::ST_HORIZONTAL;
+        return ScrollType::HORIZONTAL;
     case "vertical"_hash:
-        return ScrollType::ST_VERTICAL;
+        return ScrollType::VERTICAL;
     case "both"_hash:
-        return ScrollType::ST_BOTH;
+        return ScrollType::BOTH;
     default:
-        return ScrollType::ST_HORIZONTAL;
+        return ScrollType::HORIZONTAL;
     }
 }
 
 ScrollBarDisplayType ToolSet::parseScrollBarDisplayType(const char * p)
 {
     if (!p)
-        return ScrollBarDisplayType::SBD_DEFAULT;
+        return ScrollBarDisplayType::DEFAULT;
 
     switch (hash_(p))
     {
     case "default"_hash:
-        return ScrollBarDisplayType::SBD_DEFAULT;
+        return ScrollBarDisplayType::DEFAULT;
     case "visible"_hash:
-        return ScrollBarDisplayType::SBD_VISIBLE;
+        return ScrollBarDisplayType::VISIBLE;
     case "auto"_hash:
-        return ScrollBarDisplayType::SBD_AUTO;
+        return ScrollBarDisplayType::AUTO;
     case "hidden"_hash:
-        return ScrollBarDisplayType::SDB_HIDDEN;
+        return ScrollBarDisplayType::HIDDEN;
     default:
-        return ScrollBarDisplayType::SBD_DEFAULT;
+        return ScrollBarDisplayType::DEFAULT;
     }
 }
 
 ProgressTitleType ToolSet::parseProgressTitleType(const char * p)
 {
     if (!p)
-        return ProgressTitleType::PT_PERCENT;
+        return ProgressTitleType::PERCENT;
 
     switch (hash_(p))
     {
     case "percent"_hash:
-        return ProgressTitleType::PT_PERCENT;
+        return ProgressTitleType::PERCENT;
     case "valueAndmax"_hash:
-        return ProgressTitleType::PT_VALUE_MAX;
+        return ProgressTitleType::VALUE_MAX;
     case "value"_hash:
-        return ProgressTitleType::PT_VALUE;
+        return ProgressTitleType::VALUE;
     case "max"_hash:
-        return ProgressTitleType::PT_MAX;
+        return ProgressTitleType::MAX;
     default:
-        return ProgressTitleType::PT_PERCENT;
+        return ProgressTitleType::PERCENT;
     }
 }
+
+ListLayoutType ToolSet::parseListLayoutType(const char * p)
+{
+    if (!p)
+        return ListLayoutType::SINGLE_COLUMN;
+
+    switch (hash_(p))
+    {
+    case "column"_hash:
+        return ListLayoutType::SINGLE_COLUMN;
+    case "row"_hash:
+        return ListLayoutType::SINGLE_ROW;
+    case "flow_hz"_hash:
+        return ListLayoutType::FLOW_HORIZONTAL;
+    case "flow_vt"_hash:
+        return ListLayoutType::FLOW_VERTICAL;
+    case "pagination"_hash:
+        return ListLayoutType::PAGINATION;
+    default:
+        return ListLayoutType::SINGLE_COLUMN;
+    }
+}
+
+ListSelectionMode ToolSet::parseListSelectionMode(const char * p)
+{
+    if (!p)
+        return ListSelectionMode::SINGLE;
+
+    switch (hash_(p))
+    {
+    case "single"_hash:
+        return ListSelectionMode::SINGLE;
+    case "multiple"_hash:
+        return ListSelectionMode::MULTIPLE;
+    case "multipleSingleClick"_hash:
+        return ListSelectionMode::MULTIPLE_SINGLECLICK;
+    case "none"_hash:
+        return ListSelectionMode::NONE;
+    default:
+        return ListSelectionMode::SINGLE;
+    }
+}
+
+ChildrenRenderOrder ToolSet::parseChildrenRenderOrder(const char * p)
+{
+    if (!p)
+        return ChildrenRenderOrder::ASCENT;
+
+    switch (hash_(p))
+    {
+    case "ascent"_hash:
+        return ChildrenRenderOrder::ASCENT;
+    case "descent"_hash:
+        return ChildrenRenderOrder::DESCENT;
+    case "arch"_hash:
+        return ChildrenRenderOrder::ARCH;
+    default:
+        return ChildrenRenderOrder::ASCENT;
+    }
+}
+
+GroupLayoutType ToolSet::parseGroupLayoutType(const char * p)
+{
+    if (!p)
+        return GroupLayoutType::NONE;
+
+    switch (hash_(p))
+    {
+    case "hz"_hash:
+        return GroupLayoutType::HORIZONTAL;
+    case "vt"_hash:
+        return GroupLayoutType::VERTICAL;
+    default:
+        return GroupLayoutType::NONE;
+    }
+}
+
+PopupDirection ToolSet::parsePopupDirection(const char * p)
+{
+    if (!p)
+        return PopupDirection::AUTO;
+
+    switch (hash_(p))
+    {
+    case "auto"_hash:
+        return PopupDirection::AUTO;
+    case "up"_hash:
+        return PopupDirection::UP;
+    case "down"_hash:
+        return PopupDirection::DOWN;
+    default:
+        return PopupDirection::AUTO;
+    }
+}
+
+TextAutoSize ToolSet::parseTextAutoSize(const char * p)
+{
+    if (!p)
+        return TextAutoSize::NONE;
+
+    switch (hash_(p))
+    {
+    case "none"_hash:
+        return TextAutoSize::NONE;
+    case "both"_hash:
+        return TextAutoSize::BOTH;
+    case "height"_hash:
+        return TextAutoSize::HEIGHT;
+    case "shrink"_hash:
+        return TextAutoSize::SHRINK;
+    default:
+        return TextAutoSize::NONE;
+    }
+}
+
+FlipType ToolSet::parseFlipType(const char * p)
+{
+    if (!p)
+        return FlipType::NONE;
+
+    switch (hash_(p))
+    {
+    case "both"_hash:
+        return FlipType::BOTH;
+    case "hz"_hash:
+        return FlipType::HORIZONTAL;
+    case "vt"_hash:
+        return FlipType::VERTICAL;
+    default:
+        return FlipType::NONE;
+    }
+}
+
+cocos2d::tweenfunc::TweenType ToolSet::parseEaseType(const char * p)
+{
+    if (!p)
+        return tweenfunc::Expo_EaseOut;
+
+    switch (hash_(p))
+    {
+    case "Linear"_hash:
+        return tweenfunc::Linear;
+
+    case "Elastic.In"_hash:
+        return tweenfunc::Elastic_EaseIn;
+    case "Elastic.Out"_hash:
+        return tweenfunc::Elastic_EaseOut;
+    case "Elastic.InOut"_hash:
+        return tweenfunc::Elastic_EaseInOut;
+
+    case "Quad.In"_hash:
+        return tweenfunc::Quad_EaseIn;
+    case "Quad.Out"_hash:
+        return tweenfunc::Quad_EaseOut;
+    case "Quad.InOut"_hash:
+        return tweenfunc::Quad_EaseInOut;
+
+    case "Cube.In"_hash:
+        return tweenfunc::Cubic_EaseIn;
+    case "Cube.Out"_hash:
+        return tweenfunc::Cubic_EaseOut;
+    case "Cube.InOut"_hash:
+        return tweenfunc::Cubic_EaseInOut;
+
+    case "Quart.In"_hash:
+        return tweenfunc::Quart_EaseIn;
+    case "Quart.Out"_hash:
+        return tweenfunc::Quart_EaseOut;
+    case "Quart.InOut"_hash:
+        return tweenfunc::Quart_EaseInOut;
+
+    case "Sine.In"_hash:
+        return tweenfunc::Sine_EaseIn;
+    case "Sine.Out"_hash:
+        return tweenfunc::Sine_EaseOut;
+    case "Sine.InOut"_hash:
+        return tweenfunc::Sine_EaseInOut;
+
+    case "Bounce.In"_hash:
+        return tweenfunc::Bounce_EaseIn;
+    case "Bounce.Out"_hash:
+        return tweenfunc::Bounce_EaseOut;
+    case "Bounce.InOut"_hash:
+        return tweenfunc::Bounce_EaseInOut;
+
+    case "Circ.In"_hash:
+        return tweenfunc::Circ_EaseIn;
+    case "Circ.Out"_hash:
+        return tweenfunc::Circ_EaseOut;
+    case "Circ.InOut"_hash:
+        return tweenfunc::Circ_EaseInOut;
+
+    case "Expo.In"_hash:
+        return tweenfunc::Expo_EaseIn;
+    case "Expo.Out"_hash:
+        return tweenfunc::Expo_EaseOut;
+    case "Expo.InOut"_hash:
+        return tweenfunc::Expo_EaseInOut;
+
+    case "Back.In"_hash:
+        return tweenfunc::Back_EaseIn;
+    case "Back.Out"_hash:
+        return tweenfunc::Back_EaseOut;
+    case "Back.InOut"_hash:
+        return tweenfunc::Back_EaseInOut;
+
+    default:
+        return tweenfunc::Expo_EaseOut;
+    }
+}
+
+#pragma warning(default:4307)
 
 NS_FGUI_END

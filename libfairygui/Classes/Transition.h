@@ -3,7 +3,6 @@
 
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
-#include "tinyxml2/tinyxml2.h"
 
 NS_FGUI_BEGIN
 
@@ -23,4 +22,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __TRANSITION_H__
+#endif

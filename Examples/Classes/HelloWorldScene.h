@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include "FairyGUI.h"
+#include "Window1.h"
+#include "Window2.h"
 
 class HelloWorld : public cocos2d::Scene
 {
@@ -21,10 +23,17 @@ private:
     void runDemo(fairygui::EventContext* context);
     void onClickBack(fairygui::EventContext* context);
 
+    void playDragDrop();
+    void playWindow();
+    void playDepth();
+
     fairygui::GComponent* _view;
     fairygui::GObject* _backBtn;
     fairygui::GComponent* _demoContainer;
     fairygui::Controller* _cc;
+    Window1* _winA;
+    Window2* _winB;
+
     cocos2d::Map<std::string, fairygui::GComponent*> _demoObjects;
 
 };

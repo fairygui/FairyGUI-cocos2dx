@@ -111,9 +111,6 @@
     <ClInclude Include="..\Classes\FairyGUIMacros.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\display\ScissorClipNode.h">
-      <Filter>src\display</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\event\InputEvent.h">
       <Filter>src\event</Filter>
     </ClInclude>
@@ -167,6 +164,21 @@
     </ClInclude>
     <ClInclude Include="..\Classes\FieldTypes.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GObjectPool.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\DragDropManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\display\Actions.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\display\FUIRichText.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\display\FUISprite.h">
+      <Filter>src\display</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -257,9 +269,6 @@
     <ClCompile Include="..\Classes\GButton.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\display\ScissorClipNode.cpp">
-      <Filter>src\display</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\event\InputEvent.cpp">
       <Filter>src\event</Filter>
     </ClCompile>
@@ -307,6 +316,21 @@
     </ClCompile>
     <ClCompile Include="..\Classes\Margin.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GObjectPool.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\DragDropManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\Actions.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\FUISprite.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\FUIRichText.cpp">
+      <Filter>src\display</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,11 +1,9 @@
 #include "GComponent.h"
-#include "Controller.h"
-#include "utils/ToolSet.h"
 #include "UIObjectFactory.h"
 #include "Relations.h"
 #include "GGroup.h"
 #include "ScrollPane.h"
-#include "display/ScissorClipNode.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -13,18 +11,18 @@ USING_NS_CC;
 using namespace std;
 using namespace tinyxml2;
 
-GComponent::GComponent()
-    :_sortingChildCount(0),
-    _opaque(false),
+GComponent::GComponent() :
     _container(nullptr),
-    _rootContainer(nullptr),
-    _childrenRenderOrder(ChildrenRenderOrder::CRO_ASCENT),
-    _apexIndex(0),
-    _applyingController(nullptr),
-    _buildingDisplayList(false),
     _scrollPane(nullptr),
+    _mask(nullptr),
+    _childrenRenderOrder(ChildrenRenderOrder::ASCENT),
+    _apexIndex(0),
     _boundsChanged(false),
-    _trackBounds(false)
+    _trackBounds(false),
+    _opaque(false),
+    _sortingChildCount(0),
+    _applyingController(nullptr),
+    _buildingDisplayList(false)
 {
 }
 
@@ -33,9 +31,20 @@ GComponent::~GComponent()
     _children.clear();
     _controllers.clear();
     _transitions.clear();
-    if (_container != _rootContainer)
-        CC_SAFE_RELEASE(_container);
+    CC_SAFE_RELEASE(_container);
     CC_SAFE_RELEASE(_scrollPane);
+}
+
+void GComponent::handleInit()
+{
+    _displayObject = ClippingRectangleNode::create();
+    ((ClippingRectangleNode*)_displayObject)->setClippingEnabled(false);
+    _displayObject->retain();
+
+    _container = Node::create();
+    _container->retain();
+    _container->setCascadeOpacityEnabled(true);
+    _displayObject->addChild(_container);
 }
 
 GObject* GComponent::addChild(GObject* child)
@@ -46,20 +55,19 @@ GObject* GComponent::addChild(GObject* child)
 
 GObject* GComponent::addChildAt(GObject* child, int index)
 {
-    CCASSERT(index >= 0 && index <= _children.size(), "Invalid child index");
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
-    if (child->getParent() == this)
+    if (child->_parent == this)
     {
         setChildIndex(child, index);
     }
     else
     {
         child->removeFromParent();
-        child->setParent(this);
+        child->_parent = this;
 
         int cnt = _children.size();
-        if (child->getSortingOrder() != 0)
+        if (child->_sortingOrder != 0)
         {
             _sortingChildCount++;
             index = getInsertPosForSortingChild(child);
@@ -77,8 +85,8 @@ GObject* GComponent::addChildAt(GObject* child, int index)
 
         childStateChanged(child);
         setBoundsChangedFlag();
-        if (child->getGroup() != nullptr)
-            child->getGroup()->setBoundsChangedFlag(true);
+        if (child->_group != nullptr)
+            child->_group->setBoundsChangedFlag(true);
     }
     return child;
 }
@@ -93,51 +101,40 @@ int GComponent::getInsertPosForSortingChild(GObject* target)
         if (child == target)
             continue;
 
-        if (target->getSortingOrder() < child->getSortingOrder())
+        if (target->_sortingOrder < child->_sortingOrder)
             break;
     }
     return i;
 }
 
-GObject* GComponent::removeChild(GObject* child)
+void GComponent::removeChild(GObject* child)
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
     int childIndex = _children.getIndex(child);
     if (childIndex != -1)
         removeChildAt(childIndex);
-    return child;
 }
 
-GObject* GComponent::removeChildAt(int index)
+void GComponent::removeChildAt(int index)
 {
-    CCASSERT(index >= 0 && index <= _children.size(), "Invalid child index");
-
     GObject* child = _children.at(index);
 
-    child->setParent(nullptr);
+    child->_parent = nullptr;
 
-    if (child->getSortingOrder() != 0)
+    if (child->_sortingOrder != 0)
         _sortingChildCount--;
 
     child->setGroup(nullptr);
-    if (child->inContainer())
+    if (child->_displayObject->getParent() != nullptr)
     {
-        _container->removeChild(child->displayObject());
-        if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ARCH)
-        {
-
-        }
+        _container->removeChild(child->_displayObject, false);
+        if (_childrenRenderOrder == ChildrenRenderOrder::ARCH)
+            CALL_LATER(GComponent, buildNativeDisplayList);
     }
 
     _children.erase(index);
     setBoundsChangedFlag();
-    return child;
-}
-
-void GComponent::removeChildren()
-{
-    removeChildren(0, -1);
 }
 
 void GComponent::removeChildren(int beginIndex, int endIndex)
@@ -149,87 +146,97 @@ void GComponent::removeChildren(int beginIndex, int endIndex)
         removeChildAt(beginIndex);
 }
 
-GObject* GComponent::getChildAt(int index)
+GObject* GComponent::getChildAt(int index) const
 {
-    CCASSERT(index >= 0 && index <= _children.size(), "Invalid child index");
-
     return _children.at(index);
 }
 
-GObject* GComponent::getChild(const std::string& name)
+GObject* GComponent::getChild(const std::string& name) const
 {
-    for (auto it = _children.cbegin(); it != _children.cend(); ++it)
+    for (const auto& child : _children)
     {
-        if ((*it)->name.compare(name) == 0)
-            return *it;
+        if (child->name.compare(name) == 0)
+            return child;
     }
 
     return nullptr;
 }
 
-GObject* GComponent::getVisibleChild(const std::string&)
-{
-    for (auto it = _children.cbegin(); it != _children.cend(); ++it)
-    {
-        if ((*it)->finalVisible() && (*it)->name.compare(name) == 0)
-            return (*it);
-    }
-
-    return nullptr;
-}
-
-GObject* GComponent::getChildInGroup(GGroup* group, const std::string&)
+GObject* GComponent::getChildInGroup(const GGroup* group, const std::string& name) const
 {
     CCASSERT(group != nullptr, "Argument must be non-nil");
 
-    for (auto it = _children.cbegin(); it != _children.cend(); ++it)
+    for (const auto& child : _children)
     {
-        if ((*it)->getGroup() == group && (*it)->name.compare(name) == 0)
-            return (*it);
+        if (child->_group == group && child->name.compare(name) == 0)
+            return child;
     }
 
     return nullptr;
 }
 
-GObject* GComponent::getChildById(const std::string& id)
+GObject* GComponent::getChildById(const std::string& id) const
 {
-    for (auto it = _children.cbegin(); it != _children.cend(); ++it)
+    for (const auto& child : _children)
     {
-        if ((*it)->id.compare(id) == 0)
-            return (*it);
+        if (child->id.compare(id) == 0)
+            return child;
     }
 
     return nullptr;
 }
 
-int GComponent::getChildIndex(GObject* child)
+int GComponent::getChildIndex(const GObject* child) const
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
-    return _children.getIndex(child);
+    return _children.getIndex((GObject*)child);
 }
 
-void GComponent::setChildIndex(GObject* child, int nIndex)
+void GComponent::setChildIndex(GObject* child, int index)
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
     int oldIndex = _children.getIndex(child);
     CCASSERT(oldIndex != -1, "Not a child of this container");
 
-    if (child->getSortingOrder() != 0) //no effect
+    if (child->_sortingOrder != 0) //no effect
         return;
 
     int cnt = _children.size();
     if (_sortingChildCount > 0)
     {
-        if (nIndex > (cnt - _sortingChildCount - 1))
-            nIndex = cnt - _sortingChildCount - 1;
+        if (index > (cnt - _sortingChildCount - 1))
+            index = cnt - _sortingChildCount - 1;
     }
 
-    _setChildIndex(child, oldIndex, nIndex);
+    moveChild(child, oldIndex, index);
 }
 
-int GComponent::_setChildIndex(GObject* child, int oldIndex, int index)
+int GComponent::setChildIndexBefore(GObject* child, int index)
+{
+    CCASSERT(child != nullptr, "Argument must be non-nil");
+
+    int oldIndex = _children.getIndex(child);
+    CCASSERT(oldIndex != -1, "Not a child of this container");
+
+    if (child->_sortingOrder != 0) //no effect
+        return oldIndex;
+
+    int cnt = _children.size();
+    if (_sortingChildCount > 0)
+    {
+        if (index > (cnt - _sortingChildCount - 1))
+            index = cnt - _sortingChildCount - 1;
+    }
+
+    if (oldIndex < index)
+        return moveChild(child, oldIndex, index - 1);
+    else
+        return moveChild(child, oldIndex, index);
+}
+
+int GComponent::moveChild(GObject* child, int oldIndex, int index)
 {
     int cnt = _children.size();
     if (index > cnt)
@@ -244,33 +251,32 @@ int GComponent::_setChildIndex(GObject* child, int oldIndex, int index)
     else
         _children.insert(index, child);
 
-    if (child->inContainer())
+    if (child->_displayObject->getParent() != nullptr)
     {
-        if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ASCENT)
+        if (_childrenRenderOrder == ChildrenRenderOrder::ASCENT)
         {
             int fromIndex = min(index, oldIndex);
-            int toIndex = min(max(index, oldIndex), cnt);
+            int toIndex = min(max(index, oldIndex), cnt - 1);
             for (int i = fromIndex; i <= toIndex; i++)
             {
                 GObject* g = _children.at(i);
-                if (g->inContainer())
-                    g->displayObject()->setLocalZOrder(i);
+                if (g->_displayObject->getParent() != nullptr)
+                    g->_displayObject->setLocalZOrder(i);
             }
         }
-        else if (_childrenRenderOrder == ChildrenRenderOrder::CRO_DESCENT)
+        else if (_childrenRenderOrder == ChildrenRenderOrder::DESCENT)
         {
             int fromIndex = min(index, oldIndex);
-            int toIndex = min(max(index, oldIndex), cnt);
+            int toIndex = min(max(index, oldIndex), cnt - 1);
             for (int i = fromIndex; i <= toIndex; i++)
             {
                 GObject* g = _children.at(i);
-                if (g->inContainer())
-                    g->displayObject()->setLocalZOrder(cnt - 1 - i);
+                if (g->_displayObject->getParent() != nullptr)
+                    g->_displayObject->setLocalZOrder(cnt - 1 - i);
             }
         }
         else
-        {
-        }
+            CALL_LATER(GComponent, buildNativeDisplayList);
 
         setBoundsChangedFlag();
     }
@@ -280,35 +286,52 @@ int GComponent::_setChildIndex(GObject* child, int oldIndex, int index)
 
 void GComponent::swapChildren(GObject* child1, GObject* child2)
 {
+    CCASSERT(child1 != nullptr, "Argument1 must be non-nil");
+    CCASSERT(child2 != nullptr, "Argument2 must be non-nil");
 
+    int index1 = _children.getIndex(child1);
+    int index2 = _children.getIndex(child2);
+
+    CCASSERT(index1 != -1, "Not a child of this container");
+    CCASSERT(index2 != -1, "Not a child of this container");
+
+    swapChildrenAt(index1, index2);
 }
 
 void GComponent::swapChildrenAt(int index1, int index2)
 {
+    GObject* child1 = _children.at(index1);
+    GObject* child2 = _children.at(index2);
 
+    setChildIndex(child1, index2);
+    setChildIndex(child2, index1);
 }
 
-int GComponent::numChildren()
+int GComponent::numChildren() const
 {
     return _children.size();
 }
 
-void GComponent::addController(Controller* controller)
+bool GComponent::isAncestorOf(const GObject * obj) const
 {
-    _controllers.pushBack(controller);
-}
+    if (obj == nullptr)
+        return false;
 
-void GComponent::setMargin(const Margin & value)
-{
-    _margin = value;
-}
-
-Controller* GComponent::getController(const std::string& name)
-{
-    int cnt = _controllers.size();
-    for (int i = 0; i < cnt; ++i)
+    GComponent* p = obj->_parent;
+    while (p != nullptr)
     {
-        Controller* c = _controllers.at(i);
+        if (p == this)
+            return true;
+
+        p = p->_parent;
+    }
+    return false;
+}
+
+Controller* GComponent::getController(const std::string& name) const
+{
+    for (const auto& c : _controllers)
+    {
         if (c->name.compare(name) == 0)
             return c;
     }
@@ -316,10 +339,19 @@ Controller* GComponent::getController(const std::string& name)
     return nullptr;
 }
 
+void GComponent::addController(Controller* c)
+{
+    CCASSERT(c != nullptr, "Argument must be non-nil");
+
+    _controllers.pushBack(c);
+}
+
 void GComponent::removeController(Controller* c)
 {
+    CCASSERT(c != nullptr, "Argument must be non-nil");
+
     int index = _controllers.getIndex(c);
-    CCASSERT(index != -1, StringUtils::format("controller not exists: %s", c->name.c_str()).c_str());
+    CCASSERT(index != -1, "controller not exists");
 
     c->setParent(nullptr);
     applyController(c);
@@ -330,19 +362,16 @@ void GComponent::applyController(Controller * c)
 {
     _applyingController = c;
 
-    int cnt = _children.size();
-    for (int i = 0; i < cnt; ++i)
-    {
-        GObject* child = _children.at(i);
+    for (const auto& child : _children)
         child->handleControllerChanged(c);
-    }
+
     _applyingController = nullptr;
 }
 
 void GComponent::applyAllControllers()
 {
-    for (auto it = _controllers.cbegin(); it != _controllers.cend(); ++it)
-        applyController(*it);
+    for (const auto& c : _controllers)
+        applyController(c);
 }
 
 void GComponent::adjustRadioGroupDepth(GObject* obj, Controller* c)
@@ -373,204 +402,71 @@ void GComponent::adjustRadioGroupDepth(GObject* obj, Controller* c)
     }
 }
 
-void GComponent::setupScroll(const Margin& scrollBarMargin,
-    ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
-    const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
-    const std::string& headerRes, const std::string& footerRes)
+void GComponent::setOpaque(bool value)
 {
-    if (_rootContainer == _container)
-    {
-        _container = Node::create();
-        _container->retain();
-        _rootContainer->addChild(_container);
-    }
-
-    _scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
-    _scrollPane->retain();
+    _opaque = value;
 }
 
-void GComponent::setupOverflow(OverflowType overflow)
+void GComponent::setMargin(const Margin & value)
 {
-    if (overflow == OverflowType::OF_HIDDEN)
-    {
-        if (_rootContainer == _container)
-        {
-            _container = Node::create();
-            _container->retain();
-            _rootContainer->addChild(_container);
-            ((ScissorClipNode*)_rootContainer)->setClippingEnabled(true);
-        }
+    _margin = value;
+}
 
-        _container->setPosition(_margin.left, -_margin.top);
-    }
-    else if (_margin.left != 0 || _margin.top != 0)
+void GComponent::setChildrenRenderOrder(ChildrenRenderOrder value)
+{
+    if (_childrenRenderOrder != value)
     {
-        if (_rootContainer == _container)
-        {
-            _container = Node::create();
-            _container->retain();
-            _rootContainer->addChild(_container);
-        }
-
-        _container->setPosition(_margin.left, -_margin.top);
+        _childrenRenderOrder = value;
+        CALL_LATER(GComponent, buildNativeDisplayList);
     }
 }
 
-void GComponent::handleSizeChanged()
+void GComponent::setApexIndex(int value)
 {
-    GObject::handleSizeChanged();
+    if (_apexIndex != value)
+    {
+        _apexIndex = value;
 
+        if (_childrenRenderOrder == ChildrenRenderOrder::ARCH)
+            CALL_LATER(GComponent, buildNativeDisplayList);
+    }
+}
+
+void GComponent::setMask(cocos2d::Node * value)
+{
+    _mask = value;
+}
+
+float GComponent::getViewWidth() const
+{
     if (_scrollPane != nullptr)
-        _scrollPane->onOwnerSizeChanged();
-
-    /*if (rootContainer.hitArea is PixelHitTest)
-    {
-        PixelHitTest test = (PixelHitTest)rootContainer.hitArea;
-        if (sourceWidth != 0)
-            test.scaleX = this.width / this.sourceWidth;
-        if (sourceHeight != 0)
-            test.scaleY = this.height / this.sourceHeight;
-    }*/
-}
-
-void GComponent::handleGrayedChanged()
-{
-    Controller* cc = getController("grayed");
-    if (cc != nullptr)
-        cc->setSelectedIndex(isGrayed() ? 1 : 0);
+        return _scrollPane->getViewSize().width;
     else
-        GObject::handleGrayedChanged();
+        return _size.width - _margin.left - _margin.right;
 }
 
-void GComponent::handleControllerChanged(Controller* c)
+void GComponent::setViewWidth(float value)
 {
-    GObject::handleControllerChanged(c);
-
     if (_scrollPane != nullptr)
-        _scrollPane->handleControllerChanged(c);
-}
-
-void GComponent::childStateChanged(GObject* child)
-{
-    if (_buildingDisplayList)
-        return;
-
-    int cnt = _children.size();
-
-    if (dynamic_cast<GGroup*>(child) != nullptr)
-    {
-        for (int i = 0; i < cnt; ++i)
-        {
-            GObject* g = _children.at(i);
-            if (g->getGroup() == child)
-                childStateChanged(g);
-        }
-        return;
-    }
-
-    if (child->displayObject() == nullptr)
-        return;
-
-    if (child->finalVisible())
-    {
-        if (child->displayObject()->getParent() == nullptr)
-        {
-            if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ASCENT)
-            {
-                _container->addChild(child->displayObject(), _children.getIndex(child));
-            }
-            else if (_childrenRenderOrder == ChildrenRenderOrder::CRO_DESCENT)
-            {
-                _container->addChild(child->displayObject(), cnt - 1 - _children.getIndex(child));
-            }
-            else
-            {
-            }
-        }
-    }
+        _scrollPane->setViewWidth(value);
     else
-    {
-        if (child->displayObject()->getParent() != nullptr)
-        {
-            _container->removeChild(child->displayObject());
-            if (_childrenRenderOrder == ChildrenRenderOrder::CRO_ARCH)
-            {
-
-            }
-        }
-    }
+        setWidth(value + _margin.left + _margin.right);
 }
 
-void GComponent::childSortingOrderChanged(GObject* child, int oldValue, int newValue)
+float GComponent::getViewHeight() const
 {
-    if (newValue == 0)
-    {
-        _sortingChildCount--;
-        setChildIndex(child, _children.size());
-    }
+    if (_scrollPane != nullptr)
+        return _scrollPane->getViewSize().height;
     else
-    {
-        if (oldValue == 0)
-            _sortingChildCount++;
-
-        int oldIndex = _children.getIndex(child);
-        int index = getInsertPosForSortingChild(child);
-        if (oldIndex < index)
-            _setChildIndex(child, oldIndex, index - 1);
-        else
-            _setChildIndex(child, oldIndex, index);
-    }
+        return _size.height - _margin.top - _margin.bottom;
 }
 
-void GComponent::buildNativeDisplayList()
+void GComponent::setViewHeight(float value)
 {
-    if (_displayObject == nullptr)
-        return;
-
-    int cnt = _children.size();
-    if (cnt == 0)
-        return;
-
-    switch (_childrenRenderOrder)
-    {
-    case ChildrenRenderOrder::CRO_ASCENT:
-    {
-        for (int i = 0; i < cnt; i++)
-        {
-            GObject* child = _children.at(i);
-            if (child->displayObject() != nullptr && child->finalVisible())
-                _container->addChild(child->displayObject(), i);
-        }
-    }
-    break;
-    case ChildrenRenderOrder::CRO_DESCENT:
-    {
-        for (int i = 0; i < cnt; i++)
-        {
-            GObject* child = _children.at(i);
-            if (child->displayObject() != nullptr && child->finalVisible())
-                _container->addChild(child->displayObject(), cnt - 1 - i);
-        }
-    }
-    break;
-
-    case ChildrenRenderOrder::CRO_ARCH:
-    {
-        for (int i = 0; i < _apexIndex; i++)
-        {
-            GObject* child = _children.at(i);
-            if (child->displayObject() != nullptr && child->finalVisible())
-                _container->addChild(child->displayObject(), i);
-        }
-        for (int i = cnt - 1; i >= _apexIndex; i--)
-        {
-            GObject* child = _children.at(i);
-            if (child->displayObject() != nullptr && child->finalVisible())
-                _container->addChild(child->displayObject(), _apexIndex + cnt - 1 - i);
-        }
-    }
-    break;
-    }
+    if (_scrollPane != nullptr)
+        _scrollPane->setViewHeight(value);
+    else
+        setWidth(value + _margin.top + _margin.bottom);
 }
 
 void GComponent::setBoundsChangedFlag()
@@ -588,19 +484,14 @@ void GComponent::ensureBoundsCorrect()
         updateBounds();
 }
 
-cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
-{
-    return cocos2d::Vec2();
-}
-
 void GComponent::updateBounds()
 {
     float ax, ay, aw, ah;
-    if (_children.size() > 0)
+    if (!_children.empty())
     {
         ax = FLT_MAX;
         ay = FLT_MAX;
-        float ar = FLT_MIN, ab = FLT_MIN;
+        float ar = -FLT_MAX, ab = -FLT_MAX;
         float tmp;
 
         int cnt = _children.size();
@@ -613,10 +504,10 @@ void GComponent::updateBounds()
             tmp = child->getY();
             if (tmp < ay)
                 ay = tmp;
-            tmp = child->getX() + child->getActualWidth();
+            tmp = child->getX() + child->getWidth();
             if (tmp > ar)
                 ar = tmp;
-            tmp = child->getY() + child->getActualHeight();
+            tmp = child->getY() + child->getHeight();
             if (tmp > ab)
                 ab = tmp;
         }
@@ -646,15 +537,236 @@ void GComponent::doUpdateBounds()
         updateBounds();
 }
 
+void GComponent::childStateChanged(GObject* child)
+{
+    if (_buildingDisplayList)
+        return;
+
+    int cnt = _children.size();
+
+    if (dynamic_cast<GGroup*>(child) != nullptr)
+    {
+        for (int i = 0; i < cnt; ++i)
+        {
+            GObject* g = _children.at(i);
+            if (g->_group == child)
+                childStateChanged(g);
+        }
+    }
+
+    if (child->_displayObject == nullptr)
+        return;
+
+    if (child->finalVisible())
+    {
+        if (child->_displayObject->getParent() == nullptr)
+        {
+            if (_childrenRenderOrder == ChildrenRenderOrder::ASCENT)
+            {
+                int index = _children.getIndex(child);
+                _container->addChild(child->_displayObject, index);
+                int cnt = _children.size();
+                for (int i = index + 1; i < cnt; i++)
+                {
+                    child = _children.at(i);
+                    if (child->_displayObject->getParent() != nullptr)
+                        child->_displayObject->setLocalZOrder(i);
+                }
+            }
+            else if (_childrenRenderOrder == ChildrenRenderOrder::DESCENT)
+            {
+                int index = cnt - 1 - _children.getIndex(child);
+                _container->addChild(child->_displayObject, index);
+                for (int i = index - 1; i >= 0; i--)
+                {
+                    child = _children.at(i);
+                    if (child->_displayObject->getParent() != nullptr)
+                        child->_displayObject->setLocalZOrder(cnt - i - 1);
+                }
+            }
+            else
+            {
+                CALL_LATER(GComponent, buildNativeDisplayList);
+            }
+        }
+    }
+    else
+    {
+        if (child->_displayObject->getParent() != nullptr)
+        {
+            _container->removeChild(child->_displayObject, false);
+            if (_childrenRenderOrder == ChildrenRenderOrder::ARCH)
+            {
+                CALL_LATER(GComponent, buildNativeDisplayList);
+            }
+        }
+    }
+}
+
+void GComponent::childSortingOrderChanged(GObject* child, int oldValue, int newValue)
+{
+    if (newValue == 0)
+    {
+        _sortingChildCount--;
+        setChildIndex(child, _children.size());
+    }
+    else
+    {
+        if (oldValue == 0)
+            _sortingChildCount++;
+
+        int oldIndex = _children.getIndex(child);
+        int index = getInsertPosForSortingChild(child);
+        if (oldIndex < index)
+            moveChild(child, oldIndex, index - 1);
+        else
+            moveChild(child, oldIndex, index);
+    }
+}
+
+void GComponent::buildNativeDisplayList()
+{
+    if (_displayObject == nullptr)
+        return;
+
+    int cnt = _children.size();
+    if (cnt == 0)
+        return;
+
+    switch (_childrenRenderOrder)
+    {
+    case ChildrenRenderOrder::ASCENT:
+    {
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _children.at(i);
+            if (child->_displayObject != nullptr && child->finalVisible())
+                _container->addChild(child->_displayObject, i);
+        }
+    }
+    break;
+    case ChildrenRenderOrder::DESCENT:
+    {
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _children.at(i);
+            if (child->_displayObject != nullptr && child->finalVisible())
+                _container->addChild(child->_displayObject, cnt - 1 - i);
+        }
+    }
+    break;
+
+    case ChildrenRenderOrder::ARCH:
+    {
+        for (int i = 0; i < _apexIndex; i++)
+        {
+            GObject* child = _children.at(i);
+            if (child->_displayObject != nullptr && child->finalVisible())
+                _container->addChild(child->_displayObject, i);
+        }
+        for (int i = cnt - 1; i >= _apexIndex; i--)
+        {
+            GObject* child = _children.at(i);
+            if (child->_displayObject != nullptr && child->finalVisible())
+                _container->addChild(child->_displayObject, _apexIndex + cnt - 1 - i);
+        }
+    }
+    break;
+    }
+}
+
+cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
+{
+    int cnt = _children.size();
+    if (cnt == 0)
+        return pt;
+
+    ensureBoundsCorrect();
+
+    GObject* obj = nullptr;
+
+    Vec2 ret = pt;
+
+    int i = 0;
+    if (ret.y != 0)
+    {
+        for (; i < cnt; i++)
+        {
+            obj = _children.at(i);
+            if (ret.y < obj->getY())
+            {
+                if (i == 0)
+                {
+                    ret.y = 0;
+                    break;
+                }
+                else
+                {
+                    GObject* prev = _children.at(i - 1);
+                    if (ret.y < prev->getY() + prev->getHeight() / 2) //top half part
+                        ret.y = prev->getY();
+                    else //bottom half part
+                        ret.y = obj->getY();
+                    break;
+                }
+            }
+        }
+
+        if (i == cnt)
+            ret.y = obj->getY();
+    }
+
+    if (ret.x != 0)
+    {
+        if (i > 0)
+            i--;
+        for (; i < cnt; i++)
+        {
+            obj = _children.at(i);
+            if (ret.x < obj->getX())
+            {
+                if (i == 0)
+                {
+                    ret.x = 0;
+                    break;
+                }
+                else
+                {
+                    GObject* prev = _children.at(i - 1);
+                    if (ret.x < prev->getX() + prev->getWidth() / 2) // top half part
+                        ret.x = prev->getX();
+                    else//bottom half part
+                        ret.x = obj->getX();
+                    break;
+                }
+            }
+        }
+        if (i == cnt)
+            ret.x = obj->getX();
+    }
+
+    return ret;
+}
+
 GObject* GComponent::hitTest(const Vec2 &pt, const Camera* camera)
 {
+    if (!_touchable || !finalVisible())
+        return nullptr;
+
     GObject * target = nullptr;
     for (auto it = _children.rbegin(); it != _children.rend(); ++it)
     {
-        if (!(*it)->_displayObject || !(*it)->_touchable || !(*it)->finalVisible())
+        if (!(*it)->_displayObject)
             continue;
 
         target = (*it)->hitTest(pt, camera);
+        if (target)
+            return target;
+    }
+
+    if (_scrollPane)
+    {
+        target = _scrollPane->hitTest(pt, camera);
         if (target)
             return target;
     }
@@ -663,7 +775,6 @@ GObject* GComponent::hitTest(const Vec2 &pt, const Camera* camera)
     {
         Rect rect;
         rect.size = _displayObject->getContentSize();
-        rect.origin = Vec2(0, -rect.size.height);
         if (isScreenPointInRect(pt, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
             return this;
     }
@@ -671,15 +782,60 @@ GObject* GComponent::hitTest(const Vec2 &pt, const Camera* camera)
     return nullptr;
 }
 
-bool GComponent::init()
+void GComponent::setupOverflow(OverflowType overflow)
 {
-    _rootContainer = ScissorClipNode::create();
-    _rootContainer->retain();
+    if (overflow == OverflowType::HIDDEN)
+    {
+        ((ClippingRectangleNode*)_displayObject)->setClippingEnabled(true);
+        ((ClippingRectangleNode*)_displayObject)->setClippingRegion(
+            Rect(_margin.left, _margin.top,
+                _size.width - _margin.left - _margin.right,
+                _size.height - _margin.top - _margin.bottom));
+    }
 
-    _container = _rootContainer;
-    _displayObject = _rootContainer;
+    _container->setPosition(_margin.left, _size.height - _margin.top);
+}
 
-    return true;
+void GComponent::setupScroll(const Margin& scrollBarMargin,
+    ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
+    const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
+    const std::string& headerRes, const std::string& footerRes)
+{
+    _scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+    _scrollPane->retain();
+}
+
+void GComponent::handleSizeChanged()
+{
+    GObject::handleSizeChanged();
+
+    if (_scrollPane != nullptr)
+        _scrollPane->onOwnerSizeChanged();
+    else
+        _container->setPosition(_margin.left, _size.height - _margin.top);
+
+    if (((ClippingRectangleNode*)_displayObject)->isClippingEnabled())
+        ((ClippingRectangleNode*)_displayObject)->setClippingRegion(
+            Rect(_margin.left, _margin.top,
+                _size.width - _margin.left - _margin.right,
+                _size.height - _margin.top - _margin.bottom));
+}
+
+void GComponent::handleGrayedChanged()
+{
+    Controller* cc = getController("grayed");
+    if (cc != nullptr)
+        cc->setSelectedIndex(isGrayed() ? 1 : 0);
+    else
+        GObject::handleGrayedChanged();
+}
+
+void GComponent::handleControllerChanged(Controller* c)
+{
+    GObject::handleControllerChanged(c);
+
+    if (_scrollPane != nullptr)
+        _scrollPane->handleControllerChanged(c);
 }
 
 void GComponent::constructFromResource()
@@ -689,7 +845,7 @@ void GComponent::constructFromResource()
 
 void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int poolIndex)
 {
-    tinyxml2::XMLElement* xml = packageItem->componentData->RootElement();
+    tinyxml2::XMLElement* xml = _packageItem->componentData->RootElement();
 
     _underConstruct = true;
 
@@ -699,24 +855,26 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
 
     p = xml->Attribute("size");
     ToolSet::splitString(p, ',', v2, true);
-    initWidth = sourceWidth = v2.x;
-    initHeight = sourceHeight = v2.y;
+    initSize = sourceSize = v2;
 
-    setSize(sourceWidth, sourceHeight);
+    setSize(sourceSize.width, sourceSize.height);
 
     p = xml->Attribute("restrictSize");
     if (p)
     {
         ToolSet::splitString(p, ',', v4, true);
-        minWidth = v4.x;
-        maxWidth = v4.y;
-        minHeight = v4.z;
-        maxHeight = v4.w;
+        minSize.width = v4.x;
+        minSize.height = v4.z;
+        maxSize.width = v4.y;
+        maxSize.height = v4.w;
     }
 
-    //float f1, f2;
-    //if (ToolSet::getArrayAttribute(xml, "pivot", f1, f2))
-    //	setPivot(f1, f2, xml->BoolAttribute("anchor"));
+    p = xml->Attribute("pivot");
+    if (p)
+    {
+        ToolSet::splitString(p, ',', v2);
+        setPivot(v2.x, v2.y, xml->BoolAttribute("anchor"));
+    }
 
     p = xml->Attribute("opaque");
     if (p)
@@ -729,7 +887,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     if (p)
         overflow = ToolSet::parseOverflowType(p);
     else
-        overflow = OverflowType::OF_VISIBLE;
+        overflow = OverflowType::VISIBLE;
 
     p = xml->Attribute("margin");
     if (p)
@@ -738,21 +896,21 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         _margin.setMargin(v4.z, v4.x, v4.w, v4.y);
     }
 
-    if (overflow == OverflowType::OF_SCROLL)
+    if (overflow == OverflowType::SCROLL)
     {
         ScrollType scroll;
         p = xml->Attribute("scroll");
         if (p)
             scroll = ToolSet::parseScrollType(p);
         else
-            scroll = ScrollType::ST_VERTICAL;
+            scroll = ScrollType::VERTICAL;
 
         ScrollBarDisplayType scrollBarDisplay;
         p = xml->Attribute("scrollBar");
         if (p)
             scrollBarDisplay = ToolSet::parseScrollBarDisplayType(p);
         else
-            scrollBarDisplay = ScrollBarDisplayType::SBD_DEFAULT;
+            scrollBarDisplay = ScrollBarDisplayType::DEFAULT;
 
         int scrollBarFlags = xml->IntAttribute("scrollBarFlags");
 
@@ -798,7 +956,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
 
     GObject* child;
 
-    vector<DisplayListItem*>& displayList = *packageItem->displayList;
+    vector<DisplayListItem*>& displayList = *_packageItem->displayList;
     int childCount = displayList.size();
     for (int i = 0; i < childCount; i++)
     {
@@ -809,7 +967,6 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         {
             di.packageItem->load();
             child = UIObjectFactory::newObject(di.packageItem);
-            child->packageItem = di.packageItem;
             child->constructFromResource();
         }
         else
@@ -817,15 +974,15 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
 
         child->_underConstruct = true;
         child->setup_BeforeAdd(di.desc);
-        child->setParent(this);
+        child->_parent = this;
         child->retain();
         _children.pushBack(child);
     }
 
-    relations()->setup(xml);
+    _relations->setup(xml);
 
     for (int i = 0; i < childCount; i++)
-        _children.at(i)->relations()->setup(displayList[i]->desc);
+        _children.at(i)->_relations->setup(displayList[i]->desc);
 
     for (int i = 0; i < childCount; i++)
     {
@@ -833,6 +990,10 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         child->setup_AfterAdd(displayList[i]->desc);
         child->_underConstruct = false;
     }
+
+    p = xml->Attribute("mask");
+    if (p)
+        setMask(getChildById(p)->displayObject());
 
     applyAllControllers();
 
@@ -852,6 +1013,29 @@ void GComponent::constructFromXML(tinyxml2::XMLElement * xml)
 void GComponent::setup_AfterAdd(tinyxml2::XMLElement * xml)
 {
     GObject::setup_AfterAdd(xml);
+
+    const char *p;
+
+    if (_scrollPane != nullptr && _scrollPane->isPageMode())
+    {
+        p = xml->Attribute("pageController");
+        if (p)
+            _scrollPane->setPageController(_parent->getController(p));
+    }
+
+    p = xml->Attribute("controller");
+    if (p)
+    {
+        std::vector<std::string> arr;
+        ToolSet::splitString(p, ',', arr);
+        int cnt = arr.size();
+        for (int i = 0; i < cnt; i += 2)
+        {
+            Controller* cc = getController(arr[i]);
+            if (cc != nullptr)
+                cc->setSelectedPageId(arr[i + 1]);
+        }
+    }
 }
 
 NS_FGUI_END

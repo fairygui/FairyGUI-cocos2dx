@@ -21,6 +21,8 @@
 #include "Window.h"
 #include "PopupMenu.h"
 #include "UIObjectFactory.h"
+#include "GObjectPool.h"
+#include "DragDropManager.h"
 #include "FairyGUIMacros.h"
 
 #endif

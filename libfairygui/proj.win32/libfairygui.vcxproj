@@ -12,7 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\Controller.h" />
-    <ClInclude Include="..\Classes\display\ScissorClipNode.h" />
+    <ClInclude Include="..\Classes\display\Actions.h" />
+    <ClInclude Include="..\Classes\display\FUIRichText.h" />
+    <ClInclude Include="..\Classes\display\FUISprite.h" />
+    <ClInclude Include="..\Classes\DragDropManager.h" />
     <ClInclude Include="..\Classes\event\EventContext.h" />
     <ClInclude Include="..\Classes\event\InputEvent.h" />
     <ClInclude Include="..\Classes\event\InputProcessor.h" />
@@ -41,6 +44,7 @@
     <ClInclude Include="..\Classes\GLoader.h" />
     <ClInclude Include="..\Classes\GMovieClip.h" />
     <ClInclude Include="..\Classes\GObject.h" />
+    <ClInclude Include="..\Classes\GObjectPool.h" />
     <ClInclude Include="..\Classes\GProgressBar.h" />
     <ClInclude Include="..\Classes\GRichTextField.h" />
     <ClInclude Include="..\Classes\GRoot.h" />
@@ -64,7 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\Controller.cpp" />
-    <ClCompile Include="..\Classes\display\ScissorClipNode.cpp" />
+    <ClCompile Include="..\Classes\display\Actions.cpp" />
+    <ClCompile Include="..\Classes\display\FUIRichText.cpp" />
+    <ClCompile Include="..\Classes\display\FUISprite.cpp" />
+    <ClCompile Include="..\Classes\DragDropManager.cpp" />
     <ClCompile Include="..\Classes\event\EventContext.cpp" />
     <ClCompile Include="..\Classes\event\InputEvent.cpp" />
     <ClCompile Include="..\Classes\event\InputProcessor.cpp" />
@@ -89,6 +96,7 @@
     <ClCompile Include="..\Classes\GLoader.cpp" />
     <ClCompile Include="..\Classes\GMovieClip.cpp" />
     <ClCompile Include="..\Classes\GObject.cpp" />
+    <ClCompile Include="..\Classes\GObjectPool.cpp" />
     <ClCompile Include="..\Classes\GProgressBar.cpp" />
     <ClCompile Include="..\Classes\GRichTextField.cpp" />
     <ClCompile Include="..\Classes\GRoot.cpp" />
@@ -109,11 +117,6 @@
     <ClCompile Include="..\Classes\utils\ByteArray.cpp" />
     <ClCompile Include="..\Classes\utils\ToolSet.cpp" />
     <ClCompile Include="..\Classes\Window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Examples\cocos2d\external\Box2D\proj.win32\libbox2d.vcxproj">
-      <Project>{929480e7-23c0-4df6-8456-096d71547116}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{187d3e60-961a-41ee-bc18-c510a431d22e}</ProjectGuid>

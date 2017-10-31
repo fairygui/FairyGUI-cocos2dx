@@ -4,10 +4,11 @@
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GObject.h"
+#include "display/Actions.h"
 
 NS_FGUI_BEGIN
 
-class GLoader : public GObject
+class GLoader : public GObject, public IColorGear, public IAnimationGear
 {
 public:
     GLoader();
@@ -15,33 +16,53 @@ public:
 
     CREATE_FUNC(GLoader);
 
-    std::string getURL() { return _url; }
+    const std::string& getURL() const { return _url; }
     void setURL(const std::string& value);
 
-    virtual const std::string& getIcon() override { return _url; }
+    virtual const std::string& getIcon() const override { return _url; }
     virtual void setIcon(const std::string& value) override { setURL(value); }
 
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    cocos2d::TextHAlignment getAlign() const { return _align; }
+    void setAlign(cocos2d::TextHAlignment value);
+
+    cocos2d::TextVAlignment getVerticalAlign() const { return _verticalAlign; }
+    void setVerticalAlign(cocos2d::TextVAlignment value);
+
+    const cocos2d::Color3B& getColor() const { return _content->getColor(); }
+    void setColor(const cocos2d::Color3B& value);
+
+    bool isPlaying() const override { return _playing; }
+    void setPlaying(bool value) override;
+
+    int getCurrentFrame() const override { return _playAction->getCurrentFrame(); }
+    void setCurrentFrame(int value) override;
+
+    cocos2d::Color4B cg_getColor() const override;
+    void cg_setColor(const cocos2d::Color4B& value) override;
+
 protected:
-    virtual bool init() override;
+    virtual void handleInit() override;
     virtual void handleSizeChanged() override;
+    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
 
     virtual void loadExternal();
-    virtual void freeExternal(cocos2d::Texture2D* texture);
+    virtual void freeExternal(cocos2d::SpriteFrame* spriteFrame);
+    void onExternalLoadSuccess(cocos2d::SpriteFrame* spriteFrame);
+    void onExternalLoadFailed();
 
-    void setErrorState();
 private:
     void loadContent();
     void loadFromPackage();
     void clearContent();
     void updateLayout();
+    void setErrorState();
     void clearErrorState();
 
     std::string _url;
     cocos2d::TextHAlignment _align;
     cocos2d::TextVAlignment _verticalAlign;
     bool _autoSize;
-    FillType _fill;
+    LoaderFillType _fill;
     bool _updatingLayout;
     PackageItem* _contentItem;
     float _contentWidth;
@@ -49,11 +70,13 @@ private:
     float _contentSourceWidth;
     float _contentSourceHeight;
     int _contentStatus;
+    bool _playing;
+    int _frame;
 
     cocos2d::Sprite* _content;
-    cocos2d::Action* _playAction;
+    ActionMovieClip* _playAction;
 };
 
 NS_FGUI_END
 
-#endif // __GLOADER_H__
+#endif

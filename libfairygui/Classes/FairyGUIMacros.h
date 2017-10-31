@@ -28,5 +28,6 @@ if (!Director::getInstance()->getScheduler()->isScheduled(schedule_selector(##__
 cocos2d::Director::getInstance()->getScheduler()->unschedule(schedule_selector(__TYPE__::__FUNC__), this)
 
 #include "FieldTypes.h"
+#include "tinyxml2/tinyxml2.h"
 
 #endif

@@ -9,54 +9,54 @@
 NS_FGUI_BEGIN
 
 USING_NS_CC;
-using namespace std;
 
 class UIPackage
 {
 public:
     UIPackage();
-    virtual ~UIPackage();
+    ~UIPackage();
 
     class AtlasSprite
     {
     public:
-        string atlas;
+        std::string atlas;
         Rect rect;
         bool rotated;
     };
 
-    typedef std::unordered_map<string, UIPackage*> PackageMap;
-    typedef std::unordered_map<string, PackageItem*> PackageItemMap;
+    typedef std::unordered_map<std::string, UIPackage*> PackageMap;
+    typedef std::unordered_map<std::string, PackageItem*> PackageItemMap;
     typedef std::vector<UIPackage*> PackageCollection;
     typedef std::vector<PackageItem*> PackageItemCollection;
-    typedef std::unordered_map<string, AtlasSprite*> SpriteMap;
+    typedef std::unordered_map<std::string, AtlasSprite*> SpriteMap;
 
-public:
-    static int _constructing;
-    static const string URL_PREFIX;
+    static UIPackage* getById(const std::string& id);
+    static UIPackage* getByName(const std::string& name);
+    static UIPackage* addPackage(const std::string& descFilePath);
+    static void removePackage(const std::string& packageIdOrName);
+    static GObject* createObject(const std::string& pkgName, const std::string& resName);
+    static GObject* createObjectFromURL(const std::string& url);
+    static void* getItemAsset(const std::string& pkgName, const std::string& resName);
+    static void* getItemAssetByURL(const std::string& url);
+    static std::string getItemURL(const std::string& pkgName, const std::string& resName);
+    static PackageItem* getItemByURL(const std::string& url);
+    static std::string normalizeURL(const std::string& url);
 
-    static UIPackage* getById(const string& id);
-    static UIPackage* getByName(const string& name);
-    static UIPackage* addPackage(const string& descFilePath);
-    static void removePackage(const string& packageIdOrName);
-    static GObject* createObject(const string& pkgName, const string& resName);
-    static GObject* createObjectFromURL(const string& url);
-    static void* getItemAsset(const string& pkgName, const string& resName);
-    static void* getItemAssetByURL(const string& url);
-    static string getItemURL(const string& pkgName, const string& resName);
-    static PackageItem* getItemByURL(const string& url);
-    static string normalizeURL(const string& url);
+    static Texture2D* getEmptyTexture() { return _emptyTexture; }
 
-    string getId() { return _id; }
-    string getName() { return _name; }
+    const std::string& getId() const { return _id; }
+    const std::string& getName() const { return _name; }
 
-    PackageItem* getItem(const string& itemId);
-    PackageItem* getItemByName(const string& itemName);
-    void* getItemAsset(const string& resName);
+    PackageItem* getItem(const std::string& itemId);
+    PackageItem* getItemByName(const std::string& itemName);
+    void* getItemAsset(const std::string& resName);
     void* getItemAsset(PackageItem* item);
 
+    static int _constructing;
+    static const std::string URL_PREFIX;
+
 private:
-    void create(const string& assetPath);
+    void create(const std::string& assetPath);
     void decodeDesc(cocos2d::Data& data);
     void loadPackage();
     cocos2d::SpriteFrame* createSpriteTexture(AtlasSprite* sprite);
@@ -65,22 +65,21 @@ private:
     void loadComponent(PackageItem* item);
     void loadComponentChildren(PackageItem* item);
     void translateComponent(PackageItem* item);
-    GObject* createObject(const string& resName);
+    GObject* createObject(const std::string& resName);
     GObject* createObject(PackageItem* item);
 
 private:
-    string _id;
-    string _name;
-    string _assetPath;
+    std::string _id;
+    std::string _name;
+    std::string _assetPath;
 
     PackageItemCollection _items;
     PackageItemMap _itemsById;
     PackageItemMap _itemsByName;
     ValueMap _descPack;
     //ValueMap _hitTestDatas;
-    string _assetNamePrefix;
-    string _customId;
-    bool _fromBundle;
+    std::string _assetNamePrefix;
+    std::string _customId;
     bool _loadingPackage;
 
     SpriteMap _sprites;
@@ -94,4 +93,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __UIPACKAGE_H__
+#endif

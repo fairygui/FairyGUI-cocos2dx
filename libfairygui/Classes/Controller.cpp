@@ -6,12 +6,13 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 
 Controller::Controller() :
+    changing(false),
+    autoRadioGroupDepth(false),
+    _parent(nullptr),
     _selectedIndex(-1),
-    _previousIndex(-1),
-    _parent(nullptr)
+    _previousIndex(-1)
 {
 }
-
 
 Controller::~Controller()
 {
@@ -29,13 +30,13 @@ void Controller::setSelectedIndex(int value)
         _selectedIndex = value;
         _parent->applyController(this);
 
-        dispatchEvent(UIEventType::StatusChange);
+        dispatchEvent(UIEventType::Changed);
 
         changing = false;
     }
 }
 
-std::string Controller::getSelectedPage()
+const std::string& Controller::getSelectedPage() const
 {
     if (_selectedIndex == -1)
         return STD_STRING_EMPTY;
@@ -51,7 +52,7 @@ void Controller::setSelectedPage(const std::string & value)
     setSelectedIndex(i);
 }
 
-std::string Controller::getSelectedPageId()
+const std::string& Controller::getSelectedPageId() const
 {
     if (_selectedIndex == -1)
         return STD_STRING_EMPTY;
@@ -66,7 +67,7 @@ void Controller::setSelectedPageId(const std::string & value)
         setSelectedIndex(i);
 }
 
-std::string Controller::getPreviousPage()
+const std::string& Controller::getPreviousPage() const
 {
     if (_previousIndex == -1)
         return STD_STRING_EMPTY;
@@ -74,7 +75,7 @@ std::string Controller::getPreviousPage()
         return _pageNames[_previousIndex];
 }
 
-std::string Controller::getPreviousPageId()
+const std::string& Controller::getPreviousPageId() const
 {
     if (_previousIndex == -1)
         return STD_STRING_EMPTY;
@@ -82,22 +83,22 @@ std::string Controller::getPreviousPageId()
         return _pageIds[_previousIndex];
 }
 
-int Controller::getPageCount()
+int Controller::getPageCount() const
 {
     return _pageIds.size();
 }
 
-bool Controller::hasPage(const std::string & aName)
+bool Controller::hasPage(const std::string & aName) const
 {
     return ToolSet::findInStringArray(_pageNames, aName) != -1;
 }
 
-int Controller::getPageIndexById(const std::string & value)
+int Controller::getPageIndexById(const std::string & value) const
 {
     return ToolSet::findInStringArray(_pageIds, value);
 }
 
-std::string Controller::getPageNameById(const std::string & value)
+const std::string& Controller::getPageNameById(const std::string & value) const
 {
     int i = ToolSet::findInStringArray(_pageIds, value);
     if (i != -1)
@@ -106,7 +107,7 @@ std::string Controller::getPageNameById(const std::string & value)
         return STD_STRING_EMPTY;
 }
 
-std::string Controller::getPageId(int index)
+const std::string& Controller::getPageId(int index) const
 {
     return _pageIds[index];
 }
@@ -122,10 +123,15 @@ void Controller::setOppositePageId(const std::string & value)
 
 void Controller::setup(tinyxml2::XMLElement * xml)
 {
-    name = xml->Attribute("name");
-    autoRadioGroupDepth = xml->BoolAttribute("autoRadioGroupDepth");
+    const char* p;
 
-    const char* p = xml->Attribute("pages");
+    p = xml->Attribute("name");
+    if (p)
+        name = p;
+
+    autoRadioGroupDepth = xml->BoolAttribute("autoRadioGroupDepth");
+    
+    p = xml->Attribute("pages");
     if (p)
     {
         std::vector<std::string> elems;

@@ -7,10 +7,8 @@
 
 NS_FGUI_BEGIN
 
-class GGraph : public GObject
+class GGraph : public GObject, public IColorGear
 {
-public:
-
 public:
     GGraph();
     ~GGraph();
@@ -19,11 +17,14 @@ public:
 
     void drawRect(float aWidth, float aHeight, int lineSize, const cocos2d::Color4F& lineColor, const cocos2d::Color4F& fillColor);
     void drawEllipse(float aWidth, float aHeight, int lineSize, const cocos2d::Color4F& lineColor, const cocos2d::Color4F& fillColor);
+    bool isEmpty() const { return _type == 0; }
 
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    cocos2d::Color4B cg_getColor() const override;
+    void cg_setColor(const cocos2d::Color4B& value) override;
 
 protected:
-    virtual bool init() override;
+    virtual void handleInit() override;
+    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
     virtual void handleSizeChanged() override;
 
 private:
@@ -38,4 +39,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __GGRAPH_H__
+#endif

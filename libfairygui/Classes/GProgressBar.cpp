@@ -9,7 +9,7 @@ using namespace tinyxml2;
 GProgressBar::GProgressBar() :
     _max(100),
     _value(0),
-    _titleType(ProgressTitleType::PT_PERCENT),
+    _titleType(ProgressTitleType::PERCENT),
     _titleObject(nullptr),
     _barObjectH(nullptr),
     _barObjectV(nullptr),
@@ -54,29 +54,98 @@ void GProgressBar::setValue(double value)
     }
 }
 
-void GProgressBar::setup_AfterAdd(tinyxml2::XMLElement * xml)
-{
-    GComponent::setup_AfterAdd(xml);
 
-    xml = xml->FirstChildElement("ProgressBar");
-    if (xml != nullptr)
+void GProgressBar::update()
+{
+    float percent = MIN(_value / _max, 1);
+
+    if (_titleObject != nullptr)
     {
-        int tmp;
-        if (xml->QueryIntAttribute("value", &tmp) == 0)
-            _value = tmp;
-        
-        if (xml->QueryIntAttribute("max", &tmp) == 0)
-            _max = tmp;
+        std::ostringstream oss;
+        switch (_titleType)
+        {
+        case ProgressTitleType::PERCENT:
+            oss << round(percent * 100) << "%";
+            break;
+
+        case ProgressTitleType::VALUE_MAX:
+            oss << round(_value) << "/" << round(_max);
+            break;
+
+        case ProgressTitleType::VALUE:
+            oss << _value;
+            break;
+
+        case ProgressTitleType::MAX:
+            oss << _max;
+            break;
+        }
+        _titleObject->setText(oss.str());
     }
-    update();
+
+    float fullWidth = this->getWidth() - _barMaxWidthDelta;
+    float fullHeight = this->getHeight() - _barMaxHeightDelta;
+    if (!_reverse)
+    {
+        if (_barObjectH != nullptr)
+        {
+            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
+            ((GImage *)_barObjectH).fillAmount = percent;
+            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
+            ((GLoader *)_barObjectH).fillAmount = percent;
+            else*/
+            _barObjectH->setWidth(round(fullWidth * percent));
+        }
+        if (_barObjectV != nullptr)
+        {
+            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
+            ((GImage *)_barObjectV).fillAmount = percent;
+            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
+            ((GLoader *)_barObjectV).fillAmount = percent;
+            else*/
+            _barObjectV->setHeight(round(fullHeight * percent));
+        }
+    }
+    else
+    {
+        if (_barObjectH != nullptr)
+        {
+            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
+            ((GImage *)_barObjectH).fillAmount = 1 - percent;
+            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
+            ((GLoader *)_barObjectH).fillAmount = 1 - percent;
+            else*/
+            {
+                _barObjectH->setWidth(round(fullWidth * percent));
+                _barObjectH->setX(_barStartX + (fullWidth - _barObjectH->getWidth()));
+            }
+        }
+        if (_barObjectV != nullptr)
+        {
+            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
+            ((GImage *)_barObjectV).fillAmount = 1 - percent;
+            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
+            ((GLoader *)_barObjectV).fillAmount = 1 - percent;
+            else*/
+            {
+                _barObjectV->setHeight(round(fullHeight * percent));
+                _barObjectV->setY(_barStartY + (fullHeight - _barObjectV->getHeight()));
+            }
+        }
+    }
 }
 
-bool GProgressBar::init()
+void GProgressBar::handleSizeChanged()
 {
-    if (!GComponent::init())
-        return false;
+    GComponent::handleSizeChanged();
 
-    return true;
+    if (_barObjectH != nullptr)
+        _barMaxWidth = getWidth() - _barMaxWidthDelta;
+    if (_barObjectV != nullptr)
+        _barMaxHeight = getHeight() - _barMaxHeightDelta;
+
+    if (!_underConstruct)
+        update();
 }
 
 void GProgressBar::constructFromXML(tinyxml2::XMLElement * xml)
@@ -108,97 +177,21 @@ void GProgressBar::constructFromXML(tinyxml2::XMLElement * xml)
     }
 }
 
-void GProgressBar::handleSizeChanged()
+void GProgressBar::setup_AfterAdd(tinyxml2::XMLElement * xml)
 {
-    GComponent::handleSizeChanged();
+    GComponent::setup_AfterAdd(xml);
 
-    if (_barObjectH != nullptr)
-        _barMaxWidth = getWidth() - _barMaxWidthDelta;
-    if (_barObjectV != nullptr)
-        _barMaxHeight = getHeight() - _barMaxHeightDelta;
-
-    if (!_underConstruct)
-        update();
-}
-
-void GProgressBar::update()
-{
-    float percent = MIN(_value / _max, 1);
-
-    if (_titleObject != nullptr)
+    xml = xml->FirstChildElement("ProgressBar");
+    if (xml != nullptr)
     {
-        std::ostringstream oss;
-        switch (_titleType)
-        {
-        case ProgressTitleType::PT_PERCENT:
-            oss << round(percent * 100) << "%";
-            break;
+        int tmp;
+        if (xml->QueryIntAttribute("value", &tmp) == 0)
+            _value = tmp;
 
-        case ProgressTitleType::PT_VALUE_MAX:
-            oss << round(_value) << "/" << round(_max);
-            break;
-
-        case ProgressTitleType::PT_VALUE:
-            oss << _value;
-            break;
-
-        case ProgressTitleType::PT_MAX:
-            oss << _max;
-            break;
-        }
-        _titleObject->setText(oss.str());
+        if (xml->QueryIntAttribute("max", &tmp) == 0)
+            _max = tmp;
     }
-
-    float fullWidth = this->getWidth() - _barMaxWidthDelta;
-    float fullHeight = this->getHeight() - _barMaxHeightDelta;
-    if (!_reverse)
-    {
-        if (_barObjectH != nullptr)
-        {
-            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
-                ((GImage *)_barObjectH).fillAmount = percent;
-            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
-                ((GLoader *)_barObjectH).fillAmount = percent;
-            else*/
-            _barObjectH->setWidth(round(fullWidth * percent));
-        }
-        if (_barObjectV != nullptr)
-        {
-            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
-                ((GImage *)_barObjectV).fillAmount = percent;
-            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
-                ((GLoader *)_barObjectV).fillAmount = percent;
-            else*/
-            _barObjectV->setHeight(round(fullHeight * percent));
-        }
-    }
-    else
-    {
-        if (_barObjectH != nullptr)
-        {
-            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
-                ((GImage *)_barObjectH).fillAmount = 1 - percent;
-            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
-                ((GLoader *)_barObjectH).fillAmount = 1 - percent;
-            else*/
-            {
-                _barObjectH->setWidth(round(fullWidth * percent));
-                _barObjectH->setX(_barStartX + (fullWidth - _barObjectH->getWidth()));
-            }
-        }
-        if (_barObjectV != nullptr)
-        {
-            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
-                ((GImage *)_barObjectV).fillAmount = 1 - percent;
-            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
-                ((GLoader *)_barObjectV).fillAmount = 1 - percent;
-            else*/
-            {
-                _barObjectV->setHeight(round(fullHeight * percent));
-                _barObjectV->setY(_barStartY + (fullHeight - _barObjectV->getHeight()));
-            }
-        }
-    }
+    update();
 }
 
 NS_FGUI_END

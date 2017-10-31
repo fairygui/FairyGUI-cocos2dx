@@ -15,6 +15,7 @@ PackageItem::PackageItem() :
     tileGridIndice(0),
     texture(nullptr),
     animation(nullptr),
+    repeatDelay(0),
     componentData(nullptr),
     displayList(nullptr),
     extensionCreator(nullptr)

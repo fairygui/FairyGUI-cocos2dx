@@ -23,10 +23,26 @@ protected:
     void init() override;
 
 private:
-    std::unordered_map<std::string, cocos2d::Vec2> _storage;
-    cocos2d::Vec2 _default;
+    void onTweenUpdate(const cocos2d::Vec2& v, bool a, bool b);
+    void onTweenComplete();
+
+    class GearLookValue
+    {
+    public:
+        float alpha;
+        float rotation;
+        bool grayed;
+        bool touchable;
+
+        GearLookValue();
+        GearLookValue(float alpha, float rotation, bool grayed, bool touchable);
+    };
+
+    std::unordered_map<std::string, GearLookValue> _storage;
+    GearLookValue _default;
+    cocos2d::Vec2 _tweenTarget;
 };
 
 NS_FGUI_END
 
-#endif // __GEARLOOK_H__
+#endif

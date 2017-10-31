@@ -1,7 +1,5 @@
 #include "GObject.h"
-#include "utils/ToolSet.h"
 #include "GGroup.h"
-#include "GComponent.h"
 #include "GList.h"
 #include "GRoot.h"
 #include "gears/GearXY.h"
@@ -11,26 +9,23 @@
 #include "gears/GearLook.h"
 #include "gears/GearText.h"
 #include "gears/GearIcon.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace std;
 using namespace tinyxml2;
 
 uint32_t GObject::_gInstanceCounter = 0;
-GObject* GObject::draggingObject = nullptr;
+GObject* GObject::_draggingObject = nullptr;
 
-GObject::GObject()
-    : _x(0.0f),
-    _y(0.0f),
-    _width(0.0f),
-    _height(0.0f),
-    _rawWidth(0.0f),
-    _rawHeight(0.0f),
+Vec2 sGlobalDragStart;
+Rect sGlobalRect;
+bool sUpdateInDragging;
+
+GObject::GObject() :
+    _scale{ 1,1 },
     _sizePercentInGroup(0.0f),
-    _pivotX(0.0f),
-    _pivotY(0.0f),
     _pivotAsAnchor(false),
     _alpha(1.0f),
     _rotation(0.0f),
@@ -40,8 +35,7 @@ GObject::GObject()
     _touchable(true),
     _grayed(false),
     _draggable(false),
-    _scaleX(1.0f),
-    _scaleY(1.0f),
+    _dragBounds(nullptr),
     _sortingOrder(0),
     _focusable(false),
     _pixelSnapping(false),
@@ -52,59 +46,59 @@ GObject::GObject()
     _underConstruct(false),
     _gearLocked(false),
     _gears{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr },
-    name(""),
-    packageItem(nullptr),
-    data(nullptr),
-    sourceWidth(0),
-    sourceHeight(0),
-    initWidth(0),
-    initHeight(0),
-    minWidth(0),
-    maxWidth(0),
-    minHeight(0),
-    maxHeight(0)
+    _packageItem(nullptr),
+    _data(nullptr),
+    _touchDisabled(false),
+    name("")
 {
     id = "_n" + Value(_gInstanceCounter++).asString();
-
     _relations = new Relations(this);
-
-    _eventDispatcher = Director::getInstance()->getEventDispatcher();
-    _eventDispatcher->retain();
 }
 
 GObject::~GObject()
 {
     removeFromParent();
     removeEventListeners();
-    if (_displayObject != nullptr)
-        CC_SAFE_RELEASE(_displayObject);
-    CC_SAFE_RELEASE(_eventDispatcher);
+
+    CC_SAFE_RELEASE(_displayObject);
     for (int i = 0; i < 8; i++)
+        CC_SAFE_DELETE(_gears[i]);
+    CC_SAFE_DELETE(_relations);
+    CC_SAFE_DELETE(_dragBounds);
+}
+
+bool GObject::init()
+{
+    handleInit();
+
+    if (_displayObject != nullptr)
     {
-        if (_gears[i] != nullptr)
-            delete _gears[i];
+        _displayObject->setAnchorPoint(Vec2(0, 1));
+        _displayObject->setCascadeOpacityEnabled(true);
+        _displayObject->setOnEnterCallback(CC_CALLBACK_0(GObject::onEnter, this));
+        _displayObject->setOnExitCallback(CC_CALLBACK_0(GObject::onExit, this));
     }
-    delete _relations;
+    return true;
 }
 
 void GObject::setX(float value)
 {
-    setPosition(value, _y);
+    setPosition(value, _position.y);
 }
 
 void GObject::setY(float value)
 {
-    setPosition(_x, value);
+    setPosition(_position.x, value);
 }
 
 void GObject::setPosition(float xv, float yv)
 {
-    if (_x != xv || _y != yv)
+    if (_position.x != xv || _position.y != yv)
     {
-        float dx = xv - _x;
-        float dy = yv - _y;
-        _x = xv;
-        _y = yv;
+        float dx = xv - _position.x;
+        float dy = yv - _position.y;
+        _position.x = xv;
+        _position.y = yv;
 
         handlePositionChanged();
 
@@ -123,8 +117,8 @@ void GObject::setPosition(float xv, float yv)
             dispatchEvent(UIEventType::PositionChange);
         }
 
-        //if (draggingObject == this && !sUpdateInDragging)
-        //sGlobalRect = this.LocalToGlobal(new Rect(0, 0, this.width, this.height));
+        if (_draggingObject == this && !sUpdateInDragging)
+            sGlobalRect = localToGlobal(Rect(Vec2::ZERO, _size));
     }
 }
 
@@ -137,49 +131,41 @@ void GObject::setPixelSnapping(bool value)
     }
 }
 
-float GObject::getWidth()
-{
-    return _width;
-}
-
-float GObject::getHeight()
-{
-    return _height;
-}
-
 void GObject::setSize(float wv, float hv, bool ignorePivot /*= false*/)
 {
-    if (_rawWidth != wv || _rawHeight != hv)
+    if (_rawSize.width != wv || _rawSize.height != hv)
     {
-        _rawWidth = wv;
-        _rawHeight = hv;
-        if (wv < minWidth)
-            wv = minWidth;
-        else if (maxWidth > 0 && wv > maxWidth)
-            wv = maxWidth;
-        if (hv < minHeight)
-            hv = minHeight;
-        else if (maxHeight > 0 && hv > maxHeight)
-            hv = maxHeight;
-        float dWidth = wv - _width;
-        float dHeight = hv - _height;
-        _width = wv;
-        _height = hv;
+        _rawSize.width = wv;
+        _rawSize.height = hv;
+        if (wv < minSize.width)
+            wv = minSize.width;
+        else if (maxSize.width > 0 && wv > maxSize.width)
+            wv = maxSize.width;
+        if (hv < minSize.height)
+            hv = minSize.height;
+        else if (maxSize.height > 0 && hv > maxSize.height)
+            hv = maxSize.height;
+        float dWidth = wv - _size.width;
+        float dHeight = hv - _size.height;
+        _size.width = wv;
+        _size.height = hv;
 
         handleSizeChanged();
 
-        if (_pivotX != 0 || _pivotY != 0)
+        if (_pivot.x != 0 || _pivot.y != 0)
         {
             if (!_pivotAsAnchor)
             {
                 if (!ignorePivot)
-                    this->setPosition(_x - _pivotX * dWidth, _y - _pivotY * dHeight);
+                    setPosition(_position.x - _pivot.x * dWidth, _position.y - _pivot.y * dHeight);
                 else
-                    this->handlePositionChanged();
+                    handlePositionChanged();
             }
             else
-                this->handlePositionChanged();
+                handlePositionChanged();
         }
+        else
+            handlePositionChanged();
 
         GGroup* g = dynamic_cast<GGroup*>(this);
         if (g != nullptr)
@@ -199,6 +185,18 @@ void GObject::setSize(float wv, float hv, bool ignorePivot /*= false*/)
     }
 }
 
+void GObject::setSizeDirectly(float wv, float hv)
+{
+    _rawSize.width = wv;
+    _rawSize.height = hv;
+    if (wv < 0)
+        wv = 0;
+    if (hv < 0)
+        hv = 0;
+    _size.width = wv;
+    _size.height = hv;
+}
+
 void GObject::center(bool restraint /*= false*/)
 {
     GComponent* r;
@@ -207,7 +205,7 @@ void GObject::center(bool restraint /*= false*/)
     else
         r = GRoot::getInstance();
 
-    setPosition((int)((r->_width - _width) / 2), (int)((r->_height - _height) / 2));
+    setPosition((int)((r->_size.width - _size.width) / 2), (int)((r->_size.height - _size.height) / 2));
     if (restraint)
     {
         addRelation(r, RelationType::Center_Center);
@@ -215,24 +213,60 @@ void GObject::center(bool restraint /*= false*/)
     }
 }
 
+void GObject::makeFullScreen()
+{
+    setSize(GRoot::getInstance()->getWidth(), GRoot::getInstance()->getHeight());
+}
+
+void GObject::setPivot(float xv, float yv, bool asAnchor)
+{
+    if (_pivot.x != xv || _pivot.y != yv || _pivotAsAnchor != asAnchor)
+    {
+        _pivot.set(xv, yv);
+        bool old = _pivotAsAnchor;
+        _pivotAsAnchor = asAnchor;
+        if (_displayObject != nullptr)
+            _displayObject->setAnchorPoint(Vec2(_pivot.x, 1 - _pivot.y));
+        handlePositionChanged();
+    }
+}
+
 void GObject::setScale(float xv, float yv)
 {
-    if (_scaleX != xv || _scaleY != yv)
+    if (_scale.x != xv || _scale.y != yv)
     {
-        _scaleX = xv;
-        _scaleY = yv;
+        _scale.x = xv;
+        _scale.y = yv;
         handleScaleChanged();
 
         updateGear(2);
     }
 }
 
+void GObject::setSkewX(float value)
+{
+    _displayObject->setSkewX(value);
+}
+
+void GObject::setSkewY(float value)
+{
+    _displayObject->setSkewY(value);
+}
+
 void GObject::setRotation(float value)
 {
     _rotation = value;
-    if (_displayObject != nullptr)
-        _displayObject->setRotation(_rotation);
+    _displayObject->setRotation(_rotation);
     updateGear(3);
+}
+
+void GObject::setAlpha(float value)
+{
+    if (_alpha != value)
+    {
+        _alpha = value;
+        handleAlphaChanged();
+    }
 }
 
 void GObject::setGrayed(bool value)
@@ -244,30 +278,6 @@ void GObject::setGrayed(bool value)
     }
 }
 
-void GObject::makeFullScreen()
-{
-    this->setSize(GRoot::getInstance()->getWidth(), GRoot::getInstance()->getHeight());
-}
-
-uint32_t GObject::addClickListener(const EventCallback& callback)
-{
-    return addEventListener(UIEventType::Click, callback, 0);
-}
-
-uint32_t GObject::addClickListener(const EventCallback& callback, uint32_t callbackId)
-{
-    return addEventListener(UIEventType::Click, callback, callbackId);
-}
-
-void GObject::removeClickListener(uint32_t callbackId)
-{
-    removeEventListener(UIEventType::Click, callbackId);
-}
-
-GComponent * GObject::asCom()
-{
-    return dynamic_cast<GComponent*>(this);
-}
 
 void GObject::setVisible(bool value)
 {
@@ -277,6 +287,11 @@ void GObject::setVisible(bool value)
         if (_displayObject)
             _displayObject->setVisible(value);
     }
+}
+
+bool GObject::finalVisible()
+{
+    return _visible && _internalVisible && (_group == nullptr || _group->finalVisible());
 }
 
 void GObject::setTouchable(bool value)
@@ -309,13 +324,82 @@ void GObject::setGroup(GGroup * value)
     }
 }
 
-bool GObject::onStage()
+const std::string& GObject::getText() const
 {
-    GObject* p = this;
-    while (p->_parent != nullptr)
-        p = p->_parent;
+    return STD_STRING_EMPTY;
+}
 
-    return p == GRoot::getInstance();
+void GObject::setText(const std::string & text)
+{
+}
+
+const std::string & GObject::getIcon() const
+{
+    return STD_STRING_EMPTY;
+}
+
+void GObject::setIcon(const std::string & text)
+{
+}
+
+void GObject::setDraggable(bool value)
+{
+    if (_draggable != value)
+    {
+        _draggable = value;
+        initDrag();
+    }
+}
+
+void GObject::setDragBounds(const cocos2d::Rect & value)
+{
+    if (_dragBounds == nullptr)
+        _dragBounds = new Rect();
+    *_dragBounds = value;
+}
+
+void GObject::startDrag(int touchId)
+{
+    dragBegin(touchId);
+}
+
+void GObject::stopDrag()
+{
+    dragEnd();
+}
+
+std::string GObject::getResourceURL() const
+{
+    if (_packageItem != nullptr)
+        return "ui://" + _packageItem->owner->getId() + _packageItem->id;
+    else
+        return STD_STRING_EMPTY;
+}
+
+Vec2 GObject::localToGlobal(const Vec2 & pt)
+{
+    Vec2 pt2 = pt;
+    if (_pivotAsAnchor)
+    {
+        pt2.x += _size.width*_pivot.x;
+        pt2.y += _size.height*_pivot.y;
+    }
+    pt2.y = _size.height - pt2.y;
+    pt2 = _displayObject->convertToWorldSpace(pt2);
+    pt2.y = GRoot::getInstance()->getHeight() - pt2.y;
+    return pt2;
+}
+
+cocos2d::Rect GObject::localToGlobal(const cocos2d::Rect & rect)
+{
+    Rect ret;
+    Vec2 v = localToGlobal(rect.origin);
+    ret.origin.x = v.x;
+    ret.origin.y = v.y;
+    v = localToGlobal(Vec2(rect.getMaxX(), rect.getMaxY()));
+    ret.size.width = v.x - ret.origin.x;
+    ret.size.height = v.y - ret.origin.y;
+    return ret;
 }
 
 Vec2 GObject::globalToLocal(const Vec2 & pt)
@@ -323,16 +407,62 @@ Vec2 GObject::globalToLocal(const Vec2 & pt)
     Vec2 pt2 = pt;
     pt2.y = GRoot::getInstance()->getHeight() - pt2.y;
     pt2 = _displayObject->convertToNodeSpace(pt2);
-    if (dynamic_cast<GComponent*>(this))
-        pt2.y = -pt2.y;
-    else
-        pt2.y = _displayObject->getContentSize().height - pt2.y;
+    pt2.y = _size.height - pt2.y;
+    if (_pivotAsAnchor)
+    {
+        pt2.x -= _size.width*_pivot.x;
+        pt2.y -= _size.height*_pivot.y;
+    }
     return pt2;
 }
 
-void GObject::addRelation(GObject * target, RelationType relationType)
+cocos2d::Rect GObject::globalToLocal(const cocos2d::Rect & rect)
 {
-    _relations->add(target, relationType, false);
+    Rect ret;
+    Vec2 v = globalToLocal(rect.origin);
+    ret.origin.x = v.x;
+    ret.origin.y = v.y;
+    v = globalToLocal(Vec2(rect.getMaxX(), rect.getMaxY()));
+    ret.size.width = v.x - ret.origin.x;
+    ret.size.height = v.y - ret.origin.y;
+    return ret;
+}
+
+cocos2d::Rect GObject::transformRect(const cocos2d::Rect& rect, GObject * targetSpace)
+{
+    if (targetSpace == this)
+        return rect;
+
+    if (targetSpace == _parent) // optimization
+    {
+        return Rect((_position.x + rect.origin.x) * _scale.x,
+            (_position.y + rect.origin.y) * _scale.y,
+            rect.size.width * _scale.x,
+            rect.size.height * _scale.y);
+    }
+    else
+    {
+        float result[4]{ FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+        transformRectPoint(rect.origin, result, targetSpace);
+        transformRectPoint(Vec2(rect.getMaxX(), rect.origin.y), result, targetSpace);
+        transformRectPoint(Vec2(rect.origin.x, rect.getMaxY()), result, targetSpace);
+        transformRectPoint(Vec2(rect.getMaxX(), rect.getMaxY()), result, targetSpace);
+
+        return Rect(result[0], result[1], result[2] - result[0], result[3] - result[1]);
+    }
+}
+
+void GObject::transformRectPoint(const Vec2& pt, float rect[], GObject* targetSpace)
+{
+    Vec2 v = localToGlobal(pt);
+    if (targetSpace != nullptr)
+        v = targetSpace->globalToLocal(v);
+
+    if (rect[0] > v.x) rect[0] = v.x;
+    if (rect[2] < v.x) rect[2] = v.x;
+    if (rect[1] > v.y) rect[1] = v.y;
+    if (rect[3] < v.y) rect[3] = v.y;
 }
 
 void GObject::addRelation(GObject * target, RelationType relationType, bool usePercent)
@@ -441,35 +571,22 @@ void GObject::checkGearDisplay()
     }
 }
 
-void GObject::setText(const std::string & text)
+bool GObject::onStage() const
 {
+    return _displayObject->getScene() != nullptr;
 }
 
-const std::string& GObject::getText()
+GRoot* GObject::getRoot() const
 {
-    return STD_STRING_EMPTY;
-}
+    GObject* p = (GObject*)this;
+    while (p->_parent != nullptr)
+        p = p->_parent;
 
-void GObject::setIcon(const std::string & text)
-{
-}
-
-std::string GObject::getResourceURL()
-{
-    if (packageItem != nullptr)
-        return "ui://" + packageItem->owner->getId() + packageItem->id;
+    GRoot* root = dynamic_cast<GRoot*>(p);
+    if (root != nullptr)
+        return root;
     else
-        return STD_STRING_EMPTY;
-}
-
-const std::string & GObject::getIcon()
-{
-    return STD_STRING_EMPTY;
-}
-
-bool GObject::inContainer()
-{
-    return _displayObject != nullptr && _displayObject->getParent() != nullptr;
+        return GRoot::getInstance();
 }
 
 void GObject::removeFromParent()
@@ -478,33 +595,76 @@ void GObject::removeFromParent()
         _parent->removeChild(this);
 }
 
-bool GObject::finalVisible()
+void GObject::constructFromResource()
 {
-    return _visible && _internalVisible && (_group == nullptr || _group->finalVisible());
 }
 
-bool GObject::init()
+GObject* GObject::hitTest(const Vec2 &pt, const Camera* camera)
 {
-    return false;
+    if (_touchDisabled || !_touchable || !finalVisible())
+        return nullptr;
+
+    Rect rect;
+    rect.size = _displayObject->getContentSize();
+    if (isScreenPointInRect(pt, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
+        return this;
+    else
+        return nullptr;
+}
+
+GComponent * GObject::asCom()
+{
+    return dynamic_cast<GComponent*>(this);
+}
+
+GTextFieldDelegate * GObject::asTextField()
+{
+    return dynamic_cast<GTextFieldDelegate*>(this);
+}
+
+GButton * GObject::asButton()
+{
+    return dynamic_cast<GButton*>(this);
+}
+
+GList * GObject::asList()
+{
+    return dynamic_cast<GList*>(this);
+}
+
+void GObject::handleInit()
+{
+    _displayObject = Node::create();
+    _displayObject->retain();
+}
+
+void GObject::onEnter()
+{
+    dispatchEvent(UIEventType::Enter);
+}
+
+void GObject::onExit()
+{
+    dispatchEvent(UIEventType::Exit);
 }
 
 void GObject::handlePositionChanged()
 {
     if (_displayObject)
     {
-        float xv = _x;
-        float yv = _y;
+        Vec2 pt = _position;
+        pt.y = -pt.y;
         if (!_pivotAsAnchor)
         {
-            xv += _width * _pivotX;
-            yv += _height * _pivotY;
+            pt.x += _size.width * _pivot.x;
+            pt.y -= _size.height * _pivot.y;
         }
         if (_pixelSnapping)
         {
-            xv = (int)xv;
-            yv = (int)yv;
+            pt.x = (int)pt.x;
+            pt.y = (int)pt.y;
         }
-        _displayObject->setPosition(Vec2(xv, -yv));
+        _displayObject->setPosition(pt);
     }
 }
 
@@ -512,28 +672,29 @@ void GObject::handleSizeChanged()
 {
     if (_displayObject)
     {
-        if (_sizeImplType == 0 || sourceWidth == 0 || sourceHeight == 0)
-            _displayObject->setContentSize(cocos2d::Size(_width, _height));
+        if (_sizeImplType == 0 || sourceSize.width == 0 || sourceSize.height == 0)
+            _displayObject->setContentSize(_size);
         else
-            _displayObject->setScale(_scaleX * _width / sourceWidth, _scaleY * _height / sourceHeight);
+            _displayObject->setScale(_scale.x * _size.width / sourceSize.width, _scale.y * _size.height / sourceSize.height);
     }
 }
 
 void GObject::handleScaleChanged()
 {
-    if (_displayObject)
-    {
-        if (_sizeImplType == 0 || sourceWidth == 0 || sourceHeight == 0)
-            _displayObject->setScale(_scaleX, _scaleY);
-        else
-            _displayObject->setScale(_scaleX * _width / sourceWidth, _scaleY * _height / sourceHeight);
-    }
+    if (_sizeImplType == 0 || sourceSize.width == 0 || sourceSize.height == 0)
+        _displayObject->setScale(_scale.x, _scale.y);
+    else
+        _displayObject->setScale(_scale.x * _size.width / sourceSize.width, _scale.y * _size.height / sourceSize.height);
+}
+
+void GObject::handleAlphaChanged()
+{
+    _displayObject->setOpacity(_alpha * 255);
+    updateGear(3);
 }
 
 void GObject::handleGrayedChanged()
 {
-    //if (_displayObject)
-    //_displayObject->
 }
 
 void GObject::handleControllerChanged(Controller * c)
@@ -548,10 +709,6 @@ void GObject::handleControllerChanged(Controller * c)
     _handlingController = false;
 
     checkGearDisplay();
-}
-
-void GObject::constructFromResource()
-{
 }
 
 void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
@@ -580,19 +737,18 @@ void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
     if (p)
     {
         ToolSet::splitString(p, ',', v2, true);
-        initWidth = v2.x;
-        initHeight = v2.y;
-        setSize(initWidth, initHeight, true);
+        initSize = v2;
+        setSize(initSize.width, initSize.height, true);
     }
 
     p = xml->Attribute("restrictSize");
     if (p)
     {
         ToolSet::splitString(p, ',', v4, true);
-        minWidth = v4.x;
-        maxWidth = v4.y;
-        minHeight = v4.z;
-        maxHeight = v4.w;
+        minSize.width = v4.x;
+        minSize.height = v4.z;
+        maxSize.width = v4.y;
+        maxSize.height = v4.w;
     }
 
     p = xml->Attribute("scale");
@@ -602,16 +758,35 @@ void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
         setScale(v2.x, v2.y);
     }
 
+    p = xml->Attribute("skew");
+    if (p)
+    {
+        ToolSet::splitString(p, ',', v2);
+        setSkewX(v2.x);
+        setSkewY(v2.y);
+    }
+
     p = xml->Attribute("rotation");
     if (p)
         this->setRotation(atoi(p));
+
+    p = xml->Attribute("pivot");
+    if (p)
+    {
+        ToolSet::splitString(p, ',', v2);
+        setPivot(v2.x, v2.y, xml->BoolAttribute("anchor"));
+    }
+
+    p = xml->Attribute("alpha");
+    if (p)
+        this->setAlpha(atof(p));
 }
 
 void GObject::setup_AfterAdd(tinyxml2::XMLElement * xml)
 {
-    string str;
+    const char *p;
 
-    const char*p = xml->Attribute("group");
+    p = xml->Attribute("group");
     if (p)
         _group = dynamic_cast<GGroup*>(_parent->getChildById(p));
 
@@ -626,14 +801,123 @@ void GObject::setup_AfterAdd(tinyxml2::XMLElement * xml)
     }
 }
 
-GObject* GObject::hitTest(const Vec2 &pt, const Camera* camera)
+void GObject::initDrag()
 {
-    Rect rect;
-    rect.size = _displayObject->getContentSize();
-    if (isScreenPointInRect(pt, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
-        return this;
+    if (_draggable)
+    {
+        addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GObject::onTouchBegin, this), (int)this);
+        addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), (int)this);
+        addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), (int)this);
+    }
     else
-        return nullptr;
+    {
+        removeEventListener(UIEventType::TouchBegin, (int)this);
+        removeEventListener(UIEventType::TouchMove, (int)this);
+        removeEventListener(UIEventType::TouchEnd, (int)this);
+    }
+}
+
+void GObject::dragBegin(int touchId)
+{
+    if (_draggingObject != nullptr)
+    {
+        GObject* tmp = _draggingObject;
+        _draggingObject->stopDrag();
+        _draggingObject = nullptr;
+        tmp->dispatchEvent(UIEventType::DragEnd);
+    }
+
+    sGlobalDragStart = GRoot::getInstance()->getTouchPosition(touchId);
+    sGlobalRect = localToGlobal(Rect(Vec2::ZERO, _size));
+
+    _draggingObject = this;
+    GRoot::getInstance()->getInputProcessor()->addTouchMonitor(touchId, this);
+
+    addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), (int)this);
+    addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), (int)this);
+}
+
+void GObject::dragEnd()
+{
+    if (_draggingObject == this)
+    {
+        GRoot::getInstance()->getInputProcessor()->removeTouchMonitor(this);
+        _draggingObject = nullptr;
+    }
+}
+
+void GObject::onTouchBegin(EventContext* context)
+{
+    _dragTouchStartPos = context->getInput()->getPosition();
+    context->captureTouch();
+}
+
+void GObject::onTouchMove(EventContext* context)
+{
+    InputEvent* evt = context->getInput();
+
+    if (_draggingObject != this && _draggable)
+    {
+        int sensitivity;
+#ifdef CC_PLATFORM_PC
+        sensitivity = UIConfig::clickDragSensitivity;
+#else
+        sensitivity = UIConfig::touchDragSensitivity;
+#endif 
+        if (abs(_dragTouchStartPos.x - evt->getPosition().x) < sensitivity
+            && abs(_dragTouchStartPos.y - evt->getPosition().y) < sensitivity)
+            return;
+
+        if (!dispatchEvent(UIEventType::DragStart))
+            dragBegin(evt->getTouchId());
+        else
+            context->uncaptureTouch();
+    }
+
+    if (_draggingObject == this)
+    {
+        float xx = evt->getPosition().x - sGlobalDragStart.x + sGlobalRect.origin.x;
+        float yy = evt->getPosition().y - sGlobalDragStart.y + sGlobalRect.origin.y;
+
+        if (_dragBounds != nullptr)
+        {
+            Rect rect = GRoot::getInstance()->localToGlobal(*_dragBounds);
+            if (xx < rect.origin.x)
+                xx = rect.origin.x;
+            else if (xx + sGlobalRect.size.width > rect.getMaxX())
+            {
+                xx = rect.getMaxX() - sGlobalRect.size.width;
+                if (xx < rect.origin.x)
+                    xx = rect.origin.x;
+            }
+
+            if (yy < rect.origin.y)
+                yy = rect.origin.y;
+            else if (yy + sGlobalRect.size.height > rect.getMaxY())
+            {
+                yy = rect.getMaxY() - sGlobalRect.size.height;
+                if (yy < rect.origin.y)
+                    yy = rect.origin.y;
+            }
+        }
+
+        Vec2 pt = _parent->globalToLocal(Vec2(xx, yy));
+
+        sUpdateInDragging = true;
+        setPosition(round(pt.x), round(pt.y));
+        sUpdateInDragging = false;
+
+        dispatchEvent(UIEventType::DragMove);
+    }
+}
+
+void GObject::onTouchEnd(EventContext* context)
+{
+    if (_draggingObject == this)
+    {
+        _draggingObject = nullptr;
+        dispatchEvent(UIEventType::DragEnd);
+    }
 }
 
 NS_FGUI_END

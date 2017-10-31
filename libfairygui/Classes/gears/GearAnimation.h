@@ -7,6 +7,16 @@
 
 NS_FGUI_BEGIN
 
+class IAnimationGear
+{
+public:
+    virtual bool isPlaying() const = 0;
+    virtual void setPlaying(bool value) = 0;
+
+    virtual int getCurrentFrame() const = 0;
+    virtual void setCurrentFrame(int value) = 0;
+};
+
 class GObject;
 
 class GearAnimation : public GearBase
@@ -23,10 +33,19 @@ protected:
     void init() override;
 
 private:
-    std::unordered_map<std::string, cocos2d::Vec2> _storage;
-    cocos2d::Vec2 _default;
+    class GearAnimationValue
+    {
+    public:
+        bool playing;
+        int frame;
+
+        GearAnimationValue();
+        GearAnimationValue(bool playing, int frame);
+    };
+    std::unordered_map<std::string, GearAnimationValue> _storage;
+    GearAnimationValue _default;
 };
 
 NS_FGUI_END
 
-#endif // __GEARANIMATION_H__
+#endif

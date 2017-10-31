@@ -34,4 +34,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __GEARDISPLAY_H__
+#endif

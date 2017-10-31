@@ -3,7 +3,6 @@
 
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
-#include "tinyxml2/tinyxml2.h"
 #include "RelationItem.h"
 
 NS_FGUI_BEGIN
@@ -37,4 +36,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __RELATIONS_H__
+#endif

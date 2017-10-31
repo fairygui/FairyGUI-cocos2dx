@@ -10,12 +10,12 @@ NS_FGUI_BEGIN
 class GButton : public GComponent
 {
 public:
-    const std::string UP = "up";
-    const std::string DOWN = "down";
-    const std::string OVER = "over";
-    const std::string SELECTED_OVER = "selectedOver";
-    const std::string DISABLED = "disabled";
-    const std::string SELECTED_DISABLED = "selectedDisabled";
+    static const std::string UP;
+    static const std::string DOWN;
+    static const std::string OVER;
+    static const std::string SELECTED_OVER;
+    static const std::string DISABLED;
+    static const std::string SELECTED_DISABLED;
 
     GButton();
     ~GButton();
@@ -25,25 +25,36 @@ public:
     const std::string& getTitle() { return _title; }
     void setTitle(const std::string& value);
 
-    virtual const std::string& getText() override { return _title; }
+    virtual const std::string& getText() const override { return _title; }
     virtual void setText(const std::string& value) override { setTitle(value); }
 
-    virtual const std::string& getIcon() override { return _icon; }
+    virtual const std::string& getIcon() const override { return _icon; }
     virtual void setIcon(const std::string& value) override;
 
-    bool isSelected() { return _selected; }
+    const std::string& getSelectedTitle() const { return _selectedTitle; }
+    void setSelectedTitle(const std::string& value);
+
+    const std::string& getSelectedIcon() const { return _selectedIcon; }
+    void setSelectedIcon(const std::string& value);
+
+    const cocos2d::Color3B getTitleColor() const;
+    void setTitleColor(const cocos2d::Color3B& value);
+
+    int getTitleFontSize() const;
+    void setTitleFontSize(int value);
+
+    bool isSelected() const { return _selected; }
     void setSelected(bool value);
 
-    Controller* getRelatedController() { return _relatedController; }
+    Controller* getRelatedController() const { return _relatedController; }
     void setRelatedController(Controller* c);
 
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
-
-    bool changeStateOnClick;
+    bool isChangeStateOnClick() { return _changeStateOnClick; }
+    void setChangeStateOnClick(bool value) { _changeStateOnClick = value; }
 
 protected:
-    virtual bool init() override;
+    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
+    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
     virtual void handleControllerChanged(Controller* c) override;
 
     void setState(const std::string& value);
@@ -55,7 +66,7 @@ private:
     void onTouchBegin(EventContext* context);
     void onTouchEnd(EventContext* context);
     void onClick(EventContext* context);
-    void onRemoved();
+    void onExit(EventContext* context);
 
     ButtonMode _mode;
     GObject* _titleObject;
@@ -67,14 +78,17 @@ private:
     std::string _selectedTitle;
     std::string _icon;
     std::string _selectedIcon;
+    std::string _sound;
+    float _soundVolumeScale;
     bool _selected;
     bool _over;
     bool _down;
     int _downEffect;
     bool _downScaled;
     float _downEffectValue;
+    bool _changeStateOnClick;
 };
 
 NS_FGUI_END
 
-#endif // __GBUTTON_H
+#endif

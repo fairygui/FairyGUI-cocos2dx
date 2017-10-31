@@ -9,7 +9,11 @@ USING_NS_CC;
 
 bool GearBase::disableAllTweenEffect = false;
 
-GearBase::GearBase(GObject * owner)
+GearBase::GearBase(GObject * owner) :
+    tweenTime(0.3f),
+    tween(false),
+    delay(0),
+    easeType(tweenfunc::Quad_EaseOut)
 {
     _owner = owner;
 }
@@ -50,7 +54,8 @@ void GearBase::updateFromRelations(float dx, float dy)
 
 void GearBase::setup(tinyxml2::XMLElement * xml)
 {
-    const char* p = xml->Attribute("controller");
+    const char* p;
+    p = xml->Attribute("controller");
     if (p)
     {
         _controller = _owner->getParent()->getController(std::string(p));
@@ -61,13 +66,17 @@ void GearBase::setup(tinyxml2::XMLElement * xml)
     init();
 
     tween = xml->BoolAttribute("tween");
-    /*
-    str = xml.GetAttribute("ease");
-    if (str != null)
-        easeType = FieldTypes.ParseEaseType(str);*/
 
-    tweenTime = xml->FloatAttribute("duration");
-    delay = xml->FloatAttribute("delay");
+    p = xml->Attribute("ease");
+    if (p)
+        easeType = ToolSet::parseEaseType(p);
+
+    p = xml->Attribute("duration");
+    if (p)
+        tweenTime = atof(p);
+    p = xml->Attribute("delay");
+    if (p)
+        delay = atof(p);
 
     std::vector<std::string> pages;
     p = xml->Attribute("pages");
@@ -80,7 +89,7 @@ void GearBase::setup(tinyxml2::XMLElement * xml)
     }
     else
     {
-        if (pages.size() > 0)
+        if (!pages.empty())
         {
             std::vector<std::string> values;
             p = xml->Attribute("values");

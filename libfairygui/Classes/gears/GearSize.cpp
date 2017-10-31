@@ -2,13 +2,13 @@
 #include "GObject.h"
 #include "utils/ToolSet.h"
 #include "UIPackage.h"
+#include "display/Actions.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 GearSize::GearSize(GObject * owner) :GearBase(owner)
 {
-
 }
 
 GearSize::~GearSize()
@@ -45,17 +45,67 @@ void GearSize::apply()
     else
         gv = _default;
 
-    /*if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
+    if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
+        if (_owner->displayObject()->getActionByTag(ActionTag::SIZE_ACTION) != nullptr)
+        {
+            if (_tweenTarget != gv)
+            {
+                _owner->displayObject()->stopActionByTag(ActionTag::SIZE_ACTION);
+                onTweenComplete();
+            }
+            else
+                return;
+        }
 
+        bool a = gv.x != _owner->getWidth() || gv.y != _owner->getHeight();
+        bool b = gv.z != _owner->getScaleX() || gv.w != _owner->getScaleY();
+        if (a || b)
+        {
+            if (_owner->checkGearController(0, _controller))
+                _displayLockToken = _owner->addDisplayLock();
+            _tweenTarget = gv;
+
+            ActionInterval* action = ActionVec4::create(tweenTime,
+                Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()),
+                gv, 
+                CC_CALLBACK_1(GearSize::onTweenUpdate, this, a, b),
+                CC_CALLBACK_0(GearSize::onTweenComplete, this)
+            );
+            action = createEaseAction(easeType, action);
+            if (delay > 0)
+                action = Sequence::createWithTwoActions(DelayTime::create(delay), action);
+            action->setTag(ActionTag::SIZE_ACTION);
+            _owner->displayObject()->runAction(action);
+        }
     }
-    else*/
+    else
     {
         _owner->_gearLocked = true;
         _owner->setSize(gv.x, gv.y, _owner->checkGearController(1, _controller));
         _owner->setScale(gv.z, gv.w);
         _owner->_gearLocked = false;
     }
+}
+
+void GearSize::onTweenUpdate(const Vec4& v, bool a, bool b)
+{
+    _owner->_gearLocked = true;
+    if (a)
+        _owner->setSize(v.x, v.y, _owner->checkGearController(1, _controller));
+    if (b)
+        _owner->setScale(v.z, v.w);
+    _owner->_gearLocked = false;
+}
+
+void GearSize::onTweenComplete()
+{
+    if (_displayLockToken != 0)
+    {
+        _owner->releaseDisplayLock(_displayLockToken);
+        _displayLockToken = 0;
+    }
+    _owner->dispatchEvent(UIEventType::GearStop);
 }
 
 void GearSize::updateState()
@@ -66,7 +116,7 @@ void GearSize::updateState()
 
 void GearSize::updateFromRelations(float dx, float dy)
 {
-    if (_controller != nullptr && _storage.size() > 0)
+    if (_controller != nullptr && !_storage.empty())
     {
         for (auto it = _storage.begin(); it != _storage.end(); ++it)
         {

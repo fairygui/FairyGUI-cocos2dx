@@ -3,14 +3,13 @@
 
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
-#include "tinyxml2/tinyxml2.h"
 
 NS_FGUI_BEGIN
 
 class GObject;
 class EventContext;
 
-enum RelationType
+enum class RelationType
 {
     Left_Left,
     Left_Center,
@@ -28,8 +27,8 @@ enum RelationType
     Bottom_Middle,
     Bottom_Bottom,
 
-    Width_Width,
-    Height_Height,
+    Width,
+    Height,
 
     LeftExt_Left,
     LeftExt_Right,
@@ -40,7 +39,7 @@ enum RelationType
     BottomExt_Top,
     BottomExt_Bottom,
 
-    Size_Size
+    Size
 };
 
 class RelationDef
@@ -91,4 +90,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __RELATIONITEM_H__
+#endif

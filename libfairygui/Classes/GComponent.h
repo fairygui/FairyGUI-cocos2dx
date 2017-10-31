@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GObject.h"
+#include "Controller.h"
 #include "Transition.h"
 #include "Margin.h"
 
@@ -21,55 +22,75 @@ public:
 
     CREATE_FUNC(GComponent);
 
-    cocos2d::Node* getContainer() { return _container; }
-
     GObject* addChild(GObject* child);
-    GObject* addChildAt(GObject* child, int nIndex);
-    GObject * getChildAt(int index);
-    GObject * getChild(const std::string& name);
-    GObject * removeChild(GObject * child);
-    GObject * removeChildAt(int index);
-    void removeChildren();
+    virtual GObject* addChildAt(GObject* child, int index);
+
+    void removeChild(GObject * child);
+    virtual void removeChildAt(int index);
+    void removeChildren() { removeChildren(0, -1); }
     void removeChildren(int beginIndex, int endIndex);
-    GObject * getVisibleChild(const std::string& name);
-    GObject * getChildInGroup(GGroup * group, const std::string& name);
-    GObject * getChildById(const std::string& id);
-    void setChildIndex(GObject* child, int nIndex);
+
+    GObject * getChildAt(int index) const;
+    GObject * getChild(const std::string& name) const;
+    GObject * getChildInGroup(const GGroup * group, const std::string& name) const;
+    GObject * getChildById(const std::string& id) const;
+
+    int getChildIndex(const GObject* child) const;
+    void setChildIndex(GObject* child, int index);
+    int setChildIndexBefore(GObject* child, int index);
     void swapChildren(GObject* child1, GObject* child2);
     void swapChildrenAt(int index1, int index2);
-    int numChildren();
-    void addController(Controller* controller);
-    int getChildCount() { return _children.size(); }
 
-    const Margin& getMargin() { return _margin; }
-    void setMargin(const Margin& value);
-    const cocos2d::Vec2& getAlignOffset() { return _alignOffset; }
+    int numChildren() const;
+    bool isAncestorOf(const GObject* obj) const;
 
-    Controller* getController(const std::string& name);
+    void addController(Controller* c);
+    Controller* getController(const std::string& name) const;
     void removeController(Controller* c);
     void applyController(Controller* c);
     void applyAllControllers();
 
+    bool getOpaque() const { return _opaque; }
+    void setOpaque(bool value);
+
+    const Margin& getMargin() { return _margin; }
+    void setMargin(const Margin& value);
+
+    ChildrenRenderOrder getChildrenRenderOrder() const { return _childrenRenderOrder; }
+    void setChildrenRenderOrder(ChildrenRenderOrder value);
+    int getApexIndex() const { return _apexIndex; }
+    void setApexIndex(int value);
+
+    cocos2d::Node* getMask() const { return _mask;  }
+    void setMask(cocos2d::Node* value);
+
+    ScrollPane* getScrollPane() const { return _scrollPane; }
+
+    float getViewWidth() const;
+    void setViewWidth(float value);
+    float getViewHeight() const;
+    void setViewHeight(float value);
+
     void setBoundsChangedFlag();
     void ensureBoundsCorrect();
 
+    virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera) override;
     virtual cocos2d::Vec2 getSnappingPosition(const cocos2d::Vec2& pt);
 
-    virtual bool init() override;
-    virtual void constructFromResource() override;
-    void constructFromResource(std::vector<GObject*>* objectPool, int poolIndex);
-    virtual void constructFromXML(tinyxml2::XMLElement* xml);
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
-    virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera) override;
-
+    //internal use
     void childSortingOrderChanged(GObject* child, int oldValue, int newValue);
     void childStateChanged(GObject * child);
-
     void adjustRadioGroupDepth(GObject* obj, Controller* c);
+
+    virtual void constructFromResource() override;
+    void constructFromResource(std::vector<GObject*>* objectPool, int poolIndex);
 
     bool _buildingDisplayList;
 
 protected:
+    virtual void constructFromXML(tinyxml2::XMLElement* xml);
+    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void handleInit() override;
     virtual void handleSizeChanged() override;
     virtual void handleGrayedChanged() override;
     virtual void handleControllerChanged(Controller* c) override;
@@ -77,39 +98,39 @@ protected:
     virtual void updateBounds();
     void setBounds(float ax, float ay, float aw, float ah);
 
+    void setupOverflow(OverflowType overflow);
     void setupScroll(const Margin& scrollBarMargin,
         ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
         const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
         const std::string& headerRes, const std::string& footerRes);
-    void setupOverflow(OverflowType overflow);
 
+    cocos2d::Vector<GObject*> _children;
+    cocos2d::Vector<Controller*> _controllers;
+    cocos2d::Vector<Transition*> _transitions;
+    cocos2d::Node* _container;
+    ScrollPane* _scrollPane;
+    Margin _margin;
+    cocos2d::Vec2 _alignOffset;
+    ChildrenRenderOrder _childrenRenderOrder;
+    int _apexIndex;
     bool _boundsChanged;
     bool _trackBounds;
 
 private:
     int getInsertPosForSortingChild(GObject * target);
-    int getChildIndex(GObject * child);
-    int _setChildIndex(GObject* child, int oldIndex, int index);
+    int moveChild(GObject* child, int oldIndex, int index);
 
     CALL_LATER_FUNC(GComponent, doUpdateBounds);
     CALL_LATER_FUNC(GComponent, buildNativeDisplayList);
 
-    cocos2d::Vector<GObject*> _children;
-    cocos2d::Vector<Controller*> _controllers;
-    cocos2d::Vector<Transition*> _transitions;
     bool _opaque;
     int _sortingChildCount;
-    ChildrenRenderOrder _childrenRenderOrder;
-    int _apexIndex;
     Controller* _applyingController;
-    Margin _margin;
-    cocos2d::Vec2 _alignOffset;
+    cocos2d::Node* _mask;
 
-    cocos2d::Node* _container;
-    cocos2d::Node* _rootContainer;
-    ScrollPane* _scrollPane;
+    friend class ScrollPane;
 };
 
 NS_FGUI_END
 
-#endif // __GCOMPONENT_H__
+#endif

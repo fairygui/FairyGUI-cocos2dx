@@ -3,8 +3,7 @@
 
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
-#include "GProgressBar.h"
-#include "GTextField.h"
+#include "GComponent.h"
 
 NS_FGUI_BEGIN
 
@@ -16,24 +15,22 @@ public:
 
     CREATE_FUNC(GSlider);
 
-    ProgressTitleType getTitleType() { return _titleType; }
+    ProgressTitleType getTitleType() const { return _titleType; }
     void setTitleType(ProgressTitleType value);
 
-    double getMax() { return _max; }
+    double getMax() const { return _max; }
     void setMax(double value);
 
-    double getValue() { return _value; }
+    double getValue() const { return _value; }
     void setValue(double value);
-
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
 
     bool changeOnClick;
     bool canDrag;
 
 protected:
-    virtual bool init() override;
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
     virtual void handleSizeChanged() override;
+    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
+    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
 
     void update();
     void updateWidthPercent(float percent);
@@ -64,4 +61,4 @@ private:
 
 NS_FGUI_END
 
-#endif // __GSLIDER_H__
+#endif

@@ -2,16 +2,17 @@
 #include "utils/ByteArray.h"
 #include "utils/ToolSet.h"
 #include "UIObjectFactory.h"
-#include "tinyxml2/tinyxml2.h"
 
 NS_FGUI_BEGIN
+USING_NS_CC;
 
 using namespace tinyxml2;
+using namespace std;
 
 const string UIPackage::URL_PREFIX = "ui://";
 int UIPackage::_constructing = 0;
 
-const unsigned char* whiteTextureData = new unsigned char[116]{ 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF };
+const unsigned char* emptyTextureData = new unsigned char[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
 UIPackage::PackageMap UIPackage::_packageInstById;
 UIPackage::PackageMap UIPackage::_packageInstByName;
@@ -19,14 +20,13 @@ UIPackage::PackageCollection UIPackage::_packageList;
 ValueMap UIPackage::_stringsSource;
 Texture2D* UIPackage::_emptyTexture;
 
-UIPackage::UIPackage()
+UIPackage::UIPackage() :
+    _loadingPackage(false)
 {
 }
 
 UIPackage::~UIPackage()
 {
-    CC_SAFE_RELEASE(_emptyTexture);
-
     for_each(_items.begin(), _items.end(), [](PackageItem* pi) {
         CC_SAFE_DELETE(pi->scale9Grid);
         CC_SAFE_DELETE(pi->componentData);
@@ -48,17 +48,25 @@ UIPackage::~UIPackage()
 
 UIPackage * UIPackage::getById(const string& id)
 {
-    return _packageInstById[id];
+    auto it = _packageInstById.find(id);
+    if (it != _packageInstById.end())
+        return it->second;
+    else
+        return nullptr;
 }
 
 UIPackage * UIPackage::getByName(const string& name)
 {
-    return _packageInstByName[name];
+    auto it = _packageInstByName.find(name);
+    if (it != _packageInstByName.end())
+        return it->second;
+    else
+        return nullptr;
 }
 
 UIPackage * UIPackage::addPackage(const string& assetPath)
 {
-    PackageMap::iterator it = _packageInstById.find(assetPath);
+    auto it = _packageInstById.find(assetPath);
     if (it != _packageInstById.end())
         return it->second;
 
@@ -192,17 +200,25 @@ string UIPackage::normalizeURL(const string& url)
 
 PackageItem * UIPackage::getItem(const string & itemId)
 {
-    return _itemsById[itemId];
+    auto it = _itemsById.find(itemId);
+    if (it != _itemsById.end())
+        return it->second;
+    else
+        return nullptr;
 }
 
 PackageItem * UIPackage::getItemByName(const string & itemName)
 {
-    return _itemsByName[itemName];
+    auto it = _itemsByName.find(itemName);
+    if (it != _itemsByName.end())
+        return it->second;
+    else
+        return nullptr;
 }
 
 void * UIPackage::getItemAsset(const string& resName)
 {
-    PackageItem* pi = _itemsByName[resName];
+    PackageItem* pi = getItemByName(resName);
     if (!pi)
         return nullptr;
 
@@ -222,6 +238,11 @@ void * UIPackage::getItemAsset(PackageItem * item)
                 item->spriteFrame = createSpriteTexture(sprite);
             else
                 item->spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect());
+            if (item->scaleByTile)
+            {
+                Texture2D::TexParams tp = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
+                item->spriteFrame->getTexture()->setTexParameters(tp);
+            }
         }
         return item->spriteFrame;
 
@@ -238,9 +259,9 @@ void * UIPackage::getItemAsset(PackageItem * item)
         if (!item->decoded)
         {
             item->decoded = true;
-            //loadSound(item);
+            item->file = _assetNamePrefix + item->file;
         }
-        return nullptr;// item.audioClip;
+        return &item->file;
 
     case PackageItemType::FONT:
         if (!item->decoded)
@@ -288,15 +309,13 @@ void UIPackage::create(const string& assetPath)
 
     if (_emptyTexture == nullptr)
     {
-        cocos2d::Image* emptyImage = new cocos2d::Image();
-        emptyImage->initWithRawData(whiteTextureData, 16, 2, 2, 4, false);
+        Image* emptyImage = new Image();
+        emptyImage->initWithRawData(emptyTextureData, 16, 2, 2, 4, false);
         _emptyTexture = new Texture2D();
         _emptyTexture->initWithImage(emptyImage);
         _emptyTexture->retain();
         delete emptyImage;
     }
-    else
-        _emptyTexture->retain();
 
     _assetNamePrefix = assetPath + "@";
     decodeDesc(data);
@@ -304,7 +323,7 @@ void UIPackage::create(const string& assetPath)
     loadPackage();
 }
 
-void UIPackage::decodeDesc(cocos2d::Data& buffer)
+void UIPackage::decodeDesc(Data& buffer)
 {
     ByteArray* ba = ByteArray::createWithBuffer((char *)buffer.getBytes(), buffer.getSize());
 
@@ -479,7 +498,7 @@ void UIPackage::loadPackage()
         }
         _items.push_back(pi);
         _itemsById[pi->id] = pi;
-        if (pi->name.size() > 0)
+        if (!pi->name.empty())
             _itemsByName[pi->name] = pi;
 
         cxml = cxml->NextSiblingElement();
@@ -493,16 +512,16 @@ void UIPackage::loadPackage()
 
     _descPack.clear();
 
-    for (SpriteMap::iterator iter = _sprites.begin(); iter != _sprites.end(); ++iter)
+    for (auto iter = _sprites.begin(); iter != _sprites.end(); ++iter)
         delete iter->second;
     _sprites.clear();
 
     _loadingPackage = false;
 }
 
-cocos2d::SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
+SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
 {
-    PackageItem* atlasItem = _itemsById[sprite->atlas];
+    PackageItem* atlasItem = getItem(sprite->atlas);
     Texture2D* atlasTexture;
     if (atlasItem)
         atlasTexture = (Texture2D*)getItemAsset(atlasItem);
@@ -521,8 +540,8 @@ cocos2d::SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
 
 void UIPackage::loadAtlas(PackageItem * item)
 {
-    cocos2d::Image* image = new cocos2d::Image();
-    string fileName = _assetNamePrefix + (item->file.size() > 0 ? item->file : item->id + ".png");
+    Image* image = new Image();
+    string fileName = _assetNamePrefix + (!item->file.empty() ? item->file : item->id + ".png");
     if (!image->initWithImageFile(fileName))
     {
         item->texture = _emptyTexture;
@@ -551,8 +570,8 @@ void UIPackage::loadMovieClip(PackageItem * item)
     item->animation->retain();
 
     float interval = root->FloatAttribute("interval") / 1000.0f;
-    //bool swing = root->BoolAttribute("swing");
-    //float repeatDelay = root->FloatAttribute("repeatDelay") / 1000.0f;
+    item->repeatDelay = root->FloatAttribute("repeatDelay") / 1000.0f;
+    bool swing = root->BoolAttribute("swing");
 
     int frameCount = root->IntAttribute("frameCount");
     Vector<AnimationFrame*> frames(frameCount);
@@ -568,7 +587,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
     {
         ToolSet::splitString(frameEle->Attribute("rect"), ',', arr);
         Rect rect = Rect(atoi(arr[0].c_str()), atoi(arr[1].c_str()), atoi(arr[2].c_str()), atoi(arr[3].c_str()));
-        float addDelay = frameEle->IntAttribute("addDelay");
+        float addDelay = frameEle->IntAttribute("addDelay") / 1000.0f;
 
         p = frameEle->Attribute("sprite");
         if (p)
@@ -578,24 +597,39 @@ void UIPackage::loadMovieClip(PackageItem * item)
         else
             spriteId.clear();
 
-        if (spriteId.size() && (sprite = _sprites[spriteId]) != nullptr)
+        if (!spriteId.empty())
         {
-            PackageItem* atlasItem = _itemsById[sprite->atlas];
-            if (atlasItem)
+            auto it = _sprites.find(spriteId);
+            if (it != _sprites.end())
             {
-                if (item->texture == nullptr)
-                    item->texture = (Texture2D*)getItemAsset(atlasItem);
-                SpriteFrame* spriteFrame = createSpriteTexture(sprite);
-                spriteFrame->setOffset(Vec2(rect.origin.x, -rect.origin.y));
-                AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
-                frames.pushBack(frame);
+                sprite = it->second;
+                PackageItem* atlasItem = getItem(sprite->atlas);
+                if (atlasItem)
+                {
+                    if (item->texture == nullptr)
+                        item->texture = (Texture2D*)getItemAsset(atlasItem);
+                    SpriteFrame* spriteFrame = createSpriteTexture(sprite);
+                    spriteFrame->setOffset(Vec2(rect.origin.x, -rect.origin.y));
+                    AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
+                    frames.pushBack(frame);
+                }
             }
         }
         i++;
         frameEle = frameEle->NextSiblingElement("frame");
     }
-
     delete xml;
+
+    if (swing)
+    {
+        int cnt = frames.size();
+        for (int i = cnt - 1; i >= 1; i++)
+        {
+            AnimationFrame* frame = frames.at(i);
+            frames.pushBack(frame);
+        }
+    }
+
     item->animation->initWithAnimationFrames(frames, interval, 1);
 }
 
@@ -624,7 +658,7 @@ void UIPackage::loadComponentChildren(PackageItem * item)
                 string src = p;
                 string pkgId = (p = cxml->Attribute("pkg")) ? p : "";
                 UIPackage* pkg;
-                if (pkgId.size() > 0 && pkgId.compare(item->owner->getId()) == 0)
+                if (!pkgId.empty() && pkgId.compare(item->owner->getId()) == 0)
                     pkg = UIPackage::getById(pkgId);
                 else
                     pkg = item->owner;
@@ -637,7 +671,7 @@ void UIPackage::loadComponentChildren(PackageItem * item)
             }
             else
             {
-                if (cxml->Name() == "text" && cxml->BoolAttribute("input"))
+                if (strcmp(cxml->Name(), "text") == 0 && cxml->BoolAttribute("input"))
                     di = new DisplayListItem(nullptr, "inputtext");
                 else
                     di = new DisplayListItem(nullptr, cxml->Name());
@@ -657,7 +691,7 @@ void UIPackage::translateComponent(PackageItem * item)
 
 GObject * UIPackage::createObject(const string & resName)
 {
-    PackageItem* pi = _itemsByName[resName];
+    PackageItem* pi = getItemByName(resName);
     CCASSERT(pi, StringUtils::format("FairyGUI: resource not found - %s in  %s",
         resName.c_str(), _name.c_str()).c_str());
 
@@ -673,7 +707,6 @@ GObject * UIPackage::createObject(PackageItem * item)
         return nullptr;
 
     _constructing++;
-    g->packageItem = item;
     g->constructFromResource();
     _constructing--;
     return g;

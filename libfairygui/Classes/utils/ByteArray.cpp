@@ -1,5 +1,6 @@
 #include "ByteArray.h"
 
+using namespace std;
 
 ByteArray::ByteArray() :
     _buffer(nullptr),
@@ -28,7 +29,6 @@ ByteArray* ByteArray::create(int len, int endian/* = 0 */)
     ByteArray* ba = new ByteArray();
     if (ba)
     {
-        ba->autorelease();
         ba->_buffer = new char[len];
         ba->_endian = endian;
         ba->_length = len;
@@ -49,7 +49,6 @@ ByteArray* ByteArray::createWithBuffer(char* buffer, int len, int endian/* = 0 *
     ByteArray* ba = new ByteArray();
     if (ba)
     {
-        ba->autorelease();
         ba->_buffer = buffer;
         ba->_length = len;
         ba->_flag = 1;
@@ -204,7 +203,6 @@ void ByteArray::writeLongLong(long long value)
     this->_pos += sizeof(value);
 }
 
-
 string ByteArray::readString(int len)
 {
     char* value = new char[len + 1];
@@ -221,7 +219,7 @@ string ByteArray::readString(int len)
 }
 
 
-void ByteArray::writeString(string value)
+void ByteArray::writeString(const string& value)
 {
     auto len = value.length();
     const char* p = value.c_str();

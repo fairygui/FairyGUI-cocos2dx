@@ -14,18 +14,30 @@ class TouchInfo;
 class InputProcessor
 {
 public:
-    InputProcessor(GComponent* owner);
-    ~InputProcessor();
+    typedef std::function<void(int eventType)> CaptureEventCallback;
 
     static InputEvent* getRecentInput() { return &_recentInput; }
 
+    InputProcessor(GComponent* owner);
+    ~InputProcessor();
+
+    cocos2d::Vec2 getTouchPosition(int touchId);
+
     void addTouchMonitor(int touchId, UIEventDispatcher* target);
+    void removeTouchMonitor(UIEventDispatcher* target);
+
+    void cancelClick(int touchId);
+
+    void setCaptureCallback(CaptureEventCallback value) { _captureCallback = value; }
 
 private:
     bool onTouchBegan(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchMoved(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchEnded(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchCancelled(cocos2d::Touch * touch, cocos2d::Event *);
+
+    void onMouseMove(cocos2d::EventMouse* event);
+    void onMouseScroll(cocos2d::EventMouse* event);
 
     TouchInfo* getTouch(int touchId, bool createIfNotExisits = true);
     void updateRecentInput(TouchInfo* touch);
@@ -35,10 +47,12 @@ private:
     GObject* clickTest(TouchInfo* touch);
 
     cocos2d::EventListenerTouchOneByOne* _touchListener;
+    cocos2d::EventListenerMouse* _mouseListener;
     std::vector<TouchInfo*> _touches;
     std::vector<GObject*> _rollOutChain;
     std::vector<GObject*> _rollOverChain;
     GComponent* _owner;
+    CaptureEventCallback _captureCallback;
 
     static InputEvent _recentInput;
 };
@@ -55,7 +69,8 @@ public:
     cocos2d::Vec2 pos;
     int touchId;
     int clickCount;
-    int button;
+    int mouseWheelDelta;
+    cocos2d::EventMouse::MouseButton button;
     cocos2d::Vec2 downPos;
     bool began;
     bool clickCancelled;
@@ -69,4 +84,4 @@ public:
 
 NS_FGUI_END
 
-#endif // __INPUTPROCESSOR_H__
+#endif

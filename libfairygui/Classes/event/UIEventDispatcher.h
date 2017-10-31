@@ -16,13 +16,16 @@ public:
     UIEventDispatcher();
     ~UIEventDispatcher();
 
-    uint32_t addEventListener(int eventType, const EventCallback& callback, uint32_t callbackId = 0);
-    void removeEventListener(int eventType, uint32_t callbackId);
+    void addEventListener(int eventType, const EventCallback& callback) { return addEventListener(eventType, callback, cocos2d::Node::INVALID_TAG); }
+    void addEventListener(int eventType, const EventCallback& callback, int tag);
+    void removeEventListener(int eventType) { removeEventListener(eventType, cocos2d::Node::INVALID_TAG); }
+    void removeEventListener(int eventType, int tag);
     void removeEventListeners();
-    bool hasEventListener(int eventType);
+    bool hasEventListener(int eventType) const { return hasEventListener(eventType, cocos2d::Node::INVALID_TAG); }
+    bool hasEventListener(int eventType, int tag) const;
 
-    void dispatchEvent(int eventType, void* data = nullptr);
-    void bubbleEvent(int eventType, void* data = nullptr);
+    bool dispatchEvent(int eventType, void* data = nullptr);
+    bool bubbleEvent(int eventType, void* data = nullptr);
 
     bool isDispatchingEvent(int eventType);
 
@@ -34,16 +37,13 @@ private:
     {
         EventCallback callback;
         int eventType;
-        uint32_t id;
+        int tag;
         int dispatching;
     };
     std::vector<EventCallbackItem> _callbacks;
-    int _count;
     int _dispatching;
-
-    static int _gCallbackCounter;
 };
 
 NS_FGUI_END
 
-#endif // __UIEVENTDISPATCHER_H__
+#endif

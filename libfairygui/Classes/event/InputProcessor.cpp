@@ -8,9 +8,43 @@ USING_NS_CC;
 
 InputEvent InputProcessor::_recentInput;
 
+static UIEventDispatcher* __null_monitor__ = new UIEventDispatcher();
+static bool __hook_mouse_event__ = false;
+static cocos2d::EventMouse::MouseButton __mouseButton__ = EventMouse::MouseButton::BUTTON_LEFT;
+
+#ifdef CC_PLATFORM_PC
+void __hook_onGLFWMouseCallBack__(GLFWwindow *window, int button, int action, int p)
+{
+    if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        __mouseButton__ = static_cast<cocos2d::EventMouse::MouseButton>(button);
+    else
+        __mouseButton__ = EventMouse::MouseButton::BUTTON_UNSET;
+
+    GLFWEventHandler::onGLFWMouseCallBack(window, button, action, p);
+
+    __mouseButton__ = EventMouse::MouseButton::BUTTON_UNSET;
+}
+#endif
+
 InputProcessor::InputProcessor(GComponent* owner)
 {
     _owner = owner;
+
+#ifdef CC_PLATFORM_PC
+    if (!__hook_mouse_event__)
+    {
+        __hook_mouse_event__ = true;
+        GLFWwindow* window = ((GLViewImpl*)Director::getInstance()->getOpenGLView())->getWindow();
+        glfwSetMouseButtonCallback(window, __hook_onGLFWMouseCallBack__);
+        glfwSetCursorPosCallback(window, GLFWEventHandler::onGLFWMouseMoveCallBack);
+    }
+
+    _mouseListener = EventListenerMouse::create();
+    CC_SAFE_RETAIN(_mouseListener);
+    _mouseListener->onMouseMove = CC_CALLBACK_1(InputProcessor::onMouseMove, this);
+    _mouseListener->onMouseScroll = CC_CALLBACK_1(InputProcessor::onMouseScroll, this);
+    _owner->displayObject()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_mouseListener, _owner->displayObject());
+#endif
 
     _touchListener = EventListenerTouchOneByOne::create();
     CC_SAFE_RETAIN(_touchListener);
@@ -24,21 +58,38 @@ InputProcessor::InputProcessor(GComponent* owner)
 
 InputProcessor::~InputProcessor()
 {
+#ifdef CC_PLATFORM_PC
+    _owner->displayObject()->getEventDispatcher()->removeEventListener(_mouseListener);
+#endif
     _owner->displayObject()->getEventDispatcher()->removeEventListener(_touchListener);
     CC_SAFE_RELEASE_NULL(_touchListener);
+    CC_SAFE_RELEASE_NULL(_mouseListener);
+
+    for (auto &ti : _touches)
+        ti->reset();
 
     _owner = nullptr;
+}
+
+cocos2d::Vec2 InputProcessor::getTouchPosition(int touchId)
+{
+    for (auto &ti : _touches)
+    {
+        if (ti->touchId == touchId)
+            return ti->pos;
+    }
+    return _recentInput.getPosition();
 }
 
 TouchInfo* InputProcessor::getTouch(int touchId, bool createIfNotExisits)
 {
     TouchInfo* ret = nullptr;
-    for (auto it = _touches.cbegin(); it != _touches.cend(); ++it)
+    for (auto &ti : _touches)
     {
-        if ((*it)->touchId == touchId)
-            return (*it);
-        else if ((*it)->touchId == -1)
-            ret = *it;
+        if (ti->touchId == touchId)
+            return ti;
+        else if (ti->touchId == -1)
+            ret = ti;
     }
 
     if (!ret)
@@ -53,14 +104,16 @@ TouchInfo* InputProcessor::getTouch(int touchId, bool createIfNotExisits)
     return ret;
 }
 
-void InputProcessor::updateRecentInput(TouchInfo* touch)
+void InputProcessor::updateRecentInput(TouchInfo* ti)
 {
-    _recentInput._pos.x = (int)touch->pos.x;
-    _recentInput._pos.y = (int)(GRoot::getInstance()->getHeight() - touch->pos.y);
-    _recentInput._target = touch->target;
-    _recentInput._clickCount = touch->clickCount;
-    _recentInput._button = touch->button;
-    _recentInput._touch = touch->touch;
+    _recentInput._pos.x = (int)ti->pos.x;
+    _recentInput._pos.y = (int)ti->pos.y;
+    _recentInput._target = ti->target;
+    _recentInput._clickCount = ti->clickCount;
+    _recentInput._button = ti->button;
+    _recentInput._mouseWheelDelta = ti->mouseWheelDelta;
+    _recentInput._touch = ti->touch;
+    _recentInput._touchId = ti->touch ? ti->touchId : -1;
 }
 
 void InputProcessor::handleRollOver(TouchInfo* touch)
@@ -126,6 +179,22 @@ void InputProcessor::addTouchMonitor(int touchId, UIEventDispatcher * target)
         ti->touchMonitors.pushBack(target);
 }
 
+void InputProcessor::removeTouchMonitor(UIEventDispatcher * target)
+{
+    for (auto it = _touches.cbegin(); it != _touches.cend(); ++it)
+    {
+        int i = (*it)->touchMonitors.getIndex(target);
+        if (i != -1)
+            (*it)->touchMonitors.replace(i, __null_monitor__);
+    }
+}
+
+void InputProcessor::cancelClick(int touchId)
+{
+    TouchInfo* ti = getTouch(touchId, false);
+    if (ti)
+        ti->clickCancelled = true;
+}
 
 void InputProcessor::setBegin(TouchInfo* touch)
 {
@@ -196,13 +265,19 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     if (!target)
         target = _owner;
 
+    pt.y = GRoot::getInstance()->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->target = target;
     ti->pos = pt;
+    ti->button = __mouseButton__;
     ti->touch = touch;
     setBegin(ti);
 
     updateRecentInput(ti);
+
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchBegin);
+
     target->bubbleEvent(UIEventType::TouchBegin, this);
 
     if (ti->lastRollOver != ti->target)
@@ -221,25 +296,40 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
     if (!target)
         target = _owner;
 
+    pt.y = GRoot::getInstance()->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->target = target;
     ti->pos = pt;
+    ti->button = __mouseButton__;
     ti->touch = touch;
     updateRecentInput(ti);
+
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchMove);
 
     if (ti->lastRollOver != ti->target)
         handleRollOver(ti);
 
-    if (ti->touchMonitors.size() > 0)
+    if (ti->began)
     {
-        for (auto it = ti->touchMonitors.begin(); it != ti->touchMonitors.end(); ++it)
+        bool done = false;
+        int cnt = ti->touchMonitors.size();
+        if (cnt > 0)
         {
-            if (*it != target)
-                (*it)->dispatchEvent(UIEventType::TouchMove, false);
-        }
-    }
+            for (int i = 0; i < cnt; i++)
+            {
+                UIEventDispatcher* mm = ti->touchMonitors.at(i);
+                if (mm == __null_monitor__)
+                    continue;
 
-    target->bubbleEvent(UIEventType::TouchMove, this);
+                mm->dispatchEvent(UIEventType::TouchMove, this);
+                if (mm == _owner)
+                    done = true;
+            }
+        }
+        if (!done)
+            _owner->dispatchEvent(UIEventType::TouchMove, this);
+    }
 }
 
 void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
@@ -250,21 +340,33 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
     if (!target)
         target = _owner;
 
+    pt.y = GRoot::getInstance()->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->target = target;
     ti->pos = pt;
+    ti->button = __mouseButton__;
     ti->touch = touch;
     setEnd(ti);
 
     updateRecentInput(ti);
 
-    if (ti->touchMonitors.size() > 0)
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchEnd);
+
+    int cnt = ti->touchMonitors.size();
+    if (cnt > 0)
     {
-        for (auto it = ti->touchMonitors.begin(); it != ti->touchMonitors.end(); ++it)
+        for (int i = 0; i < cnt; i++)
         {
-            if (*it != target)
-                (*it)->dispatchEvent(UIEventType::TouchEnd, false);
+            UIEventDispatcher* mm = ti->touchMonitors.at(i);
+            if (mm == __null_monitor__)
+                continue;
+
+            if (mm != target
+                && (!dynamic_cast<GComponent*>(mm) || !((GComponent*)mm)->isAncestorOf(target)))
+                mm->dispatchEvent(UIEventType::TouchEnd, this);
         }
+        ti->touchMonitors.clear();
     }
     target->bubbleEvent(UIEventType::TouchEnd, this);
 
@@ -276,10 +378,16 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
         target->bubbleEvent(UIEventType::Click, this);
     }
 
+#ifndef CC_PLATFORM_PC
+    //移动平台上，手指抬起就当RollOut，但在PC上不是
     ti->target = nullptr;
-    handleRollOver(ti);
+#endif
 
-    ti->reset();
+    if (ti->lastRollOver != ti->target)
+        handleRollOver(ti);
+
+    ti->touchId = -1;
+    ti->button = EventMouse::MouseButton::BUTTON_UNSET;
 }
 
 void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
@@ -293,18 +401,104 @@ void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
 
     updateRecentInput(ti);
 
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchEnd);
+
+    int cnt = ti->touchMonitors.size();
+    if (cnt > 0)
+    {
+        for (int i = 0; i < cnt; i++)
+        {
+            UIEventDispatcher* mm = ti->touchMonitors.at(i);
+            if (mm == __null_monitor__)
+                continue;
+
+            if (mm != _owner)
+                mm->dispatchEvent(UIEventType::TouchEnd, this);
+        }
+        ti->touchMonitors.clear();
+    }
     _owner->dispatchEvent(UIEventType::TouchEnd, this);
 
     ti->target = nullptr;
-    handleRollOver(ti);
+    if (ti->lastRollOver != ti->target)
+        handleRollOver(ti);
+
+    ti->touchId = -1;
 }
 
+void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
+{
+    TouchInfo* ti = getTouch(0);
+    if (abs(ti->pos.x - event->getCursorX()) < 1
+        && abs(ti->pos.y - (GRoot::getInstance()->getHeight() - event->getCursorY())) < 1)
+        return;
+
+    auto camera = Camera::getVisitingCamera();
+    Vec2 pt(event->getCursorX(), event->getCursorY());
+    GObject* target = _owner->hitTest(pt, camera);
+    if (!target)
+        target = _owner;
+
+    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    ti->target = target;
+    ti->pos = pt;
+    ti->touch = nullptr;
+    updateRecentInput(ti);
+
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchMove);
+
+    if (ti->lastRollOver != ti->target)
+        handleRollOver(ti);
+
+    if (ti->began)
+    {
+        bool done = false;
+        int cnt = ti->touchMonitors.size();
+        if (cnt > 0)
+        {
+            for (int i = 0; i < cnt; i++)
+            {
+                UIEventDispatcher* mm = ti->touchMonitors.at(i);
+                if (mm == __null_monitor__)
+                    continue;
+
+                mm->dispatchEvent(UIEventType::TouchMove, this);
+                if (mm == _owner)
+                    done = true;
+            }
+        }
+        if (!done)
+            _owner->dispatchEvent(UIEventType::TouchMove, this);
+    }
+}
+
+void InputProcessor::onMouseScroll(cocos2d::EventMouse * event)
+{
+    auto camera = Camera::getVisitingCamera();
+    Vec2 pt(event->getCursorX(), event->getCursorY());
+    GObject* target = _owner->hitTest(pt, camera);
+    if (!target)
+        target = _owner;
+
+    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    TouchInfo* ti = getTouch(0);
+    ti->target = target;
+    ti->pos = pt;
+    ti->touch = nullptr;
+    ti->mouseWheelDelta = MAX(event->getScrollX(), event->getScrollY());
+    updateRecentInput(ti);
+    ti->target->bubbleEvent(UIEventType::MouseWheel, this);
+    ti->mouseWheelDelta = 0;
+}
 
 TouchInfo::TouchInfo() :
     touch(nullptr),
     touchId(-1),
     clickCount(0),
-    button(0),
+    mouseWheelDelta(0),
+    button(EventMouse::MouseButton::BUTTON_UNSET),
     began(false),
     lastClickTime(0),
     clickCancelled(false),
@@ -324,7 +518,8 @@ TouchInfo::~TouchInfo()
 void TouchInfo::reset()
 {
     touchId = -1;
-    button = 0;
+    mouseWheelDelta = 0;
+    button = EventMouse::MouseButton::BUTTON_UNSET;
     touch = nullptr;
     pos.setZero();
     downPos.setZero();
