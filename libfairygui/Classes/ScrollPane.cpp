@@ -119,6 +119,7 @@ ScrollPane::ScrollPane(GComponent* owner,
                     _vtScrollBar->setScrollPane(this, true);
                     _owner->displayObject()->addChild(_vtScrollBar->displayObject());
                     _vtScrollBar->_parent = _owner;
+                    _vtScrollBar->_directToParent = true;
                 }
             }
         }
@@ -136,6 +137,7 @@ ScrollPane::ScrollPane(GComponent* owner,
                     _hzScrollBar->setScrollPane(this, false);
                     _owner->displayObject()->addChild(_hzScrollBar->displayObject());
                     _hzScrollBar->_parent = _owner;
+                    _hzScrollBar->_directToParent = true;
                 }
             }
         }
@@ -165,6 +167,7 @@ ScrollPane::ScrollPane(GComponent* owner,
         {
             _header->retain();
             _header->_parent = _owner;
+            _header->_directToParent = true;
         }
     }
 
@@ -177,6 +180,7 @@ ScrollPane::ScrollPane(GComponent* owner,
         {
             _footer->retain();
             _footer->_parent = _owner;
+            _footer->_directToParent = true;
         }
     }
 
@@ -572,7 +576,7 @@ void ScrollPane::setSize(float wv, float hv)
 {
     if (_hzScrollBar != nullptr)
     {
-        _hzScrollBar->setY(-_hzScrollBar->getHeight());
+        _hzScrollBar->setY(hv -_hzScrollBar->getHeight());
         if (_vtScrollBar != nullptr)
         {
             _hzScrollBar->setWidth(wv - _vtScrollBar->getWidth() - _scrollBarMargin.left - _scrollBarMargin.right);
@@ -595,7 +599,7 @@ void ScrollPane::setSize(float wv, float hv)
             _vtScrollBar->setHeight(hv - _hzScrollBar->getHeight() - _scrollBarMargin.top - _scrollBarMargin.bottom);
         else
             _vtScrollBar->setHeight(hv - _scrollBarMargin.top - _scrollBarMargin.bottom);
-        _vtScrollBar->setY(_scrollBarMargin.top - hv);
+        _vtScrollBar->setY(_scrollBarMargin.top);
     }
 
     _viewSize.width = wv;

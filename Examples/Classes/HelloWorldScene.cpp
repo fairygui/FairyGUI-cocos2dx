@@ -70,10 +70,11 @@ bool HelloWorld::init()
     UIConfig::registerFont(u8"Î¢ÈíÑÅºÚ", "Microsoft YaHei");
 #endif
 
+    UIConfig::buttonSound = "ui://Basics/click";
     UIConfig::verticalScrollBar = "ui://Basics/ScrollBar_VT";
     UIConfig::horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
 
-    UIPackage::addPackage("Basics");
+    UIPackage::addPackage("UI/Basics");
     _view = UIPackage::createObject("Basics", "Main")->asCom();
     GRoot::getInstance()->addChild(_view);
 

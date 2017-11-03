@@ -221,6 +221,7 @@ private:
     void * _data;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
+    bool _directToParent;
 
     static uint32_t _gInstanceCounter;
     static GObject* _draggingObject;

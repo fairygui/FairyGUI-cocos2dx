@@ -4,6 +4,7 @@
 #include "GGroup.h"
 #include "ScrollPane.h"
 #include "utils/ToolSet.h"
+#include "display/FUIContainer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -14,7 +15,6 @@ using namespace tinyxml2;
 GComponent::GComponent() :
     _container(nullptr),
     _scrollPane(nullptr),
-    _mask(nullptr),
     _childrenRenderOrder(ChildrenRenderOrder::ASCENT),
     _apexIndex(0),
     _boundsChanged(false),
@@ -22,7 +22,8 @@ GComponent::GComponent() :
     _opaque(false),
     _sortingChildCount(0),
     _applyingController(nullptr),
-    _buildingDisplayList(false)
+    _buildingDisplayList(false),
+    _maskOwner(nullptr)
 {
 }
 
@@ -31,14 +32,14 @@ GComponent::~GComponent()
     _children.clear();
     _controllers.clear();
     _transitions.clear();
+    CC_SAFE_RELEASE(_maskOwner);
     CC_SAFE_RELEASE(_container);
     CC_SAFE_RELEASE(_scrollPane);
 }
 
 void GComponent::handleInit()
 {
-    _displayObject = ClippingRectangleNode::create();
-    ((ClippingRectangleNode*)_displayObject)->setClippingEnabled(false);
+    _displayObject = FUIContainer::create();
     _displayObject->retain();
 
     _container = Node::create();
@@ -432,9 +433,45 @@ void GComponent::setApexIndex(int value)
     }
 }
 
-void GComponent::setMask(cocos2d::Node * value)
+cocos2d::Node* GComponent::getMask() const
 {
-    _mask = value;
+    return ((FUIContainer*)_displayObject)->getStencil();
+}
+
+void GComponent::setMask(cocos2d::Node * value, bool inverted)
+{
+    if (_maskOwner)
+    {
+        _maskOwner->_directToParent = false;
+        childStateChanged(_maskOwner);
+        _maskOwner->handlePositionChanged();
+        _maskOwner->release();
+        _maskOwner = nullptr;
+    }
+
+    if (value)
+    {
+        for (auto &child : _children)
+        {
+            if (child->_displayObject == value)
+            {
+                _maskOwner = child;
+                if (value->getParent())
+                    value->getParent()->removeChild(value, false);
+                _maskOwner->_directToParent = true;
+                _maskOwner->handlePositionChanged();
+                _maskOwner->retain();
+                break;
+            }
+        }
+    }
+
+    ((FUIContainer*)_displayObject)->setStencil(value);
+    if (value)
+    {
+        ((FUIContainer*)_displayObject)->setAlphaThreshold(0.05f);
+        ((FUIContainer*)_displayObject)->setInverted(inverted);
+    }
 }
 
 float GComponent::getViewWidth() const
@@ -554,7 +591,7 @@ void GComponent::childStateChanged(GObject* child)
         }
     }
 
-    if (child->_displayObject == nullptr)
+    if (child->_displayObject == nullptr || child == _maskOwner)
         return;
 
     if (child->finalVisible())
@@ -626,9 +663,6 @@ void GComponent::childSortingOrderChanged(GObject* child, int oldValue, int newV
 
 void GComponent::buildNativeDisplayList()
 {
-    if (_displayObject == nullptr)
-        return;
-
     int cnt = _children.size();
     if (cnt == 0)
         return;
@@ -640,7 +674,7 @@ void GComponent::buildNativeDisplayList()
         for (int i = 0; i < cnt; i++)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
                 _container->addChild(child->_displayObject, i);
         }
     }
@@ -650,7 +684,7 @@ void GComponent::buildNativeDisplayList()
         for (int i = 0; i < cnt; i++)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
                 _container->addChild(child->_displayObject, cnt - 1 - i);
         }
     }
@@ -661,13 +695,13 @@ void GComponent::buildNativeDisplayList()
         for (int i = 0; i < _apexIndex; i++)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
                 _container->addChild(child->_displayObject, i);
         }
         for (int i = cnt - 1; i >= _apexIndex; i--)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
                 _container->addChild(child->_displayObject, _apexIndex + cnt - 1 - i);
         }
     }
@@ -754,9 +788,23 @@ GObject* GComponent::hitTest(const Vec2 &pt, const Camera* camera)
         return nullptr;
 
     GObject * target = nullptr;
+    if (_maskOwner)
+    {
+        if (_maskOwner->hitTest(pt, camera) != nullptr)
+        {
+            if (((FUIContainer*)_displayObject)->isInverted())
+                return nullptr;
+        }
+        else
+        {
+            if (!((FUIContainer*)_displayObject)->isInverted())
+                return nullptr;
+        }
+    }
+
     for (auto it = _children.rbegin(); it != _children.rend(); ++it)
     {
-        if (!(*it)->_displayObject)
+        if (!(*it)->_displayObject || *it == _maskOwner)
             continue;
 
         target = (*it)->hitTest(pt, camera);
@@ -786,8 +834,8 @@ void GComponent::setupOverflow(OverflowType overflow)
 {
     if (overflow == OverflowType::HIDDEN)
     {
-        ((ClippingRectangleNode*)_displayObject)->setClippingEnabled(true);
-        ((ClippingRectangleNode*)_displayObject)->setClippingRegion(
+        ((FUIContainer*)_displayObject)->setClippingEnabled(true);
+        ((FUIContainer*)_displayObject)->setClippingRegion(
             Rect(_margin.left, _margin.top,
                 _size.width - _margin.left - _margin.right,
                 _size.height - _margin.top - _margin.bottom));
@@ -814,8 +862,11 @@ void GComponent::handleSizeChanged()
     else
         _container->setPosition(_margin.left, _size.height - _margin.top);
 
-    if (((ClippingRectangleNode*)_displayObject)->isClippingEnabled())
-        ((ClippingRectangleNode*)_displayObject)->setClippingRegion(
+    if (_maskOwner)
+        _maskOwner->handlePositionChanged();
+
+    if (((FUIContainer*)_displayObject)->isClippingEnabled())
+        ((FUIContainer*)_displayObject)->setClippingRegion(
             Rect(_margin.left, _margin.top,
                 _size.width - _margin.left - _margin.right,
                 _size.height - _margin.top - _margin.bottom));
@@ -993,7 +1044,10 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
 
     p = xml->Attribute("mask");
     if (p)
-        setMask(getChildById(p)->displayObject());
+    {
+        bool inverted = xml->BoolAttribute("reversedMask");
+        setMask(getChildById(p)->displayObject(), inverted);
+    }
 
     applyAllControllers();
 

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\Classes\Controller.h" />
     <ClInclude Include="..\Classes\display\Actions.h" />
+    <ClInclude Include="..\Classes\display\FUIContainer.h" />
     <ClInclude Include="..\Classes\display\FUIRichText.h" />
     <ClInclude Include="..\Classes\display\FUISprite.h" />
     <ClInclude Include="..\Classes\DragDropManager.h" />
@@ -69,6 +70,7 @@
   <ItemGroup>
     <ClCompile Include="..\Classes\Controller.cpp" />
     <ClCompile Include="..\Classes\display\Actions.cpp" />
+    <ClCompile Include="..\Classes\display\FUIContainer.cpp" />
     <ClCompile Include="..\Classes\display\FUIRichText.cpp" />
     <ClCompile Include="..\Classes\display\FUISprite.cpp" />
     <ClCompile Include="..\Classes\DragDropManager.cpp" />

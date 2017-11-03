@@ -49,6 +49,7 @@ GObject::GObject() :
     _packageItem(nullptr),
     _data(nullptr),
     _touchDisabled(false),
+    _directToParent(false),
     name("")
 {
     id = "_n" + Value(_gInstanceCounter++).asString();
@@ -659,6 +660,8 @@ void GObject::handlePositionChanged()
             pt.x += _size.width * _pivot.x;
             pt.y -= _size.height * _pivot.y;
         }
+        if (_parent && _directToParent)
+            pt.y += _parent->_size.height;
         if (_pixelSnapping)
         {
             pt.x = (int)pt.x;

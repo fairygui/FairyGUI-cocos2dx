@@ -180,6 +180,9 @@
     <ClInclude Include="..\Classes\display\FUISprite.h">
       <Filter>src\display</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\display\FUIContainer.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -330,6 +333,9 @@
       <Filter>src\display</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\display\FUIRichText.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\FUIContainer.cpp">
       <Filter>src\display</Filter>
     </ClCompile>
   </ItemGroup>

@@ -355,6 +355,7 @@ void UIPackage::decodeDesc(Data& buffer)
                 memcpy(data, buffer.getBytes() + offset, size);
 
                 _descPack[entryName] = string(data);
+                delete data;
             }
         }
 
