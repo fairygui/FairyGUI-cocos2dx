@@ -10,6 +10,8 @@ NS_FGUI_BEGIN
 
 typedef std::function<void(EventContext* context)> EventCallback;
 
+class InputProcessor;
+
 class UIEventDispatcher : public cocos2d::Ref
 {
 public:
@@ -24,8 +26,8 @@ public:
     bool hasEventListener(int eventType) const { return hasEventListener(eventType, cocos2d::Node::INVALID_TAG); }
     bool hasEventListener(int eventType, int tag) const;
 
-    bool dispatchEvent(int eventType, void* data = nullptr);
-    bool bubbleEvent(int eventType, void* data = nullptr);
+    bool dispatchEvent(int eventType, cocos2d::Value data = cocos2d::Value::Null);
+    bool bubbleEvent(int eventType, cocos2d::Value data = cocos2d::Value::Null);
 
     bool isDispatchingEvent(int eventType);
 

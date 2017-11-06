@@ -1,5 +1,6 @@
 #include "PackageItem.h"
 #include "UIPackage.h"
+#include "display/BitmapFont.h"
 
 NS_FGUI_BEGIN
 
@@ -9,25 +10,38 @@ PackageItem::PackageItem() :
     height(0),
     decoded(false),
     exported(false),
+    texture(nullptr),
     spriteFrame(nullptr),
     scale9Grid(nullptr),
     scaleByTile(false),
     tileGridIndice(0),
-    texture(nullptr),
     animation(nullptr),
     repeatDelay(0),
     componentData(nullptr),
     displayList(nullptr),
-    extensionCreator(nullptr)
+    extensionCreator(nullptr),
+    bitmapFont(nullptr),
+    addedToCache(false)
 {
 }
 
 PackageItem::~PackageItem()
 {
-    if (scale9Grid)
-        CC_SAFE_DELETE(scale9Grid);
+    CC_SAFE_DELETE(scale9Grid);
     if (displayList)
-        CC_SAFE_DELETE(displayList);
+    {
+        for (auto &it : *displayList)
+            CC_SAFE_DELETE(it);
+        delete displayList;
+    }
+    CC_SAFE_DELETE(componentData);
+    if (bitmapFont) //bitmapfont的引用被fontatlas保存，所以这里不能直接释放bitmapFont
+        bitmapFont->releaseAtlas();
+    CC_SAFE_RELEASE(animation);
+    CC_SAFE_RELEASE(texture);
+    if (addedToCache)
+        SpriteFrameCache::getInstance()->removeSpriteFrameByName("ui://" + owner->getId() + id);
+    CC_SAFE_RELEASE(spriteFrame);
 }
 
 void* PackageItem::load()

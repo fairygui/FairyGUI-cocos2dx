@@ -2,7 +2,6 @@
 #define __TOOLSET_H__
 
 #include "cocos2d.h"
-#include "tinyxml2/tinyxml2.h"
 #include "FairyGUI.h"
 
 NS_FGUI_BEGIN
@@ -38,6 +37,22 @@ public:
     static cocos2d::tweenfunc::TweenType parseEaseType(const char*p);
 };
 
+class FastSplitter
+{
+public:
+    FastSplitter();
+    void start(const char* data, int dataLength, char delimiter);
+    bool next();
+    const char* getText();
+    int getTextLength();
+    void getKeyValuePair(char* keyBuf, int keyBufSize, char* valueBuf, int valueBufSize);
+
+private:
+    const char* data;
+    int dataLength;
+    int textLength;
+    char delimiter;
+};
 
 NS_FGUI_END
 

@@ -29,6 +29,7 @@ public:
     static const int PullUpRelease = 43;
 
     static const int ClickItem = 50;
+    static const int ClickLink = 51;
 
     static const int DragStart = 60;
     static const int DragMove = 61;

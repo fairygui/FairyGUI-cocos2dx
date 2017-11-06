@@ -16,6 +16,7 @@ void GRichTextField::handleInit()
 {
     _richText = FUIRichText::create();
     _richText->retain();
+    _richText->setOpenUrlHandler(CC_CALLBACK_1(GRichTextField::handleURL, this));
 
     setFontName(UIConfig::defaultFont);
     _displayObject = _richText;
@@ -47,6 +48,11 @@ void GRichTextField::setColor(const cocos2d::Color3B & value)
 void GRichTextField::setAlign(cocos2d::TextHAlignment value)
 {
     _richText->setHorizontalAlignment((ui::RichText::HorizontalAlignment)value);
+}
+
+void GRichTextField::handleURL(const std::string & url)
+{
+    dispatchEvent(UIEventType::ClickLink, Value(url));
 }
 
 void GRichTextField::handleSizeChanged()

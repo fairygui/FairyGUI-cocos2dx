@@ -114,6 +114,7 @@ void InputProcessor::updateRecentInput(TouchInfo* ti)
     _recentInput._mouseWheelDelta = ti->mouseWheelDelta;
     _recentInput._touch = ti->touch;
     _recentInput._touchId = ti->touch ? ti->touchId : -1;
+    _recentInput._inputProcessor = this;
 }
 
 void InputProcessor::handleRollOver(TouchInfo* touch)
@@ -154,7 +155,7 @@ void InputProcessor::handleRollOver(TouchInfo* touch)
         {
             element = _rollOutChain[i];
             if (element->onStage())
-                element->dispatchEvent(UIEventType::RollOut, this);
+                element->dispatchEvent(UIEventType::RollOut, Value::Null);
         }
         _rollOutChain.clear();
     }
@@ -166,7 +167,7 @@ void InputProcessor::handleRollOver(TouchInfo* touch)
         {
             element = _rollOverChain[i];
             if (element->onStage())
-                element->dispatchEvent(UIEventType::RollOver, this);
+                element->dispatchEvent(UIEventType::RollOver, Value::Null);
         }
         _rollOverChain.clear();
     }
@@ -278,12 +279,12 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     if (_captureCallback)
         _captureCallback(UIEventType::TouchBegin);
 
-    target->bubbleEvent(UIEventType::TouchBegin, this);
+    target->bubbleEvent(UIEventType::TouchBegin, Value::Null);
 
     if (ti->lastRollOver != ti->target)
         handleRollOver(ti);
 
-    _touchListener->setSwallowTouches(target != _owner);
+    //_touchListener->setSwallowTouches(target != _owner);
 
     return true;
 }
@@ -322,13 +323,13 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
                 if (mm == __null_monitor__)
                     continue;
 
-                mm->dispatchEvent(UIEventType::TouchMove, this);
+                mm->dispatchEvent(UIEventType::TouchMove, Value::Null);
                 if (mm == _owner)
                     done = true;
             }
         }
         if (!done)
-            _owner->dispatchEvent(UIEventType::TouchMove, this);
+            _owner->dispatchEvent(UIEventType::TouchMove, Value::Null);
     }
 }
 
@@ -364,18 +365,18 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
 
             if (mm != target
                 && (!dynamic_cast<GComponent*>(mm) || !((GComponent*)mm)->isAncestorOf(target)))
-                mm->dispatchEvent(UIEventType::TouchEnd, this);
+                mm->dispatchEvent(UIEventType::TouchEnd, Value::Null);
         }
         ti->touchMonitors.clear();
     }
-    target->bubbleEvent(UIEventType::TouchEnd, this);
+    target->bubbleEvent(UIEventType::TouchEnd, Value::Null);
 
     target = clickTest(ti);
     if (target)
     {
         ti->target = target;
         updateRecentInput(ti);
-        target->bubbleEvent(UIEventType::Click, this);
+        target->bubbleEvent(UIEventType::Click);
     }
 
 #ifndef CC_PLATFORM_PC
@@ -414,11 +415,11 @@ void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
                 continue;
 
             if (mm != _owner)
-                mm->dispatchEvent(UIEventType::TouchEnd, this);
+                mm->dispatchEvent(UIEventType::TouchEnd);
         }
         ti->touchMonitors.clear();
     }
-    _owner->dispatchEvent(UIEventType::TouchEnd, this);
+    _owner->dispatchEvent(UIEventType::TouchEnd);
 
     ti->target = nullptr;
     if (ti->lastRollOver != ti->target)
@@ -464,13 +465,13 @@ void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
                 if (mm == __null_monitor__)
                     continue;
 
-                mm->dispatchEvent(UIEventType::TouchMove, this);
+                mm->dispatchEvent(UIEventType::TouchMove);
                 if (mm == _owner)
                     done = true;
             }
         }
         if (!done)
-            _owner->dispatchEvent(UIEventType::TouchMove, this);
+            _owner->dispatchEvent(UIEventType::TouchMove);
     }
 }
 
@@ -489,7 +490,7 @@ void InputProcessor::onMouseScroll(cocos2d::EventMouse * event)
     ti->touch = nullptr;
     ti->mouseWheelDelta = MAX(event->getScrollX(), event->getScrollY());
     updateRecentInput(ti);
-    ti->target->bubbleEvent(UIEventType::MouseWheel, this);
+    ti->target->bubbleEvent(UIEventType::MouseWheel);
     ti->mouseWheelDelta = 0;
 }
 

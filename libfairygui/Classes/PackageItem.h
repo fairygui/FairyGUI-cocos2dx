@@ -10,6 +10,7 @@ class UIPackage;
 class DisplayListItem;
 class UIObjectFactory;
 class GComponent;
+class BitmapFont;
 
 class PackageItem
 {
@@ -31,12 +32,15 @@ public:
     bool decoded;
     bool exported;
 
+    //atlas
+    cocos2d::Texture2D* texture;
+
     //image
     cocos2d::Rect* scale9Grid;
     bool scaleByTile;
     int tileGridIndice;
-    cocos2d::Texture2D* texture;
     cocos2d::SpriteFrame* spriteFrame;
+    bool addedToCache;
 
     //movieclip
     cocos2d::Animation* animation;
@@ -49,7 +53,7 @@ public:
     std::function<GComponent*()> extensionCreator;
 
     //font
-    //BitmapFont bitmapFont;
+    BitmapFont* bitmapFont;
 };
 
 class DisplayListItem

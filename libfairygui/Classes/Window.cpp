@@ -94,7 +94,7 @@ void Window::setDragArea(GObject * value)
         if (_dragArea != nullptr)
         {
             _dragArea->setDraggable(false);
-            _dragArea->removeEventListener(UIEventType::DragStart, (int)this);
+            _dragArea->removeEventListener(UIEventType::DragStart, 9999);
             _dragArea->release();
         }
 
@@ -105,7 +105,7 @@ void Window::setDragArea(GObject * value)
             if (dynamic_cast<GGraph*>(_dragArea) && ((GGraph*)_dragArea)->isEmpty())
                 ((GGraph*)_dragArea)->drawRect(_dragArea->getWidth(), _dragArea->getHeight(), 0, Color4F(0, 0, 0, 0), Color4F(0, 0, 0, 0));
             _dragArea->setDraggable(true);
-            _dragArea->addEventListener(UIEventType::DragStart, CC_CALLBACK_1(Window::onDragStart, this), (int)this);
+            _dragArea->addEventListener(UIEventType::DragStart, CC_CALLBACK_1(Window::onDragStart, this), 9999);
         }
     }
 }

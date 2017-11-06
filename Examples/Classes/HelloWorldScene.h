@@ -26,6 +26,7 @@ private:
     void playDragDrop();
     void playWindow();
     void playDepth();
+    void playText();
 
     fairygui::GComponent* _view;
     fairygui::GObject* _backBtn;

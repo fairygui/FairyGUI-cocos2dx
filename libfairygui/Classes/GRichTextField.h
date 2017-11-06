@@ -28,11 +28,15 @@ public:
     const cocos2d::Color3B& getColor() const override { return _color; }
     void setColor(const cocos2d::Color3B& value) override;
 
+    bool isUBBEnabled() const { return _richText->isUBBEnabled(); }
+    void setUBBEnabled(bool value) { _richText->setUBBEnabled(value); }
+
     void setAlign(cocos2d::TextHAlignment value);
 
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
+    void handleURL(const std::string& url);
 
 private:
     FUIRichText* _richText;

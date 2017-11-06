@@ -24,13 +24,12 @@ ByteArray::~ByteArray()
 
 
 
-ByteArray* ByteArray::create(int len, int endian/* = 0 */)
+ByteArray* ByteArray::create(int len)
 {
     ByteArray* ba = new ByteArray();
     if (ba)
     {
         ba->_buffer = new char[len];
-        ba->_endian = endian;
         ba->_length = len;
         ba->_flag = 0;
     }
@@ -44,14 +43,17 @@ ByteArray* ByteArray::create(int len, int endian/* = 0 */)
 }
 
 
-ByteArray* ByteArray::createWithBuffer(char* buffer, int len, int endian/* = 0 */)
+ByteArray* ByteArray::createWithBuffer(char* buffer, int len, bool transferOwnerShip)
 {
     ByteArray* ba = new ByteArray();
     if (ba)
     {
         ba->_buffer = buffer;
         ba->_length = len;
-        ba->_flag = 1;
+        if (transferOwnerShip)
+            ba->_flag = 0;
+        else
+            ba->_flag = 1;
         return ba;
     }
     else {

@@ -1,0 +1,13 @@
+{
+	"codeGeneration":{
+		"classNamePrefix":"",
+		"codePath":"../Classes",
+		"getMemberByName":false,
+		"ignoreNoname":true,
+		"memberNamePrefix":"",
+		"packageName":""
+	},
+	"fileExtension":"",
+	"packageCount":2,
+	"path":"../Resources/UI"
+}

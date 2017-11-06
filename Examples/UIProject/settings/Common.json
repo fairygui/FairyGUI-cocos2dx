@@ -1,0 +1,14 @@
+{
+	"buttonClickSound":"",
+	"colorScheme":["Custom color #FF0000"],
+	"font":"宋体",
+	"fontSize":12,
+	"fontSizeScheme":["Custom font size 30"],
+	"scrollBars":{
+		"defaultDisplay":"visible",
+		"horizontal":"ui://9leh0eyfi3s65i",
+		"vertical":"ui://9leh0eyfi3s65w"
+	},
+	"textColor":"#000000",
+	"tipsRes":""
+}

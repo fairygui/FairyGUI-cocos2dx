@@ -61,8 +61,8 @@ public:
     int getApexIndex() const { return _apexIndex; }
     void setApexIndex(int value);
 
-    cocos2d::Node* getMask() const { return _mask;  }
-    void setMask(cocos2d::Node* value);
+    cocos2d::Node* getMask() const;
+    void setMask(cocos2d::Node* value, bool inverted = false);
 
     ScrollPane* getScrollPane() const { return _scrollPane; }
 
@@ -115,6 +115,7 @@ protected:
     int _apexIndex;
     bool _boundsChanged;
     bool _trackBounds;
+    GObject* _maskOwner;
 
 private:
     int getInsertPosForSortingChild(GObject * target);
@@ -126,7 +127,6 @@ private:
     bool _opaque;
     int _sortingChildCount;
     Controller* _applyingController;
-    cocos2d::Node* _mask;
 
     friend class ScrollPane;
 };

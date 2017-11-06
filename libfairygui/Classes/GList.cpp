@@ -241,7 +241,7 @@ int GList::getSelectedIndex() const
         int cnt = _children.size();
         for (int i = 0; i < cnt; i++)
         {
-            GButton* obj = _children.at(i)->asButton();
+            GButton* obj = _children.at(i)->as<GButton>();
             if (obj != nullptr && obj->isSelected())
                 return i;
         }
@@ -293,7 +293,7 @@ void GList::getSelection(std::vector<int>& result)
         int cnt = _children.size();
         for (int i = 0; i < cnt; i++)
         {
-            GButton* obj = _children.at(i)->asButton();
+            GButton* obj = _children.at(i)->as<GButton>();
             if (obj != nullptr && obj->isSelected())
                 result.push_back(i);
         }
@@ -319,11 +319,11 @@ void GList::addSelection(int index, bool scrollItToView)
     {
         ItemInfo ii = _virtualItems[index];
         if (ii.obj != nullptr)
-            obj = ii.obj->asButton();
+            obj = ii.obj->as<GButton>();
         ii.selected = true;
     }
     else
-        obj = getChildAt(index)->asButton();
+        obj = getChildAt(index)->as<GButton>();
 
     if (obj != nullptr && !obj->isSelected())
     {
@@ -342,11 +342,11 @@ void GList::removeSelection(int index)
     {
         ItemInfo ii = _virtualItems[index];
         if (ii.obj != nullptr)
-            obj = ii.obj->asButton();
+            obj = ii.obj->as<GButton>();
         ii.selected = false;
     }
     else
-        obj = getChildAt(index)->asButton();
+        obj = getChildAt(index)->as<GButton>();
 
     if (obj != nullptr)
         obj->setSelected(false);
@@ -370,7 +370,7 @@ void GList::clearSelection()
         int cnt = _children.size();
         for (int i = 0; i < cnt; i++)
         {
-            GButton *obj = _children.at(i)->asButton();
+            GButton *obj = _children.at(i)->as<GButton>();
             if (obj != nullptr)
                 obj->setSelected(false);
         }
@@ -398,7 +398,7 @@ void GList::clearSelectionExcept(GObject * g)
         int cnt = _children.size();
         for (int i = 0; i < cnt; i++)
         {
-            GButton *obj = _children.at(i)->asButton();
+            GButton *obj = _children.at(i)->as<GButton>();
             if (obj != nullptr && obj != g)
                 obj->setSelected(false);
         }
@@ -429,7 +429,7 @@ void GList::selectAll()
         int cnt = _children.size();
         for (int i = 0; i < cnt; i++)
         {
-            GButton *obj = _children.at(i)->asButton();
+            GButton *obj = _children.at(i)->as<GButton>();
             if (obj != nullptr && !obj->isSelected())
             {
                 obj->setSelected(true);
@@ -468,7 +468,7 @@ void GList::selectReverse()
         int cnt = _children.size();
         for (int i = 0; i < cnt; i++)
         {
-            GButton *obj = _children.at(i)->asButton();
+            GButton *obj = _children.at(i)->as<GButton>();
             if (obj != nullptr)
             {
                 obj->setSelected(!obj->isSelected());
@@ -680,7 +680,7 @@ void GList::onClickItem(EventContext * context)
     if (_scrollPane != nullptr && scrollItemToViewOnClick)
         _scrollPane->scrollToView(item, true);
 
-    dispatchEvent(UIEventType::ClickItem, item);
+    dispatchEvent(UIEventType::ClickItem, Value(getChildIndex(item)));
 }
 
 void GList::setSelectionOnEvent(GObject * item, InputEvent * evt)
@@ -726,7 +726,7 @@ void GList::setSelectionOnEvent(GObject * item, InputEvent * evt)
                     {
                         for (int i = min; i <= max; i++)
                         {
-                            GButton *obj = getChildAt(i)->asButton();
+                            GButton *obj = getChildAt(i)->as<GButton>();
                             if (obj != nullptr && !obj->isSelected())
                                 obj->setSelected(true);
                         }

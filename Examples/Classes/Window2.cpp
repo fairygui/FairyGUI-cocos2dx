@@ -2,7 +2,7 @@
 
 void Window2::onInit()
 {
-    setContentPane(UIPackage::createObject("Basics", "WindowB")->asCom());
+    setContentPane(UIPackage::createObject("Basics", "WindowB")->as<GComponent>());
     center();
 }
 

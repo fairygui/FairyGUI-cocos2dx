@@ -8,8 +8,7 @@ USING_NS_CC;
 DragDropManager* DragDropManager::_inst = nullptr;
 
 DragDropManager::DragDropManager() :
-    _agent(nullptr),
-    _sourceData(nullptr)
+    _agent(nullptr)
 {
     _agent = (GLoader*)UIObjectFactory::newObject("loader");
     _agent->retain();
@@ -36,7 +35,7 @@ DragDropManager* DragDropManager::getInstance()
     return _inst;
 }
 
-void DragDropManager::startDrag(const std::string & icon, void * sourceData, int touchPointID)
+void DragDropManager::startDrag(const std::string & icon, Value sourceData, int touchPointID)
 {
     if (_agent->getParent() != nullptr)
         return;
@@ -55,7 +54,7 @@ void DragDropManager::cancel()
     {
         _agent->stopDrag();
         GRoot::getInstance()->removeChild(_agent);
-        _sourceData = nullptr;
+        _sourceData = Value::Null;
     }
 }
 
@@ -66,9 +65,6 @@ void DragDropManager::onDragEnd(EventContext * context)
 
     GRoot::getInstance()->removeChild(_agent);
 
-    void* sourceData = _sourceData;
-    _sourceData = nullptr;
-
     GObject* obj = GRoot::getInstance()->getTouchTarget();
     while (obj != nullptr)
     {
@@ -77,7 +73,7 @@ void DragDropManager::onDragEnd(EventContext * context)
             if (obj->hasEventListener(UIEventType::Drop))
             {
                 //obj->requestFocus();
-                obj->dispatchEvent(UIEventType::Drop, sourceData);
+                obj->dispatchEvent(UIEventType::Drop, _sourceData);
                 return;
             }
         }

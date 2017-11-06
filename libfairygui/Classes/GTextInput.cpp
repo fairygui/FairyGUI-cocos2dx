@@ -22,6 +22,7 @@ void GTextInput::handleInit()
     setFontName(UIConfig::defaultFont);
     setColor(Color3B::BLACK);
     setFontSize(12);
+    _input->setPlaceholderFontSize(12);
 
     _displayObject = _input;
 }
@@ -40,6 +41,7 @@ void GTextInput::setFontName(const std::string & value)
 void GTextInput::setFontSize(int value)
 {
     _input->setFontSize(value);
+    _input->setPlaceholderFontSize(value);
 }
 
 void GTextInput::setColor(const cocos2d::Color3B & value)

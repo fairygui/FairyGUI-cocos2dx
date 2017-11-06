@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GObject.h"
+#include "display/FUILabel.h"
 
 NS_FGUI_BEGIN
 
@@ -19,8 +20,8 @@ public:
     virtual const cocos2d::Color3B& getColor() const = 0;
     virtual void setColor(const cocos2d::Color3B& value) = 0;
 
-    bool isUBBEnabled() const { return _ubbEnabled; }
-    void setUBBEnabled(bool value) { _ubbEnabled = value; }
+    virtual bool isUBBEnabled() const { return false; }
+    virtual void setUBBEnabled(bool value) {}
 
     virtual void setAutoSize(TextAutoSize value) {};
     virtual void setAlign(cocos2d::TextHAlignment value) {}
@@ -43,8 +44,6 @@ public:
 protected:
     virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
     virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
-
-    bool _ubbEnabled;
 };
 
 class GTextField : public GTextFieldDelegate
@@ -58,10 +57,10 @@ public:
     const std::string& getText() const override { return _label->getString(); }
     void setText(const std::string& value) override;
 
-    const std::string getFontName() const override { return _fontName; }
+    const std::string getFontName() const override { return _label->getFontName(); }
     void setFontName(const std::string& value) override;
 
-    int getFontSize() const override { return _fontSize; }
+    int getFontSize() const override { return _label->getFontSize(); }
     void setFontSize(int value) override;
 
     const cocos2d::Color3B& getColor() const override { return _color; }
@@ -90,10 +89,8 @@ protected:
     void updateSize();
 
 private:
-    cocos2d::Label* _label;
-    int _fontSize;
-    std::string _fontName;
-    int _fontType;
+    FUILabel* _label;
+
     TextAutoSize _autoSize;
     cocos2d::Color3B _color;
     cocos2d::Color4B _outlineColor;

@@ -37,7 +37,9 @@ void GTextFieldDelegate::setup_BeforeAdd(tinyxml2::XMLElement * xml)
     if (p)
         setLetterSpacing(atoi(p));
 
-    _ubbEnabled = xml->BoolAttribute("ubb");
+    p = xml->Attribute("ubb");
+    if (p)
+        setUBBEnabled(strcmp(p, "true") == 0);
 
     p = xml->Attribute("autoSize");
     if (p)
@@ -54,6 +56,10 @@ void GTextFieldDelegate::setup_BeforeAdd(tinyxml2::XMLElement * xml)
     p = xml->Attribute("bold");
     if (p)
         setBold(strcmp(p, "true") == 0);
+
+    p = xml->Attribute("singleLine");
+    if (p)
+        setSingleLine(strcmp(p, "true") == 0);
 
     p = xml->Attribute("strokeColor");
     if (p)
@@ -92,8 +98,6 @@ void GTextFieldDelegate::setup_AfterAdd(tinyxml2::XMLElement * xml)
 
 GTextField::GTextField() :
     _label(nullptr),
-    _fontSize(12),
-    _fontType(0),
     _autoSize(TextAutoSize::BOTH),
     _updatingSize(false)
 {
@@ -107,11 +111,11 @@ GTextField::~GTextField()
 
 void GTextField::handleInit()
 {
-    _label = Label::create();
+    _label = FUILabel::create();
     _label->retain();
 
     setFontName(UIConfig::defaultFont);
-    setFontSize(_fontSize);
+    setFontSize(12);
     setColor(Color3B::BLACK);
 
     _displayObject = _label;
@@ -120,48 +124,20 @@ void GTextField::handleInit()
 void GTextField::setText(const std::string & text)
 {
     _label->setString(text);
-
     if (!_underConstruct)
         updateSize();
 }
 
 void GTextField::setFontName(const std::string & value)
 {
-    bool ttf = false;
-    const std::string& fontName = UIConfig::getRealFontName(value, ttf);
-    if (ttf)
-    {
-        TTFConfig config = _label->getTTFConfig();
-        config.fontFilePath = fontName;
-        config.fontSize = _fontSize;
-        _label->setTTFConfig(config);
-        _fontType = 1;
-    }
-    else
-    {
-        _label->setSystemFontName(fontName);
-        if (_fontType == 1)
-            _label->requestSystemFontRefresh();
-        _fontType = 0;
-    }
-    _fontName = fontName;
+    _label->setFontName(value);
     if (!_underConstruct)
         updateSize();
 }
 
 void GTextField::setFontSize(int value)
 {
-    if (_fontType == 0)
-    {
-        _label->setSystemFontSize(value);
-    }
-    else
-    {
-        TTFConfig config = _label->getTTFConfig();
-        config.fontSize = value;
-        _label->setTTFConfig(config);
-    }
-    _fontSize = value;
+    _label->setFontSize(value);
     if (!_underConstruct)
         updateSize();
 }
@@ -239,7 +215,7 @@ void GTextField::setBold(bool value)
 
 void GTextField::setSingleLine(bool value)
 {
-    _label->setLineBreakWithoutSpace(!value);
+    _label->enableWrap(!value);
 }
 
 void GTextField::setLetterSpacing(float value)

@@ -76,7 +76,7 @@ bool UIEventDispatcher::hasEventListener(int eventType, int tag) const
     return false;
 }
 
-bool UIEventDispatcher::dispatchEvent(int eventType, void* data)
+bool UIEventDispatcher::dispatchEvent(int eventType, Value data)
 {
     if (_callbacks.size() == 0)
         return false;
@@ -91,7 +91,7 @@ bool UIEventDispatcher::dispatchEvent(int eventType, void* data)
     return context._defaultPrevented;
 }
 
-bool UIEventDispatcher::bubbleEvent(int eventType, void* data)
+bool UIEventDispatcher::bubbleEvent(int eventType, Value data)
 {
     EventContext context;
     context._inputEvent = InputProcessor::getRecentInput();
@@ -131,9 +131,9 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
             if (context->_touchCapture != 0)
             {
                 if (context->_touchCapture == 1 && eventType == UIEventType::TouchBegin)
-                    ((InputProcessor*)context->_data)->addTouchMonitor(context->getInput()->getTouchId(), this);
+                    context->getInput()->getProcessor()->addTouchMonitor(context->getInput()->getTouchId(), this);
                 else if (context->_touchCapture == 2)
-                    ((InputProcessor*)context->_data)->removeTouchMonitor(this);
+                    context->getInput()->getProcessor()->removeTouchMonitor(this);
             }
         }
     }

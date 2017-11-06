@@ -18,11 +18,15 @@ public:
     const std::string& getText() const { return _text; }
     void setText(const std::string& value);
 
+    bool isUBBEnabled() const { return _ubbEnabled; }
+    void setUBBEnabled(bool value) { _ubbEnabled = value; }
+
 protected:
     virtual bool init() override;
 
 private:
     std::string _text;
+    bool _ubbEnabled;
 };
 
 NS_FGUI_END

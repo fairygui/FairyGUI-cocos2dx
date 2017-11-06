@@ -13,6 +13,9 @@
   <ItemGroup>
     <ClInclude Include="..\Classes\Controller.h" />
     <ClInclude Include="..\Classes\display\Actions.h" />
+    <ClInclude Include="..\Classes\display\BitmapFont.h" />
+    <ClInclude Include="..\Classes\display\FUIContainer.h" />
+    <ClInclude Include="..\Classes\display\FUILabel.h" />
     <ClInclude Include="..\Classes\display\FUIRichText.h" />
     <ClInclude Include="..\Classes\display\FUISprite.h" />
     <ClInclude Include="..\Classes\DragDropManager.h" />
@@ -63,12 +66,17 @@
     <ClInclude Include="..\Classes\UIObjectFactory.h" />
     <ClInclude Include="..\Classes\UIPackage.h" />
     <ClInclude Include="..\Classes\utils\ByteArray.h" />
+    <ClInclude Include="..\Classes\utils\SwitchHelper.h" />
     <ClInclude Include="..\Classes\utils\ToolSet.h" />
+    <ClInclude Include="..\Classes\utils\UBBParser.h" />
     <ClInclude Include="..\Classes\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\Controller.cpp" />
     <ClCompile Include="..\Classes\display\Actions.cpp" />
+    <ClCompile Include="..\Classes\display\BitmapFont.cpp" />
+    <ClCompile Include="..\Classes\display\FUIContainer.cpp" />
+    <ClCompile Include="..\Classes\display\FUILabel.cpp" />
     <ClCompile Include="..\Classes\display\FUIRichText.cpp" />
     <ClCompile Include="..\Classes\display\FUISprite.cpp" />
     <ClCompile Include="..\Classes\DragDropManager.cpp" />
@@ -116,6 +124,7 @@
     <ClCompile Include="..\Classes\UIPackage.cpp" />
     <ClCompile Include="..\Classes\utils\ByteArray.cpp" />
     <ClCompile Include="..\Classes\utils\ToolSet.cpp" />
+    <ClCompile Include="..\Classes\utils\UBBParser.cpp" />
     <ClCompile Include="..\Classes\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

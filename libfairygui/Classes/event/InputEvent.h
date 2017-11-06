@@ -7,6 +7,7 @@
 NS_FGUI_BEGIN
 
 class GObject;
+class InputProcessor;
 
 class InputEvent
 {
@@ -14,18 +15,20 @@ public:
     InputEvent();
     ~InputEvent();
 
-    GObject* getTarget() { return _target; }
-    const int getX() { return _pos.x; }
-    const int getY() { return _pos.y; }
-    const cocos2d::Vec2& getPosition() { return _pos; }
-    cocos2d::Touch* getTouch() { return _touch; }
-    int getTouchId() { return _touchId; }
-    int isDoubleClick() { return _clickCount == 2; }
-    cocos2d::EventMouse::MouseButton getButton() { return _button; }
-    int getMouseWheelDelta() { return _mouseWheelDelta; }
+    GObject* getTarget() const { return _target; }
+    const int getX() const { return _pos.x; }
+    const int getY() const { return _pos.y; }
+    const cocos2d::Vec2& getPosition() const { return _pos; }
+    cocos2d::Touch* getTouch()const { return _touch; }
+    int getTouchId()const { return _touchId; }
+    int isDoubleClick()const { return _clickCount == 2; }
+    cocos2d::EventMouse::MouseButton getButton() const { return _button; }
+    int getMouseWheelDelta() const { return _mouseWheelDelta; }
 
-    bool isShift() { return false; }
-    bool isCtrl() { return false; }
+    bool isShift() const { return false; }
+    bool isCtrl()  const { return false; }
+
+    InputProcessor* getProcessor() const { return _inputProcessor; }
 
 private:
     GObject* _target;
@@ -35,6 +38,7 @@ private:
     int _clickCount;
     int _mouseWheelDelta;
     cocos2d::EventMouse::MouseButton _button;
+    InputProcessor* _inputProcessor;
 
     friend class InputProcessor;
 };

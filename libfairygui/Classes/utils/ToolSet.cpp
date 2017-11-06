@@ -1,4 +1,5 @@
 #include "utils/ToolSet.h"
+#include "utils/SwitchHelper.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -9,6 +10,9 @@ vector<string> helperArray;
 void ToolSet::splitString(const string &s, char delim, vector<string> &elems)
 {
     elems.clear();
+    if (s.empty())
+        return;
+
     stringstream ss(s);
     string item;
     while (std::getline(ss, item, delim)) {
@@ -112,34 +116,6 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
 }
 
 #pragma warning(once:4307) 
-
-typedef std::uint64_t hash_t;
-
-constexpr hash_t prime = 0x100000001B3ull;
-constexpr hash_t basis = 0xCBF29CE484222325ull;
-
-hash_t hash_(char const* str)
-{
-    hash_t ret{ basis };
-
-    while (*str) {
-        ret ^= *str;
-        ret *= prime;
-        str++;
-    }
-
-    return ret;
-}
-
-constexpr hash_t hash_compile_time(char const* str, hash_t last_value = basis)
-{
-    return *str ? hash_compile_time(str + 1, (*str ^ last_value) * prime) : last_value;
-}
-
-constexpr hash_t operator "" _hash(char const* p, size_t)
-{
-    return hash_compile_time(p);
-}
 
 PackageItemType ToolSet::parsePackageItemType(const char* p)
 {
@@ -556,5 +532,83 @@ cocos2d::tweenfunc::TweenType ToolSet::parseEaseType(const char * p)
 }
 
 #pragma warning(default:4307)
+
+FastSplitter::FastSplitter() :data(nullptr), dataLength(-1), delimiter('\0')
+{
+}
+
+void FastSplitter::start(const char * data, int dataLength, char delimiter)
+{
+    this->data = data;
+    this->dataLength = dataLength;
+    this->delimiter = delimiter;
+    this->textLength = -1;
+}
+
+bool FastSplitter::next()
+{
+    if (dataLength < 0)
+        return false;
+
+    if (dataLength == 0)
+    {
+        dataLength = -1;
+        textLength = 0;
+        return true;
+    }
+
+    data += textLength + 1;
+    char* found = (char*)memchr(data, (int)delimiter, dataLength);
+    if (found)
+        textLength = found - data;
+    else
+        textLength = dataLength;
+    dataLength -= (textLength + 1);
+
+    return true;
+}
+
+const char * FastSplitter::getText()
+{
+    if (textLength > 0)
+        return data;
+    else
+        return nullptr;
+}
+
+int FastSplitter::getTextLength()
+{
+    return textLength;
+}
+
+void FastSplitter::getKeyValuePair(char* keyBuf, int keyBufSize, char* valueBuf, int valueBufSize)
+{
+    if (textLength == 0)
+    {
+        keyBuf[0] = '\0';
+        valueBuf[0] = '\0';
+    }
+    else
+    {
+        char* found = (char*)memchr(data, (int)'=', textLength);
+        if (found)
+        {
+            int len = MIN(keyBufSize - 1, found - data);
+            memcpy(keyBuf, data, len);
+            keyBuf[len] = '\0';
+
+            len = MIN(valueBufSize - 1, textLength - (found - data) - 1);
+            memcpy(valueBuf, found + 1, len);
+            valueBuf[len] = '\0';
+        }
+        else
+        {
+            int len = MIN(valueBufSize - 1, textLength);
+            memcpy(keyBuf, data, len);
+            keyBuf[len] = '\0';
+            valueBuf[0] = '\0';
+        }
+    }
+}
 
 NS_FGUI_END

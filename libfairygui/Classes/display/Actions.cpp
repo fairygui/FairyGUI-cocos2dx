@@ -1,4 +1,4 @@
-#include "display/Actions.h"
+#include "Actions.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;

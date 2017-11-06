@@ -2,6 +2,7 @@
 #include "utils/ByteArray.h"
 #include "utils/ToolSet.h"
 #include "UIObjectFactory.h"
+#include "display/BitmapFont.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -14,11 +15,19 @@ int UIPackage::_constructing = 0;
 
 const unsigned char* emptyTextureData = new unsigned char[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
-UIPackage::PackageMap UIPackage::_packageInstById;
-UIPackage::PackageMap UIPackage::_packageInstByName;
-UIPackage::PackageCollection UIPackage::_packageList;
+std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstById;
+std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstByName;
+std::vector<UIPackage*> UIPackage::_packageList;
+std::unordered_map<std::string, FontAtlas*> UIPackage::_bitmapFonts;
 ValueMap UIPackage::_stringsSource;
 Texture2D* UIPackage::_emptyTexture;
+
+struct AtlasSprite
+{
+    std::string atlas;
+    Rect rect;
+    bool rotated;
+};
 
 UIPackage::UIPackage() :
     _loadingPackage(false)
@@ -27,23 +36,8 @@ UIPackage::UIPackage() :
 
 UIPackage::~UIPackage()
 {
-    for_each(_items.begin(), _items.end(), [](PackageItem* pi) {
-        CC_SAFE_DELETE(pi->scale9Grid);
-        CC_SAFE_DELETE(pi->componentData);
-        if (pi->displayList)
-        {
-            for_each(pi->displayList->begin(), pi->displayList->end(), [](DisplayListItem* di) {
-                CC_SAFE_DELETE(di);
-            });
-            CC_SAFE_DELETE(pi->displayList);
-        }
-
-        CC_SAFE_RELEASE(pi->texture);
-        CC_SAFE_RELEASE(pi->spriteFrame);
-        CC_SAFE_RELEASE(pi->animation);
-
-        CC_SAFE_DELETE(pi);
-    });
+    for (auto &it : _items)
+        delete it;
 }
 
 UIPackage * UIPackage::getById(const string& id)
@@ -233,9 +227,12 @@ void * UIPackage::getItemAsset(PackageItem * item)
         if (!item->decoded)
         {
             item->decoded = true;
-            AtlasSprite* sprite = _sprites[item->id];
-            if (sprite)
+            auto it = _sprites.find(item->id);
+            if (it != _sprites.end())
+            {
+                AtlasSprite * sprite = it->second;
                 item->spriteFrame = createSpriteTexture(sprite);
+            }
             else
                 item->spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect());
             if (item->scaleByTile)
@@ -267,9 +264,9 @@ void * UIPackage::getItemAsset(PackageItem * item)
         if (!item->decoded)
         {
             item->decoded = true;
-            //loadFont(item);
+            loadFont(item);
         }
-        return nullptr;// item.bitmapFont;
+        return item->bitmapFont;
 
     case PackageItemType::MOVIECLIP:
         if (!item->decoded)
@@ -351,10 +348,9 @@ void UIPackage::decodeDesc(Data& buffer)
 
             if (size > 0)
             {
-                char* data = new char[size];
-                memcpy(data, buffer.getBytes() + offset, size);
-
-                _descPack[entryName] = string(data);
+                Data* data = new Data();
+                data->copy(buffer.getBytes() + offset, size);
+                _descPack[entryName] = data;
             }
         }
 
@@ -409,10 +405,10 @@ void UIPackage::loadPackage()
         _sprites[itemId] = sprite;
     }
 
-    str = _descPack["package.xml"].asString();
+    Data* xmlData = _descPack["package.xml"];
 
     tinyxml2::XMLDocument* xml = new tinyxml2::XMLDocument();
-    xml->Parse(str.c_str());
+    xml->Parse((const char*)xmlData->getBytes(), xmlData->getSize());
 
     tinyxml2::XMLElement* root = xml->RootElement();
 
@@ -483,13 +479,6 @@ void UIPackage::loadPackage()
             break;
         }
 
-        case PackageItemType::FONT:
-        {
-            //pi.bitmapFont = new BitmapFont(pi);
-            //FontManager.RegisterFont(pi.bitmapFont, null);
-            break;
-        }
-
         case PackageItemType::COMPONENT:
         {
             UIObjectFactory::resolvePackageItemExtension(pi);
@@ -506,19 +495,21 @@ void UIPackage::loadPackage()
 
     delete xml;
 
-    cnt = _items.size();
-    for (int i = 0; i < cnt; i++)
-        getItemAsset(_items[i]);
+    for (auto &iter : _items)
+        getItemAsset(iter);
 
+    for (auto &iter : _descPack)
+        delete iter.second;
     _descPack.clear();
 
-    for (auto iter = _sprites.begin(); iter != _sprites.end(); ++iter)
-        delete iter->second;
+    for (auto &iter : _sprites)
+        delete iter.second;
     _sprites.clear();
 
     _loadingPackage = false;
 }
 
+//注意返回的SpriteFrame的ref=1，并且不会autorelease。内部方法，不搞那么复杂，UIPackage里的调用注意即可。
 SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
 {
     PackageItem* atlasItem = getItem(sprite->atlas);
@@ -533,7 +524,6 @@ SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
 
     SpriteFrame* spriteFrame = new SpriteFrame();
     spriteFrame->initWithTexture(atlasTexture, sprite->rect, sprite->rotated, Vec2(0, 0), sprite->rect.size);
-    spriteFrame->retain();
 
     return spriteFrame;
 }
@@ -559,9 +549,9 @@ void UIPackage::loadAtlas(PackageItem * item)
 
 void UIPackage::loadMovieClip(PackageItem * item)
 {
-    string str = _descPack[item->id + ".xml"].asString();
+    Data* xmlData = _descPack[item->id + ".xml"];
     tinyxml2::XMLDocument* xml = new tinyxml2::XMLDocument();
-    xml->Parse(str.c_str());
+    xml->Parse((const char*)xmlData->getBytes(), xmlData->getSize());
 
     tinyxml2::XMLElement* root = xml->RootElement();
     vector<string> arr;
@@ -612,6 +602,8 @@ void UIPackage::loadMovieClip(PackageItem * item)
                     spriteFrame->setOffset(Vec2(rect.origin.x, -rect.origin.y));
                     AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
                     frames.pushBack(frame);
+                    //spriteFrame的释放就交给AnimationFrame了
+                    spriteFrame->release();
                 }
             }
         }
@@ -633,11 +625,155 @@ void UIPackage::loadMovieClip(PackageItem * item)
     item->animation->initWithAnimationFrames(frames, interval, 1);
 }
 
+void UIPackage::loadFont(PackageItem * item)
+{
+    Data* fntData = _descPack[item->id + ".fnt"];
+    FastSplitter lines, props, fields;
+    lines.start((char*)fntData->getBytes(), fntData->getSize(), '\n');
+    bool ttf = false;
+    int size = 0;
+    int xadvance = 0;
+    bool resizable = false;
+    bool canTint = false;
+    int lineHeight = 0;
+    Texture2D* mainTexture = nullptr;
+    AtlasSprite* mainSprite = nullptr;
+    char keyBuf[30];
+    char valueBuf[50];
+
+    item->bitmapFont = BitmapFont::create(); //由fontAtlas retain
+
+    FontAtlas* fontAtlas = new FontAtlas(*item->bitmapFont);
+    item->bitmapFont->_fontAtlas = fontAtlas;
+    _bitmapFonts[URL_PREFIX + _id + item->id] = fontAtlas;
+
+    while (lines.next())
+    {
+        int len = lines.getTextLength();
+        const char* line = lines.getText();
+        if (len > 4 && memcmp(line, "info", 4) == 0)
+        {
+            props.start(line, len, ' ');
+            while (props.next())
+            {
+                props.getKeyValuePair(keyBuf, sizeof(keyBuf), valueBuf, sizeof(valueBuf));
+
+                if (strcmp(keyBuf, "face") == 0)
+                {
+                    ttf = true;
+
+                    auto it = _sprites.find(item->id);
+                    if (it != _sprites.end())
+                    {
+                        mainSprite = it->second;
+                        PackageItem* atlasItem = getItem(mainSprite->atlas);
+                        mainTexture = (Texture2D*)getItemAsset(atlasItem);
+                    }
+                }
+                else if (strcmp(keyBuf, "size") == 0)
+                    sscanf(valueBuf, "%d", &size);
+                else if (strcmp(keyBuf, "resizable") == 0)
+                    resizable = strcmp(valueBuf, "true") == 0;
+                else if (strcmp(keyBuf, "colored") == 0)
+                    canTint = strcmp(valueBuf, "true") == 0;
+            }
+
+            if (size == 0)
+                size = lineHeight;
+            else if (lineHeight == 0)
+                lineHeight = size;
+        }
+        else if (len > 6 && memcmp(line, "common", 6) == 0)
+        {
+            props.start(line, len, ' ');
+            while (props.next())
+            {
+                props.getKeyValuePair(keyBuf, sizeof(keyBuf), valueBuf, sizeof(valueBuf));
+
+                if (strcmp(keyBuf, "lineHeight") == 0)
+                    sscanf(valueBuf, "%d", &lineHeight);
+
+                if (strcmp(keyBuf, "xadvance") == 0)
+                    sscanf(valueBuf, "%d", &xadvance);
+            }
+        }
+        else if (len > 4 && memcmp(line, "char", 4) == 0)
+        {
+            FontLetterDefinition def;
+            int bx = 0, by = 0, charId = 0;
+            int bw = 0, bh = 0;
+            PackageItem* charImg = nullptr;
+
+            props.start(line, len, ' ');
+            while (props.next())
+            {
+                props.getKeyValuePair(keyBuf, sizeof(keyBuf), valueBuf, sizeof(valueBuf));
+
+                if (strcmp(keyBuf, "id") == 0)
+                    sscanf(valueBuf, "%d", &charId);
+                else if (strcmp(keyBuf, "x") == 0)
+                    sscanf(valueBuf, "%d", &bx);
+                else if (strcmp(keyBuf, "y") == 0)
+                    sscanf(valueBuf, "%d", &by);
+                else if (strcmp(keyBuf, "xoffset") == 0)
+                    sscanf(valueBuf, "%f", &def.offsetX);
+                else if (strcmp(keyBuf, "yoffset") == 0)
+                    sscanf(valueBuf, "%f", &def.offsetY);
+                else if (strcmp(keyBuf, "width") == 0)
+                    sscanf(valueBuf, "%d", &bw);
+                else if (strcmp(keyBuf, "height") == 0)
+                    sscanf(valueBuf, "%d", &bh);
+                else if (strcmp(keyBuf, "xadvance") == 0)
+                    sscanf(valueBuf, "%d", &def.xAdvance);
+                else if (!ttf && strcmp(keyBuf, "img") == 0)
+                    charImg = getItem(valueBuf);
+            }
+
+            if (ttf)
+            {
+                Rect tempRect = Rect(bx + mainSprite->rect.origin.x, by + mainSprite->rect.origin.y, bw, bh);
+                tempRect = CC_RECT_PIXELS_TO_POINTS(tempRect);
+                def.U = tempRect.origin.x;
+                def.V = tempRect.origin.y;
+                def.width = tempRect.size.width;
+                def.height = tempRect.size.height;
+            }
+            else if (charImg)
+            {
+                getItemAsset(charImg);
+
+                Rect tempRect = charImg->spriteFrame->getRectInPixels();
+                bw = tempRect.size.width;
+                bh = tempRect.size.height;
+                tempRect = CC_RECT_PIXELS_TO_POINTS(tempRect);
+                def.U = tempRect.origin.x;
+                def.V = tempRect.origin.y;
+                def.width = tempRect.size.width;
+                def.height = tempRect.size.height;
+                if (mainTexture == nullptr)
+                    mainTexture = charImg->spriteFrame->getTexture();
+            }
+            def.textureID = 0;
+            fontAtlas->addLetterDefinition(charId, def);
+
+            if (size == 0)
+                size = bh;
+            if (!ttf && lineHeight < size)
+                lineHeight = size;
+        }
+    }
+
+    fontAtlas->addTexture(mainTexture, 0);
+    fontAtlas->setLineHeight(lineHeight);
+    item->bitmapFont->_originalFontSize = size;
+    item->bitmapFont->_resizable = resizable;
+}
+
 void UIPackage::loadComponent(PackageItem * item)
 {
-    string str = _descPack[item->id + ".xml"].asString();
+    Data* xmlData = _descPack[item->id + ".xml"];
     tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
-    doc->Parse(str.c_str());
+    doc->Parse((const char*)xmlData->getBytes(), xmlData->getSize());
     item->componentData = doc;
 }
 

@@ -10,25 +10,13 @@ NS_FGUI_BEGIN
 
 USING_NS_CC;
 
+struct AtlasSprite;
+
 class UIPackage
 {
 public:
     UIPackage();
     ~UIPackage();
-
-    class AtlasSprite
-    {
-    public:
-        std::string atlas;
-        Rect rect;
-        bool rotated;
-    };
-
-    typedef std::unordered_map<std::string, UIPackage*> PackageMap;
-    typedef std::unordered_map<std::string, PackageItem*> PackageItemMap;
-    typedef std::vector<UIPackage*> PackageCollection;
-    typedef std::vector<PackageItem*> PackageItemCollection;
-    typedef std::unordered_map<std::string, AtlasSprite*> SpriteMap;
 
     static UIPackage* getById(const std::string& id);
     static UIPackage* getByName(const std::string& name);
@@ -62,9 +50,11 @@ private:
     cocos2d::SpriteFrame* createSpriteTexture(AtlasSprite* sprite);
     void loadAtlas(PackageItem* item);
     void loadMovieClip(PackageItem* item);
+    void loadFont(PackageItem* item);
     void loadComponent(PackageItem* item);
     void loadComponentChildren(PackageItem* item);
     void translateComponent(PackageItem* item);
+
     GObject* createObject(const std::string& resName);
     GObject* createObject(PackageItem* item);
 
@@ -73,20 +63,20 @@ private:
     std::string _name;
     std::string _assetPath;
 
-    PackageItemCollection _items;
-    PackageItemMap _itemsById;
-    PackageItemMap _itemsByName;
-    ValueMap _descPack;
+    std::vector<PackageItem*> _items;
+    std::unordered_map<std::string, PackageItem*> _itemsById;
+    std::unordered_map<std::string, PackageItem*> _itemsByName;
+    std::unordered_map<std::string, AtlasSprite*> _sprites;
+    std::unordered_map<std::string, cocos2d::Data*> _descPack;
     //ValueMap _hitTestDatas;
     std::string _assetNamePrefix;
     std::string _customId;
     bool _loadingPackage;
 
-    SpriteMap _sprites;
-
-    static PackageMap _packageInstById;
-    static PackageMap _packageInstByName;
-    static PackageCollection _packageList;
+    static std::unordered_map<std::string, UIPackage*> _packageInstById;
+    static std::unordered_map<std::string, UIPackage*> _packageInstByName;
+    static std::vector<UIPackage*> _packageList;
+    static std::unordered_map<std::string, cocos2d::FontAtlas*> _bitmapFonts;
     static ValueMap _stringsSource;
     static Texture2D* _emptyTexture;
 };

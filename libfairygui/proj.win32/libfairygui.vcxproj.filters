@@ -180,6 +180,21 @@
     <ClInclude Include="..\Classes\display\FUISprite.h">
       <Filter>src\display</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\display\FUIContainer.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\display\BitmapFont.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\display\FUILabel.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\UBBParser.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\SwitchHelper.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -331,6 +346,18 @@
     </ClCompile>
     <ClCompile Include="..\Classes\display\FUIRichText.cpp">
       <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\FUIContainer.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\BitmapFont.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\FUILabel.cpp">
+      <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\UBBParser.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

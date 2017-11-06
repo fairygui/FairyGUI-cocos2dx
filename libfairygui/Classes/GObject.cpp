@@ -16,7 +16,6 @@ USING_NS_CC;
 
 using namespace tinyxml2;
 
-uint32_t GObject::_gInstanceCounter = 0;
 GObject* GObject::_draggingObject = nullptr;
 
 Vec2 sGlobalDragStart;
@@ -49,8 +48,10 @@ GObject::GObject() :
     _packageItem(nullptr),
     _data(nullptr),
     _touchDisabled(false),
+    _directToParent(false),
     name("")
 {
+    static uint32_t _gInstanceCounter = 0;
     id = "_n" + Value(_gInstanceCounter++).asString();
     _relations = new Relations(this);
 }
@@ -612,26 +613,6 @@ GObject* GObject::hitTest(const Vec2 &pt, const Camera* camera)
         return nullptr;
 }
 
-GComponent * GObject::asCom()
-{
-    return dynamic_cast<GComponent*>(this);
-}
-
-GTextFieldDelegate * GObject::asTextField()
-{
-    return dynamic_cast<GTextFieldDelegate*>(this);
-}
-
-GButton * GObject::asButton()
-{
-    return dynamic_cast<GButton*>(this);
-}
-
-GList * GObject::asList()
-{
-    return dynamic_cast<GList*>(this);
-}
-
 void GObject::handleInit()
 {
     _displayObject = Node::create();
@@ -659,6 +640,8 @@ void GObject::handlePositionChanged()
             pt.x += _size.width * _pivot.x;
             pt.y -= _size.height * _pivot.y;
         }
+        if (_parent && _directToParent)
+            pt.y += _parent->_size.height;
         if (_pixelSnapping)
         {
             pt.x = (int)pt.x;

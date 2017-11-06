@@ -70,18 +70,19 @@ bool HelloWorld::init()
     UIConfig::registerFont(u8"Î¢ÈíÑÅºÚ", "Microsoft YaHei");
 #endif
 
+    UIConfig::buttonSound = "ui://Basics/click";
     UIConfig::verticalScrollBar = "ui://Basics/ScrollBar_VT";
     UIConfig::horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
 
-    UIPackage::addPackage("Basics");
-    _view = UIPackage::createObject("Basics", "Main")->asCom();
+    UIPackage::addPackage("UI/Basics");
+    _view = UIPackage::createObject("Basics", "Main")->as<GComponent>();
     GRoot::getInstance()->addChild(_view);
 
     _backBtn = _view->getChild("btn_Back");
     _backBtn->setVisible(false);
     _backBtn->addClickListener(CC_CALLBACK_1(HelloWorld::onClickBack, this));
 
-    _demoContainer = _view->getChild("container")->asCom();
+    _demoContainer = _view->getChild("container")->as<GComponent>();
     _cc = _view->getController("c1");
 
     int cnt = _view->numChildren();
@@ -108,7 +109,7 @@ void HelloWorld::runDemo(EventContext* context)
     GComponent* obj;
     if (it == _demoObjects.end())
     {
-        obj = UIPackage::createObject("Basics", "Demo_" + type)->asCom();
+        obj = UIPackage::createObject("Basics", "Demo_" + type)->as<GComponent>();
         _demoObjects.insert(type, obj);
     }
     else
@@ -119,12 +120,28 @@ void HelloWorld::runDemo(EventContext* context)
     _cc->setSelectedIndex(1);
     _backBtn->setVisible(true);
 
-    if (type == "Depth")
+    if (type == "Text")
+        playText();
+    else if (type == "Depth")
         playDepth();
     else if (type == "Window")
         playWindow();
     else if (type == "Drag&Drop")
         playDragDrop();
+}
+
+void HelloWorld::playText()
+{
+    GComponent* obj = _demoObjects.at("Text");
+    obj->getChild("n12")->addEventListener(UIEventType::ClickLink, [this](EventContext* context)
+    {
+        GRichTextField* t = dynamic_cast<GRichTextField*>(context->getSender());
+        t->setText("[img]ui://Basics/long_dead_png[/img][color=#FF0000]You click the link[/color]£º" + context->getData().asString());
+    });
+    obj->getChild("n25")->addClickListener([this, obj](EventContext* context)
+    {
+        obj->getChild("n24")->setText(obj->getChild("n22")->getText());
+    });
 }
 
 void HelloWorld::playWindow()
@@ -154,7 +171,7 @@ Vec2 startPos;
 void HelloWorld::playDepth()
 {
     GComponent* obj = _demoObjects.at("Depth");
-    GComponent* testContainer = obj->getChild("n22")->asCom();
+    GComponent* testContainer = obj->getChild("n22")->as<GComponent>();
     GObject* fixedObj = testContainer->getChild("n0");
     fixedObj->setSortingOrder(100);
     fixedObj->setDraggable(true);
@@ -181,7 +198,7 @@ void HelloWorld::playDepth()
         startPos.y += 10;
         graph->setPosition(startPos.x, startPos.y);
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::RED);
-        obj->getChild("n22")->asCom()->addChild(graph);
+        obj->getChild("n22")->as<GComponent>()->addChild(graph);
     }, (int)this);
 
     obj->getChild("btn1")->addClickListener([obj](EventContext*)
@@ -192,7 +209,7 @@ void HelloWorld::playDepth()
         graph->setPosition(startPos.x, startPos.y);
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::GREEN);
         graph->setSortingOrder(200);
-        obj->getChild("n22")->asCom()->addChild(graph);
+        obj->getChild("n22")->as<GComponent>()->addChild(graph);
     }, (int)this);
 }
 
@@ -201,22 +218,21 @@ void HelloWorld::playDragDrop()
     GComponent* obj = _demoObjects.at("Drag&Drop");
     obj->getChild("a")->setDraggable(true);
 
-    GButton* b = obj->getChild("b")->asButton();
+    GButton* b = obj->getChild("b")->as<GButton>();
     b->setDraggable(true);
     b->addEventListener(UIEventType::DragStart, [b](EventContext* context)
     {
         //Cancel the original dragging, and start a new one with a agent.
         context->preventDefault();
 
-        DragDropManager::getInstance()->startDrag(b->getIcon(), (void*)b->getIcon().c_str(),
-            context->getInput()->getTouchId());
+        DragDropManager::getInstance()->startDrag(b->getIcon(), Value(b->getIcon()), context->getInput()->getTouchId());
     });
 
-    GButton* c = obj->getChild("c")->asButton();
+    GButton* c = obj->getChild("c")->as<GButton>();
     c->setIcon("");
     c->addEventListener(UIEventType::Drop, [c](EventContext* context)
     {
-        c->setIcon((char*)context->getData());
+        c->setIcon(context->getData().asString());
     });
 
     GObject* bounds = obj->getChild("n7");
@@ -226,7 +242,7 @@ void HelloWorld::playDragDrop()
     rect.origin.x -= obj->getParent()->getX();;
     //----
 
-    GButton* d = obj->getChild("d")->asButton();
+    GButton* d = obj->getChild("d")->as<GButton>();
     d->setDraggable(true);
     d->setDragBounds(rect);
 }

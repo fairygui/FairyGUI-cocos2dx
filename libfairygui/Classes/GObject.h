@@ -18,9 +18,15 @@ NS_FGUI_BEGIN
 class GComponent;
 class GGroup;
 class GButton;
+class GLabel;
+class GComboBox;
+class GProgressBar;
+class GSlider;
 class GList;
 class GRoot;
 class GTextFieldDelegate;
+class GRichTextField;
+class GTextInput;
 
 class GObject : public UIEventDispatcher
 {
@@ -138,10 +144,7 @@ public:
     virtual void constructFromResource();
     virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera);
 
-    GComponent* asCom();
-    GTextFieldDelegate* asTextField();
-    GButton* asButton();
-    GList* asList();
+    template<typename T> T* as();
 
     std::string id;
     std::string name;
@@ -221,8 +224,8 @@ private:
     void * _data;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
+    bool _directToParent;
 
-    static uint32_t _gInstanceCounter;
     static GObject* _draggingObject;
 
     friend class GComponent;
@@ -231,6 +234,13 @@ private:
     friend class RelationItem;
     friend class UIObjectFactory;
 };
+
+template<typename T>
+inline T* GObject::as()
+{
+    return dynamic_cast<T*>(this);
+}
+
 
 NS_FGUI_END
 

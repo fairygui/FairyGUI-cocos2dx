@@ -8,6 +8,7 @@
 NS_FGUI_BEGIN
 
 class GObject;
+class InputProcessor;
 
 class EventContext
 {
@@ -16,7 +17,7 @@ public:
     ~EventContext();
 
     cocos2d::Ref* getSender() const { return _sender; }
-    void* getData() const { return _data; }
+    const cocos2d::Value& getData() const { return _data; }
     InputEvent* getInput() const { return _inputEvent; }
     void stopPropagation() { _isStopped = true; }
     void preventDefault() { _defaultPrevented = true; }
@@ -26,7 +27,7 @@ public:
 private:
     cocos2d::Ref* _sender;
     InputEvent* _inputEvent;
-    void* _data;
+    cocos2d::Value _data;
     bool _isStopped;
     bool _defaultPrevented;
     int _touchCapture;

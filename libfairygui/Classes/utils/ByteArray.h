@@ -15,8 +15,8 @@
 class ByteArray
 {
 public:
-    static ByteArray* create(int len, int endian = ENDIAN_LITTLE);
-    static ByteArray* createWithBuffer(char* buffer, int len, int endian = ENDIAN_LITTLE);
+    static ByteArray* create(int len);
+    static ByteArray* createWithBuffer(char* buffer, int len, bool transferOwnerShip = false);
 
     static int checkCPUEndian();
 
