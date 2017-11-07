@@ -14,15 +14,15 @@ void __selector_##__FUNC__(float dt) \
 void __FUNC__()
 
 #define CALL_LATER(__TYPE__,__FUNC__,...) \
-if (!Director::getInstance()->getScheduler()->isScheduled(schedule_selector(##__TYPE__::__selector_##__FUNC__), this))\
-    Director::getInstance()->getScheduler()->schedule(schedule_selector(##__TYPE__::__selector_##__FUNC__), this, (__VA_ARGS__+0), false)
+if (!Director::getInstance()->getScheduler()->isScheduled(schedule_selector(__TYPE__::__selector_##__FUNC__), this))\
+    Director::getInstance()->getScheduler()->schedule(schedule_selector(__TYPE__::__selector_##__FUNC__), this, (__VA_ARGS__+0), false)
 
 #define CALL_LATER_CANCEL(__TYPE__,__FUNC__) \
 cocos2d::Director::getInstance()->getScheduler()->unschedule(schedule_selector(__TYPE__::__selector_##__FUNC__), this)
 
 #define CALL_PER_FRAME(__TYPE__,__FUNC__) \
-if (!Director::getInstance()->getScheduler()->isScheduled(schedule_selector(##__TYPE__::__FUNC__), this))\
-    Director::getInstance()->getScheduler()->schedule(schedule_selector(##__TYPE__::__FUNC__), this, 0, false)
+if (!Director::getInstance()->getScheduler()->isScheduled(schedule_selector(__TYPE__::__FUNC__), this))\
+    Director::getInstance()->getScheduler()->schedule(schedule_selector(__TYPE__::__FUNC__), this, 0, false)
 
 #define CALL_PER_FRAME_CANCEL(__TYPE__,__FUNC__) \
 cocos2d::Director::getInstance()->getScheduler()->unschedule(schedule_selector(__TYPE__::__FUNC__), this)
