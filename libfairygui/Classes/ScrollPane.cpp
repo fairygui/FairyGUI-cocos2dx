@@ -99,7 +99,7 @@ ScrollPane::ScrollPane(GComponent* owner,
 #ifdef CC_PLATFORM_PC
         scrollBarDisplay = UIConfig::defaultScrollBarDisplay;
 #else
-        scrollBarDisplay = ScrollBarDisplayType.Auto;
+        scrollBarDisplay = ScrollBarDisplayType::AUTO;
 #endif
     }
 
