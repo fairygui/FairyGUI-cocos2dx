@@ -199,7 +199,7 @@ void HelloWorld::playDepth()
         graph->setPosition(startPos.x, startPos.y);
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::RED);
         obj->getChild("n22")->as<GComponent>()->addChild(graph);
-    }, (int)this);
+    },EventTag(this)); //因为playDepth是重复进入的，使用EventTag，防止了重复注册事件。
 
     obj->getChild("btn1")->addClickListener([obj](EventContext*)
     {
@@ -210,7 +210,7 @@ void HelloWorld::playDepth()
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::GREEN);
         graph->setSortingOrder(200);
         obj->getChild("n22")->as<GComponent>()->addChild(graph);
-    }, (int)this);
+    }, EventTag(this));
 }
 
 void HelloWorld::playDragDrop()

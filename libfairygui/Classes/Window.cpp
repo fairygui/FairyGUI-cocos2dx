@@ -76,14 +76,14 @@ void Window::setCloseButton(GObject * value)
 {
     if (_closeButton != nullptr)
     {
-        _closeButton->removeClickListener((int)this);
+        _closeButton->removeClickListener(EventTag(this));
         _closeButton->release();
     }
     _closeButton = value;
     if (_closeButton != nullptr)
     {
         _closeButton->retain();
-        _closeButton->addClickListener(CC_CALLBACK_1(Window::closeEventHandler, this), (int)this);
+        _closeButton->addClickListener(CC_CALLBACK_1(Window::closeEventHandler, this), EventTag(this));
     }
 }
 
@@ -94,7 +94,7 @@ void Window::setDragArea(GObject * value)
         if (_dragArea != nullptr)
         {
             _dragArea->setDraggable(false);
-            _dragArea->removeEventListener(UIEventType::DragStart, 9999);
+            _dragArea->removeEventListener(UIEventType::DragStart, EventTag(this));
             _dragArea->release();
         }
 
@@ -105,7 +105,7 @@ void Window::setDragArea(GObject * value)
             if (dynamic_cast<GGraph*>(_dragArea) && ((GGraph*)_dragArea)->isEmpty())
                 ((GGraph*)_dragArea)->drawRect(_dragArea->getWidth(), _dragArea->getHeight(), 0, Color4F(0, 0, 0, 0), Color4F(0, 0, 0, 0));
             _dragArea->setDraggable(true);
-            _dragArea->addEventListener(UIEventType::DragStart, CC_CALLBACK_1(Window::onDragStart, this), 9999);
+            _dragArea->addEventListener(UIEventType::DragStart, CC_CALLBACK_1(Window::onDragStart, this), EventTag(this));
         }
     }
 }

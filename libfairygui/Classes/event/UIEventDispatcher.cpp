@@ -5,6 +5,83 @@
 USING_NS_CC;
 NS_FGUI_BEGIN
 
+const EventTag EventTag::None;
+
+EventTag::EventTag() :_value(0)
+{
+}
+
+EventTag::EventTag(void * ptr) : _value((uintptr_t)ptr)
+{
+}
+
+EventTag::EventTag(int value) : _value(value)
+{
+}
+
+EventTag::EventTag(const EventTag & other)
+{
+    *this = other;
+}
+
+EventTag::EventTag(EventTag && other)
+{
+    *this = std::move(other);
+}
+
+EventTag::~EventTag()
+{
+}
+
+EventTag & EventTag::operator=(const EventTag & other)
+{
+    if (this != &other)
+        _value = other._value;
+    return *this;
+}
+
+EventTag & EventTag::operator=(EventTag && other)
+{
+    if (this != &other)
+    {
+        _value = other._value;
+        other._value = 0;
+    }
+    return *this;
+}
+
+EventTag & EventTag::operator=(void * ptr)
+{
+    _value = (uintptr_t)ptr;
+    return *this;
+}
+
+EventTag & EventTag::operator=(int v)
+{
+    _value = v;
+    return *this;
+}
+
+bool EventTag::operator!=(const EventTag & v)
+{
+    return _value != v._value;
+}
+
+bool EventTag::operator!=(const EventTag & v) const
+{
+    return _value != v._value;
+}
+
+bool EventTag::operator==(const EventTag & v)
+{
+    return _value == v._value;
+}
+
+bool EventTag::operator==(const EventTag & v) const
+{
+    return _value == v._value;
+}
+
 UIEventDispatcher::UIEventDispatcher() :_dispatching(0)
 {
 }
@@ -14,9 +91,9 @@ UIEventDispatcher::~UIEventDispatcher()
 
 }
 
-void UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, int tag)
+void UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, const EventTag& tag)
 {
-    if (tag != Node::INVALID_TAG)
+    if (!tag.isNone())
     {
         for (auto it = _callbacks.begin(); it != _callbacks.end(); it++)
         {
@@ -36,11 +113,11 @@ void UIEventDispatcher::addEventListener(int eventType, const EventCallback& cal
     _callbacks.push_back(item);
 }
 
-void UIEventDispatcher::removeEventListener(int eventType, int tag)
+void UIEventDispatcher::removeEventListener(int eventType, const EventTag& tag)
 {
     for (auto it = _callbacks.begin(); it != _callbacks.end(); )
     {
-        if (it->eventType == eventType && (it->tag == tag || tag == Node::INVALID_TAG))
+        if (it->eventType == eventType && (it->tag == tag || tag.isNone()))
         {
             if (_dispatching > 0)
             {
@@ -66,11 +143,11 @@ void UIEventDispatcher::removeEventListeners()
         _callbacks.clear();
 }
 
-bool UIEventDispatcher::hasEventListener(int eventType, int tag) const
+bool UIEventDispatcher::hasEventListener(int eventType, const EventTag& tag) const
 {
     for (auto it = _callbacks.cbegin(); it != _callbacks.cend(); ++it)
     {
-        if (it->eventType == eventType && (it->tag == tag || tag == Node::INVALID_TAG) && it->callback != nullptr)
+        if (it->eventType == eventType && (it->tag == tag || tag.isNone()) && it->callback != nullptr)
             return true;
     }
     return false;

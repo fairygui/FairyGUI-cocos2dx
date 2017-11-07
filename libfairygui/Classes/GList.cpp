@@ -177,8 +177,8 @@ GObject * GList::addChildAt(GObject * child, int index)
         button->setChangeStateOnClick(false);
     }
 
-    child->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GList::onItemTouchBegin, this), (int)this);
-    child->addClickListener(CC_CALLBACK_1(GList::onClickItem, this), (int)this);
+    child->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GList::onItemTouchBegin, this), EventTag(this));
+    child->addClickListener(CC_CALLBACK_1(GList::onClickItem, this), EventTag(this));
 
     return child;
 }
@@ -186,8 +186,8 @@ GObject * GList::addChildAt(GObject * child, int index)
 void GList::removeChildAt(int index)
 {
     GObject* child = _children.at(index);
-    child->removeClickListener((int)this);
-    child->removeEventListener(UIEventType::TouchBegin, (int)this);
+    child->removeClickListener(EventTag(this));
+    child->removeEventListener(UIEventType::TouchBegin, EventTag(this));
 
     GComponent::removeChildAt(index);
 }

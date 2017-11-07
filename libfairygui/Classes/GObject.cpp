@@ -788,15 +788,15 @@ void GObject::initDrag()
 {
     if (_draggable)
     {
-        addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GObject::onTouchBegin, this), (int)this);
-        addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), (int)this);
-        addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), (int)this);
+        addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GObject::onTouchBegin, this), EventTag(this));
+        addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), EventTag(this));
+        addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), EventTag(this));
     }
     else
     {
-        removeEventListener(UIEventType::TouchBegin, (int)this);
-        removeEventListener(UIEventType::TouchMove, (int)this);
-        removeEventListener(UIEventType::TouchEnd, (int)this);
+        removeEventListener(UIEventType::TouchBegin, EventTag(this));
+        removeEventListener(UIEventType::TouchMove, EventTag(this));
+        removeEventListener(UIEventType::TouchEnd, EventTag(this));
     }
 }
 
@@ -816,8 +816,8 @@ void GObject::dragBegin(int touchId)
     _draggingObject = this;
     GRoot::getInstance()->getInputProcessor()->addTouchMonitor(touchId, this);
 
-    addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), (int)this);
-    addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), (int)this);
+    addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), EventTag(this));
+    addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), EventTag(this));
 }
 
 void GObject::dragEnd()

@@ -400,8 +400,8 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
 void RelationItem::addRefTarget(GObject* target)
 {
     if (target != _owner->_parent)
-        target->addEventListener(UIEventType::PositionChange, CC_CALLBACK_1(RelationItem::onTargetXYChanged, this), (int)_owner->displayObject()->_ID);
-    target->addEventListener(UIEventType::SizeChange, CC_CALLBACK_1(RelationItem::onTargetSizeChanged, this), (int)_owner->displayObject()->_ID);
+        target->addEventListener(UIEventType::PositionChange, CC_CALLBACK_1(RelationItem::onTargetXYChanged, this), EventTag(this));
+    target->addEventListener(UIEventType::SizeChange, CC_CALLBACK_1(RelationItem::onTargetSizeChanged, this), EventTag(this));
     _targetData.x = _target->_position.x;
     _targetData.y = _target->_position.y;
     _targetData.z = _target->_size.width;
@@ -410,8 +410,8 @@ void RelationItem::addRefTarget(GObject* target)
 
 void RelationItem::releaseRefTarget(GObject* target)
 {
-    target->removeEventListener(UIEventType::PositionChange, (int)_owner->displayObject()->_ID);
-    target->removeEventListener(UIEventType::SizeChange, (int)_owner->displayObject()->_ID);
+    target->removeEventListener(UIEventType::PositionChange, EventTag(this));
+    target->removeEventListener(UIEventType::SizeChange, EventTag(this));
 }
 
 void RelationItem::onTargetXYChanged(EventContext* context)

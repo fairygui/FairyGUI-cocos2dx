@@ -138,8 +138,8 @@ public:
     void removeFromParent();
 
     void addClickListener(const EventCallback& callback) { addEventListener(UIEventType::Click, callback); }
-    void addClickListener(const EventCallback& callback, int tag) { addEventListener(UIEventType::Click, callback, tag); }
-    void removeClickListener(int tag) { removeEventListener(UIEventType::Click, tag); }
+    void addClickListener(const EventCallback& callback, const EventTag& tag) { addEventListener(UIEventType::Click, callback, tag); }
+    void removeClickListener(const EventTag& tag) { removeEventListener(UIEventType::Click, tag); }
 
     virtual void constructFromResource();
     virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera);
