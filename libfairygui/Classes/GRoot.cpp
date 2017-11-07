@@ -436,7 +436,9 @@ void GRoot::handleInit()
     _inputProcessor = new InputProcessor(this);
     _inputProcessor->setCaptureCallback(CC_CALLBACK_1(GRoot::onTouchEvent, this));
 
+#ifdef CC_PLATFORM_PC
     _windowSizeListener = Director::getInstance()->getEventDispatcher()->addCustomEventListener(GLViewImpl::EVENT_WINDOW_RESIZED, CC_CALLBACK_0(GRoot::onWindowSizeChanged, this));
+#endif
     onWindowSizeChanged();
 }
 
