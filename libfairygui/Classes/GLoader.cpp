@@ -244,11 +244,8 @@ void GLoader::updateLayout()
         if (_size.width == _contentWidth && _size.height == _contentHeight)
         {
             _content->setScale(1, 1);
-            //if (_content->getTexture() != nullptr)
-            //	_content.SetNativeSize();
             return;
         }
-        //如果不相等，可能是由于大小限制造成的，要后续处理
     }
 
     float sx = 1, sy = 1;
@@ -313,7 +310,7 @@ void GLoader::handleSizeChanged()
         updateLayout();
 }
 
-void GLoader::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GLoader::setup_BeforeAdd(TXMLElement * xml)
 {
     GObject::setup_BeforeAdd(xml);
 

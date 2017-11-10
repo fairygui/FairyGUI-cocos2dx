@@ -4,8 +4,6 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
-
 GScrollBar::GScrollBar() :
     _grip(nullptr),
     _arrowButton1(nullptr),
@@ -62,7 +60,7 @@ float GScrollBar::getMinSize()
         return (_arrowButton1 != nullptr ? _arrowButton1->getWidth() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getWidth() : 0);
 }
 
-void GScrollBar::constructFromXML(tinyxml2::XMLElement * xml)
+void GScrollBar::constructFromXML(TXMLElement * xml)
 {
     xml = xml->FirstChildElement("ScrollBar");
     if (xml != nullptr)

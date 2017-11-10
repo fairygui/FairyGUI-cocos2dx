@@ -1,5 +1,5 @@
-#ifndef __CONTROLLER_H__
-#define __CONTROLLER_H__
+#ifndef __GCONTROLLER_H__
+#define __GCONTROLLER_H__
 
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
@@ -9,11 +9,11 @@ NS_FGUI_BEGIN
 
 class GComponent;
 
-class Controller : public UIEventDispatcher
+class GController : public UIEventDispatcher
 {
 public:
-    Controller();
-    ~Controller();
+    GController();
+    ~GController();
 
     GComponent* getParent() const { return _parent; }
     void setParent(GComponent* value) { _parent = value; }
@@ -38,7 +38,7 @@ public:
     const std::string& getPageId(int index) const;
     void setOppositePageId(const std::string& value);
 
-    void setup(tinyxml2::XMLElement* xml);
+    void setup(TXMLElement* xml);
 
     std::string name;
     bool changing;

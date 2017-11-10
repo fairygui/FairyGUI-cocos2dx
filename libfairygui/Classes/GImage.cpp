@@ -77,7 +77,7 @@ void GImage::constructFromResource()
     setSize(sourceSize.width, sourceSize.height);
 }
 
-void GImage::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GImage::setup_BeforeAdd(TXMLElement * xml)
 {
     GObject::setup_BeforeAdd(xml);
 

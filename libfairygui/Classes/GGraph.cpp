@@ -4,8 +4,6 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
-
 GGraph::GGraph() :
     _shape(nullptr),
     _type(0),
@@ -95,7 +93,7 @@ void GGraph::handleSizeChanged()
     updateShape();
 }
 
-void GGraph::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GGraph::setup_BeforeAdd(TXMLElement * xml)
 {
     GObject::setup_BeforeAdd(xml);
 

@@ -77,11 +77,33 @@ ActionInterval * createEaseAction(cocos2d::tweenfunc::TweenType tweenType, cocos
     }
 }
 
-ActionVec2* ActionVec2::create(float duration, const cocos2d::Vec2& from, const cocos2d::Vec2& to,
-    ActionVec2Callback onUpdate, std::function<void()> onComplete)
+ActionInterval* composeActions(ActionInterval* mainAction, tweenfunc::TweenType easeType, float delay, std::function<void()> func, int tag)
 {
-    auto ref = new (std::nothrow) ActionVec2();
-    if (ref && ref->initWithDuration(duration, from, to, onUpdate, onComplete))
+    ActionInterval* action = createEaseAction(easeType, mainAction);
+    if (func != nullptr)
+    {
+        FiniteTimeAction* callbackAction = CallFunc::create(func);
+        if (delay > 0)
+            action = Sequence::create({ DelayTime::create(delay), action, callbackAction });
+        else
+            action = Sequence::createWithTwoActions(action, callbackAction);
+    }
+    else
+    {
+        if (delay > 0)
+            action = Sequence::createWithTwoActions(DelayTime::create(delay), action);
+    }
+    action->setTag(tag);
+
+    return action;
+}
+
+//----------------
+
+ActionFloat2* ActionFloat2::create(float duration, const cocos2d::Vec2& from, const cocos2d::Vec2& to, ActionFloat2Callback onUpdate)
+{
+    auto ref = new (std::nothrow) ActionFloat2();
+    if (ref && ref->initWithDuration(duration, from, to, onUpdate))
     {
         ref->autorelease();
         return ref;
@@ -91,15 +113,67 @@ ActionVec2* ActionVec2::create(float duration, const cocos2d::Vec2& from, const 
     return nullptr;
 }
 
-bool ActionVec2::initWithDuration(float duration, const cocos2d::Vec2& from, const cocos2d::Vec2& to,
-    ActionVec2Callback onUpdate, std::function<void()> onComplete)
+bool ActionFloat2::initWithDuration(float duration, const cocos2d::Vec2& from, const cocos2d::Vec2& to, ActionFloat2Callback onUpdate)
 {
     if (ActionInterval::initWithDuration(duration))
     {
         _from = from;
         _to = to;
         _updateCallback = onUpdate;
-        _completeCallback = onComplete;
+        return true;
+    }
+    return false;
+}
+
+ActionFloat2* ActionFloat2::clone() const
+{
+    return ActionFloat2::create(_duration, _from, _to, _updateCallback);
+}
+
+void ActionFloat2::startWithTarget(Node *target)
+{
+    ActionInterval::startWithTarget(target);
+    _delta = _to - _from;
+}
+
+void ActionFloat2::update(float delta)
+{
+    Vec2 value = _to - _delta * (1 - delta);
+
+    if (_updateCallback)
+    {
+        // report back value to caller
+        _updateCallback(value.x, value.y);
+    }
+}
+
+ActionFloat2* ActionFloat2::reverse() const
+{
+    return ActionFloat2::create(_duration, _to, _from, _updateCallback);
+}
+
+//------------------
+
+ActionVec2* ActionVec2::create(float duration, const cocos2d::Vec2& from, const cocos2d::Vec2& to, ActionVec2Callback onUpdate)
+{
+    auto ref = new (std::nothrow) ActionVec2();
+    if (ref && ref->initWithDuration(duration, from, to, onUpdate))
+    {
+        ref->autorelease();
+        return ref;
+    }
+
+    delete ref;
+    return nullptr;
+}
+
+bool ActionVec2::initWithDuration(float duration, const cocos2d::Vec2& from, const cocos2d::Vec2& to, ActionVec2Callback onUpdate)
+{
+    if (ActionInterval::initWithDuration(duration))
+    {
+        _from = from;
+        _to = to;
+        _updateCallback = onUpdate;
         return true;
     }
     return false;
@@ -107,7 +181,7 @@ bool ActionVec2::initWithDuration(float duration, const cocos2d::Vec2& from, con
 
 ActionVec2* ActionVec2::clone() const
 {
-    return ActionVec2::create(_duration, _from, _to, _updateCallback, _completeCallback);
+    return ActionVec2::create(_duration, _from, _to, _updateCallback);
 }
 
 void ActionVec2::startWithTarget(Node *target)
@@ -127,26 +201,17 @@ void ActionVec2::update(float delta)
     }
 }
 
-void ActionVec2::stop()
-{
-    ActionInterval::stop();
-
-    if (_completeCallback)
-        _completeCallback();
-}
-
 ActionVec2* ActionVec2::reverse() const
 {
-    return ActionVec2::create(_duration, _to, _from, _updateCallback, _completeCallback);
+    return ActionVec2::create(_duration, _to, _from, _updateCallback);
 }
 
 //--------------------
 
-ActionVec4* ActionVec4::create(float duration, const cocos2d::Vec4& from, const cocos2d::Vec4& to,
-    ActionVec4Callback onUpdate, std::function<void()> onComplete)
+ActionVec4* ActionVec4::create(float duration, const cocos2d::Vec4& from, const cocos2d::Vec4& to, ActionVec4Callback onUpdate)
 {
     auto ref = new (std::nothrow) ActionVec4();
-    if (ref && ref->initWithDuration(duration, from, to, onUpdate, onComplete))
+    if (ref && ref->initWithDuration(duration, from, to, onUpdate))
     {
         ref->autorelease();
         return ref;
@@ -156,15 +221,13 @@ ActionVec4* ActionVec4::create(float duration, const cocos2d::Vec4& from, const 
     return nullptr;
 }
 
-bool ActionVec4::initWithDuration(float duration, const cocos2d::Vec4& from, const cocos2d::Vec4& to,
-    ActionVec4Callback onUpdate, std::function<void()> onComplete)
+bool ActionVec4::initWithDuration(float duration, const cocos2d::Vec4& from, const cocos2d::Vec4& to, ActionVec4Callback onUpdate)
 {
     if (ActionInterval::initWithDuration(duration))
     {
         _from = from;
         _to = to;
         _updateCallback = onUpdate;
-        _completeCallback = onComplete;
         return true;
     }
     return false;
@@ -172,7 +235,7 @@ bool ActionVec4::initWithDuration(float duration, const cocos2d::Vec4& from, con
 
 ActionVec4* ActionVec4::clone() const
 {
-    return ActionVec4::create(_duration, _from, _to, _updateCallback, _completeCallback);
+    return ActionVec4::create(_duration, _from, _to, _updateCallback);
 }
 
 void ActionVec4::startWithTarget(Node *target)
@@ -192,17 +255,9 @@ void ActionVec4::update(float delta)
     }
 }
 
-void ActionVec4::stop()
-{
-    ActionInterval::stop();
-
-    if (_completeCallback)
-        _completeCallback();
-}
-
 ActionVec4* ActionVec4::reverse() const
 {
-    return ActionVec4::create(_duration, _to, _from, _updateCallback, _completeCallback);
+    return ActionVec4::create(_duration, _to, _from, _updateCallback);
 }
 
 //-------------------
@@ -337,7 +392,7 @@ void ActionMovieClip::setPlaySettings(int start, int end, int times, int endAt, 
     _start = start;
     _end = end;
     if (_end == -1 || _end > frames.size() - 1)
-        _end = frames.size() - 1;
+        _end = (int)frames.size() - 1;
     _times = times;
     _endAt = endAt;
     if (_endAt == -1)
@@ -369,7 +424,7 @@ void ActionMovieClip::setAnimation(cocos2d::Animation *animation, float repeatDe
 
     auto frames = _animation->getFrames();
     _start = 0;
-    _end = _endAt = frames.size() - 1;
+    _end = _endAt = (int)frames.size() - 1;
     _times = 0;
     _status = 0;
     _repeatedCount = 0;
@@ -395,4 +450,90 @@ void ActionMovieClip::drawFrame()
     //static_cast<Sprite*>(_target)->setBlendFunc(blend);
 }
 
+//-------------------
+
+RepeatYoyo * RepeatYoyo::create(cocos2d::FiniteTimeAction * action, unsigned int times, bool yoyo)
+{
+    RepeatYoyo* repeat = new (std::nothrow) RepeatYoyo();
+    if (repeat && repeat->initWithAction(action, times))
+    {
+        repeat->_yoyo = yoyo;
+        repeat->autorelease();
+        return repeat;
+    }
+
+    delete repeat;
+    return nullptr;
+}
+
+RepeatYoyo * RepeatYoyo::clone() const
+{
+    return RepeatYoyo::create(_innerAction->clone(), _times, _yoyo);
+}
+
+RepeatYoyo* RepeatYoyo::reverse() const
+{
+    return RepeatYoyo::create(_innerAction->reverse(), _times, _yoyo);
+}
+
+void RepeatYoyo::update(float dt)
+{
+    if (dt >= _nextDt)
+    {
+        while (dt >= _nextDt && _total < _times)
+        {
+            float dt2 = (_yoyo && _total % 2 == 1) ? 0 : 1.0f;
+            if (!(sendUpdateEventToScript(dt2, _innerAction)))
+                _innerAction->update(dt2);
+            _total++;
+
+            _innerAction->stop();
+
+            _innerAction->startWithTarget(_target);
+            _nextDt = _innerAction->getDuration() / _duration * (_total + 1);
+        }
+
+        // fix for issue #1288, incorrect end value of repeat
+        if (std::abs(dt - 1.0f) < FLT_EPSILON && _total < _times)
+        {
+            float dt2 = (_yoyo && _total % 2 == 1) ? 0 : 1.0f;
+            if (!(sendUpdateEventToScript(dt2, _innerAction)))
+                _innerAction->update(dt2);
+
+            _total++;
+        }
+
+        // don't set an instant action back or update it, it has no use because it has no duration
+        if (!_actionInstant)
+        {
+            if (_total == _times)
+            {
+                // minggo: inner action update is invoked above, don't have to invoke it here
+                //                if (!(sendUpdateEventToScript(1, _innerAction)))
+                //                    _innerAction->update(1);
+                _innerAction->stop();
+            }
+            else
+            {
+                float dt2 = dt - (_nextDt - _innerAction->getDuration() / _duration);
+                if (_yoyo && _total % 2 == 1)
+                    dt2 = 1 - dt2;
+
+                // issue #390 prevent jerk, use right update
+                if (!(sendUpdateEventToScript(dt2, _innerAction)))
+                    _innerAction->update(dt2);
+            }
+        }
+    }
+    else
+    {
+        float dt2 = fmodf(dt * _times, 1.0f);
+        if (_yoyo && _total % 2 == 1)
+            dt2 = 1 - dt2;
+        if (!(sendUpdateEventToScript(dt2, _innerAction)))
+            _innerAction->update(dt2);
+    }
+}
+
 NS_FGUI_END
+

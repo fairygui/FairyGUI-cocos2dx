@@ -9,12 +9,14 @@ NS_FGUI_BEGIN
 class RectClippingSupport
 {
 public:
-    RectClippingSupport()
-        :_clippingEnabled(false)
-    {}
+    RectClippingSupport();
 
     cocos2d::Rect _clippingRegion;
     bool _clippingEnabled;
+    bool _scissorOldState;
+    cocos2d::Rect _clippingOldRect;
+    cocos2d::Rect _clippingRect;
+    bool _clippingRectDirty;
 
     cocos2d::CustomCommand _beforeVisitCmdScissor;
     cocos2d::CustomCommand _afterVisitCmdScissor;
@@ -61,12 +63,28 @@ public:
     void visit(cocos2d::Renderer *renderer, const cocos2d::Mat4 &parentTransform, uint32_t parentFlags) override;
     void setCameraMask(unsigned short mask, bool applyChildren = true) override;
 
+    virtual void setContentSize(const cocos2d::Size& contentSize) override;
+
 private:
     void onBeforeVisitScissor();
     void onAfterVisitScissor();
+    const cocos2d::Rect& getClippingRect();
 
     RectClippingSupport* _rectClippingSupport;
     StencilClippingSupport* _stencilClippingSupport;
+};
+
+//internal use
+class FUIInnerContainer : public cocos2d::Node
+{
+public:
+    CREATE_FUNC(FUIInnerContainer);
+
+    void setPosition2(const cocos2d::Vec2 &position) { setPosition(position.x, _parent->getContentSize().height - position.y); }
+    cocos2d::Vec2 getPosition2() { return cocos2d::Vec2(_position.x, _parent->getContentSize().height - _position.y); }
+    void setPosition2(float x, float y) { setPosition(x, _parent->getContentSize().height - y); }
+    void  setPositionY2(float y) { setPositionY(_parent->getContentSize().height - y); }
+    float getPositionY2(void) const { return  _parent->getContentSize().height - _position.y; }
 };
 
 NS_FGUI_END

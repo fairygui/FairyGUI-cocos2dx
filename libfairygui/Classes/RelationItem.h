@@ -81,6 +81,7 @@ private:
     void releaseRefTarget(GObject* target);
     void onTargetXYChanged(EventContext* context);
     void onTargetSizeChanged(EventContext* context);
+    void onTargetGone(EventContext*);
 
     GObject* _owner;
     GObject* _target;

@@ -58,7 +58,7 @@ GObject * UIObjectFactory::newObject(PackageItem * pi)
             ret = pi->extensionCreator();
         else
         {
-            tinyxml2::XMLDocument* xml = pi->componentData;
+            TXMLDocument* xml = pi->componentData;
             const char *p = xml->RootElement()->Attribute("extention");
             if (p)
             {
@@ -83,6 +83,8 @@ GObject * UIObjectFactory::newObject(PackageItem * pi)
         }
         break;
     }
+    default:
+        break;
     }
 
     if (ret)
@@ -100,7 +102,7 @@ GObject * UIObjectFactory::newObject(const string & type)
     else if (type == "component")
         return GComponent::create();
     else if (type == "text")
-        return GTextField::create();
+        return GBasicTextField::create();
     else if (type == "richtext")
         return GRichTextField::create();
     else if (type == "inputtext")

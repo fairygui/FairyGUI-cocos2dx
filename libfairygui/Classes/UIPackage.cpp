@@ -3,11 +3,11 @@
 #include "utils/ToolSet.h"
 #include "UIObjectFactory.h"
 #include "display/BitmapFont.h"
+#include "event/HitTest.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
 using namespace std;
 
 const string UIPackage::URL_PREFIX = "ui://";
@@ -38,6 +38,8 @@ UIPackage::~UIPackage()
 {
     for (auto &it : _items)
         delete it;
+    for (auto &it : _hitTestDatas)
+        delete it.second;
 }
 
 UIPackage * UIPackage::getById(const string& id)
@@ -105,24 +107,6 @@ GObject* UIPackage::createObjectFromURL(const string& url)
         return nullptr;
 }
 
-void * UIPackage::getItemAsset(const string& pkgName, const string& resName)
-{
-    UIPackage* pkg = UIPackage::getByName(pkgName);
-    if (pkg)
-        return pkg->getItemAsset(resName);
-    else
-        return nullptr;
-}
-
-void * UIPackage::getItemAssetByURL(const string& url)
-{
-    PackageItem* pi = UIPackage::getItemByURL(url);
-    if (pi)
-        return pi->owner->getItemAsset(pi);
-    else
-        return nullptr;
-}
-
 string UIPackage::getItemURL(const string& pkgName, const string& resName)
 {
     UIPackage* pkg = UIPackage::getByName(pkgName);
@@ -140,11 +124,11 @@ PackageItem * UIPackage::getItemByURL(const string& url)
     if (url.size() == 0)
         return nullptr;
 
-    int pos1 = url.find('/');
+    ssize_t pos1 = url.find('/');
     if (pos1 == -1)
         return nullptr;
 
-    int pos2 = url.find('/', pos1 + 2);
+    ssize_t pos2 = url.find('/', pos1 + 2);
     if (pos2 == -1)
     {
         if (url.size() > 13)
@@ -177,11 +161,11 @@ string UIPackage::normalizeURL(const string& url)
     if (url.size() == 0)
         return url;
 
-    int pos1 = url.find('/');
+    ssize_t pos1 = url.find('/');
     if (pos1 == -1)
         return url;
 
-    int pos2 = url.find('/', pos1 + 2);
+    ssize_t pos2 = url.find('/', pos1 + 2);
     if (pos2 == -1)
         return url;
     else
@@ -210,16 +194,14 @@ PackageItem * UIPackage::getItemByName(const string & itemName)
         return nullptr;
 }
 
-void * UIPackage::getItemAsset(const string& resName)
+void UIPackage::loadItem(const string& resName)
 {
     PackageItem* pi = getItemByName(resName);
-    if (!pi)
-        return nullptr;
-
-    return  getItemAsset(pi);
+    if (pi)
+        return loadItem(pi);
 }
 
-void * UIPackage::getItemAsset(PackageItem * item)
+void UIPackage::loadItem(PackageItem * item)
 {
     switch (item->type)
     {
@@ -241,16 +223,15 @@ void * UIPackage::getItemAsset(PackageItem * item)
                 item->spriteFrame->getTexture()->setTexParameters(tp);
             }
         }
-        return item->spriteFrame;
+        break;
 
     case PackageItemType::ATLAS:
         if (!item->decoded)
         {
             item->decoded = true;
             loadAtlas(item);
-
         }
-        return item->texture;
+        break;
 
     case PackageItemType::SOUND:
         if (!item->decoded)
@@ -258,7 +239,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
             item->decoded = true;
             item->file = _assetNamePrefix + item->file;
         }
-        return &item->file;
+        break;
 
     case PackageItemType::FONT:
         if (!item->decoded)
@@ -266,7 +247,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
             item->decoded = true;
             loadFont(item);
         }
-        return item->bitmapFont;
+        break;
 
     case PackageItemType::MOVIECLIP:
         if (!item->decoded)
@@ -274,7 +255,7 @@ void * UIPackage::getItemAsset(PackageItem * item)
             item->decoded = true;
             loadMovieClip(item);
         }
-        return item->animation;
+        break;
 
     case PackageItemType::COMPONENT:
         if (!item->decoded)
@@ -287,18 +268,26 @@ void * UIPackage::getItemAsset(PackageItem * item)
             loadComponentChildren(item);
             translateComponent(item);
         }
-        return item->componentData;
-
+        break;
     default:
-        return nullptr;
+        break;
     }
+}
+
+PixelHitTestData * UIPackage::getPixelHitTestData(const std::string & itemId)
+{
+    auto it = _hitTestDatas.find(itemId);
+    if (it != _hitTestDatas.end())
+        return it->second;
+    else
+        return nullptr;
 }
 
 void UIPackage::create(const string& assetPath)
 {
     Data data;
 
-    if (CCFileUtils::getInstance()->getContents(assetPath + ".bytes", &data) != CCFileUtils::Status::OK)
+    if (FileUtils::getInstance()->getContents(assetPath + ".bytes", &data) != FileUtils::Status::OK)
     {
         CCLOGERROR("FairyGUI: cannot load package from '%s'", assetPath.c_str());
         return;
@@ -324,7 +313,7 @@ void UIPackage::decodeDesc(Data& buffer)
 {
     ByteArray* ba = ByteArray::createWithBuffer((char *)buffer.getBytes(), buffer.getSize());
 
-    int pos = ba->getLength() - 22;
+    size_t pos = ba->getLength() - 22;
     ba->setPosition(pos + 10);
     int entryCount = ba->readShort();
     ba->setPosition(pos + 16);
@@ -364,7 +353,7 @@ void UIPackage::loadPackage()
 {
     string str;
 
-    if (CCFileUtils::getInstance()->getContents(_assetNamePrefix + "sprites.bytes", &str) != CCFileUtils::Status::OK)
+    if (FileUtils::getInstance()->getContents(_assetNamePrefix + "sprites.bytes", &str) != FileUtils::Status::OK)
     {
         CCLOGERROR("FairyGUI: cannot load package from '%s'", _assetNamePrefix.c_str());
         return;
@@ -376,8 +365,8 @@ void UIPackage::loadPackage()
     vector<string> arr;
 
     ToolSet::splitString(str, '\n', lines);
-    int cnt = lines.size();
-    for (int i = 1; i < cnt; i++)
+    size_t cnt = lines.size();
+    for (size_t i = 1; i < cnt; i++)
     {
         str = lines[i];
         if (str.size() == 0)
@@ -391,7 +380,7 @@ void UIPackage::loadPackage()
             sprite->atlas = "atlas" + Value(binIndex).asString();
         else
         {
-            int pos = itemId.find_first_of("_");
+            size_t pos = itemId.find_first_of("_");
             if (pos == -1)
                 sprite->atlas = "atlas_" + itemId;
             else
@@ -405,17 +394,36 @@ void UIPackage::loadPackage()
         _sprites[itemId] = sprite;
     }
 
+    string hitTestDataFilePath = _assetNamePrefix + "hittest.bytes";
+    bool tmp = FileUtils::getInstance()->isPopupNotify();
+    FileUtils::getInstance()->setPopupNotify(false);
+    bool hasHitTestData = FileUtils::getInstance()->isFileExist(hitTestDataFilePath);
+    FileUtils::getInstance()->setPopupNotify(tmp);
+ 
+    if (hasHitTestData)
+    {
+        Data data = FileUtils::getInstance()->getDataFromFile(hitTestDataFilePath);
+        ByteArray* ba = ByteArray::createWithBuffer((char*)data.getBytes(), data.getSize(), true);
+        ba->setEndian(ByteArray::ENDIAN_BIG);
+        while (ba->getBytesAvailable())
+        {
+            PixelHitTestData* pht = new PixelHitTestData();
+            _hitTestDatas[ba->readString()] = pht;
+            pht->load(*ba);
+        }
+    }
+
     Data* xmlData = _descPack["package.xml"];
 
-    tinyxml2::XMLDocument* xml = new tinyxml2::XMLDocument();
+    TXMLDocument* xml = new TXMLDocument();
     xml->Parse((const char*)xmlData->getBytes(), xmlData->getSize());
 
-    tinyxml2::XMLElement* root = xml->RootElement();
+    TXMLElement* root = xml->RootElement();
 
     _id = root->Attribute("id");
     _name = root->Attribute("name");
 
-    XMLElement* rxml = root->FirstChildElement("resources");
+    TXMLElement* rxml = root->FirstChildElement("resources");
     if (rxml == nullptr)
     {
         CCLOGERROR("FairyGUI: invalid package xml '%s'", _assetNamePrefix.c_str());
@@ -423,7 +431,7 @@ void UIPackage::loadPackage()
     }
 
     PackageItem* pi;
-    XMLElement* cxml = rxml->FirstChildElement();
+    TXMLElement* cxml = rxml->FirstChildElement();
     Vec2 v2;
     Vec4 v4;
     const char *p;
@@ -484,6 +492,9 @@ void UIPackage::loadPackage()
             UIObjectFactory::resolvePackageItemExtension(pi);
             break;
         }
+                
+        default:
+            break;
         }
         _items.push_back(pi);
         _itemsById[pi->id] = pi;
@@ -496,7 +507,7 @@ void UIPackage::loadPackage()
     delete xml;
 
     for (auto &iter : _items)
-        getItemAsset(iter);
+        loadItem(iter);
 
     for (auto &iter : _descPack)
         delete iter.second;
@@ -509,13 +520,16 @@ void UIPackage::loadPackage()
     _loadingPackage = false;
 }
 
-//注意返回的SpriteFrame的ref=1，并且不会autorelease。内部方法，不搞那么复杂，UIPackage里的调用注意即可。
+//note: SpriteFrame.ref=1，not autorelease.
 SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
 {
     PackageItem* atlasItem = getItem(sprite->atlas);
     Texture2D* atlasTexture;
     if (atlasItem)
-        atlasTexture = (Texture2D*)getItemAsset(atlasItem);
+    {
+        loadItem(atlasItem);
+        atlasTexture = atlasItem->texture;
+    }
     else
     {
         atlasTexture = _emptyTexture;
@@ -531,11 +545,12 @@ SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
 void UIPackage::loadAtlas(PackageItem * item)
 {
     Image* image = new Image();
-    string fileName = _assetNamePrefix + (!item->file.empty() ? item->file : item->id + ".png");
-    if (!image->initWithImageFile(fileName))
+    string filePath = _assetNamePrefix + (!item->file.empty() ? item->file : item->id + ".png");
+    if (!image->initWithImageFile(filePath))
     {
         item->texture = _emptyTexture;
-        CCLOG("FairyGUI: texture '%s' not found in %s", fileName.c_str(), _name.c_str());
+        delete image;
+        CCLOGWARN("FairyGUI: texture '%s' not found in %s", filePath.c_str(), _name.c_str());
         return;
     }
 
@@ -543,17 +558,42 @@ void UIPackage::loadAtlas(PackageItem * item)
     tex->initWithImage(image);
     item->texture = tex;
     tex->retain();
-
     delete image;
+
+    string ext = FileUtils::getInstance()->getFileExtension(filePath);
+    size_t pos = filePath.find_last_of('.');
+    if (pos != -1)
+        filePath = filePath.substr(0, pos) + "!a" + ext;
+    else
+        filePath = filePath + "!a" + ext;
+
+    bool tmp = FileUtils::getInstance()->isPopupNotify();
+    FileUtils::getInstance()->setPopupNotify(false);
+    bool hasAlphaTexture = FileUtils::getInstance()->isFileExist(filePath);
+    FileUtils::getInstance()->setPopupNotify(tmp);
+    if (hasAlphaTexture)
+    {
+        image = new Image();
+        if (!image->initWithImageFile(filePath))
+        {
+            delete image;
+            return;
+        }
+
+        tex = new Texture2D();
+        tex->initWithImage(image);
+        item->texture->setAlphaTexture(tex);
+        delete image;
+    }
 }
 
 void UIPackage::loadMovieClip(PackageItem * item)
 {
     Data* xmlData = _descPack[item->id + ".xml"];
-    tinyxml2::XMLDocument* xml = new tinyxml2::XMLDocument();
+    TXMLDocument* xml = new TXMLDocument();
     xml->Parse((const char*)xmlData->getBytes(), xmlData->getSize());
 
-    tinyxml2::XMLElement* root = xml->RootElement();
+    TXMLElement* root = xml->RootElement();
     vector<string> arr;
 
     item->animation = Animation::create();
@@ -569,10 +609,11 @@ void UIPackage::loadMovieClip(PackageItem * item)
     int i = 0;
     string spriteId;
     AtlasSprite* sprite;
+    SpriteFrame* spriteFrame = nullptr;
     const char* p;
 
-    tinyxml2::XMLElement* framesEle = root->FirstChildElement("frames");
-    tinyxml2::XMLElement* frameEle = framesEle->FirstChildElement("frame");
+    TXMLElement* framesEle = root->FirstChildElement("frames");
+    TXMLElement* frameEle = framesEle->FirstChildElement("frame");
     while (frameEle)
     {
         ToolSet::splitString(frameEle->Attribute("rect"), ',', arr);
@@ -587,6 +628,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
         else
             spriteId.clear();
 
+        spriteFrame = nullptr;
         if (!spriteId.empty())
         {
             auto it = _sprites.find(spriteId);
@@ -595,18 +637,18 @@ void UIPackage::loadMovieClip(PackageItem * item)
                 sprite = it->second;
                 PackageItem* atlasItem = getItem(sprite->atlas);
                 if (atlasItem)
-                {
-                    if (item->texture == nullptr)
-                        item->texture = (Texture2D*)getItemAsset(atlasItem);
-                    SpriteFrame* spriteFrame = createSpriteTexture(sprite);
-                    spriteFrame->setOffset(Vec2(rect.origin.x, -rect.origin.y));
-                    AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
-                    frames.pushBack(frame);
-                    //spriteFrame的释放就交给AnimationFrame了
-                    spriteFrame->release();
-                }
+                    spriteFrame = createSpriteTexture(sprite);
             }
         }
+
+        if (spriteFrame == nullptr)
+            spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect(Vec2::ZERO, Size::ZERO));
+        spriteFrame->setOffset(Vec2(rect.origin.x, -rect.origin.y));
+        AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
+        frames.pushBack(frame);
+        //tranfer to AnimationFrame
+        spriteFrame->release();
+
         i++;
         frameEle = frameEle->NextSiblingElement("frame");
     }
@@ -614,7 +656,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
 
     if (swing)
     {
-        int cnt = frames.size();
+        int cnt = (int)frames.size();
         for (int i = cnt - 1; i >= 1; i++)
         {
             AnimationFrame* frame = frames.at(i);
@@ -649,7 +691,7 @@ void UIPackage::loadFont(PackageItem * item)
 
     while (lines.next())
     {
-        int len = lines.getTextLength();
+        size_t len = lines.getTextLength();
         const char* line = lines.getText();
         if (len > 4 && memcmp(line, "info", 4) == 0)
         {
@@ -667,7 +709,8 @@ void UIPackage::loadFont(PackageItem * item)
                     {
                         mainSprite = it->second;
                         PackageItem* atlasItem = getItem(mainSprite->atlas);
-                        mainTexture = (Texture2D*)getItemAsset(atlasItem);
+                        loadItem(atlasItem);
+                        mainTexture = atlasItem->texture;
                     }
                 }
                 else if (strcmp(keyBuf, "size") == 0)
@@ -740,7 +783,7 @@ void UIPackage::loadFont(PackageItem * item)
             }
             else if (charImg)
             {
-                getItemAsset(charImg);
+                loadItem(charImg);
 
                 Rect tempRect = charImg->spriteFrame->getRectInPixels();
                 bw = tempRect.size.width;
@@ -772,19 +815,19 @@ void UIPackage::loadFont(PackageItem * item)
 void UIPackage::loadComponent(PackageItem * item)
 {
     Data* xmlData = _descPack[item->id + ".xml"];
-    tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument();
+    TXMLDocument* doc = new TXMLDocument();
     doc->Parse((const char*)xmlData->getBytes(), xmlData->getSize());
     item->componentData = doc;
 }
 
 void UIPackage::loadComponentChildren(PackageItem * item)
 {
-    tinyxml2::XMLElement* listNode = item->componentData->RootElement()->FirstChildElement("displayList");
+    TXMLElement* listNode = item->componentData->RootElement()->FirstChildElement("displayList");
     item->displayList = new vector<DisplayListItem*>();
     const char *p;
     if (listNode)
     {
-        XMLElement* cxml = listNode->FirstChildElement();
+        TXMLElement* cxml = listNode->FirstChildElement();
         DisplayListItem* di;
         while (cxml)
         {
@@ -836,7 +879,7 @@ GObject * UIPackage::createObject(const string & resName)
 
 GObject * UIPackage::createObject(PackageItem * item)
 {
-    getItemAsset(item);
+    loadItem(item);
 
     GObject* g = UIObjectFactory::newObject(item);
     if (g == nullptr)

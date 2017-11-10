@@ -1,10 +1,29 @@
 #include "GRoot.h"
 #include "UIPackage.h"
+#include "AudioEngine.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 GRoot* GRoot::_inst = nullptr;
+bool GRoot::_soundEnabled = true;
+float GRoot::_soundVolumeScale = 1.0f;
+
+GRoot* GRoot::create(Scene* scene, int zOrder)
+{
+    GRoot *pRet = new(std::nothrow) GRoot();
+    if (pRet && pRet->initWithScene(scene, zOrder))
+    {
+        pRet->autorelease();
+        return pRet;
+    }
+    else
+    {
+        delete pRet;
+        pRet = nullptr;
+        return nullptr;
+    }
+}
 
 GRoot::GRoot() :
     _windowSizeListener(nullptr),
@@ -19,19 +38,12 @@ GRoot::GRoot() :
 GRoot::~GRoot()
 {
     delete _inputProcessor;
+    CC_SAFE_RELEASE(_modalWaitPane);
+    CC_SAFE_RELEASE(_defaultTooltipWin);
+    CC_SAFE_RELEASE(_modalLayer);
 
-    Director::getInstance()->getEventDispatcher()->removeEventListener(_windowSizeListener);
-}
-
-GRoot* GRoot::getInstance()
-{
-    if (_inst == nullptr)
-    {
-        _inst = GRoot::create();
-        _inst->retain();
-    }
-
-    return _inst;
+    if (_windowSizeListener)
+        Director::getInstance()->getEventDispatcher()->removeEventListener(_windowSizeListener);
 }
 
 void GRoot::showWindow(Window * win)
@@ -73,26 +85,6 @@ void GRoot::bringToFront(Window * win)
 
     if (i >= 0)
         setChildIndex(win, i);
-}
-
-void GRoot::showModalWait()
-{
-    if (!UIConfig::globalModalWaiting.empty())
-    {
-        if (_modalWaitPane == nullptr)
-            _modalWaitPane = UIPackage::createObjectFromURL(UIConfig::globalModalWaiting);
-
-        _modalWaitPane->setSize(getWidth(), getHeight());
-        _modalWaitPane->addRelation(this, RelationType::Size);
-
-        addChild(_modalWaitPane);
-    }
-}
-
-void GRoot::closeModalWait()
-{
-    if (_modalWaitPane != nullptr && _modalWaitPane->getParent() != nullptr)
-        removeChild(_modalWaitPane);
 }
 
 void GRoot::closeAllExceptModals()
@@ -180,6 +172,39 @@ bool GRoot::hasModalWindow()
     return _modalLayer != nullptr && _modalLayer->getParent() != nullptr;
 }
 
+void GRoot::showModalWait()
+{
+    getModalWaitingPane();
+    if (_modalWaitPane)
+        addChild(_modalWaitPane);
+}
+
+void GRoot::closeModalWait()
+{
+    if (_modalWaitPane != nullptr && _modalWaitPane->getParent() != nullptr)
+        removeChild(_modalWaitPane);
+}
+
+GObject * GRoot::getModalWaitingPane()
+{
+    if (!UIConfig::globalModalWaiting.empty())
+    {
+        if (_modalWaitPane == nullptr)
+        {
+            _modalWaitPane = UIPackage::createObjectFromURL(UIConfig::globalModalWaiting);
+            _modalWaitPane->setSortingOrder(INT_MAX);
+            _modalWaitPane->retain();
+        }
+
+        _modalWaitPane->setSize(getWidth(), getHeight());
+        _modalWaitPane->addRelation(this, RelationType::Size);
+
+        return _modalWaitPane;
+    }
+    else
+        return nullptr;
+}
+
 bool GRoot::isModalWaiting()
 {
     return (_modalWaitPane != nullptr) && _modalWaitPane->onStage();
@@ -204,10 +229,10 @@ void GRoot::showPopup(GObject * popup, GObject * target, PopupDirection dir)
 {
     if (!_popupStack.empty())
     {
-        int k = _popupStack.getIndex(popup);
+        int k = (int)_popupStack.getIndex(popup);
         if (k != -1)
         {
-            for (int i = _popupStack.size() - 1; i >= k; i--)
+            for (int i = (int)_popupStack.size() - 1; i >= k; i--)
             {
                 closePopup(_popupStack.back());
                 _popupStack.popBack();
@@ -248,10 +273,10 @@ void GRoot::hidePopup(GObject * popup)
 {
     if (popup != nullptr)
     {
-        int k = _popupStack.getIndex(popup);
+        int k = (int)_popupStack.getIndex(popup);
         if (k != -1)
         {
-            for (int i = _popupStack.size() - 1; i >= k; i--)
+            for (int i = (int)_popupStack.size() - 1; i >= k; i--)
             {
                 closePopup(_popupStack.back());
                 _popupStack.popBack();
@@ -286,10 +311,10 @@ void GRoot::checkPopups()
         bool handled = false;
         while (mc != this && mc != nullptr)
         {
-            int k = _popupStack.getIndex(mc);
+            int k = (int)_popupStack.getIndex(mc);
             if (k != -1)
             {
-                for (int i = _popupStack.size() - 1; i > k; i--)
+                for (int i = (int)_popupStack.size() - 1; i > k; i--)
                 {
                     GObject* popup = _popupStack.back();
                     _justClosedPopups.pushBack(popup);
@@ -304,7 +329,7 @@ void GRoot::checkPopups()
 
         if (!handled)
         {
-            for (int i = _popupStack.size() - 1; i >= 0; i--)
+            for (int i = (int)_popupStack.size() - 1; i >= 0; i--)
             {
                 GObject* popup = _popupStack.at(i);
                 _justClosedPopups.pushBack(popup);
@@ -360,7 +385,7 @@ void GRoot::showTooltips(const std::string & msg)
     if (_defaultTooltipWin == nullptr)
     {
         const std::string& resourceURL = UIConfig::tooltipsWin;
-        if (resourceURL.length() > 0)
+        if (resourceURL.empty())
         {
             CCLOGWARN("FairyGUI: UIConfig.tooltipsWin not defined");
             return;
@@ -368,6 +393,7 @@ void GRoot::showTooltips(const std::string & msg)
 
         _defaultTooltipWin = UIPackage::createObjectFromURL(resourceURL);
         _defaultTooltipWin->setTouchable(false);
+        _defaultTooltipWin->retain();
     }
 
     _defaultTooltipWin->setText(msg);
@@ -418,6 +444,26 @@ void GRoot::hideTooltips()
     }
 }
 
+void GRoot::playSound(const std::string & url, float volumnScale)
+{
+    if (!_soundEnabled)
+        return;
+
+    PackageItem* pi = UIPackage::getItemByURL(url);
+    if (pi)
+        experimental::AudioEngine::play2d(pi->file, false, _soundVolumeScale * volumnScale);
+}
+
+void GRoot::setSoundEnabled(bool value)
+{
+    _soundEnabled = value;
+}
+
+void GRoot::setSoundVolumeScale(float value)
+{
+    _soundVolumeScale = value;
+}
+
 void GRoot::onTouchEvent(int eventType)
 {
     if (eventType == UIEventType::TouchBegin)
@@ -429,9 +475,29 @@ void GRoot::onTouchEvent(int eventType)
     }
 }
 
-void GRoot::handleInit()
+void GRoot::handlePositionChanged()
 {
-    GComponent::handleInit();
+    _displayObject->setPosition(0, _size.height);
+}
+
+
+void GRoot::onEnter()
+{
+    GComponent::onEnter();
+    _inst = this;
+}
+
+void GRoot::onExit()
+{
+    GComponent::onExit();
+    if (_inst == this)
+        _inst = nullptr;
+}
+
+bool GRoot::initWithScene(cocos2d::Scene * scene, int zOrder)
+{
+    if (!GComponent::init())
+        return false;
 
     _inputProcessor = new InputProcessor(this);
     _inputProcessor->setCaptureCallback(CC_CALLBACK_1(GRoot::onTouchEvent, this));
@@ -440,11 +506,10 @@ void GRoot::handleInit()
     _windowSizeListener = Director::getInstance()->getEventDispatcher()->addCustomEventListener(GLViewImpl::EVENT_WINDOW_RESIZED, CC_CALLBACK_0(GRoot::onWindowSizeChanged, this));
 #endif
     onWindowSizeChanged();
-}
 
-void GRoot::handlePositionChanged()
-{
-    _displayObject->setPosition(0, _size.height);
+    scene->addChild(_displayObject, zOrder);
+
+    return true;
 }
 
 void GRoot::onWindowSizeChanged()
@@ -452,6 +517,5 @@ void GRoot::onWindowSizeChanged()
     const cocos2d::Size& rs = Director::getInstance()->getOpenGLView()->getDesignResolutionSize();
     setSize(rs.width, rs.height);
 }
-
 
 NS_FGUI_END

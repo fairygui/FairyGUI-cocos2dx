@@ -15,16 +15,45 @@
 		294D0D641D0D56D500F7F5D4 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 294D0D631D0D56D500F7F5D4 /* CoreText.framework */; };
 		3EACC98F19EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
 		3EACC99019EE6D4300EB3C5E /* res in Resources */ = {isa = PBXBuildFile; fileRef = 3EACC98E19EE6D4300EB3C5E /* res */; };
+		4454012F1FB3DE9700869375 /* BasicsScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011B1FB3DE9700869375 /* BasicsScene.cpp */; };
+		445401301FB3DE9700869375 /* HitTestScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011C1FB3DE9700869375 /* HitTestScene.cpp */; };
+		445401311FB3DE9700869375 /* LoopListScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011D1FB3DE9700869375 /* LoopListScene.cpp */; };
+		445401321FB3DE9700869375 /* MenuScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011E1FB3DE9700869375 /* MenuScene.cpp */; };
+		445401331FB3DE9700869375 /* PullToRefreshScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011F1FB3DE9700869375 /* PullToRefreshScene.cpp */; };
+		445401341FB3DE9700869375 /* TransitionDemoScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445401201FB3DE9700869375 /* TransitionDemoScene.cpp */; };
+		445401351FB3DE9700869375 /* VirtualListScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445401211FB3DE9700869375 /* VirtualListScene.cpp */; };
+		445401361FB3DE9700869375 /* MailItem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445401251FB3DE9700869375 /* MailItem.cpp */; };
+		445401371FB3DE9700869375 /* Window1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454012B1FB3DE9700869375 /* Window1.cpp */; };
+		445401381FB3DE9700869375 /* Window2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454012D1FB3DE9700869375 /* Window2.cpp */; };
+		445403AF1FB4563E00869375 /* BasicsScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011B1FB3DE9700869375 /* BasicsScene.cpp */; };
+		445403B01FB4563E00869375 /* HitTestScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011C1FB3DE9700869375 /* HitTestScene.cpp */; };
+		445403B11FB4563E00869375 /* LoopListScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011D1FB3DE9700869375 /* LoopListScene.cpp */; };
+		445403B21FB4563E00869375 /* MenuScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011E1FB3DE9700869375 /* MenuScene.cpp */; };
+		445403B31FB4563E00869375 /* PullToRefreshScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454011F1FB3DE9700869375 /* PullToRefreshScene.cpp */; };
+		445403B41FB4563E00869375 /* TransitionDemoScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445401201FB3DE9700869375 /* TransitionDemoScene.cpp */; };
+		445403B51FB4563E00869375 /* VirtualListScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445401211FB3DE9700869375 /* VirtualListScene.cpp */; };
+		445403B61FB4563E00869375 /* MailItem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445401251FB3DE9700869375 /* MailItem.cpp */; };
+		445403B71FB4563E00869375 /* Window1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454012B1FB3DE9700869375 /* Window1.cpp */; };
+		445403B81FB4563E00869375 /* Window2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454012D1FB3DE9700869375 /* Window2.cpp */; };
+		445403DA1FB4571400869375 /* UI in Resources */ = {isa = PBXBuildFile; fileRef = 445403D91FB4571400869375 /* UI */; };
+		445403DC1FB457AA00869375 /* libfairygui Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 445403DB1FB457AA00869375 /* libfairygui Mac.a */; };
+		445403DE1FB481C600869375 /* libfairygui iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 445403DD1FB481C600869375 /* libfairygui iOS.a */; };
+		445403DF1FB4823800869375 /* UI in Resources */ = {isa = PBXBuildFile; fileRef = 445403D91FB4571400869375 /* UI */; };
+		445403EA1FB59A9100869375 /* DemoScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E01FB59A9100869375 /* DemoScene.cpp */; };
+		445403EB1FB59A9100869375 /* GuideScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E21FB59A9100869375 /* GuideScene.cpp */; };
+		445403EC1FB59A9100869375 /* JoystickModule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E41FB59A9100869375 /* JoystickModule.cpp */; };
+		445403ED1FB59A9100869375 /* JoystickScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E61FB59A9100869375 /* JoystickScene.cpp */; };
+		445403EE1FB59A9100869375 /* ModalWaitingScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E81FB59A9100869375 /* ModalWaitingScene.cpp */; };
+		445403EF1FB59E6900869375 /* DemoScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E01FB59A9100869375 /* DemoScene.cpp */; };
+		445403F01FB59E6900869375 /* GuideScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E21FB59A9100869375 /* GuideScene.cpp */; };
+		445403F11FB59E6900869375 /* JoystickModule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E41FB59A9100869375 /* JoystickModule.cpp */; };
+		445403F21FB59E6900869375 /* JoystickScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E61FB59A9100869375 /* JoystickScene.cpp */; };
+		445403F31FB59E6900869375 /* ModalWaitingScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E81FB59A9100869375 /* ModalWaitingScene.cpp */; };
 		46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7619C43A67006E1F66 /* CloseNormal.png */; };
-		46880B7C19C43A67006E1F66 /* CloseNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7619C43A67006E1F66 /* CloseNormal.png */; };
 		46880B7D19C43A67006E1F66 /* CloseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7719C43A67006E1F66 /* CloseSelected.png */; };
-		46880B7E19C43A67006E1F66 /* CloseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7719C43A67006E1F66 /* CloseSelected.png */; };
 		46880B8119C43A67006E1F66 /* HelloWorld.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7A19C43A67006E1F66 /* HelloWorld.png */; };
-		46880B8219C43A67006E1F66 /* HelloWorld.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7A19C43A67006E1F66 /* HelloWorld.png */; };
 		46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46880B8419C43A87006E1F66 /* AppDelegate.cpp */; };
 		46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46880B8419C43A87006E1F66 /* AppDelegate.cpp */; };
-		46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */; };
-		46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */; };
 		503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 503AE0F617EB97AB00D1A890 /* Icon.icns */; };
 		503AE10017EB989F00D1A890 /* AppController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 503AE0FB17EB989F00D1A890 /* AppController.mm */; };
 		503AE10117EB989F00D1A890 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 503AE0FC17EB989F00D1A890 /* main.m */; };
@@ -101,6 +130,13 @@
 			remoteGlobalIDString = A07A4C241783777C0073F6A7;
 			remoteInfo = "cocos2dx iOS";
 		};
+		445401191FB3DE8A00869375 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 507B40FD1C31BDD30067B53E;
+			remoteInfo = "libcocos2d tvOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -112,13 +148,46 @@
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		294D0D631D0D56D500F7F5D4 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
 		3EACC98E19EE6D4300EB3C5E /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; path = res; sourceTree = "<group>"; };
+		4454011B1FB3DE9700869375 /* BasicsScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicsScene.cpp; sourceTree = "<group>"; };
+		4454011C1FB3DE9700869375 /* HitTestScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HitTestScene.cpp; sourceTree = "<group>"; };
+		4454011D1FB3DE9700869375 /* LoopListScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoopListScene.cpp; sourceTree = "<group>"; };
+		4454011E1FB3DE9700869375 /* MenuScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MenuScene.cpp; sourceTree = "<group>"; };
+		4454011F1FB3DE9700869375 /* PullToRefreshScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PullToRefreshScene.cpp; sourceTree = "<group>"; };
+		445401201FB3DE9700869375 /* TransitionDemoScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TransitionDemoScene.cpp; sourceTree = "<group>"; };
+		445401211FB3DE9700869375 /* VirtualListScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VirtualListScene.cpp; sourceTree = "<group>"; };
+		445401221FB3DE9700869375 /* BasicsScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicsScene.h; sourceTree = "<group>"; };
+		445401231FB3DE9700869375 /* HitTestScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HitTestScene.h; sourceTree = "<group>"; };
+		445401241FB3DE9700869375 /* LoopListScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoopListScene.h; sourceTree = "<group>"; };
+		445401251FB3DE9700869375 /* MailItem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MailItem.cpp; sourceTree = "<group>"; };
+		445401261FB3DE9700869375 /* MailItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MailItem.h; sourceTree = "<group>"; };
+		445401271FB3DE9700869375 /* MenuScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuScene.h; sourceTree = "<group>"; };
+		445401281FB3DE9700869375 /* PullToRefreshScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshScene.h; sourceTree = "<group>"; };
+		445401291FB3DE9700869375 /* TransitionDemoScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransitionDemoScene.h; sourceTree = "<group>"; };
+		4454012A1FB3DE9700869375 /* VirtualListScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VirtualListScene.h; sourceTree = "<group>"; };
+		4454012B1FB3DE9700869375 /* Window1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Window1.cpp; sourceTree = "<group>"; };
+		4454012C1FB3DE9700869375 /* Window1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window1.h; sourceTree = "<group>"; };
+		4454012D1FB3DE9700869375 /* Window2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Window2.cpp; sourceTree = "<group>"; };
+		4454012E1FB3DE9700869375 /* Window2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window2.h; sourceTree = "<group>"; };
+		445402321FB3E9D000869375 /* fairygui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = fairygui.xcodeproj; path = ../../libfairygui/proj.ios_mac/fairygui.xcodeproj; sourceTree = "<group>"; };
+		445403AD1FB419AA00869375 /* libfairygui MAC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libfairygui MAC.a"; path = "../../../../Library/Developer/Xcode/DerivedData/Examples-akfnehjximnvajhjuibyxjdwlekq/Build/Products/Debug/libfairygui MAC.a"; sourceTree = "<group>"; };
+		445403D91FB4571400869375 /* UI */ = {isa = PBXFileReference; lastKnownFileType = folder; path = UI; sourceTree = "<group>"; };
+		445403DB1FB457AA00869375 /* libfairygui Mac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libfairygui Mac.a"; path = "../../../../Library/Developer/Xcode/DerivedData/Examples-akfnehjximnvajhjuibyxjdwlekq/Build/Products/Debug/libfairygui Mac.a"; sourceTree = "<group>"; };
+		445403DD1FB481C600869375 /* libfairygui iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libfairygui iOS.a"; path = "../../../../Library/Developer/Xcode/DerivedData/Examples-akfnehjximnvajhjuibyxjdwlekq/Build/Products/Debug-iphonesimulator/libfairygui iOS.a"; sourceTree = "<group>"; };
+		445403E01FB59A9100869375 /* DemoScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoScene.cpp; sourceTree = "<group>"; };
+		445403E11FB59A9100869375 /* DemoScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoScene.h; sourceTree = "<group>"; };
+		445403E21FB59A9100869375 /* GuideScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GuideScene.cpp; sourceTree = "<group>"; };
+		445403E31FB59A9100869375 /* GuideScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuideScene.h; sourceTree = "<group>"; };
+		445403E41FB59A9100869375 /* JoystickModule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JoystickModule.cpp; sourceTree = "<group>"; };
+		445403E51FB59A9100869375 /* JoystickModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickModule.h; sourceTree = "<group>"; };
+		445403E61FB59A9100869375 /* JoystickScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JoystickScene.cpp; sourceTree = "<group>"; };
+		445403E71FB59A9100869375 /* JoystickScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickScene.h; sourceTree = "<group>"; };
+		445403E81FB59A9100869375 /* ModalWaitingScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModalWaitingScene.cpp; sourceTree = "<group>"; };
+		445403E91FB59A9100869375 /* ModalWaitingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalWaitingScene.h; sourceTree = "<group>"; };
 		46880B7619C43A67006E1F66 /* CloseNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseNormal.png; sourceTree = "<group>"; };
 		46880B7719C43A67006E1F66 /* CloseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseSelected.png; sourceTree = "<group>"; };
 		46880B7A19C43A67006E1F66 /* HelloWorld.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HelloWorld.png; sourceTree = "<group>"; };
 		46880B8419C43A87006E1F66 /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		46880B8519C43A87006E1F66 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HelloWorldScene.cpp; sourceTree = "<group>"; };
-		46880B8719C43A87006E1F66 /* HelloWorldScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelloWorldScene.h; sourceTree = "<group>"; };
 		503AE0F617EB97AB00D1A890 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
 		503AE0F717EB97AB00D1A890 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		503AE0FA17EB989F00D1A890 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppController.h; path = ios/AppController.h; sourceTree = SOURCE_ROOT; };
@@ -172,6 +241,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				445403DE1FB481C600869375 /* libfairygui iOS.a in Frameworks */,
 				294D0D641D0D56D500F7F5D4 /* CoreText.framework in Frameworks */,
 				ED545A7C1B68A1F400C3958E /* libiconv.dylib in Frameworks */,
 				52B47A471A53D09C004E4C60 /* Security.framework in Frameworks */,
@@ -193,6 +263,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				445403DC1FB457AA00869375 /* libfairygui Mac.a in Frameworks */,
 				ED545A7E1B68A1FA00C3958E /* libiconv.dylib in Frameworks */,
 				1AC6FB21180E996B004C840B /* libcocos2d Mac.a in Frameworks */,
 				5087E76717EB910900C73F5D /* libz.dylib in Frameworks */,
@@ -240,6 +311,7 @@
 			children = (
 				1AC6FAF9180E9839004C840B /* libcocos2d Mac.a */,
 				1AC6FB07180E9839004C840B /* libcocos2d iOS.a */,
+				4454011A1FB3DE8A00869375 /* libcocos2d tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -254,6 +326,7 @@
 				080E96DDFE201D6D7F000001 /* ios */,
 				503AE10617EB990700D1A890 /* mac */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				445402321FB3E9D000869375 /* fairygui.xcodeproj */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -261,6 +334,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				445403DD1FB481C600869375 /* libfairygui iOS.a */,
+				445403DB1FB457AA00869375 /* libfairygui Mac.a */,
+				445403AD1FB419AA00869375 /* libfairygui MAC.a */,
 				294D0D631D0D56D500F7F5D4 /* CoreText.framework */,
 				ED545A7D1B68A1FA00C3958E /* libiconv.dylib */,
 				ED545A7B1B68A1F400C3958E /* libiconv.dylib */,
@@ -288,6 +364,7 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				445403D91FB4571400869375 /* UI */,
 				521A8EA819F11F5000D177D7 /* fonts */,
 				3EACC98E19EE6D4300EB3C5E /* res */,
 				46880B7619C43A67006E1F66 /* CloseNormal.png */,
@@ -301,10 +378,38 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				445403E01FB59A9100869375 /* DemoScene.cpp */,
+				445403E11FB59A9100869375 /* DemoScene.h */,
+				445403E21FB59A9100869375 /* GuideScene.cpp */,
+				445403E31FB59A9100869375 /* GuideScene.h */,
+				445403E41FB59A9100869375 /* JoystickModule.cpp */,
+				445403E51FB59A9100869375 /* JoystickModule.h */,
+				445403E61FB59A9100869375 /* JoystickScene.cpp */,
+				445403E71FB59A9100869375 /* JoystickScene.h */,
+				445403E81FB59A9100869375 /* ModalWaitingScene.cpp */,
+				445403E91FB59A9100869375 /* ModalWaitingScene.h */,
+				4454011B1FB3DE9700869375 /* BasicsScene.cpp */,
+				4454011C1FB3DE9700869375 /* HitTestScene.cpp */,
+				4454011D1FB3DE9700869375 /* LoopListScene.cpp */,
+				4454011E1FB3DE9700869375 /* MenuScene.cpp */,
+				4454011F1FB3DE9700869375 /* PullToRefreshScene.cpp */,
+				445401201FB3DE9700869375 /* TransitionDemoScene.cpp */,
+				445401211FB3DE9700869375 /* VirtualListScene.cpp */,
+				445401221FB3DE9700869375 /* BasicsScene.h */,
+				445401231FB3DE9700869375 /* HitTestScene.h */,
+				445401241FB3DE9700869375 /* LoopListScene.h */,
+				445401251FB3DE9700869375 /* MailItem.cpp */,
+				445401261FB3DE9700869375 /* MailItem.h */,
+				445401271FB3DE9700869375 /* MenuScene.h */,
+				445401281FB3DE9700869375 /* PullToRefreshScene.h */,
+				445401291FB3DE9700869375 /* TransitionDemoScene.h */,
+				4454012A1FB3DE9700869375 /* VirtualListScene.h */,
+				4454012B1FB3DE9700869375 /* Window1.cpp */,
+				4454012C1FB3DE9700869375 /* Window1.h */,
+				4454012D1FB3DE9700869375 /* Window2.cpp */,
+				4454012E1FB3DE9700869375 /* Window2.h */,
 				46880B8419C43A87006E1F66 /* AppDelegate.cpp */,
 				46880B8519C43A87006E1F66 /* AppDelegate.h */,
-				46880B8619C43A87006E1F66 /* HelloWorldScene.cpp */,
-				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -445,6 +550,13 @@
 			remoteRef = 1AC6FB06180E9839004C840B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		4454011A1FB3DE8A00869375 /* libcocos2d tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libcocos2d tvOS.a";
+			remoteRef = 445401191FB3DE8A00869375 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -452,6 +564,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				445403DF1FB4823800869375 /* UI in Resources */,
 				5087E78117EB970100C73F5D /* Icon-120.png in Resources */,
 				5087E78617EB970100C73F5D /* Icon-76.png in Resources */,
 				5087E77F17EB970100C73F5D /* Default@2x.png in Resources */,
@@ -482,12 +595,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46880B8219C43A67006E1F66 /* HelloWorld.png in Resources */,
+				445403DA1FB4571400869375 /* UI in Resources */,
 				503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */,
 				3EACC99019EE6D4300EB3C5E /* res in Resources */,
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
-				46880B7C19C43A67006E1F66 /* CloseNormal.png in Resources */,
-				46880B7E19C43A67006E1F66 /* CloseSelected.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,11 +609,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				445403EC1FB59A9100869375 /* JoystickModule.cpp in Sources */,
+				445403EA1FB59A9100869375 /* DemoScene.cpp in Sources */,
+				445401301FB3DE9700869375 /* HitTestScene.cpp in Sources */,
+				445401321FB3DE9700869375 /* MenuScene.cpp in Sources */,
+				445401381FB3DE9700869375 /* Window2.cpp in Sources */,
+				4454012F1FB3DE9700869375 /* BasicsScene.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
-				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
+				445403ED1FB59A9100869375 /* JoystickScene.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
+				445401341FB3DE9700869375 /* TransitionDemoScene.cpp in Sources */,
+				445401361FB3DE9700869375 /* MailItem.cpp in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
+				445403EB1FB59A9100869375 /* GuideScene.cpp in Sources */,
+				445401311FB3DE9700869375 /* LoopListScene.cpp in Sources */,
+				445401351FB3DE9700869375 /* VirtualListScene.cpp in Sources */,
+				445401371FB3DE9700869375 /* Window1.cpp in Sources */,
+				445403EE1FB59A9100869375 /* ModalWaitingScene.cpp in Sources */,
+				445401331FB3DE9700869375 /* PullToRefreshScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,9 +635,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				445403EF1FB59E6900869375 /* DemoScene.cpp in Sources */,
+				445403F01FB59E6900869375 /* GuideScene.cpp in Sources */,
+				445403F11FB59E6900869375 /* JoystickModule.cpp in Sources */,
+				445403F21FB59E6900869375 /* JoystickScene.cpp in Sources */,
+				445403F31FB59E6900869375 /* ModalWaitingScene.cpp in Sources */,
+				445403AF1FB4563E00869375 /* BasicsScene.cpp in Sources */,
+				445403B01FB4563E00869375 /* HitTestScene.cpp in Sources */,
+				445403B11FB4563E00869375 /* LoopListScene.cpp in Sources */,
+				445403B21FB4563E00869375 /* MenuScene.cpp in Sources */,
+				445403B31FB4563E00869375 /* PullToRefreshScene.cpp in Sources */,
+				445403B41FB4563E00869375 /* TransitionDemoScene.cpp in Sources */,
+				445403B51FB4563E00869375 /* VirtualListScene.cpp in Sources */,
+				445403B61FB4563E00869375 /* MailItem.cpp in Sources */,
+				445403B71FB4563E00869375 /* Window1.cpp in Sources */,
+				445403B81FB4563E00869375 /* Window2.cpp in Sources */,
 				46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10517EB98FF00D1A890 /* main.cpp in Sources */,
-				46880B8B19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,7 +690,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ios/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
 					"$(_COCOS_LIB_IOS_BEGIN)",
@@ -583,7 +722,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ios/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
 					"$(_COCOS_LIB_IOS_BEGIN)",
@@ -675,9 +814,10 @@
 					"$(SRCROOT)/../cocos2d/external",
 					"$(SRCROOT)/../cocos2d/external/chipmunk/include/chipmunk",
 					"$(SRCROOT)/../cocos2d/cocos/editor-support",
+					"$(SRCROOT)/../../libfairygui/Classes",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -699,9 +839,10 @@
 					"$(SRCROOT)/../cocos2d/external",
 					"$(SRCROOT)/../cocos2d/external/chipmunk/include/chipmunk",
 					"$(SRCROOT)/../cocos2d/cocos/editor-support",
+					"$(SRCROOT)/../../libfairygui/Classes",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;

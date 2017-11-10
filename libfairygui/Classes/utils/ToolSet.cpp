@@ -52,8 +52,11 @@ void ToolSet::splitString(const string &s, char delim, cocos2d::Vec4& value, boo
         if (helperArray.size() > 1)
         {
             value.y = atoi(helperArray[1].c_str());
-            value.z = atoi(helperArray[2].c_str());
-            value.w = atoi(helperArray[3].c_str());
+            if (helperArray.size() > 2)
+            {
+                value.z = atoi(helperArray[2].c_str());
+                value.w = atoi(helperArray[3].c_str());
+            }
         }
         else
             value.y = value.z = value.w = value.x;
@@ -64,36 +67,39 @@ void ToolSet::splitString(const string &s, char delim, cocos2d::Vec4& value, boo
         if (helperArray.size() > 1)
         {
             value.y = atof(helperArray[1].c_str());
-            value.z = atof(helperArray[2].c_str());
-            value.w = atof(helperArray[3].c_str());
+            if (helperArray.size() > 2)
+            {
+                value.z = atof(helperArray[2].c_str());
+                value.w = atof(helperArray[3].c_str());
+            }
         }
         else
             value.y = value.z = value.w = value.x;
     }
 }
 
-void ToolSet::splitString(const std::string & s, char delim, std::string & str1, std::string str2)
+void ToolSet::splitString(const std::string & s, char delim, std::string & str1, std::string& str2)
 {
     splitString(s, delim, helperArray);
     str1 = helperArray[0];
     if (helperArray.size() > 1)
         str2 = helperArray[1];
     else
-        str2 = str1;
+        str2 = "";
 }
 
-ssize_t ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::string& str)
+int ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::string& str)
 {
     auto iter = std::find(arr.begin(), arr.end(), str);
     if (iter != arr.end())
-        return iter - arr.begin();
+        return (int)(iter - arr.begin());
 
     return -1;
 }
 
 Color4B ToolSet::convertFromHtmlColor(const char* str)
 {
-    int len = strlen(str);
+    ssize_t len = strlen(str);
     if (len < 7 || str[0] != '#')
         return Color4B::BLACK;
 
@@ -453,6 +459,46 @@ FlipType ToolSet::parseFlipType(const char * p)
     }
 }
 
+TransitionActionType ToolSet::parseTransitionActionType(const char * p)
+{
+    if (!p)
+        return TransitionActionType::Unknown;
+
+    switch (hash_(p))
+    {
+    case "XY"_hash:
+        return TransitionActionType::XY;
+    case "Size"_hash:
+        return TransitionActionType::Size;
+    case "Scale"_hash:
+        return TransitionActionType::Scale;
+    case "Pivot"_hash:
+        return TransitionActionType::Pivot;
+    case "Alpha"_hash:
+        return TransitionActionType::Alpha;
+    case "Rotation"_hash:
+        return TransitionActionType::Rotation;
+    case "Color"_hash:
+        return TransitionActionType::Color;
+    case "Animation"_hash:
+        return TransitionActionType::Animation;
+    case "Visible"_hash:
+        return TransitionActionType::Visible;
+    case "Sound"_hash:
+        return TransitionActionType::Sound;
+    case "Transition"_hash:
+        return TransitionActionType::Transition;
+    case "Shake"_hash:
+        return TransitionActionType::Shake;
+    case "ColorFilter"_hash:
+        return TransitionActionType::ColorFilter;
+    case "Skew"_hash:
+        return TransitionActionType::Skew;
+    default:
+        return TransitionActionType::Unknown;
+    }
+}
+
 cocos2d::tweenfunc::TweenType ToolSet::parseEaseType(const char * p)
 {
     if (!p)
@@ -537,7 +583,7 @@ FastSplitter::FastSplitter() :data(nullptr), dataLength(-1), delimiter('\0')
 {
 }
 
-void FastSplitter::start(const char * data, int dataLength, char delimiter)
+void FastSplitter::start(const char * data, ssize_t dataLength, char delimiter)
 {
     this->data = data;
     this->dataLength = dataLength;
@@ -576,12 +622,12 @@ const char * FastSplitter::getText()
         return nullptr;
 }
 
-int FastSplitter::getTextLength()
+ssize_t FastSplitter::getTextLength()
 {
     return textLength;
 }
 
-void FastSplitter::getKeyValuePair(char* keyBuf, int keyBufSize, char* valueBuf, int valueBufSize)
+void FastSplitter::getKeyValuePair(char* keyBuf, ssize_t keyBufSize, char* valueBuf, ssize_t valueBufSize)
 {
     if (textLength == 0)
     {
@@ -593,7 +639,7 @@ void FastSplitter::getKeyValuePair(char* keyBuf, int keyBufSize, char* valueBuf,
         char* found = (char*)memchr(data, (int)'=', textLength);
         if (found)
         {
-            int len = MIN(keyBufSize - 1, found - data);
+            ssize_t len = MIN(keyBufSize - 1, found - data);
             memcpy(keyBuf, data, len);
             keyBuf[len] = '\0';
 
@@ -603,7 +649,7 @@ void FastSplitter::getKeyValuePair(char* keyBuf, int keyBufSize, char* valueBuf,
         }
         else
         {
-            int len = MIN(valueBufSize - 1, textLength);
+            ssize_t len = MIN(valueBufSize - 1, textLength);
             memcpy(keyBuf, data, len);
             keyBuf[len] = '\0';
             valueBuf[0] = '\0';

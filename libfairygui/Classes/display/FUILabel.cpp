@@ -74,9 +74,9 @@ void FUILabel::setTextColor(const Color4B & color)
 
 bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 & imageOffset, float fontSize)
 {
-    BitmapFont* bmFont = (BitmapFont*)UIPackage::getItemAssetByURL(bmfontFilePath);
-
-    if (!bmFont)
+    PackageItem* pi = UIPackage::getItemByURL(bmfontFilePath);
+    BitmapFont* bmFont;
+    if (!pi || !(bmFont = pi->bitmapFont))
     {
         reset();
         return false;

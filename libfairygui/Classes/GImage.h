@@ -30,7 +30,7 @@ public:
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
 
 private:
     cocos2d::Sprite* _content;

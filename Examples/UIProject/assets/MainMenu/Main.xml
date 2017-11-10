@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <graph id="n3_txxc" name="n3" xy="0,0" size="1136,640" locked="true" type="rect" lineSize="0" fillColor="#ff333333">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n1_rftu" name="n1" src="rftu4" xy="164,75" size="235,51">
+      <Button title="基础功能展示"/>
+    </component>
+    <component id="n2_rftu" name="n2" src="rftu4" xy="164,146" size="235,51">
+      <Button title="动效展示"/>
+    </component>
+    <component id="n4_oarg" name="n4" src="rftu4" xy="164,217" size="235,51">
+      <Button title="虚拟列表"/>
+    </component>
+    <component id="n5_oarg" name="n5" src="rftu4" xy="164,288" size="235,51">
+      <Button title="循环列表"/>
+    </component>
+    <component id="n6_oarg" name="n6" src="rftu4" xy="164,359" size="235,51">
+      <Button title="像素点击测试"/>
+    </component>
+    <component id="n7_oarg" name="n7" src="rftu4" xy="164,430" size="235,51">
+      <Button title="下拉刷新"/>
+    </component>
+    <component id="n8_oarg" name="n8" src="rftu4" xy="510,75" size="235,51">
+      <Button title="模式等待"/>
+    </component>
+    <component id="n9_oarg" name="n9" src="rftu4" xy="510,146" size="235,51">
+      <Button title="摇杆"/>
+    </component>
+  </displayList>
+</component>

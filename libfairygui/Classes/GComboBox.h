@@ -31,8 +31,8 @@ public:
     int getSelectedIndex() const { return _selectedIndex; }
     void setSelectedIndex(int value);
 
-    Controller* getSelectionController() const { return _selectionController; }
-    void setSelectionController(Controller* value) { _selectionController = value; }
+    GController* getSelectionController() const { return _selectionController; }
+    void setSelectionController(GController* value) { _selectionController = value; }
 
     std::vector<std::string>& getItems() { return _items; }
     std::vector<std::string>& getIcons() { return _icons; }
@@ -44,9 +44,9 @@ public:
     PopupDirection popupDirection;
 
 protected:
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
-    virtual void handleControllerChanged(Controller* c) override;
+    virtual void constructFromXML(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void handleControllerChanged(GController* c) override;
     virtual void handleGrayedChanged() override;
 
     void setState(const std::string& value);
@@ -60,7 +60,7 @@ protected:
     GObject* _titleObject;
     GObject* _iconObject;
     GList* _list;
-    Controller* _selectionController;
+    GController* _selectionController;
 
     std::vector<std::string> _items;
     std::vector<std::string> _icons;
@@ -77,7 +77,7 @@ private:
 
     bool _itemsUpdated;
     int _selectedIndex;
-    Controller* _buttonController;
+    GController* _buttonController;
     bool _down;
     bool _over;
 };

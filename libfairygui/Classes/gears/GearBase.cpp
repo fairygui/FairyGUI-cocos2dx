@@ -1,7 +1,6 @@
 #include "GearBase.h"
 #include "GearDisplay.h"
 #include "GComponent.h"
-#include "Controller.h"
 #include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
@@ -22,7 +21,7 @@ GearBase::~GearBase()
 {
 }
 
-void GearBase::setController(Controller * value)
+void GearBase::setController(GController * value)
 {
     if (value != _controller)
     {
@@ -52,7 +51,7 @@ void GearBase::updateFromRelations(float dx, float dy)
 {
 }
 
-void GearBase::setup(tinyxml2::XMLElement * xml)
+void GearBase::setup(TXMLElement * xml)
 {
     const char* p;
     p = xml->Attribute("controller");
@@ -96,8 +95,8 @@ void GearBase::setup(tinyxml2::XMLElement * xml)
             if (p)
                 ToolSet::splitString(p, '|', values);
 
-            int cnt1 = pages.size();
-            int cnt2 = values.size();
+            int cnt1 = (int)pages.size();
+            int cnt2 = (int)values.size();
             std::string str;
             for (int i = 0; i < cnt1; i++)
             {

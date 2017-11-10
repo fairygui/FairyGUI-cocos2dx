@@ -24,7 +24,7 @@ void GearXY::init()
 
 void GearXY::addStatus(const std::string&  pageId, const std::string& value)
 {
-    if (value == "-" || value.length() == 0) //历史遗留处理
+    if (value == "-" || value.length() == 0)
         return;
 
     Vec2 v2;
@@ -47,11 +47,11 @@ void GearXY::apply()
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_owner->displayObject()->getActionByTag(ActionTag::XY_ACTION) != nullptr)
+        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_XY_ACTION) != nullptr)
         {
             if (_tweenTarget.x != gv.x || _tweenTarget.y != gv.y)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::XY_ACTION);
+                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_XY_ACTION);
                 onTweenComplete();
             }
             else
@@ -64,16 +64,11 @@ void GearXY::apply()
                 _displayLockToken = _owner->addDisplayLock();
             _tweenTarget = gv;
 
-            ActionInterval* action = ActionVec2::create(tweenTime, 
-                _owner->getPosition(), 
+            ActionInterval* action = ActionVec2::create(tweenTime,
+                _owner->getPosition(),
                 gv,
-                CC_CALLBACK_1(GearXY::onTweenUpdate, this),
-                CC_CALLBACK_0(GearXY::onTweenComplete, this)
-            );
-            action = createEaseAction(easeType, action);
-            if (delay > 0)
-                action = Sequence::createWithTwoActions(DelayTime::create(delay), action);
-            action->setTag(ActionTag::XY_ACTION);
+                CC_CALLBACK_1(GearXY::onTweenUpdate, this));
+            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearXY::onTweenComplete, this), ActionTag::GEAR_XY_ACTION);
             _owner->displayObject()->runAction(action);
         }
     }

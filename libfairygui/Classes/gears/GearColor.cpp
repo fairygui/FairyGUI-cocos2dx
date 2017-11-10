@@ -36,7 +36,7 @@ void GearColor::init()
 
 void GearColor::addStatus(const std::string&  pageId, const std::string& value)
 {
-    if (value == "-" || value.length() == 0) //历史遗留处理
+    if (value == "-" || value.length() == 0)
         return;
 
     std::vector<std::string> arr;
@@ -75,11 +75,11 @@ void GearColor::apply()
             _owner->_gearLocked = false;
         }
 
-        if (_owner->displayObject()->getActionByTag(ActionTag::COLOR_ACTION) != nullptr)
+        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_COLOR_ACTION) != nullptr)
         {
             if (_tweenTarget.x != gv.color.r || _tweenTarget.y != gv.color.g || _tweenTarget.z != gv.color.b)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::COLOR_ACTION);
+                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_COLOR_ACTION);
                 onTweenComplete();
             }
             else
@@ -96,12 +96,8 @@ void GearColor::apply()
             ActionInterval* action = ActionVec4::create(tweenTime,
                 Vec4(curColor.r, curColor.g, curColor.b, curColor.a),
                 _tweenTarget,
-                CC_CALLBACK_1(GearColor::onTweenUpdate, this),
-                CC_CALLBACK_0(GearColor::onTweenComplete, this));
-            action = createEaseAction(easeType, action);
-            if (delay > 0)
-                action = Sequence::createWithTwoActions(DelayTime::create(delay), action);
-            action->setTag(ActionTag::COLOR_ACTION);
+                CC_CALLBACK_1(GearColor::onTweenUpdate, this));
+            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearColor::onTweenComplete, this), ActionTag::GEAR_COLOR_ACTION);
             _owner->displayObject()->runAction(action);
         }
     }

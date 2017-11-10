@@ -15,8 +15,8 @@
 class ByteArray
 {
 public:
-    static ByteArray* create(int len);
-    static ByteArray* createWithBuffer(char* buffer, int len, bool transferOwnerShip = false);
+    static ByteArray* create(size_t len);
+    static ByteArray* createWithBuffer(char* buffer, size_t len, bool transferOwnerShip = false);
 
     static int checkCPUEndian();
 
@@ -41,7 +41,8 @@ public:
     long long readLongLong();
     void writeLongLong(long long value);
 
-    std::string readString(int len);
+    std::string readString();
+    std::string readString(size_t len);
     void writeString(const std::string& value);
 
     char readByte();
@@ -56,22 +57,22 @@ public:
     int getEndian();
     void setEndian(int n);
 
-    int getPosition();
-    void setPosition(int _pos);
+    size_t getPosition();
+    void setPosition(size_t _pos);
 
-    int getBytesAvailable();
-    int getLength();
+    size_t getBytesAvailable();
+    size_t getLength();
 
     virtual ~ByteArray();
 protected:
     ByteArray();
 
 private:
-    void copyMemory(void* to, const void* from, int len);
+    void copyMemory(void* to, const void* from, size_t len);
 
     char* _buffer;
-    int _pos;
-    int _length;
+    ssize_t _pos;
+    size_t _length;
     int _endian;
     short _flag;
 };

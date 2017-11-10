@@ -12,8 +12,8 @@ public:
     static void splitString(const std::string &s, char delim, std::vector<std::string> &elems);
     static void splitString(const std::string &s, char delim, cocos2d::Vec2& value, bool intType = false);
     static void splitString(const std::string &s, char delim, cocos2d::Vec4& value, bool intType = false);
-    static void splitString(const std::string &s, char delim, std::string& str1, std::string str2);
-    static ssize_t findInStringArray(const std::vector<std::string>& arr, const std::string& str);
+    static void splitString(const std::string &s, char delim, std::string& str1, std::string& str2);
+    static int findInStringArray(const std::vector<std::string>& arr, const std::string& str);
 
     static cocos2d::Color4B convertFromHtmlColor(const char* str);
 
@@ -34,6 +34,7 @@ public:
     static PopupDirection parsePopupDirection(const char*p);
     static TextAutoSize parseTextAutoSize(const char*p);
     static FlipType parseFlipType(const char*p);
+    static TransitionActionType parseTransitionActionType(const char*p);
     static cocos2d::tweenfunc::TweenType parseEaseType(const char*p);
 };
 
@@ -41,16 +42,16 @@ class FastSplitter
 {
 public:
     FastSplitter();
-    void start(const char* data, int dataLength, char delimiter);
+    void start(const char* data, ssize_t dataLength, char delimiter);
     bool next();
     const char* getText();
-    int getTextLength();
-    void getKeyValuePair(char* keyBuf, int keyBufSize, char* valueBuf, int valueBufSize);
+    ssize_t getTextLength();
+    void getKeyValuePair(char* keyBuf, ssize_t keyBufSize, char* valueBuf, ssize_t valueBufSize);
 
 private:
     const char* data;
-    int dataLength;
-    int textLength;
+    ssize_t dataLength;
+    ssize_t textLength;
     char delimiter;
 };
 

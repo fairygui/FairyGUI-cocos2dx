@@ -38,7 +38,7 @@ void GearLook::init()
 
 void GearLook::addStatus(const std::string&  pageId, const std::string& value)
 {
-    if (value == "-" || value.length() == 0) //历史遗留处理
+    if (value == "-" || value.length() == 0)
         return;
 
     std::vector<std::string> arr;
@@ -68,11 +68,11 @@ void GearLook::apply()
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_owner->displayObject()->getActionByTag(ActionTag::LOOK_ACTION) != nullptr)
+        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_LOOK_ACTION) != nullptr)
         {
             if (_tweenTarget.x != gv.alpha || _tweenTarget.y != gv.rotation)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::LOOK_ACTION);
+                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_LOOK_ACTION);
                 onTweenComplete();
             }
             else
@@ -87,15 +87,11 @@ void GearLook::apply()
                 _displayLockToken = _owner->addDisplayLock();
             _tweenTarget.set(gv.alpha, gv.rotation);
 
-            ActionInterval* action = ActionVec2::create(tweenTime, 
+            ActionInterval* action = ActionVec2::create(tweenTime,
                 Vec2(_owner->getAlpha(), _owner->getRotation()),
-                _tweenTarget, 
-                CC_CALLBACK_1(GearLook::onTweenUpdate, this, a, b), 
-                CC_CALLBACK_0(GearLook::onTweenComplete, this));
-            action = createEaseAction(easeType, action);
-            if (delay > 0)
-                action = Sequence::createWithTwoActions(DelayTime::create(delay), action);
-            action->setTag(ActionTag::LOOK_ACTION);
+                _tweenTarget,
+                CC_CALLBACK_1(GearLook::onTweenUpdate, this, a, b));
+            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearLook::onTweenComplete, this), ActionTag::GEAR_LOOK_ACTION);
             _owner->displayObject()->runAction(action);
         }
     }

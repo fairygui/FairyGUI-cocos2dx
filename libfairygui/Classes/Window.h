@@ -64,7 +64,10 @@ protected:
     virtual void onHide() {};
     virtual void doShowAnimation();
     virtual void doHideAnimation();
-    
+
+    virtual void onEnter() override;
+    virtual void onExit() override;
+
     void closeEventHandler(EventContext*context);
 
     GComponent* _contentPane;
@@ -74,8 +77,6 @@ private:
     void onUILoadComplete();
     void _initWindow();
 
-    void __onShown(EventContext* context);
-    void __onHide(EventContext* context);
     void onTouchBegin(EventContext* context);
     void onDragStart(EventContext* context);
 

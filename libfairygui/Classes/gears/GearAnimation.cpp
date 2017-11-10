@@ -36,7 +36,7 @@ void GearAnimation::init()
 
 void GearAnimation::addStatus(const std::string&  pageId, const std::string& value)
 {
-    if (value == "-" || value.length() == 0) //历史遗留处理
+    if (value == "-" || value.length() == 0)
         return;
 
     std::vector<std::string> arr;

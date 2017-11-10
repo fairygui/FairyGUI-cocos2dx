@@ -31,7 +31,7 @@ public:
     int _updating;
 
 protected:
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
     virtual void handleAlphaChanged() override;
 
 private:

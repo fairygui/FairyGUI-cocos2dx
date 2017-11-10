@@ -33,8 +33,6 @@ void Window::handleInit()
 {
     GComponent::handleInit();
 
-    addEventListener(UIEventType::Enter, CC_CALLBACK_1(Window::__onShown, this));
-    addEventListener(UIEventType::Exit, CC_CALLBACK_1(Window::__onHide, this));
     addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(Window::onTouchBegin, this));
 }
 
@@ -112,7 +110,7 @@ void Window::setDragArea(GObject * value)
 
 void Window::show()
 {
-    GRoot::getInstance()->showWindow(this);
+    UIRoot->showWindow(this);
 }
 
 void Window::hide()
@@ -123,7 +121,7 @@ void Window::hide()
 
 void Window::hideImmediately()
 {
-    GRoot::getInstance()->hideWindowImmediately(this);
+    UIRoot->hideWindowImmediately(this);
 }
 
 void Window::toggleStatus()
@@ -136,7 +134,7 @@ void Window::toggleStatus()
 
 void Window::bringToFront()
 {
-    GRoot::getInstance()->bringToFront(this);
+    UIRoot->bringToFront(this);
 }
 
 bool Window::isTop() const
@@ -154,6 +152,7 @@ void Window::showModalWait(int requestingCmd)
         if (_modalWaitPane == nullptr)
         {
             _modalWaitPane = UIPackage::createObjectFromURL(UIConfig::windowModalWaiting);
+            _modalWaitPane->retain();
         }
 
         layoutModalWaitPane();
@@ -198,7 +197,7 @@ void Window::initWindow()
     if (!_uiSources.empty())
     {
         _loading = false;
-        int cnt = _uiSources.size();
+        int cnt = (int)_uiSources.size();
         for (int i = 0; i < cnt; i++)
         {
             IUISource* lib = _uiSources.at(i);
@@ -247,7 +246,7 @@ void Window::closeEventHandler(EventContext * context)
 
 void Window::onUILoadComplete()
 {
-    int cnt = _uiSources.size();
+    int cnt = (int)_uiSources.size();
     for (int i = 0; i < cnt; i++)
     {
         IUISource* lib = _uiSources.at(i);
@@ -259,16 +258,20 @@ void Window::onUILoadComplete()
     _initWindow();
 }
 
-void Window::__onShown(EventContext * context)
+void Window::onEnter()
 {
+    GComponent::onEnter();
+
     if (!_inited)
         initWindow();
     else
         doShowAnimation();
 }
 
-void Window::__onHide(EventContext * context)
+void Window::onExit()
 {
+    GComponent::onExit();
+
     closeModalWait();
     onHide();
 }

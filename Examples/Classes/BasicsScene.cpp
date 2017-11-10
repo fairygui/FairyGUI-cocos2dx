@@ -1,86 +1,24 @@
-#include "HelloWorldScene.h"
-#include "SimpleAudioEngine.h"
+#include "BasicsScene.h"
+#include "Window1.h"
+#include "Window2.h"
 
 USING_NS_CC;
-USING_NS_FGUI;
 
-Scene* HelloWorld::createScene()
+void BasicsScene::continueInit()
 {
-    return HelloWorld::create();
-}
-
-// Print useful error message instead of segfaulting when files are not there.
-static void problemLoading(const char* filename)
-{
-    printf("Error while loading: %s\n", filename);
-    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
-}
-
-// on "init" you need to initialize your instance
-bool HelloWorld::init()
-{
-    //////////////////////////////
-    // 1. super init first
-    if (!Scene::init())
-    {
-        return false;
-    }
-
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-        "CloseNormal.png",
-        "CloseSelected.png",
-        CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
-    if (closeItem == nullptr ||
-        closeItem->getContentSize().width <= 0 ||
-        closeItem->getContentSize().height <= 0)
-    {
-        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
-    }
-    else
-    {
-        float x = origin.x + visibleSize.width - closeItem->getContentSize().width / 2;
-        float y = origin.y + closeItem->getContentSize().height / 2;
-        closeItem->setPosition(Vec2(x, y));
-    }
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-
-    /////////////////////////////
-    // 3. add your codes below...
-
-    this->addChild(GRoot::getInstance()->displayObject());
-
-#ifdef CC_PLATFORM_PC
-    //cocos2dx在PC上用系统字体没有描边功能，这里用个ttf字体作为测试
-    UIConfig::registerFont(UIConfig::defaultFont, "fonts/DroidSansFallback.ttf");
-
-    //demo中有用到一个单独定义字体的文本
-    UIConfig::registerFont(u8"微软雅黑", "Microsoft YaHei");
-#endif
-
     UIConfig::buttonSound = "ui://Basics/click";
     UIConfig::verticalScrollBar = "ui://Basics/ScrollBar_VT";
     UIConfig::horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
+    UIConfig::tooltipsWin = "ui://Basics/WindowFrame";
 
+    
     UIPackage::addPackage("UI/Basics");
     _view = UIPackage::createObject("Basics", "Main")->as<GComponent>();
-    GRoot::getInstance()->addChild(_view);
+    _groot->addChild(_view);
 
     _backBtn = _view->getChild("btn_Back");
     _backBtn->setVisible(false);
-    _backBtn->addClickListener(CC_CALLBACK_1(HelloWorld::onClickBack, this));
+    _backBtn->addClickListener(CC_CALLBACK_1(BasicsScene::onClickBack, this));
 
     _demoContainer = _view->getChild("container")->as<GComponent>();
     _cc = _view->getController("c1");
@@ -90,19 +28,29 @@ bool HelloWorld::init()
     {
         GObject* obj = _view->getChildAt(i);
         if (obj->getGroup() != nullptr && obj->getGroup()->name.compare("btns") == 0)
-            obj->addClickListener(CC_CALLBACK_1(HelloWorld::runDemo, this));
+            obj->addClickListener(CC_CALLBACK_1(BasicsScene::runDemo, this));
     }
-
-    return true;
 }
 
-void HelloWorld::onClickBack(EventContext* context)
+BasicsScene::BasicsScene():
+    _winA(nullptr),
+    _winB(nullptr)
+{
+}
+
+BasicsScene::~BasicsScene()
+{
+    CC_SAFE_RELEASE(_winA);
+    CC_SAFE_RELEASE(_winB);
+}
+
+void BasicsScene::onClickBack(EventContext* context)
 {
     _cc->setSelectedIndex(0);
     _backBtn->setVisible(false);
 }
 
-void HelloWorld::runDemo(EventContext* context)
+void BasicsScene::runDemo(EventContext* context)
 {
     std::string type = ((GObject*)context->getSender())->name.substr(4);
     auto it = _demoObjects.find(type);
@@ -130,13 +78,13 @@ void HelloWorld::runDemo(EventContext* context)
         playDragDrop();
 }
 
-void HelloWorld::playText()
+void BasicsScene::playText()
 {
     GComponent* obj = _demoObjects.at("Text");
     obj->getChild("n12")->addEventListener(UIEventType::ClickLink, [this](EventContext* context)
     {
         GRichTextField* t = dynamic_cast<GRichTextField*>(context->getSender());
-        t->setText("[img]ui://Basics/long_dead_png[/img][color=#FF0000]You click the link[/color]：" + context->getData().asString());
+        t->setText("[img]ui://Basics/long_dead_png[/img][color=#FF0000]You click the link[/color]:" + context->getData().asString());
     });
     obj->getChild("n25")->addClickListener([this, obj](EventContext* context)
     {
@@ -144,7 +92,7 @@ void HelloWorld::playText()
     });
 }
 
-void HelloWorld::playWindow()
+void BasicsScene::playWindow()
 {
     GComponent* obj = _demoObjects.at("Window");
     if (_winA == nullptr)
@@ -168,7 +116,7 @@ void HelloWorld::playWindow()
 }
 
 Vec2 startPos;
-void HelloWorld::playDepth()
+void BasicsScene::playDepth()
 {
     GComponent* obj = _demoObjects.at("Depth");
     GComponent* testContainer = obj->getChild("n22")->as<GComponent>();
@@ -199,7 +147,7 @@ void HelloWorld::playDepth()
         graph->setPosition(startPos.x, startPos.y);
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::RED);
         obj->getChild("n22")->as<GComponent>()->addChild(graph);
-    },EventTag(this)); //因为playDepth是重复进入的，使用EventTag，防止了重复注册事件。
+    },EventTag(this)); //avoid duplicate register
 
     obj->getChild("btn1")->addClickListener([obj](EventContext*)
     {
@@ -213,7 +161,7 @@ void HelloWorld::playDepth()
     }, EventTag(this));
 }
 
-void HelloWorld::playDragDrop()
+void BasicsScene::playDragDrop()
 {
     GComponent* obj = _demoObjects.at("Drag&Drop");
     obj->getChild("a")->setDraggable(true);
@@ -236,7 +184,7 @@ void HelloWorld::playDragDrop()
     });
 
     GObject* bounds = obj->getChild("n7");
-    Rect rect = bounds->transformRect(Rect(Vec2::ZERO, bounds->getSize()), GRoot::getInstance());
+    Rect rect = bounds->transformRect(Rect(Vec2::ZERO, bounds->getSize()), _groot);
 
     //---!!Because at this time the container is on the right side of the stage and beginning to move to left(transition), so we need to caculate the final position
     rect.origin.x -= obj->getParent()->getX();;
@@ -245,21 +193,4 @@ void HelloWorld::playDragDrop()
     GButton* d = obj->getChild("d")->as<GButton>();
     d->setDraggable(true);
     d->setDragBounds(rect);
-}
-
-void HelloWorld::menuCloseCallback(Ref* pSender)
-{
-    //Close the cocos2d-x game scene and quit the application
-    Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
-
-    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() and exit(0) as given above,instead trigger a custom event created in RootViewController.mm as below*/
-
-    //EventCustom customEndEvent("game_scene_close_event");
-    //_eventDispatcher->dispatchEvent(&customEndEvent);
-
-
 }

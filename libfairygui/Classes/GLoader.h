@@ -43,7 +43,7 @@ public:
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
 
     virtual void loadExternal();
     virtual void freeExternal(cocos2d::SpriteFrame* spriteFrame);

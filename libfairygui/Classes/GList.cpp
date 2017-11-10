@@ -8,7 +8,13 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 
 using namespace std;
-using namespace tinyxml2;
+
+GList::ItemInfo::ItemInfo()
+{
+    obj = nullptr;
+    updateFlag = 0;
+    selected = false;
+}
 
 GList::GList() :
     foldInvisibleItems(false),
@@ -212,7 +218,7 @@ void GList::removeChildrenToPool()
 void GList::removeChildrenToPool(int beginIndex, int endIndex)
 {
     if (endIndex < 0 || endIndex >= _children.size())
-        endIndex = _children.size() - 1;
+        endIndex = (int)_children.size() - 1;
 
     for (int i = beginIndex; i <= endIndex; ++i)
         removeChildToPoolAt(beginIndex);
@@ -226,8 +232,8 @@ int GList::getSelectedIndex() const
         for (int i = 0; i < cnt; i++)
         {
             const ItemInfo& ii = _virtualItems[i];
-            if (dynamic_cast<GButton*>(ii.obj) != nullptr && ((GButton*)ii.obj)->isSelected()
-                || ii.obj == nullptr && ii.selected)
+            if ((dynamic_cast<GButton*>(ii.obj) != nullptr && ((GButton*)ii.obj)->isSelected())
+                || (ii.obj == nullptr && ii.selected))
             {
                 if (_loop)
                     return i % _numItems;
@@ -238,7 +244,7 @@ int GList::getSelectedIndex() const
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         for (int i = 0; i < cnt; i++)
         {
             GButton* obj = _children.at(i)->as<GButton>();
@@ -261,7 +267,7 @@ void GList::setSelectedIndex(int value)
         clearSelection();
 }
 
-void GList::setSelectionController(Controller * value)
+void GList::setSelectionController(GController * value)
 {
     _selectionController = value;
 }
@@ -274,9 +280,9 @@ void GList::getSelection(std::vector<int>& result)
         int cnt = _realNumItems;
         for (int i = 0; i < cnt; i++)
         {
-            ItemInfo ii = _virtualItems[i];
-            if (dynamic_cast<GButton*>(ii.obj) != nullptr && ((GButton*)ii.obj)->isSelected()
-                || ii.obj == nullptr && ii.selected)
+            ItemInfo& ii = _virtualItems[i];
+            if ((dynamic_cast<GButton*>(ii.obj) != nullptr && ((GButton*)ii.obj)->isSelected())
+                || (ii.obj == nullptr && ii.selected))
             {
                 if (_loop)
                 {
@@ -290,7 +296,7 @@ void GList::getSelection(std::vector<int>& result)
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         for (int i = 0; i < cnt; i++)
         {
             GButton* obj = _children.at(i)->as<GButton>();
@@ -317,7 +323,7 @@ void GList::addSelection(int index, bool scrollItToView)
     GButton* obj = nullptr;
     if (_virtual)
     {
-        ItemInfo ii = _virtualItems[index];
+        ItemInfo& ii = _virtualItems[index];
         if (ii.obj != nullptr)
             obj = ii.obj->as<GButton>();
         ii.selected = true;
@@ -340,7 +346,7 @@ void GList::removeSelection(int index)
     GButton *obj = nullptr;
     if (_virtual)
     {
-        ItemInfo ii = _virtualItems[index];
+        ItemInfo& ii = _virtualItems[index];
         if (ii.obj != nullptr)
             obj = ii.obj->as<GButton>();
         ii.selected = false;
@@ -359,7 +365,7 @@ void GList::clearSelection()
         int cnt = _realNumItems;
         for (int i = 0; i < cnt; i++)
         {
-            ItemInfo ii = _virtualItems[i];
+            ItemInfo& ii = _virtualItems[i];
             if (dynamic_cast<GButton*>(ii.obj))
                 ((GButton*)ii.obj)->setSelected(false);
             ii.selected = false;
@@ -367,7 +373,7 @@ void GList::clearSelection()
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         for (int i = 0; i < cnt; i++)
         {
             GButton *obj = _children.at(i)->as<GButton>();
@@ -384,7 +390,7 @@ void GList::clearSelectionExcept(GObject * g)
         int cnt = _realNumItems;
         for (int i = 0; i < cnt; i++)
         {
-            ItemInfo ii = _virtualItems[i];
+            ItemInfo& ii = _virtualItems[i];
             if (ii.obj != g)
             {
                 if (dynamic_cast<GButton*>(ii.obj))
@@ -395,7 +401,7 @@ void GList::clearSelectionExcept(GObject * g)
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         for (int i = 0; i < cnt; i++)
         {
             GButton *obj = _children.at(i)->as<GButton>();
@@ -415,7 +421,7 @@ void GList::selectAll()
         int cnt = _realNumItems;
         for (int i = 0; i < cnt; i++)
         {
-            ItemInfo ii = _virtualItems[i];
+            ItemInfo& ii = _virtualItems[i];
             if (dynamic_cast<GButton*>(ii.obj) && !((GButton*)ii.obj)->isSelected())
             {
                 ((GButton*)ii.obj)->setSelected(true);
@@ -426,7 +432,7 @@ void GList::selectAll()
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         for (int i = 0; i < cnt; i++)
         {
             GButton *obj = _children.at(i)->as<GButton>();
@@ -453,7 +459,7 @@ void GList::selectReverse()
         int cnt = _realNumItems;
         for (int i = 0; i < cnt; i++)
         {
-            ItemInfo ii = _virtualItems[i];
+            ItemInfo& ii = _virtualItems[i];
             if (dynamic_cast<GButton*>(ii.obj))
             {
                 ((GButton*)ii.obj)->setSelected(!((GButton*)ii.obj)->isSelected());
@@ -465,7 +471,7 @@ void GList::selectReverse()
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         for (int i = 0; i < cnt; i++)
         {
             GButton *obj = _children.at(i)->as<GButton>();
@@ -542,7 +548,7 @@ void GList::handleArrowKey(int dir)
         {
             GObject* current = _children.at(index);
             int k = 0;
-            int cnt = _children.size();
+            int cnt = (int)_children.size();
             int i;
             for (i = index + 1; i < cnt; i++)
             {
@@ -581,7 +587,7 @@ void GList::handleArrowKey(int dir)
         {
             GObject* current = _children.at(index);
             int k = 0;
-            int cnt = _children.size();
+            int cnt = (int)_children.size();
             int i;
             for (i = index + 1; i < cnt; i++)
             {
@@ -655,7 +661,7 @@ void GList::onItemTouchBegin(EventContext * context)
     _selectionHandled = false;
 
     if (UIConfig::defaultScrollTouchEffect
-        && (_scrollPane != nullptr || _parent != nullptr && _parent->getScrollPane() != nullptr))
+        && (_scrollPane != nullptr || (_parent != nullptr && _parent->getScrollPane() != nullptr)))
         return;
 
     if (_selectionMode == ListSelectionMode::SINGLE)
@@ -666,7 +672,6 @@ void GList::onItemTouchBegin(EventContext * context)
     {
         if (!item->isSelected())
             setSelectionOnEvent(item, context->getInput());
-        //如果item.selected，这里不处理selection，因为可能用户在拖动
     }
 }
 
@@ -716,7 +721,7 @@ void GList::setSelectionOnEvent(GObject * item, InputEvent * evt)
                     {
                         for (int i = min; i <= max; i++)
                         {
-                            ItemInfo ii = _virtualItems[i];
+                            ItemInfo& ii = _virtualItems[i];
                             if (dynamic_cast<GButton*>(ii.obj))
                                 ((GButton*)ii.obj)->setSelected(true);
                             ii.selected = true;
@@ -768,7 +773,7 @@ void GList::resizeToFit(int itemCount, int minSize)
 {
     ensureBoundsCorrect();
 
-    int curCount = this->getNumItems();
+    int curCount = getNumItems();
     if (itemCount > curCount)
         itemCount = curCount;
 
@@ -776,16 +781,16 @@ void GList::resizeToFit(int itemCount, int minSize)
     {
         int lineCount = ceil((float)itemCount / _curLineItemCount);
         if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
-            this->setViewHeight(lineCount * _itemSize.y + MAX(0, lineCount - 1) * _lineGap);
+            setViewHeight(lineCount * _itemSize.y + MAX(0, lineCount - 1) * _lineGap);
         else
-            this->setViewWidth(lineCount * _itemSize.x + MAX(0, lineCount - 1) * _columnGap);
+            setViewWidth(lineCount * _itemSize.x + MAX(0, lineCount - 1) * _columnGap);
     }
     else if (itemCount == 0)
     {
         if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
-            this->setViewHeight(minSize);
+            setViewHeight(minSize);
         else
-            this->setViewWidth(minSize);
+            setViewWidth(minSize);
     }
     else
     {
@@ -793,7 +798,7 @@ void GList::resizeToFit(int itemCount, int minSize)
         GObject *obj = nullptr;
         while (i >= 0)
         {
-            obj = this->getChildAt(i);
+            obj = getChildAt(i);
             if (!foldInvisibleItems || obj->isVisible())
                 break;
             i--;
@@ -801,9 +806,9 @@ void GList::resizeToFit(int itemCount, int minSize)
         if (i < 0)
         {
             if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
-                this->setViewHeight(minSize);
+                setViewHeight(minSize);
             else
-                this->setViewWidth(minSize);
+                setViewWidth(minSize);
         }
         else
         {
@@ -813,17 +818,22 @@ void GList::resizeToFit(int itemCount, int minSize)
                 size = obj->getY() + obj->getHeight();
                 if (size < minSize)
                     size = minSize;
-                this->setViewHeight(size);
+                setViewHeight(size);
             }
             else
             {
                 size = obj->getX() + obj->getWidth();
                 if (size < minSize)
                     size = minSize;
-                this->setViewWidth(size);
+                setViewWidth(size);
             }
         }
     }
+}
+
+int GList::getFirstChildInView()
+{
+    return childIndexToItemIndex(GComponent::getFirstChildInView());
 }
 
 void GList::handleSizeChanged()
@@ -835,12 +845,12 @@ void GList::handleSizeChanged()
         setVirtualListChangedFlag(true);
 }
 
-void GList::handleControllerChanged(Controller * c)
+void GList::handleControllerChanged(GController * c)
 {
     GComponent::handleControllerChanged(c);
 
     if (_selectionController == c)
-        this->setSelectedIndex(c->getSelectedIndex());
+        setSelectedIndex(c->getSelectedIndex());
 }
 
 void GList::updateSelectionController(int index)
@@ -848,7 +858,7 @@ void GList::updateSelectionController(int index)
     if (_selectionController != nullptr && !_selectionController->changing
         && index < _selectionController->getPageCount())
     {
-        Controller* c = _selectionController;
+        GController* c = _selectionController;
         _selectionController = nullptr;
         c->setSelectedIndex(index);
         _selectionController = c;
@@ -870,7 +880,7 @@ void GList::scrollToView(int index, bool ani, bool setFirst)
             index = floor(_firstIndex / _numItems) * _numItems + index;
 
         Rect rect;
-        ItemInfo ii = _virtualItems[index];
+        ItemInfo& ii = _virtualItems[index];
         if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
         {
             float pos = 0;
@@ -893,7 +903,7 @@ void GList::scrollToView(int index, bool ani, bool setFirst)
                 ii.size.x, ii.size.y);
         }
 
-        setFirst = true;//因为在可变item大小的情况下，只有设置在最顶端，位置才不会因为高度变化而改变，所以只能支持setFirst=true
+        setFirst = true;
         if (_scrollPane != nullptr)
             _scrollPane->scrollToView(rect, ani, setFirst);
         else if (_parent != nullptr && _parent->getScrollPane() != nullptr)
@@ -1025,7 +1035,7 @@ int GList::getNumItems()
     if (_virtual)
         return _numItems;
     else
-        return _children.size();
+        return (int)_children.size();
 
 }
 
@@ -1037,12 +1047,11 @@ void GList::setNumItems(int value)
 
         _numItems = value;
         if (_loop)
-            _realNumItems = _numItems * 6;//设置6倍数量，用于循环滚动
+            _realNumItems = _numItems * 6;
         else
             _realNumItems = _numItems;
 
-        //_virtualItems的设计是只增不减的
-        int oldCount = _virtualItems.size();
+        int oldCount = (int)_virtualItems.size();
         if (_realNumItems > oldCount)
         {
             for (int i = oldCount; i < _realNumItems; i++)
@@ -1059,7 +1068,7 @@ void GList::setNumItems(int value)
                 _virtualItems[i].selected = false;
         }
 
-        if (this->_virtualListChanged != 0)
+        if (_virtualListChanged != 0)
             CALL_LATER_CANCEL(GList, doRefreshVirtualList);
 
         //立即刷新
@@ -1067,7 +1076,7 @@ void GList::setNumItems(int value)
     }
     else
     {
-        int cnt = _children.size();
+        int cnt = (int)_children.size();
         if (value > cnt)
         {
             for (int i = cnt; i < value; i++)
@@ -1130,7 +1139,7 @@ cocos2d::Vec2 GList::getSnappingPosition(const cocos2d::Vec2 & pt)
 
 void GList::checkVirtualList()
 {
-    if (this->_virtualListChanged != 0)
+    if (_virtualListChanged != 0)
     {
         doRefreshVirtualList();
         CALL_LATER_CANCEL(GList, doRefreshVirtualList);
@@ -1439,8 +1448,8 @@ void GList::handleScroll(bool forceUpdate)
     _boundsChanged = false;
 }
 
-static uint32_t itemInfoVer = 0; //用来标志item是否在本次处理中已经被重用了
-static uint32_t enterCounter = 0; //因为HandleScroll是会重入的，这个用来避免极端情况下的死锁
+static uint32_t itemInfoVer = 0;
+static uint32_t enterCounter = 0;
 
 void GList::handleScroll1(bool forceUpdate)
 {
@@ -1450,9 +1459,8 @@ void GList::handleScroll1(bool forceUpdate)
 
     float pos = _scrollPane->getScrollingPosY();
     float max = pos + _scrollPane->getViewSize().height;
-    bool end = max == _scrollPane->getContentSize().height;//这个标志表示当前需要滚动到最末，无论内容变化大小
+    bool end = max == _scrollPane->getContentSize().height;
 
-                                               //寻找当前位置的第一条项目
     int newFirstIndex = getIndexOnPos1(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
     {
@@ -1464,7 +1472,7 @@ void GList::handleScroll1(bool forceUpdate)
     _firstIndex = newFirstIndex;
     int curIndex = newFirstIndex;
     bool forward = oldFirstIndex > newFirstIndex;
-    int oldCount = this->numChildren();
+    int oldCount = numChildren();
     int lastIndex = oldFirstIndex + oldCount - 1;
     int reuseIndex = forward ? lastIndex : oldFirstIndex;
     float curX = 0, curY = pos;
@@ -1477,7 +1485,7 @@ void GList::handleScroll1(bool forceUpdate)
     itemInfoVer++;
     while (curIndex < _realNumItems && (end || curY < max))
     {
-        ItemInfo ii = _virtualItems[curIndex];
+        ItemInfo& ii = _virtualItems[curIndex];
 
         if (ii.obj == nullptr || forceUpdate)
         {
@@ -1500,12 +1508,11 @@ void GList::handleScroll1(bool forceUpdate)
 
         if (ii.obj == nullptr)
         {
-            //搜索最适合的重用item，保证每次刷新需要新建或者重新render的item最少
             if (forward)
             {
                 for (int j = reuseIndex; j >= oldFirstIndex; j--)
                 {
-                    ItemInfo ii2 = _virtualItems[j];
+                    ItemInfo& ii2 = _virtualItems[j];
                     if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
@@ -1522,7 +1529,7 @@ void GList::handleScroll1(bool forceUpdate)
             {
                 for (int j = reuseIndex; j <= lastIndex; j++)
                 {
-                    ItemInfo ii2 = _virtualItems[j];
+                    ItemInfo& ii2 = _virtualItems[j];
                     if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
@@ -1544,9 +1551,9 @@ void GList::handleScroll1(bool forceUpdate)
             {
                 ii.obj = _pool->getObject(url);
                 if (forward)
-                    this->addChildAt(ii.obj, curIndex - newFirstIndex);
+                    addChildAt(ii.obj, curIndex - newFirstIndex);
                 else
-                    this->addChild(ii.obj);
+                    addChild(ii.obj);
             }
             if (dynamic_cast<GButton*>(ii.obj))
                 ((GButton*)ii.obj)->setSelected(ii.selected);
@@ -1567,7 +1574,6 @@ void GList::handleScroll1(bool forceUpdate)
                 deltaSize += ceil(ii.obj->getHeight()) - ii.size.y;
                 if (curIndex == newFirstIndex && oldFirstIndex > newFirstIndex)
                 {
-                    //当内容向下滚动时，如果新出现的项目大小发生变化，需要做一个位置补偿，才不会导致滚动跳动
                     firstItemDeltaSize = ceil(ii.obj->getHeight()) - ii.size.y;
                 }
             }
@@ -1577,7 +1583,7 @@ void GList::handleScroll1(bool forceUpdate)
 
         ii.updateFlag = itemInfoVer;
         ii.obj->setPosition(curX, curY);
-        if (curIndex == newFirstIndex) //要显示多一条才不会穿帮
+        if (curIndex == newFirstIndex)
             max += ii.size.y;
 
         curX += ii.size.x + _columnGap;
@@ -1592,7 +1598,7 @@ void GList::handleScroll1(bool forceUpdate)
 
     for (int i = 0; i < oldCount; i++)
     {
-        ItemInfo ii = _virtualItems[oldFirstIndex + i];
+        ItemInfo& ii = _virtualItems[oldFirstIndex + i];
         if (ii.updateFlag != itemInfoVer && ii.obj != nullptr)
         {
             if (dynamic_cast<GButton*>(ii.obj))
@@ -1605,8 +1611,8 @@ void GList::handleScroll1(bool forceUpdate)
     if (deltaSize != 0 || firstItemDeltaSize != 0)
         _scrollPane->changeContentSizeOnScrolling(0, deltaSize, 0, firstItemDeltaSize);
 
-    if (curIndex > 0 && this->numChildren() > 0
-        && (-_container->getPositionY()) < 0 && getChildAt(0)->getY() > -(-_container->getPositionY()))//最后一页没填满！
+    if (curIndex > 0 && numChildren() > 0
+        && _container->getPositionY2() < 0 && getChildAt(0)->getY() > -_container->getPositionY2())
         handleScroll1(false);
 
     enterCounter--;
@@ -1620,9 +1626,8 @@ void GList::handleScroll2(bool forceUpdate)
 
     float pos = _scrollPane->getScrollingPosX();
     float max = pos + _scrollPane->getViewSize().width;
-    bool end = pos == _scrollPane->getContentSize().width;//这个标志表示当前需要滚动到最末，无论内容变化大小
+    bool end = pos == _scrollPane->getContentSize().width;
 
-                                              //寻找当前位置的第一条项目
     int newFirstIndex = getIndexOnPos2(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
     {
@@ -1634,7 +1639,7 @@ void GList::handleScroll2(bool forceUpdate)
     _firstIndex = newFirstIndex;
     int curIndex = newFirstIndex;
     bool forward = oldFirstIndex > newFirstIndex;
-    int oldCount = this->numChildren();
+    int oldCount = numChildren();
     int lastIndex = oldFirstIndex + oldCount - 1;
     int reuseIndex = forward ? lastIndex : oldFirstIndex;
     float curX = pos, curY = 0;
@@ -1647,7 +1652,7 @@ void GList::handleScroll2(bool forceUpdate)
     itemInfoVer++;
     while (curIndex < _realNumItems && (end || curX < max))
     {
-        ItemInfo ii = _virtualItems[curIndex];
+        ItemInfo& ii = _virtualItems[curIndex];
 
         if (ii.obj == nullptr || forceUpdate)
         {
@@ -1674,7 +1679,7 @@ void GList::handleScroll2(bool forceUpdate)
             {
                 for (int j = reuseIndex; j >= oldFirstIndex; j--)
                 {
-                    ItemInfo ii2 = _virtualItems[j];
+                    ItemInfo& ii2 = _virtualItems[j];
                     if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
@@ -1691,7 +1696,7 @@ void GList::handleScroll2(bool forceUpdate)
             {
                 for (int j = reuseIndex; j <= lastIndex; j++)
                 {
-                    ItemInfo ii2 = _virtualItems[j];
+                    ItemInfo& ii2 = _virtualItems[j];
                     if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
@@ -1713,9 +1718,9 @@ void GList::handleScroll2(bool forceUpdate)
             {
                 ii.obj = _pool->getObject(url);
                 if (forward)
-                    this->addChildAt(ii.obj, curIndex - newFirstIndex);
+                    addChildAt(ii.obj, curIndex - newFirstIndex);
                 else
-                    this->addChild(ii.obj);
+                    addChild(ii.obj);
             }
             if (dynamic_cast<GButton*>(ii.obj))
                 ((GButton*)ii.obj)->setSelected(ii.selected);
@@ -1736,7 +1741,6 @@ void GList::handleScroll2(bool forceUpdate)
                 deltaSize += ceil(ii.obj->getWidth()) - ii.size.x;
                 if (curIndex == newFirstIndex && oldFirstIndex > newFirstIndex)
                 {
-                    //当内容向下滚动时，如果新出现的一个项目大小发生变化，需要做一个位置补偿，才不会导致滚动跳动
                     firstItemDeltaSize = ceil(ii.obj->getWidth()) - ii.size.x;
                 }
             }
@@ -1746,7 +1750,7 @@ void GList::handleScroll2(bool forceUpdate)
 
         ii.updateFlag = itemInfoVer;
         ii.obj->setPosition(curX, curY);
-        if (curIndex == newFirstIndex) //要显示多一条才不会穿帮
+        if (curIndex == newFirstIndex) 
             max += ii.size.x;
 
         curY += ii.size.y + _lineGap;
@@ -1761,7 +1765,7 @@ void GList::handleScroll2(bool forceUpdate)
 
     for (int i = 0; i < oldCount; i++)
     {
-        ItemInfo ii = _virtualItems[oldFirstIndex + i];
+        ItemInfo& ii = _virtualItems[oldFirstIndex + i];
         if (ii.updateFlag != itemInfoVer && ii.obj != nullptr)
         {
             if (dynamic_cast<GButton*>(ii.obj))
@@ -1774,8 +1778,8 @@ void GList::handleScroll2(bool forceUpdate)
     if (deltaSize != 0 || firstItemDeltaSize != 0)
         _scrollPane->changeContentSizeOnScrolling(deltaSize, 0, firstItemDeltaSize, 0);
 
-    if (curIndex > 0 && this->numChildren() > 0 && _container->getPositionX() < 0
-        && getChildAt(0)->getX() > -_container->getPositionX())//最后一页没填满！
+    if (curIndex > 0 && numChildren() > 0 && _container->getPositionX() < 0
+        && getChildAt(0)->getX() > -_container->getPositionX())
         handleScroll2(false);
 
     enterCounter--;
@@ -1785,7 +1789,6 @@ void GList::handleScroll3(bool forceUpdate)
 {
     float pos = _scrollPane->getScrollingPosX();
 
-    //寻找当前位置的第一条项目
     int newFirstIndex = getIndexOnPos3(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
         return;
@@ -1793,23 +1796,20 @@ void GList::handleScroll3(bool forceUpdate)
     int oldFirstIndex = _firstIndex;
     _firstIndex = newFirstIndex;
 
-    //分页模式不支持不等高，所以渲染满一页就好了
-
     int reuseIndex = oldFirstIndex;
-    int virtualItemCount = _virtualItems.size();
+    int virtualItemCount = (int)_virtualItems.size();
     int pageSize = _curLineItemCount * _curLineItemCount2;
     int startCol = newFirstIndex % _curLineItemCount;
-    float viewWidth = this->getViewWidth();
+    float viewWidth = getViewWidth();
     int page = (int)(newFirstIndex / pageSize);
     int startIndex = page * pageSize;
-    int lastIndex = startIndex + pageSize * 2; //测试两页
+    int lastIndex = startIndex + pageSize * 2;
     bool needRender;
     string url = _defaultItem;
     int partWidth = (int)((_scrollPane->getViewSize().width - _columnGap * (_curLineItemCount - 1)) / _curLineItemCount);
     int partHeight = (int)((_scrollPane->getViewSize().height - _lineGap * (_curLineItemCount2 - 1)) / _curLineItemCount2);
     itemInfoVer++;
 
-    //先标记这次要用到的项目
     for (int i = startIndex; i < lastIndex; i++)
     {
         if (i >= _realNumItems)
@@ -1827,7 +1827,7 @@ void GList::handleScroll3(bool forceUpdate)
                 continue;
         }
 
-        ItemInfo ii = _virtualItems[i];
+        ItemInfo& ii = _virtualItems[i];
         ii.updateFlag = itemInfoVer;
     }
 
@@ -1838,16 +1838,15 @@ void GList::handleScroll3(bool forceUpdate)
         if (i >= _realNumItems)
             continue;
 
-        ItemInfo ii = _virtualItems[i];
+        ItemInfo& ii = _virtualItems[i];
         if (ii.updateFlag != itemInfoVer)
             continue;
 
         if (ii.obj == nullptr)
         {
-            //寻找看有没有可重用的
             while (reuseIndex < virtualItemCount)
             {
-                ItemInfo ii2 = _virtualItems[reuseIndex];
+                ItemInfo& ii2 = _virtualItems[reuseIndex];
                 if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer)
                 {
                     if (dynamic_cast<GButton*>(ii2.obj))
@@ -1873,7 +1872,7 @@ void GList::handleScroll3(bool forceUpdate)
                 }
 
                 ii.obj = _pool->getObject(url);
-                this->addChildAt(ii.obj, insertIndex);
+                addChildAt(ii.obj, insertIndex);
             }
             else
             {
@@ -1911,7 +1910,6 @@ void GList::handleScroll3(bool forceUpdate)
         }
     }
 
-    //排列item
     float borderX = (startIndex / pageSize) * viewWidth;
     float xx = borderX;
     float yy = 0;
@@ -1921,7 +1919,7 @@ void GList::handleScroll3(bool forceUpdate)
         if (i >= _realNumItems)
             continue;
 
-        ItemInfo ii = _virtualItems[i];
+        ItemInfo& ii = _virtualItems[i];
         if (ii.updateFlag == itemInfoVer)
             ii.obj->setPosition(xx, yy);
 
@@ -1944,10 +1942,9 @@ void GList::handleScroll3(bool forceUpdate)
             xx += ii.size.x + _columnGap;
     }
 
-    //释放未使用的
     for (int i = reuseIndex; i < virtualItemCount; i++)
     {
-        ItemInfo ii = _virtualItems[i];
+        ItemInfo& ii = _virtualItems[i];
         if (ii.updateFlag != itemInfoVer && ii.obj != nullptr)
         {
             if (dynamic_cast<GButton*>(ii.obj))
@@ -1962,10 +1959,10 @@ void GList::handleArchOrder1()
 {
     if (_childrenRenderOrder == ChildrenRenderOrder::ARCH)
     {
-        float mid = _scrollPane->getPosY() + this->getViewHeight() / 2;
+        float mid = _scrollPane->getPosY() + getViewHeight() / 2;
         float minDist = FLT_MAX, dist;
         int apexIndex = 0;
-        int cnt = this->numChildren();
+        int cnt = numChildren();
         for (int i = 0; i < cnt; i++)
         {
             GObject *obj = getChildAt(i);
@@ -1987,10 +1984,10 @@ void GList::handleArchOrder2()
 {
     if (_childrenRenderOrder == ChildrenRenderOrder::ARCH)
     {
-        float mid = _scrollPane->getPosX() + this->getViewWidth() / 2;
+        float mid = _scrollPane->getPosX() + getViewWidth() / 2;
         float minDist = FLT_MAX, dist;
         int apexIndex = 0;
-        int cnt = this->numChildren();
+        int cnt = numChildren();
         for (int i = 0; i < cnt; i++)
         {
             GObject *obj = getChildAt(i);
@@ -2036,7 +2033,7 @@ void GList::handleAlign(float contentWidth, float contentHeight)
         if (_scrollPane != nullptr)
             _scrollPane->adjustMaskContainer();
         else
-            _container->setPosition(_margin.left + _alignOffset.x, -(_margin.top + _alignOffset.y));
+            _container->setPosition2(_margin.left + _alignOffset.x, _margin.top + _alignOffset.y);
     }
 }
 
@@ -2045,7 +2042,7 @@ void GList::updateBounds()
     if (_virtual)
         return;
 
-    int cnt = _children.size();
+    int cnt = (int)_children.size();
     int i;
     int j = 0;
     GObject* child;
@@ -2054,8 +2051,8 @@ void GList::updateBounds()
     float cw, ch;
     float maxWidth = 0;
     float maxHeight = 0;
-    float viewWidth = this->getViewWidth();
-    float viewHeight = this->getViewHeight();
+    float viewWidth = getViewWidth();
+    float viewHeight = getViewHeight();
 
     if (_layout == ListLayoutType::SINGLE_COLUMN)
     {
@@ -2159,8 +2156,8 @@ void GList::updateBounds()
                 if (curX != 0)
                     curX += _columnGap;
 
-                if (_columnCount != 0 && j >= _columnCount
-                    || _columnCount == 0 && curX + child->getWidth() > viewWidth && maxHeight != 0)
+                if ((_columnCount != 0 && j >= _columnCount)
+                    || (_columnCount == 0 && curX + child->getWidth() > viewWidth && maxHeight != 0))
                 {
                     //new line
                     curX = 0;
@@ -2242,8 +2239,8 @@ void GList::updateBounds()
                 if (curY != 0)
                     curY += _lineGap;
 
-                if (_lineCount != 0 && j >= _lineCount
-                    || _lineCount == 0 && curY + child->getHeight() > viewHeight && maxWidth != 0)
+                if ((_lineCount != 0 && j >= _lineCount)
+                    || (_lineCount == 0 && curY + child->getHeight() > viewHeight && maxWidth != 0))
                 {
                     curY = 0;
                     curX += ceil(maxWidth) + _columnGap;
@@ -2318,8 +2315,8 @@ void GList::updateBounds()
 
                     k++;
 
-                    if (_lineCount != 0 && k >= _lineCount
-                        || _lineCount == 0 && curY + child->getHeight() > viewHeight)
+                    if ((_lineCount != 0 && k >= _lineCount)
+                        || (_lineCount == 0 && curY + child->getHeight() > viewHeight))
                     {
                         //new page
                         page++;
@@ -2343,8 +2340,8 @@ void GList::updateBounds()
                 if (_autoResizeItem && _lineCount > 0)
                     child->setSize(child->getWidth(), eachHeight, true);
 
-                if (_columnCount != 0 && j >= _columnCount
-                    || _columnCount == 0 && curX + child->getWidth() > viewWidth && maxHeight != 0)
+                if ((_columnCount != 0 && j >= _columnCount)
+                    || (_columnCount == 0 && curX + child->getWidth() > viewWidth && maxHeight != 0))
                 {
                     curX = 0;
                     curY += maxHeight + _lineGap;
@@ -2352,8 +2349,8 @@ void GList::updateBounds()
                     j = 0;
                     k++;
 
-                    if (_lineCount != 0 && k >= _lineCount
-                        || _lineCount == 0 && curY + child->getHeight() > viewHeight && maxWidth != 0)//new page
+                    if ((_lineCount != 0 && k >= _lineCount)
+                        || (_lineCount == 0 && curY + child->getHeight() > viewHeight && maxWidth != 0))//new page
                     {
                         page++;
                         curY = 0;
@@ -2377,7 +2374,7 @@ void GList::updateBounds()
     setBounds(0, 0, cw, ch);
 }
 
-void GList::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GList::setup_BeforeAdd(TXMLElement * xml)
 {
     GComponent::setup_BeforeAdd(xml);
 
@@ -2491,7 +2488,7 @@ void GList::setup_BeforeAdd(tinyxml2::XMLElement * xml)
             _apexIndex = xml->IntAttribute("apex");
     }
 
-    XMLElement* ix = xml->FirstChildElement("item");
+    TXMLElement* ix = xml->FirstChildElement("item");
     std::string url;
     while (ix)
     {
@@ -2525,7 +2522,7 @@ void GList::setup_BeforeAdd(tinyxml2::XMLElement * xml)
     }
 }
 
-void GList::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GList::setup_AfterAdd(TXMLElement * xml)
 {
     GComponent::setup_AfterAdd(xml);
 

@@ -11,6 +11,7 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 
 struct AtlasSprite;
+class PixelHitTestData;
 
 class UIPackage
 {
@@ -24,8 +25,6 @@ public:
     static void removePackage(const std::string& packageIdOrName);
     static GObject* createObject(const std::string& pkgName, const std::string& resName);
     static GObject* createObjectFromURL(const std::string& url);
-    static void* getItemAsset(const std::string& pkgName, const std::string& resName);
-    static void* getItemAssetByURL(const std::string& url);
     static std::string getItemURL(const std::string& pkgName, const std::string& resName);
     static PackageItem* getItemByURL(const std::string& url);
     static std::string normalizeURL(const std::string& url);
@@ -37,8 +36,10 @@ public:
 
     PackageItem* getItem(const std::string& itemId);
     PackageItem* getItemByName(const std::string& itemName);
-    void* getItemAsset(const std::string& resName);
-    void* getItemAsset(PackageItem* item);
+    void loadItem(const std::string& resName);
+    void loadItem(PackageItem* item);
+
+    PixelHitTestData* getPixelHitTestData(const std::string& itemId);
 
     static int _constructing;
     static const std::string URL_PREFIX;
@@ -68,7 +69,7 @@ private:
     std::unordered_map<std::string, PackageItem*> _itemsByName;
     std::unordered_map<std::string, AtlasSprite*> _sprites;
     std::unordered_map<std::string, cocos2d::Data*> _descPack;
-    //ValueMap _hitTestDatas;
+    std::unordered_map<std::string, PixelHitTestData*> _hitTestDatas;
     std::string _assetNamePrefix;
     std::string _customId;
     bool _loadingPackage;

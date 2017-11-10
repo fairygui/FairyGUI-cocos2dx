@@ -8,7 +8,7 @@
 
 NS_FGUI_BEGIN
 
-class GTextFieldDelegate : public GObject, public IColorGear
+class GTextField : public GObject, public IColorGear
 {
 public:
     virtual const std::string getFontName() const = 0;
@@ -42,17 +42,17 @@ public:
     void cg_setOutlineColor(const cocos2d::Color4B& value) override { }
 
 protected:
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
 };
 
-class GTextField : public GTextFieldDelegate
+class GBasicTextField : public GTextField
 {
 public:
-    GTextField();
-    ~GTextField();
+    GBasicTextField();
+    ~GBasicTextField();
 
-    CREATE_FUNC(GTextField);
+    CREATE_FUNC(GBasicTextField);
 
     const std::string& getText() const override { return _label->getString(); }
     void setText(const std::string& value) override;
@@ -66,25 +66,25 @@ public:
     const cocos2d::Color3B& getColor() const override { return _color; }
     void setColor(const cocos2d::Color3B& value) override;
 
-    void setAutoSize(TextAutoSize value) override;
-    void setAlign(cocos2d::TextHAlignment value);
-    void setVerticalAlign(cocos2d::TextVAlignment value);
-    void setUnderline(bool value) override;
-    void setItalic(bool value) override;
-    void setBold(bool value) override;
-    void setSingleLine(bool value) override;
-    void setLetterSpacing(float value) override;
-    void setLineSpacing(float value) override;
-    void enableOutline(const cocos2d::Color4B& color, float size) override;
-    void enableShadow(const cocos2d::Color4B& color, const cocos2d::Size& offset) override;
+    virtual void setAutoSize(TextAutoSize value) override;
+    virtual void setAlign(cocos2d::TextHAlignment value) override;
+    virtual void setVerticalAlign(cocos2d::TextVAlignment value) override;
+    virtual void setUnderline(bool value) override;
+    virtual void setItalic(bool value) override;
+    virtual void setBold(bool value) override;
+    virtual void setSingleLine(bool value) override;
+    virtual void setLetterSpacing(float value) override;
+    virtual void setLineSpacing(float value) override;
+    virtual void enableOutline(const cocos2d::Color4B& color, float size) override;
+    virtual void enableShadow(const cocos2d::Color4B& color, const cocos2d::Size& offset) override;
 
-    cocos2d::Color4B cg_getOutlineColor() const override { return _outlineColor; }
-    void cg_setOutlineColor(const cocos2d::Color4B& value) override;
+    virtual cocos2d::Color4B cg_getOutlineColor() const override { return _outlineColor; }
+    virtual void cg_setOutlineColor(const cocos2d::Color4B& value) override;
 
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
 
     void updateSize();
 

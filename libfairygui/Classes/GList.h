@@ -78,10 +78,12 @@ public:
     void resizeToFit(int itemCount) { resizeToFit(itemCount, 0); }
     void resizeToFit(int itemCount, int minSize);
 
+    virtual int getFirstChildInView() override;
+
     void scrollToView(int index, bool ani = false, bool setFirst = false);
 
-    Controller* getSelectionController() const { return _selectionController; }
-    void setSelectionController(Controller* value);
+    GController* getSelectionController() const { return _selectionController; }
+    void setSelectionController(GController* value);
 
     void setVirtual();
     void setVirtualAndLoop();
@@ -102,11 +104,11 @@ public:
     bool foldInvisibleItems;
 
 protected:
-    virtual void handleControllerChanged(Controller* c) override;
+    virtual void handleControllerChanged(GController* c) override;
     virtual void handleSizeChanged() override;
     virtual void updateBounds() override;
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
 
 private:
     void clearSelectionExcept(GObject *g);
@@ -148,7 +150,7 @@ private:
     bool _autoResizeItem;
     ListSelectionMode _selectionMode;
     std::string _defaultItem;
-    Controller* _selectionController;
+    GController* _selectionController;
 
     GObjectPool* _pool;
     bool _selectionHandled;
@@ -161,18 +163,19 @@ private:
     int _realNumItems;
     int _firstIndex; //the top left index
     int _curLineItemCount; //item count in one line
-    int _curLineItemCount2; //只用在页面模式，表示垂直方向的项目数
+    int _curLineItemCount2; //item count in vertical direction,only pagination layout
     cocos2d::Vec2 _itemSize;
     int _virtualListChanged; //1-content changed, 2-size changed
     bool _eventLocked;
 
-    class ItemInfo
+    struct ItemInfo
     {
-    public:
         cocos2d::Vec2 size;
         GObject* obj;
         uint32_t updateFlag;
         bool selected;
+
+        ItemInfo();
     };
     std::vector<ItemInfo> _virtualItems;
 };

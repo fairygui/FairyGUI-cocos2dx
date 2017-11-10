@@ -2,12 +2,9 @@
 #include "utils/ToolSet.h"
 #include "GLabel.h"
 #include "GTextField.h"
-#include "AudioEngine.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
-
-using namespace tinyxml2;
 
 const std::string GButton::UP = "up";
 const std::string GButton::DOWN = "down";
@@ -27,7 +24,8 @@ GButton::GButton() :
     _down(false),
     _downEffect(0),
     _downScaled(false),
-    _downEffectValue(0.8f)
+    _downEffectValue(0.8f),
+    _changeStateOnClick(true)
 {
     _sound = UIConfig::buttonSound;
     _soundVolumeScale = UIConfig::buttonSoundVolumeScale;
@@ -145,7 +143,7 @@ void GButton::setSelected(bool value)
     }
 }
 
-void GButton::setRelatedController(Controller * c)
+void GButton::setRelatedController(GController * c)
 {
     _relatedController = c;
 }
@@ -198,7 +196,7 @@ void GButton::setCurrentState()
     }
 }
 
-void GButton::constructFromXML(tinyxml2::XMLElement * xml)
+void GButton::constructFromXML(TXMLElement * xml)
 {
     GComponent::constructFromXML(xml);
 
@@ -247,7 +245,7 @@ void GButton::constructFromXML(tinyxml2::XMLElement * xml)
     addEventListener(UIEventType::Exit, CC_CALLBACK_1(GButton::onExit, this));
 }
 
-void GButton::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GButton::setup_AfterAdd(TXMLElement * xml)
 {
     GComponent::setup_AfterAdd(xml);
 
@@ -300,7 +298,7 @@ void GButton::setup_AfterAdd(tinyxml2::XMLElement * xml)
         _soundVolumeScale = atof(p) / 100.0f;
 }
 
-void GButton::handleControllerChanged(Controller* c)
+void GButton::handleControllerChanged(GController* c)
 {
     GObject::handleControllerChanged(c);
 
@@ -382,11 +380,7 @@ void GButton::onTouchEnd(EventContext* context)
 void GButton::onClick(EventContext* context)
 {
     if (!_sound.empty())
-    {
-        std::string *p = (std::string*)UIPackage::getItemAssetByURL(_sound);
-        if (p)
-            experimental::AudioEngine::play2d(*p, false, _soundVolumeScale);
-    }
+        UIRoot->playSound(_sound, _soundVolumeScale);
 
     if (_mode == ButtonMode::CHECK)
     {

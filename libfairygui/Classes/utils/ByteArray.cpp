@@ -24,7 +24,7 @@ ByteArray::~ByteArray()
 
 
 
-ByteArray* ByteArray::create(int len)
+ByteArray* ByteArray::create(size_t len)
 {
     ByteArray* ba = new ByteArray();
     if (ba)
@@ -43,7 +43,7 @@ ByteArray* ByteArray::create(int len)
 }
 
 
-ByteArray* ByteArray::createWithBuffer(char* buffer, int len, bool transferOwnerShip)
+ByteArray* ByteArray::createWithBuffer(char* buffer, size_t len, bool transferOwnerShip)
 {
     ByteArray* ba = new ByteArray();
     if (ba)
@@ -205,12 +205,18 @@ void ByteArray::writeLongLong(long long value)
     this->_pos += sizeof(value);
 }
 
-string ByteArray::readString(int len)
+string ByteArray::readString()
+{
+    int len = readUnsignedShort();
+    return readString(len);
+}
+
+string ByteArray::readString(size_t len)
 {
     char* value = new char[len + 1];
 
     value[len] = '\0';
-    copyMemory(value, this->_buffer + this->_pos, len);
+    memcpy(value, this->_buffer + this->_pos, len);
     this->_pos += len;
 
     string str(value);
@@ -220,19 +226,16 @@ string ByteArray::readString(int len)
     return str;
 }
 
-
 void ByteArray::writeString(const string& value)
 {
     auto len = value.length();
+    writeUnsignedShort(len);
     const char* p = value.c_str();
     memcpy(this->_buffer + this->_pos, p, len);
     this->_pos += len;
 }
 
-
-
-
-void ByteArray::copyMemory(void* to, const void* from, int len)
+void ByteArray::copyMemory(void* to, const void* from, size_t len)
 {
     char* t = (char*)to;
     char* f = (char*)from;
@@ -242,7 +245,7 @@ void ByteArray::copyMemory(void* to, const void* from, int len)
     }
     else if (_endian == ENDIAN_BIG)
     {
-        for (int i = len - 1; i >= 0; i--)
+        for (ssize_t i = len - 1; i >= 0; i--)
         {
             t[(len - 1) - i] = f[i];
         }
@@ -286,25 +289,25 @@ int ByteArray::getEndian()
 }
 
 
-int ByteArray::getPosition()
+size_t ByteArray::getPosition()
 {
     return this->_pos;
 }
 
 
-void ByteArray::setPosition(int pos)
+void ByteArray::setPosition(size_t pos)
 {
     this->_pos = pos;
 }
 
 
-int ByteArray::getLength()
+size_t ByteArray::getLength()
 {
     return this->_length;
 }
 
 
-int ByteArray::getBytesAvailable()
+size_t ByteArray::getBytesAvailable()
 {
     return this->_length - this->_pos;
 }

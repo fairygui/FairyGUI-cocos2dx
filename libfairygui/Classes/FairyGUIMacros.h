@@ -27,7 +27,12 @@ if (!Director::getInstance()->getScheduler()->isScheduled(schedule_selector(__TY
 #define CALL_PER_FRAME_CANCEL(__TYPE__,__FUNC__) \
 cocos2d::Director::getInstance()->getScheduler()->unschedule(schedule_selector(__TYPE__::__FUNC__), this)
 
+#define UIRoot GRoot::getInstance()
+
 #include "FieldTypes.h"
 #include "tinyxml2/tinyxml2.h"
+
+typedef tinyxml2::XMLElement TXMLElement;
+typedef tinyxml2::XMLDocument TXMLDocument;
 
 #endif

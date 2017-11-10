@@ -5,12 +5,12 @@
     <image id="n0_n3qd" name="n0" src="n3qds" xy="54,20" pivot="0.5,0.5" group="n2_n3qd">
       <gearDisplay controller="c1" pages="2"/>
     </image>
-    <text id="n1_n3qd" name="n1" xy="106,23" size="242,26" group="n2_n3qd" fontSize="22" color="#999999" align="center" autoSize="none" bold="true" singleLine="true" text="Loading">
+    <text id="n1_n3qd" name="n1" xy="106,23" size="242,33" group="n2_n3qd" fontSize="22" color="#999999" align="center" autoSize="none" bold="true" singleLine="true" text="Loading">
       <gearText controller="c1" pages="0,1,2" values="Pull down to refresh|Release to refresh|Loading" default="Pull down to refrsh"/>
     </text>
     <image id="n3_n3qd" name="n3" src="n3qdt" xy="52,14" pivot="0.5,0.5" group="n2_n3qd">
       <gearDisplay controller="c1" pages="0,1"/>
-      <gearLook controller="c1" pages="0" values="1,180,0" default="1,0,0"/>
+      <gearLook controller="c1" pages="0" values="1,180,0,1" default="1,0,0,1"/>
     </image>
     <group id="n2_n3qd" name="n2" xy="52,14" size="296,46" advanced="true">
       <gearDisplay controller="c1" pages="0,1,2"/>

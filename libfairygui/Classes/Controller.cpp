@@ -5,7 +5,7 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-Controller::Controller() :
+GController::GController() :
     changing(false),
     autoRadioGroupDepth(false),
     _parent(nullptr),
@@ -14,11 +14,11 @@ Controller::Controller() :
 {
 }
 
-Controller::~Controller()
+GController::~GController()
 {
 }
 
-void Controller::setSelectedIndex(int value)
+void GController::setSelectedIndex(int value)
 {
     if (_selectedIndex != value)
     {
@@ -36,7 +36,7 @@ void Controller::setSelectedIndex(int value)
     }
 }
 
-const std::string& Controller::getSelectedPage() const
+const std::string& GController::getSelectedPage() const
 {
     if (_selectedIndex == -1)
         return STD_STRING_EMPTY;
@@ -44,7 +44,7 @@ const std::string& Controller::getSelectedPage() const
         return _pageNames[_selectedIndex];
 }
 
-void Controller::setSelectedPage(const std::string & value)
+void GController::setSelectedPage(const std::string & value)
 {
     int i = ToolSet::findInStringArray(_pageNames, value);
     if (i == -1)
@@ -52,7 +52,7 @@ void Controller::setSelectedPage(const std::string & value)
     setSelectedIndex(i);
 }
 
-const std::string& Controller::getSelectedPageId() const
+const std::string& GController::getSelectedPageId() const
 {
     if (_selectedIndex == -1)
         return STD_STRING_EMPTY;
@@ -60,14 +60,14 @@ const std::string& Controller::getSelectedPageId() const
         return _pageIds[_selectedIndex];
 }
 
-void Controller::setSelectedPageId(const std::string & value)
+void GController::setSelectedPageId(const std::string & value)
 {
     int i = ToolSet::findInStringArray(_pageIds, value);
     if (i != -1)
         setSelectedIndex(i);
 }
 
-const std::string& Controller::getPreviousPage() const
+const std::string& GController::getPreviousPage() const
 {
     if (_previousIndex == -1)
         return STD_STRING_EMPTY;
@@ -75,7 +75,7 @@ const std::string& Controller::getPreviousPage() const
         return _pageNames[_previousIndex];
 }
 
-const std::string& Controller::getPreviousPageId() const
+const std::string& GController::getPreviousPageId() const
 {
     if (_previousIndex == -1)
         return STD_STRING_EMPTY;
@@ -83,22 +83,22 @@ const std::string& Controller::getPreviousPageId() const
         return _pageIds[_previousIndex];
 }
 
-int Controller::getPageCount() const
+int GController::getPageCount() const
 {
-    return _pageIds.size();
+    return (int)_pageIds.size();
 }
 
-bool Controller::hasPage(const std::string & aName) const
+bool GController::hasPage(const std::string & aName) const
 {
     return ToolSet::findInStringArray(_pageNames, aName) != -1;
 }
 
-int Controller::getPageIndexById(const std::string & value) const
+int GController::getPageIndexById(const std::string & value) const
 {
     return ToolSet::findInStringArray(_pageIds, value);
 }
 
-const std::string& Controller::getPageNameById(const std::string & value) const
+const std::string& GController::getPageNameById(const std::string & value) const
 {
     int i = ToolSet::findInStringArray(_pageIds, value);
     if (i != -1)
@@ -107,12 +107,12 @@ const std::string& Controller::getPageNameById(const std::string & value) const
         return STD_STRING_EMPTY;
 }
 
-const std::string& Controller::getPageId(int index) const
+const std::string& GController::getPageId(int index) const
 {
     return _pageIds[index];
 }
 
-void Controller::setOppositePageId(const std::string & value)
+void GController::setOppositePageId(const std::string & value)
 {
     int i = ToolSet::findInStringArray(_pageIds, value);
     if (i > 0)
@@ -121,7 +121,7 @@ void Controller::setOppositePageId(const std::string & value)
         setSelectedIndex(1);
 }
 
-void Controller::setup(tinyxml2::XMLElement * xml)
+void GController::setup(TXMLElement * xml)
 {
     const char* p;
 
@@ -136,7 +136,7 @@ void Controller::setup(tinyxml2::XMLElement * xml)
     {
         std::vector<std::string> elems;
         ToolSet::splitString(p, ',', elems);
-        int cnt = elems.size();
+        int cnt = (int)elems.size();
         for (int i = 0; i < cnt; i += 2)
         {
             _pageIds.push_back(elems[i]);
@@ -144,7 +144,7 @@ void Controller::setup(tinyxml2::XMLElement * xml)
         }
     }
 
-    if (_parent != nullptr && _pageIds.size() >= 0)
+    if (_parent != nullptr && _pageIds.size() > 0)
         _selectedIndex = 0;
     else
         _selectedIndex = -1;

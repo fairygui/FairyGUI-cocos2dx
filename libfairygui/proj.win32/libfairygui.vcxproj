@@ -20,6 +20,7 @@
     <ClInclude Include="..\Classes\display\FUISprite.h" />
     <ClInclude Include="..\Classes\DragDropManager.h" />
     <ClInclude Include="..\Classes\event\EventContext.h" />
+    <ClInclude Include="..\Classes\event\HitTest.h" />
     <ClInclude Include="..\Classes\event\InputEvent.h" />
     <ClInclude Include="..\Classes\event\InputProcessor.h" />
     <ClInclude Include="..\Classes\event\UIEventDispatcher.h" />
@@ -81,6 +82,7 @@
     <ClCompile Include="..\Classes\display\FUISprite.cpp" />
     <ClCompile Include="..\Classes\DragDropManager.cpp" />
     <ClCompile Include="..\Classes\event\EventContext.cpp" />
+    <ClCompile Include="..\Classes\event\HitTest.cpp" />
     <ClCompile Include="..\Classes\event\InputEvent.cpp" />
     <ClCompile Include="..\Classes\event\InputProcessor.cpp" />
     <ClCompile Include="..\Classes\event\UIEventDispatcher.cpp" />

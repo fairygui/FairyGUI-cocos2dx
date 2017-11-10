@@ -88,7 +88,15 @@ UIEventDispatcher::UIEventDispatcher() :_dispatching(0)
 
 UIEventDispatcher::~UIEventDispatcher()
 {
-
+    for (auto it = _callbacks.begin(); it != _callbacks.end(); it++)
+    {
+        if (it->eventType == UIEventType::Destroy && it->callback != nullptr)
+        {
+            //Destroy event we dont provide a EventContext.
+            it->callback(nullptr);
+        }
+    }
+    _callbacks.clear();
 }
 
 void UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, const EventTag& tag)
@@ -160,7 +168,8 @@ bool UIEventDispatcher::dispatchEvent(int eventType, Value data)
 
     EventContext context;
     context._sender = this;
-    context._inputEvent = InputProcessor::getRecentInput();
+    if (InputProcessor::_activeProcessor)
+        context._inputEvent = InputProcessor::_activeProcessor->getRecentInput();
     context._data = data;
 
     doDispatch(eventType, &context);
@@ -171,7 +180,8 @@ bool UIEventDispatcher::dispatchEvent(int eventType, Value data)
 bool UIEventDispatcher::bubbleEvent(int eventType, Value data)
 {
     EventContext context;
-    context._inputEvent = InputProcessor::getRecentInput();
+    if (InputProcessor::_activeProcessor)
+        context._inputEvent = InputProcessor::_activeProcessor->getRecentInput();
     context._data = data;
 
     doBubble(eventType, &context);
@@ -195,8 +205,8 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 
     retain();
     context->_sender = this;
-    int cnt = _callbacks.size(); //dont use iterator, because new item would be added in callback.
-    for (int i = 0; i < cnt; i++)
+    size_t cnt = _callbacks.size(); //dont use iterator, because new item would be added in callback.
+    for (size_t i = 0; i < cnt; i++)
     {
         EventCallbackItem& ci = _callbacks[i];
         if (ci.eventType == eventType && ci.callback != nullptr)

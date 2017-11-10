@@ -18,7 +18,7 @@ public:
     PackageItem();
     virtual ~PackageItem();
 
-    void* load();
+    void load();
 
 public:
     UIPackage* owner;
@@ -48,7 +48,7 @@ public:
     float repeatDelay;
 
     //component
-    tinyxml2::XMLDocument* componentData;
+    TXMLDocument* componentData;
     std::vector<DisplayListItem*>* displayList;
     std::function<GComponent*()> extensionCreator;
 
@@ -61,7 +61,7 @@ class DisplayListItem
 public:
     PackageItem* packageItem;
     std::string type;
-    tinyxml2::XMLElement* desc;
+    TXMLElement* desc;
     int listItemCount;
 
     DisplayListItem(PackageItem* pi, std::string type);

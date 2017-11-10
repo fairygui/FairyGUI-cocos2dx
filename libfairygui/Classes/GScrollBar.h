@@ -21,7 +21,7 @@ public:
     float getMinSize();
 
 protected:
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
+    virtual void constructFromXML(TXMLElement* xml) override;
 
 private:
     void onTouchBegin(EventContext* context);

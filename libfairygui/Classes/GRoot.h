@@ -16,9 +16,8 @@ public:
     GRoot();
     ~GRoot();
 
-    CREATE_FUNC(GRoot);
-
-    static GRoot* getInstance();
+    static GRoot* create(cocos2d::Scene* scene, int zOrder = 1000);
+    static GRoot* getInstance() { return _inst; }
 
     void showWindow(Window* win);
     void hideWindow(Window* win);
@@ -30,6 +29,7 @@ public:
     void closeAllWindows();
     Window* getTopWindow();
 
+    GObject* getModalWaitingPane();
     GGraph* getModalLayer();
     bool hasModalWindow();
     bool isModalWaiting();
@@ -51,11 +51,19 @@ public:
     void showTooltipsWin(GObject* tooltipWin);
     void hideTooltips();
 
+    void playSound(const std::string& url, float volumeScale = 1);
+    bool isSoundEnabled() const { return _soundEnabled; }
+    void setSoundEnabled(bool value);
+    float getSoundVolumeScale() const { return _soundVolumeScale; }
+    void setSoundVolumeScale(float value);
+
 protected:
-    virtual void handleInit() override;
     virtual void handlePositionChanged() override;
+    virtual void onEnter() override;
+    virtual void onExit() override;
 
 private:
+    bool initWithScene(cocos2d::Scene* scene, int zOrder);
     void onWindowSizeChanged();
     void createModalLayer();
     void adjustModalLayer();
@@ -65,7 +73,6 @@ private:
 
     CALL_LATER_FUNC(GRoot, doShowTooltipsWin);
 
-    static GRoot* _inst;
     cocos2d::EventListener* _windowSizeListener;
     InputProcessor* _inputProcessor;
 
@@ -75,6 +82,11 @@ private:
     cocos2d::Vector<GObject*> _justClosedPopups;
     GObject* _tooltipWin;
     GObject* _defaultTooltipWin;
+
+    static bool _soundEnabled;
+    static float _soundVolumeScale;
+
+    static GRoot* _inst;
 };
 
 NS_FGUI_END

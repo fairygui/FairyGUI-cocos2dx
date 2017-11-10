@@ -25,7 +25,7 @@ public:
     void copyFrom(const Relations& source);
     void onOwnerSizeChanged(float dWidth, float dHeight);
     bool isEmpty() const;
-    void setup(tinyxml2::XMLElement* xml);
+    void setup(TXMLElement* xml);
 
     GObject* handling;
 

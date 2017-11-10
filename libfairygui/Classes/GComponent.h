@@ -4,13 +4,14 @@
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GObject.h"
-#include "Controller.h"
 #include "Transition.h"
 #include "Margin.h"
+#include "event/HitTest.h"
+#include "display/FUIContainer.h"
 
 NS_FGUI_BEGIN
 
-class Controller;
+class GController;
 class ScrollPane;
 class GGroup;
 
@@ -44,11 +45,18 @@ public:
     int numChildren() const;
     bool isAncestorOf(const GObject* obj) const;
 
-    void addController(Controller* c);
-    Controller* getController(const std::string& name) const;
-    void removeController(Controller* c);
-    void applyController(Controller* c);
+    virtual bool isChildInView(GObject* child);
+    virtual int getFirstChildInView();
+
+    void addController(GController* c);
+    GController* getController(const std::string& name) const;
+    const cocos2d::Vector<GController*>& getControllers() const { return _controllers; }
+    void removeController(GController* c);
+    void applyController(GController* c);
     void applyAllControllers();
+
+    Transition* getTransition(const std::string& name) const;
+    const cocos2d::Vector<Transition*>& getTransitions() const { return _transitions; }
 
     bool getOpaque() const { return _opaque; }
     void setOpaque(bool value);
@@ -64,6 +72,9 @@ public:
     cocos2d::Node* getMask() const;
     void setMask(cocos2d::Node* value, bool inverted = false);
 
+    IHitTest* getHitArea() const { return _hitArea; }
+    void setHitArea(IHitTest* value);
+
     ScrollPane* getScrollPane() const { return _scrollPane; }
 
     float getViewWidth() const;
@@ -74,13 +85,13 @@ public:
     void setBoundsChangedFlag();
     void ensureBoundsCorrect();
 
-    virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera) override;
+    virtual GObject* hitTest(const cocos2d::Vec2 & worldPoint, const cocos2d::Camera * camera) override;
     virtual cocos2d::Vec2 getSnappingPosition(const cocos2d::Vec2& pt);
 
     //internal use
     void childSortingOrderChanged(GObject* child, int oldValue, int newValue);
     void childStateChanged(GObject * child);
-    void adjustRadioGroupDepth(GObject* obj, Controller* c);
+    void adjustRadioGroupDepth(GObject* obj, GController* c);
 
     virtual void constructFromResource() override;
     void constructFromResource(std::vector<GObject*>* objectPool, int poolIndex);
@@ -88,12 +99,15 @@ public:
     bool _buildingDisplayList;
 
 protected:
-    virtual void constructFromXML(tinyxml2::XMLElement* xml);
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void constructFromXML(TXMLElement* xml);
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
     virtual void handleGrayedChanged() override;
-    virtual void handleControllerChanged(Controller* c) override;
+    virtual void handleControllerChanged(GController* c) override;
+
+    virtual void onEnter() override;
+    virtual void onExit() override;
 
     virtual void updateBounds();
     void setBounds(float ax, float ay, float aw, float ah);
@@ -105,9 +119,9 @@ protected:
         const std::string& headerRes, const std::string& footerRes);
 
     cocos2d::Vector<GObject*> _children;
-    cocos2d::Vector<Controller*> _controllers;
+    cocos2d::Vector<GController*> _controllers;
     cocos2d::Vector<Transition*> _transitions;
-    cocos2d::Node* _container;
+    FUIInnerContainer* _container;
     ScrollPane* _scrollPane;
     Margin _margin;
     cocos2d::Vec2 _alignOffset;
@@ -116,17 +130,20 @@ protected:
     bool _boundsChanged;
     bool _trackBounds;
     GObject* _maskOwner;
+    IHitTest* _hitArea;
 
 private:
     int getInsertPosForSortingChild(GObject * target);
     int moveChild(GObject* child, int oldIndex, int index);
+
+    void addAdoptiveChild(GObject* child);
 
     CALL_LATER_FUNC(GComponent, doUpdateBounds);
     CALL_LATER_FUNC(GComponent, buildNativeDisplayList);
 
     bool _opaque;
     int _sortingChildCount;
-    Controller* _applyingController;
+    GController* _applyingController;
 
     friend class ScrollPane;
 };

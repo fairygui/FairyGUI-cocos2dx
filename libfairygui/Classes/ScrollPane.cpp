@@ -9,12 +9,11 @@ USING_NS_CC;
 ScrollPane* ScrollPane::_draggingPane = nullptr;
 int ScrollPane::_gestureFlag = 0;
 
-const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
-const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
-const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+const float TWEEN_TIME_GO = 0.5f; //tween time for SetPos(ani)
+const float TWEEN_TIME_DEFAULT = 0.3f; //min tween time for inertial scroll
+const float PULL_RATIO = 0.5f; //pull down/up ratio
 
 inline float sp_getField(const Vec2& pt, int axis) { return axis == 0 ? pt.x : pt.y; }
-inline float sp_getField_reverseY(const Vec2& pt, int axis) { return axis == 0 ? pt.x : -pt.y; }
 inline float sp_getField(const cocos2d::Size& sz, int axis) { return axis == 0 ? sz.width : sz.height; }
 void sp_setField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x = value; else pt.y = value; }
 void sp_setField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width = value; else sz.height = value; }
@@ -23,7 +22,8 @@ void sp_incField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.w
 
 inline float sp_EaseFunc(float t, float d)
 {
-    return (t = t / d - 1) * t * t + 1;//cubicOut
+    t = t/d - 1;
+    return t * t * t + 1;//cubicOut
 }
 
 ScrollPane::ScrollPane(GComponent* owner,
@@ -58,8 +58,8 @@ ScrollPane::ScrollPane(GComponent* owner,
     _maskContainer->setCascadeOpacityEnabled(true);
     _owner->displayObject()->addChild(_maskContainer);
 
-    _container = _owner->displayObject()->getChildren().at(0);
-    _container->setPosition(0, 0);
+    _container = (FUIInnerContainer*)_owner->displayObject()->getChildren().at(0);
+    _container->setPosition2(0, 0);
     _container->removeFromParent();
     _maskContainer->addChild(_container, 1);
 
@@ -88,7 +88,7 @@ ScrollPane::ScrollPane(GComponent* owner,
     _inertiaDisabled = (flags & 256) != 0;
     _maskDisabled = (flags & 512) != 0;
     if (_maskDisabled)
-        ((ClippingRectangleNode*)_maskContainer)->setClippingEnabled(false);
+        _maskContainer->setClippingEnabled(false);
 
     _scrollBarVisible = true;
     _mouseWheelEnabled = true;
@@ -117,9 +117,7 @@ ScrollPane::ScrollPane(GComponent* owner,
                 {
                     _vtScrollBar->retain();
                     _vtScrollBar->setScrollPane(this, true);
-                    _owner->displayObject()->addChild(_vtScrollBar->displayObject());
-                    _vtScrollBar->_parent = _owner;
-                    _vtScrollBar->_directToParent = true;
+                    _owner->addAdoptiveChild(_vtScrollBar);
                 }
             }
         }
@@ -135,9 +133,7 @@ ScrollPane::ScrollPane(GComponent* owner,
                 {
                     _hzScrollBar->retain();
                     _hzScrollBar->setScrollPane(this, false);
-                    _owner->displayObject()->addChild(_hzScrollBar->displayObject());
-                    _hzScrollBar->_parent = _owner;
-                    _hzScrollBar->_directToParent = true;
+                    _owner->addAdoptiveChild(_hzScrollBar);
                 }
             }
         }
@@ -166,8 +162,8 @@ ScrollPane::ScrollPane(GComponent* owner,
         else
         {
             _header->retain();
-            _header->_parent = _owner;
-            _header->_directToParent = true;
+            _header->setVisible(false);
+            _owner->addAdoptiveChild(_header);
         }
     }
 
@@ -179,8 +175,8 @@ ScrollPane::ScrollPane(GComponent* owner,
         else
         {
             _footer->retain();
-            _footer->_parent = _owner;
-            _footer->_directToParent = true;
+            _footer->setVisible(false);
+            _owner->addAdoptiveChild(_footer);
         }
     }
 
@@ -385,7 +381,7 @@ bool ScrollPane::isChildInView(GObject * obj) const
 {
     if (_overlapSize.height > 0)
     {
-        float dist = obj->getY() + (-_container->getPositionY());
+        float dist = obj->getY() + _container->getPositionY2();
         if (dist < -obj->getHeight() - 20 || dist > _viewSize.height + 20)
             return false;
     }
@@ -445,7 +441,7 @@ float ScrollPane::getScrollingPosX() const
 
 float ScrollPane::getScrollingPosY() const
 {
-    return clampf(-(-_container->getPositionY()), 0, _overlapSize.height);
+    return clampf(-_container->getPositionY2(), 0, _overlapSize.height);
 }
 
 void ScrollPane::setViewWidth(float value)
@@ -469,7 +465,7 @@ void ScrollPane::lockHeader(int size)
     if (_headerLockedSize == size)
         return;
 
-    Vec2 cpos = Vec2(_container->getPositionX(), -_container->getPositionY());
+    Vec2 cpos = _container->getPosition2();
 
     _headerLockedSize = size;
     if (!_owner->isDispatchingEvent(UIEventType::PullDownRelease)
@@ -491,7 +487,7 @@ void ScrollPane::lockFooter(int size)
     if (_footerLockedSize == size)
         return;
 
-    Vec2 cpos = Vec2(_container->getPositionX(), -_container->getPositionY());
+    Vec2 cpos = _container->getPosition2();
 
     _footerLockedSize = size;
     if (!_owner->isDispatchingEvent(UIEventType::PullUpRelease)
@@ -522,7 +518,7 @@ void ScrollPane::cancelDragging()
     _isMouseMoved = false;
 }
 
-void ScrollPane::handleControllerChanged(Controller * c)
+void ScrollPane::handleControllerChanged(GController * c)
 {
     if (_pageController == c)
     {
@@ -544,8 +540,8 @@ void ScrollPane::updatePageController()
             index = getPageY();
         if (index < _pageController->getPageCount())
         {
-            Controller* c = _pageController;
-            _pageController = nullptr; //防止HandleControllerChanged的调用
+            GController* c = _pageController;
+            _pageController = nullptr; //avoid calling handleControllerChanged
             c->setSelectedIndex(index);
             _pageController = c;
         }
@@ -563,7 +559,7 @@ void ScrollPane::adjustMaskContainer()
     mx += _owner->_alignOffset.x;
     my += _owner->_alignOffset.y;
 
-    _maskContainer->setPosition(Vec2(mx, _owner->getHeight() - my));
+    _maskContainer->setPosition(Vec2(mx, _owner->getHeight() - _viewSize.height - my));
 }
 
 void ScrollPane::onOwnerSizeChanged()
@@ -576,7 +572,7 @@ void ScrollPane::setSize(float wv, float hv)
 {
     if (_hzScrollBar != nullptr)
     {
-        _hzScrollBar->setY(hv -_hzScrollBar->getHeight());
+        _hzScrollBar->setY(hv - _hzScrollBar->getHeight());
         if (_vtScrollBar != nullptr)
         {
             _hzScrollBar->setWidth(wv - _vtScrollBar->getWidth() - _scrollBarMargin.left - _scrollBarMargin.right);
@@ -640,7 +636,6 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
 
     if (_tweening == 1)
     {
-        //如果原来滚动位置是贴边，加入处理继续贴边。
         if (deltaWidth != 0 && isRightmost && _tweenChange.x < 0)
         {
             _xPos = _overlapSize.width;
@@ -655,7 +650,6 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
     }
     else if (_tweening == 2)
     {
-        //重新调整起始位置，确保能够顺滑滚下去
         if (deltaPosX != 0)
         {
             _container->setPositionX(_container->getPositionX() - deltaPosX);
@@ -664,9 +658,9 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
         }
         if (deltaPosY != 0)
         {
-            _container->setPositionY(-(-_container->getPositionY() - deltaPosY));
+            _container->setPositionY2(_container->getPositionY2() - deltaPosY);
             _tweenStart.y -= deltaPosY;
-            _yPos = -(-_container->getPositionY());
+            _yPos = -_container->getPositionY2();
         }
     }
     else if (_isMouseMoved)
@@ -679,14 +673,13 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
         }
         if (deltaPosY != 0)
         {
-            _container->setPositionY(-((-_container->getPositionY()) - deltaPosY));
+            _container->setPositionY2(_container->getPositionY2() - deltaPosY);
             _containerPos.y -= deltaPosY;
-            _yPos = -(-_container->getPositionY());
+            _yPos = -_container->getPositionY2();
         }
     }
     else
     {
-        //如果原来滚动位置是贴边，加入处理继续贴边。
         if (deltaWidth != 0 && isRightmost)
         {
             _xPos = _overlapSize.width;
@@ -696,7 +689,7 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
         if (deltaHeight != 0 && isBottom)
         {
             _yPos = _overlapSize.height;
-            _container->setPositionY(-(-_container->getPositionY() - _yPos));
+            _container->setPositionY2(_container->getPositionY2() - _yPos);
         }
     }
 
@@ -775,7 +768,17 @@ void ScrollPane::handleSizeChanged()
         }
     }
 
-    ((ClippingRectangleNode*)_maskContainer)->setClippingRegion(Rect(Vec2(0, -_viewSize.height), _viewSize));
+    _maskContainer->setContentSize(_viewSize);
+    _maskContainer->setClippingRegion(Rect(Vec2::ZERO, _viewSize));
+
+    if (_vtScrollBar)
+        _vtScrollBar->handlePositionChanged();
+    if (_hzScrollBar)
+        _hzScrollBar->handlePositionChanged();
+    if (_header)
+        _header->handlePositionChanged();
+    if (_footer)
+        _footer->handlePositionChanged();
 
     if (_scrollType == ScrollType::HORIZONTAL || _scrollType == ScrollType::BOTH)
         _overlapSize.width = ceil(MAX(0, _contentSize.width - _viewSize.width));
@@ -786,7 +789,7 @@ void ScrollPane::handleSizeChanged()
     else
         _overlapSize.height = 0;
 
-    //边界检查
+
     _xPos = clampf(_xPos, 0, _overlapSize.width);
     _yPos = clampf(_yPos, 0, _overlapSize.height);
     float max = sp_getField(_overlapSize, _refreshBarAxis);
@@ -795,11 +798,11 @@ void ScrollPane::handleSizeChanged()
     else
         max += _footerLockedSize;
     if (_refreshBarAxis == 0)
-        _container->setPosition(clampf(_container->getPositionX(), -max, _headerLockedSize),
-            -clampf(-_container->getPositionY(), -_overlapSize.height, 0));
+        _container->setPosition2(clampf(_container->getPositionX(), -max, _headerLockedSize),
+            clampf(_container->getPositionY2(), -_overlapSize.height, 0));
     else
-        _container->setPosition(clampf(_container->getPositionX(), -_overlapSize.width, 0),
-            -clampf(-_container->getPositionY(), -max, _headerLockedSize));
+        _container->setPosition2(clampf(_container->getPositionX(), -_overlapSize.width, 0),
+            clampf(_container->getPositionY2(), -max, _headerLockedSize));
 
     if (_header != nullptr)
     {
@@ -856,7 +859,6 @@ GObject* ScrollPane::hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * c
 
 void ScrollPane::posChanged(bool ani)
 {
-    //只要有1处要求不要缓动，那就不缓动
     if (_aniFlag == 0)
         _aniFlag = ani ? 1 : -1;
     else if (_aniFlag == 1 && !ani)
@@ -882,7 +884,7 @@ void ScrollPane::refresh()
     refresh2();
 
     _owner->dispatchEvent(UIEventType::Scroll);
-    if (_needRefresh) //在onScroll事件里开发者可能修改位置，这里再刷新一次，避免闪烁
+    if (_needRefresh) //pos may change in onScroll
     {
         _needRefresh = false;
         CALL_LATER_CANCEL(ScrollPane, refresh);
@@ -912,18 +914,17 @@ void ScrollPane::refresh2()
             pos.y = -(int)_yPos;
         else
         {
-            if (_container->getPositionY() != 0)
-                _container->setPositionY(0);
+            if (_container->getPositionY2() != 0)
+                _container->setPositionY2(0);
             pos.y = 0;
         }
 
-        if (pos.x != _container->getPositionX() || pos.y != (-_container->getPositionY()))
+        if (pos.x != _container->getPositionX() || pos.y != _container->getPositionY2())
         {
             _tweening = 1;
             _tweenTime.setZero();
             _tweenDuration.set(TWEEN_TIME_GO, TWEEN_TIME_GO);
-            _tweenStart = _container->getPosition();
-            _tweenStart.y = -_tweenStart.y;
+            _tweenStart = _container->getPosition2();
             _tweenChange = pos - _tweenStart;
             CALL_PER_FRAME(ScrollPane, tweenUpdate);
         }
@@ -935,7 +936,7 @@ void ScrollPane::refresh2()
         if (_tweening != 0)
             killTween();
 
-        _container->setPosition(Vec2((int)-_xPos, (int)_yPos));
+        _container->setPosition2(Vec2((int)-_xPos, (int)-_yPos));
 
         loopCheckingCurrent();
     }
@@ -948,7 +949,7 @@ void ScrollPane::syncScrollBar(bool end)
 {
     if (_vtScrollBar != nullptr)
     {
-        _vtScrollBar->setScrollPerc(_overlapSize.height == 0 ? 0 : clampf(-(-_container->getPositionY()), 0, _overlapSize.height) / _overlapSize.height);
+        _vtScrollBar->setScrollPerc(_overlapSize.height == 0 ? 0 : clampf(-_container->getPositionY2(), 0, _overlapSize.height) / _overlapSize.height);
         if (_scrollBarDisplayAuto)
             showScrollBar(!end);
     }
@@ -1017,7 +1018,7 @@ bool ScrollPane::loopCheckingCurrent()
     }
 
     if (changed)
-        _container->setPosition(Vec2((int)-_xPos, (int)_yPos));
+        _container->setPosition2(Vec2((int)-_xPos, (int)-_yPos));
 
     return changed;
 }
@@ -1091,7 +1092,7 @@ void ScrollPane::loopCheckingNewPos(float & value, int axis)
         if (axis == 0)
             _container->setPositionX(-(int)pos);
         else
-            _container->setPositionY((int)pos);
+            _container->setPositionY2(-(int)pos);
     }
 }
 
@@ -1126,29 +1127,26 @@ float ScrollPane::alignByPage(float pos, int axis, bool inertialScrolling)
     else
     {
         page = floor(-pos / pageSize);
-        float change = inertialScrolling ? (pos - sp_getField(_containerPos, axis)) : (pos - sp_getField_reverseY(_container->getPosition(), axis));
+        float change = inertialScrolling ? (pos - sp_getField(_containerPos, axis)) : (pos - sp_getField(_container->getPosition2(), axis));
         float testPageSize = MIN(pageSize, contentSize - (page + 1) * pageSize);
         float delta = -pos - page * pageSize;
 
-        //页面吸附策略
-        if (abs(change) > pageSize)//如果滚动距离超过1页,则需要超过页面的一半，才能到更下一页
+        if (std::abs(change) > pageSize)
         {
             if (delta > testPageSize * 0.5f)
                 page++;
         }
-        else //否则只需要页面的1/3，当然，需要考虑到左移和右移的情况
+        else
         {
             if (delta > testPageSize * (change < 0 ? 0.3f : 0.7f))
                 page++;
         }
 
-        //重新计算终点
         pos = -page * pageSize;
-        if (pos < -overlapSize) //最后一页未必有pageSize那么大
+        if (pos < -overlapSize)
             pos = -overlapSize;
     }
 
-    //惯性滚动模式下，会增加判断尽量不要滚动超过一页
     if (inertialScrolling)
     {
         float oldPos = sp_getField(_tweenStart, axis);
@@ -1192,11 +1190,8 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
         pos = -sp_getField(_overlapSize, axis);
     else
     {
-        //以屏幕像素为基准
-        float v2 = abs(v) * _velocityScale;
+        float v2 = std::abs(v) * _velocityScale;
         float ratio = 0;
-        //在移动设备上，需要对不同分辨率做一个适配，我们的速度判断以1136分辨率为基准
-        //这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
 #ifdef CC_PLATFORM_PC
         if (v2 > 500)
             ratio = pow((v2 - 500) / 500, 2);
@@ -1213,7 +1208,7 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
         {
             if (v2 > 1000)
                 ratio = pow((v2 - 1000) / 1000, 2);
-    }
+        }
 #endif
 
         if (ratio != 0)
@@ -1225,12 +1220,7 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
             v *= ratio;
             sp_setField(_velocity, axis, v);
 
-            //算法：v*（_decelerationRate的n次幂）= 60，即在n帧后速度降为60（假设每秒60帧）。
             duration = log(60 / v2) / log(_decelerationRate) / 60;
-
-            //计算距离要使用本地速度
-            //理论公式貌似滚动的距离不够，改为经验公式
-            //float change = (int)((v/ 60 - 1) / (1 - _decelerationRate));
             float change = (int)(v * duration * 0.4f);
             pos += change;
         }
@@ -1246,10 +1236,10 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
 void ScrollPane::fixDuration(int axis, float oldChange)
 {
     float tweenChange = sp_getField(_tweenChange, axis);
-    if (tweenChange == 0 || abs(tweenChange) >= abs(oldChange))
+    if (tweenChange == 0 || std::abs(tweenChange) >= std::abs(oldChange))
         return;
 
-    float newDuration = abs(tweenChange / oldChange) * sp_getField(_tweenDuration, axis);
+    float newDuration = std::abs(tweenChange / oldChange) * sp_getField(_tweenDuration, axis);
     if (newDuration < TWEEN_TIME_DEFAULT)
         newDuration = TWEEN_TIME_DEFAULT;
 
@@ -1258,11 +1248,10 @@ void ScrollPane::fixDuration(int axis, float oldChange)
 
 void ScrollPane::killTween()
 {
-    if (_tweening == 1) //取消类型为1的tween需立刻设置到终点
+    if (_tweening == 1)
     {
         Vec2 t = _tweenStart + _tweenChange;
-        t.y = -t.y;
-        _container->setPosition(t);
+        _container->setPosition2(t);
         _owner->dispatchEvent(UIEventType::Scroll);
     }
 
@@ -1276,13 +1265,12 @@ void ScrollPane::checkRefreshBar()
     if (_header == nullptr && _footer == nullptr)
         return;
 
-    float pos = sp_getField_reverseY(_container->getPosition(), _refreshBarAxis);
+    float pos = sp_getField(_container->getPosition2(), _refreshBarAxis);
     if (_header != nullptr)
     {
         if (pos > 0)
         {
-            if (_header->displayObject()->getParent() == nullptr)
-                _maskContainer->addChild(_header->displayObject(), 0);
+            _header->setVisible(true);
             Vec2 vec;
 
             vec = _header->getSize();
@@ -1290,19 +1278,15 @@ void ScrollPane::checkRefreshBar()
             _header->setSize(vec.x, vec.y);
         }
         else
-        {
-            if (_header->displayObject()->getParent() != nullptr)
-                _maskContainer->removeChild(_header->displayObject());
-        }
+            _header->setVisible(false);
     }
 
     if (_footer != nullptr)
     {
         float max = sp_getField(_overlapSize, _refreshBarAxis);
-        if (pos < -max || max == 0 && _footerLockedSize > 0)
+        if (pos < -max || (max == 0 && _footerLockedSize > 0))
         {
-            if (_footer->displayObject()->getParent() == nullptr)
-                _maskContainer->addChild(_footer->displayObject(), 0);
+            _footer->setVisible(true);
 
             Vec2 vec;
 
@@ -1323,10 +1307,7 @@ void ScrollPane::checkRefreshBar()
             _footer->setSize(vec.x, vec.y);
         }
         else
-        {
-            if (_footer->displayObject()->getParent() != nullptr)
-                _maskContainer->removeChild(_footer->displayObject());
-        }
+            _footer->setVisible(false);
     }
 }
 
@@ -1335,7 +1316,7 @@ void ScrollPane::tweenUpdate(float dt)
     float nx = runTween(0, dt);
     float ny = runTween(1, dt);
 
-    _container->setPosition(nx, -ny);
+    _container->setPosition2(nx, ny);
 
     if (_tweening == 2)
     {
@@ -1401,16 +1382,16 @@ float ScrollPane::runTween(int axis, float dt)
 
         if (_tweening == 2 && _bouncebackEffect)
         {
-            if (newValue > 20 + threshold1 && sp_getField(_tweenChange, axis) > 0
-                || newValue > threshold1 && sp_getField(_tweenChange, axis) == 0)//开始回弹
+            if ((newValue > 20 + threshold1 && sp_getField(_tweenChange, axis) > 0)
+                || (newValue > threshold1 && sp_getField(_tweenChange, axis) == 0))
             {
                 sp_setField(_tweenTime, axis, 0);
                 sp_setField(_tweenDuration, axis, TWEEN_TIME_DEFAULT);
                 sp_setField(_tweenChange, axis, -newValue + threshold1);
                 sp_setField(_tweenStart, axis, newValue);
             }
-            else if (newValue < threshold2 - 20 && sp_getField(_tweenChange, axis) < 0
-                || newValue < threshold2 && sp_getField(_tweenChange, axis) == 0)//开始回弹
+            else if ((newValue < threshold2 - 20 && sp_getField(_tweenChange, axis) < 0)
+                || (newValue < threshold2 && sp_getField(_tweenChange, axis) == 0))
             {
                 sp_setField(_tweenTime, axis, 0);
                 sp_setField(_tweenDuration, axis, TWEEN_TIME_DEFAULT);
@@ -1433,7 +1414,7 @@ float ScrollPane::runTween(int axis, float dt)
         }
     }
     else
-        newValue = sp_getField_reverseY(_container->getPosition(), axis);
+        newValue = sp_getField(_container->getPosition2(), axis);
 
     return newValue;
 }
@@ -1452,14 +1433,12 @@ void ScrollPane::onTouchBegin(EventContext * context)
         killTween();
         evt->getProcessor()->cancelClick(evt->getTouchId());
 
-        //立刻停止惯性滚动，可能位置不对齐，设定这个标志，使touchEnd时归位
         _isMouseMoved = true;
     }
     else
         _isMouseMoved = false;
 
-    _containerPos = _container->getPosition();
-    _containerPos.y = -_containerPos.y;
+    _containerPos = _container->getPosition2();
     _beginTouchPos = _lastTouchPos = pt;
     _lastTouchGlobalPos = evt->getPosition();
     _isHoldAreaDone = false;
@@ -1473,7 +1452,7 @@ void ScrollPane::onTouchMove(EventContext * context)
     if (!_touchEffect)
         return;
 
-    if (_draggingPane != nullptr && _draggingPane != this || GObject::_draggingObject != nullptr) //已经有其他拖动
+    if ((_draggingPane != nullptr && _draggingPane != this) || GObject::getDraggingObject() != nullptr)
         return;
 
     InputEvent* evt = context->getInput();
@@ -1493,17 +1472,16 @@ void ScrollPane::onTouchMove(EventContext * context)
     {
         if (!_isHoldAreaDone)
         {
-            //表示正在监测垂直方向的手势
             _gestureFlag |= 1;
 
-            diff = abs(_beginTouchPos.y - pt.y);
+            diff = std::abs(_beginTouchPos.y - pt.y);
             if (diff < sensitivity)
                 return;
 
-            if ((_gestureFlag & 2) != 0) //已经有水平方向的手势在监测，那么我们用严格的方式检查是不是按垂直方向移动，避免冲突
+            if ((_gestureFlag & 2) != 0)
             {
-                float diff2 = abs(_beginTouchPos.x - pt.x);
-                if (diff < diff2) //不通过则不允许滚动了
+                float diff2 = std::abs(_beginTouchPos.x - pt.x);
+                if (diff < diff2)
                     return;
             }
         }
@@ -1516,13 +1494,13 @@ void ScrollPane::onTouchMove(EventContext * context)
         {
             _gestureFlag |= 2;
 
-            diff = abs(_beginTouchPos.x - pt.x);
+            diff = std::abs(_beginTouchPos.x - pt.x);
             if (diff < sensitivity)
                 return;
 
             if ((_gestureFlag & 1) != 0)
             {
-                float diff2 = abs(_beginTouchPos.y - pt.y);
+                float diff2 = std::abs(_beginTouchPos.y - pt.y);
                 if (diff < diff2)
                     return;
             }
@@ -1536,10 +1514,10 @@ void ScrollPane::onTouchMove(EventContext * context)
 
         if (!_isHoldAreaDone)
         {
-            diff = abs(_beginTouchPos.y - pt.y);
+            diff = std::abs(_beginTouchPos.y - pt.y);
             if (diff < sensitivity)
             {
-                diff = abs(_beginTouchPos.x - pt.x);
+                diff = std::abs(_beginTouchPos.x - pt.x);
                 if (diff < sensitivity)
                     return;
             }
@@ -1557,23 +1535,23 @@ void ScrollPane::onTouchMove(EventContext * context)
         if (newPos.y > 0)
         {
             if (!_bouncebackEffect || _inertiaDisabled)
-                _container->setPositionY(0);
+                _container->setPositionY2(0);
             else if (_header != nullptr && _header->maxSize.height != 0)
-                _container->setPositionY(-((int)MIN(newPos.y * 0.5f, _header->maxSize.height)));
+                _container->setPositionY2(((int)MIN(newPos.y * 0.5f, _header->maxSize.height)));
             else
-                _container->setPositionY(-((int)MIN(newPos.y * 0.5f, _viewSize.height * PULL_RATIO)));
+                _container->setPositionY2(((int)MIN(newPos.y * 0.5f, _viewSize.height * PULL_RATIO)));
         }
         else if (newPos.y < -_overlapSize.height)
         {
             if (!_bouncebackEffect || _inertiaDisabled)
-                _container->setPositionY(_overlapSize.height);
+                _container->setPositionY2(-_overlapSize.height);
             else if (_footer != nullptr && _footer->maxSize.height > 0)
-                _container->setPositionY(-((int)MAX((newPos.y + _overlapSize.height) * 0.5f, -_footer->maxSize.height) - _overlapSize.height));
+                _container->setPositionY2(((int)MAX((newPos.y + _overlapSize.height) * 0.5f, -_footer->maxSize.height) - _overlapSize.height));
             else
-                _container->setPositionY(-((int)MAX((newPos.y + _overlapSize.height) * 0.5f, -_viewSize.height * PULL_RATIO) - _overlapSize.height));
+                _container->setPositionY2(((int)MAX((newPos.y + _overlapSize.height) * 0.5f, -_viewSize.height * PULL_RATIO) - _overlapSize.height));
         }
         else
-            _container->setPositionY(-newPos.y);
+            _container->setPositionY2(newPos.y);
     }
 
     if (sh)
@@ -1600,10 +1578,10 @@ void ScrollPane::onTouchMove(EventContext * context)
             _container->setPositionX(newPos.x);
     }
 
-    //更新速度
     auto deltaTime = Director::getInstance()->getDeltaTime();
-    float elapsed = (clock() - _lastMoveTime) * 60 - 1;
-    if (elapsed > 1) //速度衰减
+    float elapsed_t = (clock() - _lastMoveTime) / CLOCKS_PER_SEC;
+    float elapsed = elapsed_t * 60 - 1;
+    if (elapsed > 1)
         _velocity = _velocity * pow(0.833f, elapsed);
     Vec2 deltaPosition = pt - _lastTouchPos;
     if (!sh)
@@ -1612,32 +1590,26 @@ void ScrollPane::onTouchMove(EventContext * context)
         deltaPosition.y = 0;
     _velocity = _velocity.lerp(deltaPosition / deltaTime, deltaTime * 10);
 
-    /*速度计算使用的是本地位移，但在后续的惯性滚动判断中需要用到屏幕位移，所以这里要记录一个位移的比例。
-    *后续的处理要使用这个比例但不使用坐标转换的方法的原因是，在曲面UI等异形UI中，还无法简单地进行屏幕坐标和本地坐标的转换。
-    */
     Vec2 deltaGlobalPosition = _lastTouchGlobalPos - evt->getPosition();
     if (deltaPosition.x != 0)
-        _velocityScale = abs(deltaGlobalPosition.x / deltaPosition.x);
+        _velocityScale = std::abs(deltaGlobalPosition.x / deltaPosition.x);
     else if (deltaPosition.y != 0)
-        _velocityScale = abs(deltaGlobalPosition.y / deltaPosition.y);
+        _velocityScale = std::abs(deltaGlobalPosition.y / deltaPosition.y);
 
     _lastTouchPos = pt;
     _lastTouchGlobalPos = evt->getPosition();
     _lastMoveTime = clock();
 
-    //同步更新pos值
     if (_overlapSize.width > 0)
         _xPos = clampf(-_container->getPositionX(), 0, _overlapSize.width);
     if (_overlapSize.height > 0)
-        _yPos = clampf(-(-_container->getPositionY()), 0, _overlapSize.height);
+        _yPos = clampf(-_container->getPositionY2(), 0, _overlapSize.height);
 
-    //循环滚动特别检查
     if (_loop != 0)
     {
-        newPos = _container->getPosition();
-        newPos.y = -newPos.y;
+        newPos = _container->getPosition2();
         if (loopCheckingCurrent())
-            _containerPos += Vec2(_container->getPositionX(), -_container->getPositionY()) - newPos;
+            _containerPos += _container->getPosition2() - newPos;
     }
 
     _draggingPane = this;
@@ -1653,8 +1625,6 @@ void ScrollPane::onTouchMove(EventContext * context)
 
 void ScrollPane::onTouchEnd(EventContext * context)
 {
-    InputEvent* evt = context->getInput();
-
     if (_draggingPane == this)
         _draggingPane = nullptr;
 
@@ -1667,8 +1637,7 @@ void ScrollPane::onTouchEnd(EventContext * context)
     }
 
     _isMouseMoved = false;
-    _tweenStart = _container->getPosition();
-    _tweenStart.y = -_tweenStart.y;
+    _tweenStart = _container->getPosition2();
 
     Vec2 endPos = _tweenStart;
     bool flag = false;
@@ -1682,12 +1651,12 @@ void ScrollPane::onTouchEnd(EventContext * context)
         endPos.x = -_overlapSize.width;
         flag = true;
     }
-    if (-_container->getPositionY() > 0)
+    if (_container->getPositionY2() > 0)
     {
         endPos.y = 0;
         flag = true;
     }
-    else if (-_container->getPositionY() < -_overlapSize.height)
+    else if (_container->getPositionY2() < -_overlapSize.height)
     {
         endPos.y = -_overlapSize.height;
         flag = true;
@@ -1721,16 +1690,14 @@ void ScrollPane::onTouchEnd(EventContext * context)
     }
     else
     {
-        //更新速度
-        float elapsed = (clock() - _lastMoveTime) * 60 - 1;
+        float elapsed_t = (clock() - _lastMoveTime) / CLOCKS_PER_SEC;
+        float elapsed = elapsed_t * 60 - 1;
         if (elapsed > 1)
             _velocity = _velocity * pow(0.833f, elapsed);
 
-        //根据速度计算目标位置和需要时间
         endPos = updateTargetAndDuration(_tweenStart);
         Vec2 oldChange = endPos - _tweenStart;
 
-        //调整目标位置
         loopCheckingTarget(endPos);
         if (_pageMode || _snapToItem)
             alignPosition(endPos, true);
@@ -1739,7 +1706,6 @@ void ScrollPane::onTouchEnd(EventContext * context)
         if (_tweenChange.x == 0 && _tweenChange.y == 0)
             return;
 
-        //如果目标位置已调整，随之调整需要时间
         if (_pageMode || _snapToItem)
         {
             fixDuration(0, oldChange.x);

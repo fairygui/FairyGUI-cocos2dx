@@ -2,17 +2,18 @@
 #include "GComponent.h"
 #include "InputEvent.h"
 #include "GRoot.h"
+#include "GRichTextField.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-InputEvent InputProcessor::_recentInput;
+InputProcessor* InputProcessor::_activeProcessor = nullptr;
 
 static UIEventDispatcher* __null_monitor__ = new UIEventDispatcher();
-static bool __hook_mouse_event__ = false;
 static cocos2d::EventMouse::MouseButton __mouseButton__ = EventMouse::MouseButton::BUTTON_LEFT;
 
 #ifdef CC_PLATFORM_PC
+static bool __hook_mouse_event__ = false;
 void __hook_onGLFWMouseCallBack__(GLFWwindow *window, int button, int action, int p)
 {
     if (action == GLFW_PRESS || action == GLFW_RELEASE)
@@ -29,6 +30,7 @@ void __hook_onGLFWMouseCallBack__(GLFWwindow *window, int button, int action, in
 InputProcessor::InputProcessor(GComponent* owner)
 {
     _owner = owner;
+    _recentInput._inputProcessor = this;
 
 #ifdef CC_PLATFORM_PC
     if (!__hook_mouse_event__)
@@ -114,7 +116,6 @@ void InputProcessor::updateRecentInput(TouchInfo* ti)
     _recentInput._mouseWheelDelta = ti->mouseWheelDelta;
     _recentInput._touch = ti->touch;
     _recentInput._touchId = ti->touch ? ti->touchId : -1;
-    _recentInput._inputProcessor = this;
 }
 
 void InputProcessor::handleRollOver(TouchInfo* touch)
@@ -134,7 +135,7 @@ void InputProcessor::handleRollOver(TouchInfo* touch)
         CC_SAFE_RETAIN(touch->lastRollOver);
 
     element = touch->target;
-    int i;
+    size_t i;
     while (element != nullptr)
     {
         auto iter = std::find(_rollOutChain.cbegin(), _rollOutChain.cend(), element);
@@ -148,7 +149,7 @@ void InputProcessor::handleRollOver(TouchInfo* touch)
         element = element->getParent();
     }
 
-    int cnt = _rollOutChain.size();
+    size_t cnt = _rollOutChain.size();
     if (cnt > 0)
     {
         for (i = 0; i < cnt; i++)
@@ -184,7 +185,7 @@ void InputProcessor::removeTouchMonitor(UIEventDispatcher * target)
 {
     for (auto it = _touches.cbegin(); it != _touches.cend(); ++it)
     {
-        int i = (*it)->touchMonitors.getIndex(target);
+        ssize_t i = (*it)->touchMonitors.getIndex(target);
         if (i != -1)
             (*it)->touchMonitors.replace(i, __null_monitor__);
     }
@@ -221,8 +222,9 @@ void InputProcessor::setEnd(TouchInfo* touch)
     touch->began = false;
 
     auto now = clock();
+    float elapsed_t = (now - touch->lastClickTime) / CLOCKS_PER_SEC;
 
-    if ((now - touch->lastClickTime) / CLOCKS_PER_SEC < 0.35f)
+    if (elapsed_t < 0.35f)
     {
         if (touch->clickCount == 2)
             touch->clickCount = 1;
@@ -238,17 +240,17 @@ GObject* InputProcessor::clickTest(TouchInfo* touch)
 {
     if (touch->downTargets.size() == 0
         || touch->clickCancelled
-        || abs(touch->pos.x - touch->downPos.x) > 50 || abs(touch->pos.y - touch->downPos.y) > 50)
+        || std::abs(touch->pos.x - touch->downPos.x) > 50 || std::abs(touch->pos.y - touch->downPos.y) > 50)
         return nullptr;
 
     GObject* obj = touch->downTargets.at(0);
-    if (obj->onStage()) //依然派发到原来的downTarget，虽然可能它已经偏离当前位置，主要是为了正确处理点击缩放的效果
+    if (obj->onStage())
         return obj;
 
     obj = touch->target;
     while (obj != nullptr)
     {
-        int i = touch->downTargets.getIndex(obj);
+        ssize_t i = touch->downTargets.getIndex(obj);
         if (i != -1 && obj->onStage())
             return obj;
 
@@ -266,7 +268,7 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     if (!target)
         target = _owner;
 
-    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->target = target;
     ti->pos = pt;
@@ -275,6 +277,7 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     setBegin(ti);
 
     updateRecentInput(ti);
+    _activeProcessor = this;
 
     if (_captureCallback)
         _captureCallback(UIEventType::TouchBegin);
@@ -284,7 +287,8 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     if (ti->lastRollOver != ti->target)
         handleRollOver(ti);
 
-    //_touchListener->setSwallowTouches(target != _owner);
+    _activeProcessor = nullptr;
+    _touchListener->setSwallowTouches(target != _owner);
 
     return true;
 }
@@ -297,13 +301,15 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
     if (!target)
         target = _owner;
 
-    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->target = target;
     ti->pos = pt;
     ti->button = __mouseButton__;
     ti->touch = touch;
+
     updateRecentInput(ti);
+    _activeProcessor = this;
 
     if (_captureCallback)
         _captureCallback(UIEventType::TouchMove);
@@ -314,10 +320,10 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
     if (ti->began)
     {
         bool done = false;
-        int cnt = ti->touchMonitors.size();
+        size_t cnt = ti->touchMonitors.size();
         if (cnt > 0)
         {
-            for (int i = 0; i < cnt; i++)
+            for (size_t i = 0; i < cnt; i++)
             {
                 UIEventDispatcher* mm = ti->touchMonitors.at(i);
                 if (mm == __null_monitor__)
@@ -331,6 +337,8 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
         if (!done)
             _owner->dispatchEvent(UIEventType::TouchMove, Value::Null);
     }
+
+    _activeProcessor = nullptr;
 }
 
 void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
@@ -341,7 +349,7 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
     if (!target)
         target = _owner;
 
-    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->target = target;
     ti->pos = pt;
@@ -350,14 +358,15 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
     setEnd(ti);
 
     updateRecentInput(ti);
+    _activeProcessor = this;
 
     if (_captureCallback)
         _captureCallback(UIEventType::TouchEnd);
 
-    int cnt = ti->touchMonitors.size();
+    size_t cnt = ti->touchMonitors.size();
     if (cnt > 0)
     {
-        for (int i = 0; i < cnt; i++)
+        for (size_t i = 0; i < cnt; i++)
         {
             UIEventDispatcher* mm = ti->touchMonitors.at(i);
             if (mm == __null_monitor__)
@@ -376,11 +385,20 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
     {
         ti->target = target;
         updateRecentInput(ti);
+
+        GRichTextField* tf = dynamic_cast<GRichTextField*>(target);
+        if (tf)
+        {
+            const char* linkHref = dynamic_cast<FUIRichText*>(tf->displayObject())->hitTestLink(pt);
+            if (linkHref)
+                tf->bubbleEvent(UIEventType::ClickLink, Value(linkHref));
+        }
+
         target->bubbleEvent(UIEventType::Click);
     }
 
 #ifndef CC_PLATFORM_PC
-    //移动平台上，手指抬起就当RollOut，但在PC上不是
+    //on mobile platform, triiger RollOut on up event, but not on PC
     ti->target = nullptr;
 #endif
 
@@ -389,6 +407,8 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
 
     ti->touchId = -1;
     ti->button = EventMouse::MouseButton::BUTTON_UNSET;
+
+    _activeProcessor = nullptr;
 }
 
 void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
@@ -401,14 +421,15 @@ void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
     ti->touch = touch;
 
     updateRecentInput(ti);
+    _activeProcessor = this;
 
     if (_captureCallback)
         _captureCallback(UIEventType::TouchEnd);
 
-    int cnt = ti->touchMonitors.size();
+    size_t cnt = ti->touchMonitors.size();
     if (cnt > 0)
     {
-        for (int i = 0; i < cnt; i++)
+        for (size_t i = 0; i < cnt; i++)
         {
             UIEventDispatcher* mm = ti->touchMonitors.at(i);
             if (mm == __null_monitor__)
@@ -426,13 +447,14 @@ void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
         handleRollOver(ti);
 
     ti->touchId = -1;
+    _activeProcessor = nullptr;
 }
 
 void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
 {
     TouchInfo* ti = getTouch(0);
-    if (abs(ti->pos.x - event->getCursorX()) < 1
-        && abs(ti->pos.y - (GRoot::getInstance()->getHeight() - event->getCursorY())) < 1)
+    if (std::abs(ti->pos.x - event->getCursorX()) < 1
+        && std::abs(ti->pos.y - (UIRoot->getHeight() - event->getCursorY())) < 1)
         return;
 
     auto camera = Camera::getVisitingCamera();
@@ -441,11 +463,13 @@ void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
     if (!target)
         target = _owner;
 
-    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    pt.y = UIRoot->getHeight() - pt.y;
     ti->target = target;
     ti->pos = pt;
     ti->touch = nullptr;
+
     updateRecentInput(ti);
+    _activeProcessor = this;
 
     if (_captureCallback)
         _captureCallback(UIEventType::TouchMove);
@@ -456,10 +480,10 @@ void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
     if (ti->began)
     {
         bool done = false;
-        int cnt = ti->touchMonitors.size();
+        size_t cnt = ti->touchMonitors.size();
         if (cnt > 0)
         {
-            for (int i = 0; i < cnt; i++)
+            for (size_t i = 0; i < cnt; i++)
             {
                 UIEventDispatcher* mm = ti->touchMonitors.at(i);
                 if (mm == __null_monitor__)
@@ -473,6 +497,8 @@ void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
         if (!done)
             _owner->dispatchEvent(UIEventType::TouchMove);
     }
+
+    _activeProcessor = nullptr;
 }
 
 void InputProcessor::onMouseScroll(cocos2d::EventMouse * event)
@@ -483,15 +509,20 @@ void InputProcessor::onMouseScroll(cocos2d::EventMouse * event)
     if (!target)
         target = _owner;
 
-    pt.y = GRoot::getInstance()->getHeight() - pt.y;
+    pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(0);
     ti->target = target;
     ti->pos = pt;
     ti->touch = nullptr;
     ti->mouseWheelDelta = MAX(event->getScrollX(), event->getScrollY());
+
     updateRecentInput(ti);
+    _activeProcessor = this;
+
     ti->target->bubbleEvent(UIEventType::MouseWheel);
     ti->mouseWheelDelta = 0;
+
+    _activeProcessor = nullptr;
 }
 
 TouchInfo::TouchInfo() :

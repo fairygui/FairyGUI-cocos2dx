@@ -3,7 +3,6 @@
 
 NS_FGUI_BEGIN
 USING_NS_CC;
-using namespace tinyxml2;
 
 Relations::Relations(GObject* owner) :
     handling(nullptr)
@@ -47,7 +46,7 @@ void Relations::addItems(GObject * target, const char * sidePairs)
     RelationItem* newItem = new RelationItem(_owner);
     newItem->setTarget(target);
 
-    RelationType tid;
+    RelationType tid = RelationType::Left_Left;
     char temp[20];
     const char*p = sidePairs;
 
@@ -64,7 +63,7 @@ void Relations::addItems(GObject * target, const char * sidePairs)
             strcpy(temp, p);
             p = NULL;
         }
-        int len = strlen(temp);
+        int len = (int)strlen(temp);
         bool usePercent = temp[len - 1] == '%';
         int c1 = temp[0];
         int c2;
@@ -297,9 +296,9 @@ bool Relations::isEmpty() const
     return _items.size() == 0;
 }
 
-void Relations::setup(tinyxml2::XMLElement * xml)
+void Relations::setup(TXMLElement * xml)
 {
-    XMLElement* cxml = xml->FirstChildElement("relation");
+    TXMLElement* cxml = xml->FirstChildElement("relation");
 
     GObject* target;
     while (cxml)

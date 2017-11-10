@@ -14,8 +14,6 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
-
 GObject* GObject::_draggingObject = nullptr;
 
 Vec2 sGlobalDragStart;
@@ -48,7 +46,7 @@ GObject::GObject() :
     _packageItem(nullptr),
     _data(nullptr),
     _touchDisabled(false),
-    _directToParent(false),
+    _isAdoptiveChild(false),
     name("")
 {
     static uint32_t _gInstanceCounter = 0;
@@ -59,7 +57,6 @@ GObject::GObject() :
 GObject::~GObject()
 {
     removeFromParent();
-    removeEventListeners();
 
     CC_SAFE_RELEASE(_displayObject);
     for (int i = 0; i < 8; i++)
@@ -204,7 +201,7 @@ void GObject::center(bool restraint /*= false*/)
     if (_parent != nullptr)
         r = _parent;
     else
-        r = GRoot::getInstance();
+        r = UIRoot;
 
     setPosition((int)((r->_size.width - _size.width) / 2), (int)((r->_size.height - _size.height) / 2));
     if (restraint)
@@ -216,7 +213,7 @@ void GObject::center(bool restraint /*= false*/)
 
 void GObject::makeFullScreen()
 {
-    setSize(GRoot::getInstance()->getWidth(), GRoot::getInstance()->getHeight());
+    setSize(UIRoot->getWidth(), UIRoot->getHeight());
 }
 
 void GObject::setPivot(float xv, float yv, bool asAnchor)
@@ -224,7 +221,6 @@ void GObject::setPivot(float xv, float yv, bool asAnchor)
     if (_pivot.x != xv || _pivot.y != yv || _pivotAsAnchor != asAnchor)
     {
         _pivot.set(xv, yv);
-        bool old = _pivotAsAnchor;
         _pivotAsAnchor = asAnchor;
         if (_displayObject != nullptr)
             _displayObject->setAnchorPoint(Vec2(_pivot.x, 1 - _pivot.y));
@@ -287,6 +283,11 @@ void GObject::setVisible(bool value)
         _visible = value;
         if (_displayObject)
             _displayObject->setVisible(value);
+        if (_parent != nullptr)
+        {
+            _parent->childStateChanged(this);
+            _parent->setBoundsChangedFlag();
+        }
     }
 }
 
@@ -343,6 +344,26 @@ void GObject::setIcon(const std::string & text)
 {
 }
 
+void GObject::setTooltips(const std::string & value)
+{
+    _tooltips = value;
+    if (!_tooltips.empty())
+    {
+        addEventListener(UIEventType::RollOver, CC_CALLBACK_1(GObject::onRollOver, this), EventTag(this));
+        addEventListener(UIEventType::RollOut, CC_CALLBACK_1(GObject::onRollOut, this), EventTag(this));
+    }
+}
+
+void GObject::onRollOver(EventContext* context)
+{
+    getRoot()->showTooltips(_tooltips);
+}
+
+void GObject::onRollOut(EventContext* context)
+{
+    getRoot()->hideTooltips();
+}
+
 void GObject::setDraggable(bool value)
 {
     if (_draggable != value)
@@ -387,7 +408,7 @@ Vec2 GObject::localToGlobal(const Vec2 & pt)
     }
     pt2.y = _size.height - pt2.y;
     pt2 = _displayObject->convertToWorldSpace(pt2);
-    pt2.y = GRoot::getInstance()->getHeight() - pt2.y;
+    pt2.y = UIRoot->getHeight() - pt2.y;
     return pt2;
 }
 
@@ -406,7 +427,7 @@ cocos2d::Rect GObject::localToGlobal(const cocos2d::Rect & rect)
 Vec2 GObject::globalToLocal(const Vec2 & pt)
 {
     Vec2 pt2 = pt;
-    pt2.y = GRoot::getInstance()->getHeight() - pt2.y;
+    pt2.y = UIRoot->getHeight() - pt2.y;
     pt2 = _displayObject->convertToNodeSpace(pt2);
     pt2.y = _size.height - pt2.y;
     if (_pivotAsAnchor)
@@ -523,7 +544,7 @@ void GObject::updateGear(int index)
         gear->updateState();
 }
 
-bool GObject::checkGearController(int index, Controller* c)
+bool GObject::checkGearController(int index, GController* c)
 {
     return _gears[index] != nullptr && _gears[index]->getController() == c;
 }
@@ -587,7 +608,7 @@ GRoot* GObject::getRoot() const
     if (root != nullptr)
         return root;
     else
-        return GRoot::getInstance();
+        return UIRoot;
 }
 
 void GObject::removeFromParent()
@@ -600,14 +621,15 @@ void GObject::constructFromResource()
 {
 }
 
-GObject* GObject::hitTest(const Vec2 &pt, const Camera* camera)
+GObject* GObject::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
     if (_touchDisabled || !_touchable || !finalVisible())
         return nullptr;
 
     Rect rect;
     rect.size = _displayObject->getContentSize();
-    if (isScreenPointInRect(pt, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
+    //if (isScreenPointInRect(worldPoint, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
+    if (rect.containsPoint(_displayObject->convertToNodeSpace(worldPoint)))
         return this;
     else
         return nullptr;
@@ -640,8 +662,13 @@ void GObject::handlePositionChanged()
             pt.x += _size.width * _pivot.x;
             pt.y -= _size.height * _pivot.y;
         }
-        if (_parent && _directToParent)
-            pt.y += _parent->_size.height;
+        if (_isAdoptiveChild)
+        {
+            if (_displayObject->getParent())
+                pt.y += _displayObject->getParent()->getContentSize().height;
+            else if (_parent)
+                pt.y += _parent->_size.height;
+        }
         if (_pixelSnapping)
         {
             pt.x = (int)pt.x;
@@ -680,7 +707,7 @@ void GObject::handleGrayedChanged()
 {
 }
 
-void GObject::handleControllerChanged(Controller * c)
+void GObject::handleControllerChanged(GController * c)
 {
     _handlingController = true;
     for (int i = 0; i < 8; i++)
@@ -694,7 +721,7 @@ void GObject::handleControllerChanged(Controller * c)
     checkGearDisplay();
 }
 
-void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GObject::setup_BeforeAdd(TXMLElement * xml)
 {
     const char *p;
     Vec2 v2;
@@ -751,7 +778,7 @@ void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
 
     p = xml->Attribute("rotation");
     if (p)
-        this->setRotation(atoi(p));
+        setRotation(atoi(p));
 
     p = xml->Attribute("pivot");
     if (p)
@@ -762,10 +789,26 @@ void GObject::setup_BeforeAdd(tinyxml2::XMLElement * xml)
 
     p = xml->Attribute("alpha");
     if (p)
-        this->setAlpha(atof(p));
+        setAlpha(atof(p));
+
+    p = xml->Attribute("touchable");
+    if (p)
+        setTouchable(strcmp(p, "true") == 0);
+
+    p = xml->Attribute("visible");
+    if (p)
+        setVisible(strcmp(p, "true") == 0);
+
+    p = xml->Attribute("grayed");
+    if (p)
+        setGrayed(strcmp(p, "true") == 0);
+
+    p = xml->Attribute("tooltips");
+    if (p)
+        setTooltips(p);
 }
 
-void GObject::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GObject::setup_AfterAdd(TXMLElement * xml)
 {
     const char *p;
 
@@ -773,7 +816,7 @@ void GObject::setup_AfterAdd(tinyxml2::XMLElement * xml)
     if (p)
         _group = dynamic_cast<GGroup*>(_parent->getChildById(p));
 
-    XMLElement* exml = xml->FirstChildElement();
+    TXMLElement* exml = xml->FirstChildElement();
     while (exml)
     {
         int gearIndex = ToolSet::parseGearIndex(exml->Name());
@@ -810,11 +853,11 @@ void GObject::dragBegin(int touchId)
         tmp->dispatchEvent(UIEventType::DragEnd);
     }
 
-    sGlobalDragStart = GRoot::getInstance()->getTouchPosition(touchId);
+    sGlobalDragStart = UIRoot->getTouchPosition(touchId);
     sGlobalRect = localToGlobal(Rect(Vec2::ZERO, _size));
 
     _draggingObject = this;
-    GRoot::getInstance()->getInputProcessor()->addTouchMonitor(touchId, this);
+    UIRoot->getInputProcessor()->addTouchMonitor(touchId, this);
 
     addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), EventTag(this));
     addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GObject::onTouchEnd, this), EventTag(this));
@@ -824,7 +867,7 @@ void GObject::dragEnd()
 {
     if (_draggingObject == this)
     {
-        GRoot::getInstance()->getInputProcessor()->removeTouchMonitor(this);
+        UIRoot->getInputProcessor()->removeTouchMonitor(this);
         _draggingObject = nullptr;
     }
 }
@@ -847,8 +890,8 @@ void GObject::onTouchMove(EventContext* context)
 #else
         sensitivity = UIConfig::touchDragSensitivity;
 #endif 
-        if (abs(_dragTouchStartPos.x - evt->getPosition().x) < sensitivity
-            && abs(_dragTouchStartPos.y - evt->getPosition().y) < sensitivity)
+        if (std::abs(_dragTouchStartPos.x - evt->getPosition().x) < sensitivity
+            && std::abs(_dragTouchStartPos.y - evt->getPosition().y) < sensitivity)
             return;
 
         if (!dispatchEvent(UIEventType::DragStart))
@@ -864,7 +907,7 @@ void GObject::onTouchMove(EventContext* context)
 
         if (_dragBounds != nullptr)
         {
-            Rect rect = GRoot::getInstance()->localToGlobal(*_dragBounds);
+            Rect rect = UIRoot->localToGlobal(*_dragBounds);
             if (xx < rect.origin.x)
                 xx = rect.origin.x;
             else if (xx + sGlobalRect.size.width > rect.getMaxX())

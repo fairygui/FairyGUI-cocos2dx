@@ -46,8 +46,8 @@ public:
     bool isPageMode() const { return _pageMode; }
     void setPageMode(bool value) { _pageMode = value; }
 
-    Controller* getPageController() const { return _pageController; }
-    void setPageController(Controller* value) { _pageController = value; }
+    GController* getPageController() const { return _pageController; }
+    void setPageController(GController* value) { _pageController = value; }
 
     bool isMouseWheelEnabled() const { return _mouseWheelEnabled; }
     void setMouseWheelEnabled(bool value) { _mouseWheelEnabled = value; }
@@ -106,7 +106,7 @@ private:
     void setSize(float wv, float hv);
     void handleSizeChanged();
 
-    void handleControllerChanged(Controller* c);
+    void handleControllerChanged(GController* c);
     void updatePageController();
 
     GObject* hitTest(const cocos2d::Vec2 &pt, const cocos2d::Camera* camera);
@@ -193,13 +193,13 @@ private:
     cocos2d::Vec2 _tweenDuration;
 
     GComponent* _owner;
-    cocos2d::Node* _maskContainer;
-    cocos2d::Node* _container;
+    cocos2d::ClippingRectangleNode* _maskContainer;
+    FUIInnerContainer* _container;
     GScrollBar* _hzScrollBar;
     GScrollBar* _vtScrollBar;
     GComponent* _header;
     GComponent* _footer;
-    Controller* _pageController;
+    GController* _pageController;
 
     static int _gestureFlag;
     static ScrollPane* _draggingPane;

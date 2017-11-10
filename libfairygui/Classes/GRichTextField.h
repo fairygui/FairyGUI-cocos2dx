@@ -8,7 +8,7 @@
 
 NS_FGUI_BEGIN
 
-class GRichTextField : public GTextFieldDelegate
+class GRichTextField : public GTextField
 {
 public:
     GRichTextField();
@@ -28,10 +28,10 @@ public:
     const cocos2d::Color3B& getColor() const override { return _color; }
     void setColor(const cocos2d::Color3B& value) override;
 
-    bool isUBBEnabled() const { return _richText->isUBBEnabled(); }
-    void setUBBEnabled(bool value) { _richText->setUBBEnabled(value); }
+    virtual bool isUBBEnabled() const override { return _richText->isUBBEnabled(); }
+    virtual void setUBBEnabled(bool value) override { _richText->setUBBEnabled(value); }
 
-    void setAlign(cocos2d::TextHAlignment value);
+    virtual void setAlign(cocos2d::TextHAlignment value) override;
 
 protected:
     virtual void handleInit() override;

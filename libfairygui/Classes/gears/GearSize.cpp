@@ -24,7 +24,7 @@ void GearSize::init()
 
 void GearSize::addStatus(const std::string&  pageId, const std::string& value)
 {
-    if (value == "-" || value.length() == 0) //历史遗留处理
+    if (value == "-" || value.length() == 0)
         return;
 
     Vec4 v4;
@@ -47,11 +47,11 @@ void GearSize::apply()
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_owner->displayObject()->getActionByTag(ActionTag::SIZE_ACTION) != nullptr)
+        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_SIZE_ACTION) != nullptr)
         {
             if (_tweenTarget != gv)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::SIZE_ACTION);
+                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_SIZE_ACTION);
                 onTweenComplete();
             }
             else
@@ -68,14 +68,10 @@ void GearSize::apply()
 
             ActionInterval* action = ActionVec4::create(tweenTime,
                 Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()),
-                gv, 
-                CC_CALLBACK_1(GearSize::onTweenUpdate, this, a, b),
-                CC_CALLBACK_0(GearSize::onTweenComplete, this)
-            );
-            action = createEaseAction(easeType, action);
-            if (delay > 0)
-                action = Sequence::createWithTwoActions(DelayTime::create(delay), action);
-            action->setTag(ActionTag::SIZE_ACTION);
+                gv,
+                CC_CALLBACK_1(GearSize::onTweenUpdate, this, a, b));
+
+            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearSize::onTweenComplete, this), ActionTag::GEAR_SIZE_ACTION);
             _owner->displayObject()->runAction(action);
         }
     }

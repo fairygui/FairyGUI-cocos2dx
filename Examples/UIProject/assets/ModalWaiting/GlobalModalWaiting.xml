@@ -7,4 +7,7 @@
       <relation target="" sidePair="center-center,middle-middle"/>
     </group>
   </displayList>
+  <transition name="t0" autoPlay="true" autoPlayRepeat="-1">
+    <item time="0" type="Rotation" target="n1" tween="true" startValue="0" endValue="360" duration="24" ease="Linear"/>
+  </transition>
 </component>

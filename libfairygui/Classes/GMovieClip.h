@@ -28,7 +28,7 @@ public:
     const cocos2d::Color3B& getColor() const { return _content->getColor(); }
     void setColor(const cocos2d::Color3B& value);
 
-    //从start帧开始，播放到end帧（ - 1表示结尾），重复times次（0表示无限循环），循环结束后，停止在endAt帧（ - 1表示参数end）
+    //from start to end(-1 means ending)，repeat times(0 means infinite loop)，when all is over, stopping at endAt(-1 means same value of end)
     void setPlaySettings(int start = 0, int end = -1, int times = 0, int endAt = -1, std::function<void()> completeCallback = nullptr);
 
     virtual void constructFromResource() override;
@@ -38,7 +38,7 @@ public:
 
 protected:
     virtual void handleInit() override;
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
 
 private:
     cocos2d::Sprite* _content;

@@ -16,7 +16,7 @@ class InputProcessor
 public:
     typedef std::function<void(int eventType)> CaptureEventCallback;
 
-    static InputEvent* getRecentInput() { return &_recentInput; }
+    InputEvent* getRecentInput() { return &_recentInput; }
 
     InputProcessor(GComponent* owner);
     ~InputProcessor();
@@ -53,8 +53,11 @@ private:
     std::vector<GObject*> _rollOverChain;
     GComponent* _owner;
     CaptureEventCallback _captureCallback;
+    InputEvent _recentInput;
 
-    static InputEvent _recentInput;
+    static InputProcessor* _activeProcessor;
+
+    friend class UIEventDispatcher;
 };
 
 class TouchInfo

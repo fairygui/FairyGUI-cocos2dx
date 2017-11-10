@@ -35,7 +35,7 @@ PackageItem::~PackageItem()
         delete displayList;
     }
     CC_SAFE_DELETE(componentData);
-    if (bitmapFont) //bitmapfont的引用被fontatlas保存，所以这里不能直接释放bitmapFont
+    if (bitmapFont) //bitmapfont will be released by fontatlas
         bitmapFont->releaseAtlas();
     CC_SAFE_RELEASE(animation);
     CC_SAFE_RELEASE(texture);
@@ -44,9 +44,9 @@ PackageItem::~PackageItem()
     CC_SAFE_RELEASE(spriteFrame);
 }
 
-void* PackageItem::load()
+void PackageItem::load()
 {
-    return owner->getItemAsset(this);
+    owner->loadItem(this);
 }
 
 DisplayListItem::DisplayListItem(PackageItem* pi, std::string type)

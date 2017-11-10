@@ -4,8 +4,6 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
-
 GComboBox::GComboBox() :
     _dropdown(nullptr),
     _titleObject(nullptr),
@@ -94,7 +92,7 @@ void GComboBox::refresh()
     if (!_items.empty())
     {
         if (_selectedIndex >= (int)_items.size())
-            _selectedIndex = _items.size() - 1;
+            _selectedIndex = (int)_items.size() - 1;
         else if (_selectedIndex == -1)
             _selectedIndex = 0;
         setTitle(_items[_selectedIndex]);
@@ -137,7 +135,7 @@ void GComboBox::updateSelectionController()
     if (_selectionController != nullptr && !_selectionController->changing
         && _selectedIndex < _selectionController->getPageCount())
     {
-        Controller* c = _selectionController;
+        GController* c = _selectionController;
         _selectionController = nullptr;
         c->setSelectedIndex(_selectedIndex);
         _selectionController = c;
@@ -161,7 +159,7 @@ void GComboBox::showDropdown()
         _list->setSelectedIndex(-1);
     _dropdown->setWidth(_size.width);
 
-    GRoot::getInstance()->togglePopup(_dropdown, this, popupDirection);
+    UIRoot->togglePopup(_dropdown, this, popupDirection);
     if (_dropdown->getParent() != nullptr)
         setState(GButton::DOWN);
 }
@@ -169,17 +167,17 @@ void GComboBox::showDropdown()
 void GComboBox::renderDropdownList()
 {
     _list->removeChildrenToPool();
-    int cnt = _items.size();
-    for (int i = 0; i < cnt; i++)
+    size_t cnt = _items.size();
+    for (size_t i = 0; i < cnt; i++)
     {
         GObject* item = _list->addItemFromPool();
         item->setText(_items[i]);
-        item->setIcon((!_icons.empty() && i < (int)_icons.size()) ? _icons[i] : STD_STRING_EMPTY);
-        item->name = i < (int)_values.size() ? _values[i] : STD_STRING_EMPTY;
+        item->setIcon((!_icons.empty() && i < _icons.size()) ? _icons[i] : STD_STRING_EMPTY);
+        item->name = i < _values.size() ? _values[i] : STD_STRING_EMPTY;
     }
 }
 
-void GComboBox::handleControllerChanged(Controller* c)
+void GComboBox::handleControllerChanged(GController* c)
 {
     GComponent::handleControllerChanged(c);
 
@@ -200,7 +198,7 @@ void GComboBox::handleGrayedChanged()
         GComponent::handleGrayedChanged();
 }
 
-void GComboBox::constructFromXML(tinyxml2::XMLElement * xml)
+void GComboBox::constructFromXML(TXMLElement * xml)
 {
     GComponent::constructFromXML(xml);
 
@@ -239,7 +237,7 @@ void GComboBox::constructFromXML(tinyxml2::XMLElement * xml)
     addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GComboBox::onTouchEnd, this));
 }
 
-void GComboBox::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GComboBox::setup_AfterAdd(TXMLElement * xml)
 {
     GComponent::setup_AfterAdd(xml);
 
@@ -256,7 +254,7 @@ void GComboBox::setup_AfterAdd(tinyxml2::XMLElement * xml)
     if (p)
         popupDirection = ToolSet::parsePopupDirection(p);
 
-    XMLElement* cxml = xml->FirstChildElement("item");
+    TXMLElement* cxml = xml->FirstChildElement("item");
     bool hasIcon = false;
     while (cxml)
     {
@@ -324,7 +322,7 @@ void GComboBox::onClickItem(EventContext* context)
 void GComboBox::onRollover(EventContext* context)
 {
     _over = true;
-    if (_down || _dropdown != nullptr && _dropdown->getParent() != nullptr)
+    if (_down || (_dropdown != nullptr && _dropdown->getParent() != nullptr))
         return;
 
     setCurrentState();
@@ -333,7 +331,7 @@ void GComboBox::onRollover(EventContext* context)
 void GComboBox::onRollout(EventContext* context)
 {
     _over = false;
-    if (_down || _dropdown != nullptr && _dropdown->getParent() != nullptr)
+    if (_down || (_dropdown != nullptr && _dropdown->getParent() != nullptr))
         return;
 
     setCurrentState();

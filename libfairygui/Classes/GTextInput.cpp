@@ -56,9 +56,9 @@ void GTextInput::handleSizeChanged()
     _input->setContentSize(_size);
 }
 
-void GTextInput::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GTextInput::setup_BeforeAdd(TXMLElement * xml)
 {
-    GTextFieldDelegate::setup_BeforeAdd(xml);
+    GTextField::setup_BeforeAdd(xml);
 
     const char *p;
 

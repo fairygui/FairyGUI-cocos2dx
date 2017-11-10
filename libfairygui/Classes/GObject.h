@@ -101,6 +101,9 @@ public:
     virtual const std::string& getIcon() const;
     virtual void setIcon(const std::string& text);
 
+    const std::string& getTooltips() const { return _tooltips; }
+    void setTooltips(const std::string& value);
+
     void* getData() const { return _data; };
     void setData(void* value) { _data = value; }
 
@@ -127,7 +130,7 @@ public:
     void removeRelation(GObject* target, RelationType relationType);
 
     GearBase* getGear(int index);
-    bool checkGearController(int index, Controller* c);
+    bool checkGearController(int index, GController* c);
     uint32_t addDisplayLock();
     void releaseDisplayLock(uint32_t token);
 
@@ -142,7 +145,7 @@ public:
     void removeClickListener(const EventTag& tag) { removeEventListener(UIEventType::Click, tag); }
 
     virtual void constructFromResource();
-    virtual GObject* hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera);
+    virtual GObject* hitTest(const cocos2d::Vec2 & worldPoint, const cocos2d::Camera * camera);
 
     template<typename T> T* as();
 
@@ -161,7 +164,6 @@ protected:
     GComponent* _parent;
     cocos2d::Node* _displayObject;
     PackageItem* _packageItem;
-    //Size的实现方式，有两种，0-GObject的w/h等于DisplayObject的w/h。1-GObject的sourceWidth/sourceHeight等于DisplayObject的w/h，剩余部分由scale实现
     int _sizeImplType;
     bool _touchDisabled;
 
@@ -170,14 +172,14 @@ protected:
     virtual void handleScaleChanged();
     virtual void handleGrayedChanged();
     virtual void handlePositionChanged();
-    virtual void handleControllerChanged(Controller* c);
+    virtual void handleControllerChanged(GController* c);
     virtual void handleAlphaChanged();
 
     virtual void onEnter();
     virtual void onExit();
 
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml);
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml);
+    virtual void setup_BeforeAdd(TXMLElement* xml);
+    virtual void setup_AfterAdd(TXMLElement* xml);
 
     bool init();
 
@@ -209,6 +211,8 @@ private:
     void onTouchBegin(EventContext* context);
     void onTouchMove(EventContext* context);
     void onTouchEnd(EventContext* context);
+    void onRollOver(EventContext* context);
+    void onRollOut(EventContext* context);
 
     bool _internalVisible;
     bool _handlingController;
@@ -224,13 +228,12 @@ private:
     void * _data;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
-    bool _directToParent;
+    bool _isAdoptiveChild;
 
     static GObject* _draggingObject;
 
     friend class GComponent;
     friend class GGroup;
-    friend class ScrollPane;
     friend class RelationItem;
     friend class UIObjectFactory;
 };

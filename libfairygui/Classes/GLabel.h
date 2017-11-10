@@ -31,8 +31,8 @@ public:
     void setTitleFontSize(int value);
 
 protected:
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void constructFromXML(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
 
 private:
     GObject* _titleObject;

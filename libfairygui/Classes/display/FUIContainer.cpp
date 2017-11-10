@@ -22,6 +22,13 @@ static void setProgram(Node *n, GLProgram *p)
 }
 #endif
 
+RectClippingSupport::RectClippingSupport() :
+    _clippingEnabled(false),
+    _scissorOldState(false),
+    _clippingRectDirty(true)
+{
+}
+
 StencilClippingSupport::StencilClippingSupport() :
     _stencil(nullptr),
     _originStencilProgram(nullptr),
@@ -198,9 +205,10 @@ void FUIContainer::onEnter()
     Node::onEnter();
 
     if (_stencilClippingSupport != nullptr && _stencilClippingSupport->_stencil != nullptr)
-    {
         _stencilClippingSupport->_stencil->onEnter();
-    }
+
+    if (_rectClippingSupport != nullptr)
+        _rectClippingSupport->_clippingRectDirty = true;
 }
 
 void FUIContainer::onEnterTransitionDidFinish()
@@ -232,10 +240,7 @@ void FUIContainer::onExitTransitionDidStart()
 #endif
 
     if (_stencilClippingSupport != nullptr && _stencilClippingSupport->_stencil != nullptr)
-    {
         _stencilClippingSupport->_stencil->onExitTransitionDidStart();
-    }
-
     Node::onExitTransitionDidStart();
 }
 
@@ -250,10 +255,8 @@ void FUIContainer::onExit()
 #endif
 
     if (_stencilClippingSupport != nullptr && _stencilClippingSupport->_stencil != nullptr)
-    {
         _stencilClippingSupport->_stencil->onExit();
-    }
-
+    
     Node::onExit();
 }
 
@@ -265,30 +268,135 @@ void FUIContainer::setCameraMask(unsigned short mask, bool applyChildren)
         _stencilClippingSupport->_stencil->setCameraMask(mask, applyChildren);
 }
 
+void FUIContainer::setContentSize(const Size & contentSize)
+{
+    Node::setContentSize(contentSize);
+
+    if (_rectClippingSupport)
+        _rectClippingSupport->_clippingRectDirty = true;
+}
+
 void FUIContainer::onBeforeVisitScissor()
 {
-    glEnable(GL_SCISSOR_TEST);
-
-    float scaleX = _scaleX;
-    float scaleY = _scaleY;
-    Node *parent = this->getParent();
-    while (parent) {
-        scaleX *= parent->getScaleX();
-        scaleY *= parent->getScaleY();
-        parent = parent->getParent();
+    auto glview = Director::getInstance()->getOpenGLView();
+    // apply scissor test
+    _rectClippingSupport->_scissorOldState = glview->isScissorEnabled();
+    if (false == _rectClippingSupport->_scissorOldState)
+    {
+        glEnable(GL_SCISSOR_TEST);
     }
 
-    const Point pos = convertToWorldSpace(Point(_rectClippingSupport->_clippingRegion.origin.x, _rectClippingSupport->_clippingRegion.origin.y));
-    GLView* glView = Director::getInstance()->getOpenGLView();
-    glView->setScissorInPoints(pos.x,
-        pos.y,
-        _rectClippingSupport->_clippingRegion.size.width * scaleX,
-        _rectClippingSupport->_clippingRegion.size.height * scaleY);
+    // apply scissor box
+    Rect clippingRect = getClippingRect();
+    _rectClippingSupport->_clippingOldRect = glview->getScissorRect();
+    if (false == _rectClippingSupport->_clippingOldRect.equals(clippingRect))
+    {
+        glview->setScissorInPoints(clippingRect.origin.x,
+            clippingRect.origin.y,
+            clippingRect.size.width,
+            clippingRect.size.height);
+    }
 }
 
 void FUIContainer::onAfterVisitScissor()
 {
-    glDisable(GL_SCISSOR_TEST);
+    if (_rectClippingSupport->_scissorOldState)
+    {
+        // revert scissor box
+        if (false == _rectClippingSupport->_clippingOldRect.equals(_rectClippingSupport->_clippingRect))
+        {
+            auto glview = Director::getInstance()->getOpenGLView();
+            glview->setScissorInPoints(_rectClippingSupport->_clippingOldRect.origin.x,
+                _rectClippingSupport->_clippingOldRect.origin.y,
+                _rectClippingSupport->_clippingOldRect.size.width,
+                _rectClippingSupport->_clippingOldRect.size.height);
+        }
+    }
+    else
+    {
+        // revert scissor test
+        glDisable(GL_SCISSOR_TEST);
+    }
+}
+
+const Rect& FUIContainer::getClippingRect()
+{
+    if (_rectClippingSupport->_clippingRectDirty)
+    {
+        Vec2 worldPos = convertToWorldSpaceAR(_rectClippingSupport->_clippingRegion.origin);
+        AffineTransform t = getNodeToWorldAffineTransform();
+        float scissorWidth = _rectClippingSupport->_clippingRegion.size.width*t.a;
+        float scissorHeight = _rectClippingSupport->_clippingRegion.size.height*t.d;
+        Rect parentClippingRect;
+        FUIContainer* parent = this;
+        FUIContainer* clippingParent = nullptr;
+
+        while (parent)
+        {
+            parent = dynamic_cast<FUIContainer*>(parent->getParent());
+            if (parent)
+            {
+                if (parent->isClippingEnabled())
+                {
+                    clippingParent = parent;
+                    break;
+                }
+            }
+        }
+
+        if (clippingParent)
+        {
+            parentClippingRect = clippingParent->getClippingRect();
+            float finalX = worldPos.x - (scissorWidth * _anchorPoint.x);
+            float finalY = worldPos.y - (scissorHeight * _anchorPoint.y);
+            float finalWidth = scissorWidth;
+            float finalHeight = scissorHeight;
+
+            float leftOffset = worldPos.x - parentClippingRect.origin.x;
+            if (leftOffset < 0.0f)
+            {
+                finalX = parentClippingRect.origin.x;
+                finalWidth += leftOffset;
+            }
+            float rightOffset = (worldPos.x + scissorWidth) - (parentClippingRect.origin.x + parentClippingRect.size.width);
+            if (rightOffset > 0.0f)
+            {
+                finalWidth -= rightOffset;
+            }
+            float topOffset = (worldPos.y + scissorHeight) - (parentClippingRect.origin.y + parentClippingRect.size.height);
+            if (topOffset > 0.0f)
+            {
+                finalHeight -= topOffset;
+            }
+            float bottomOffset = worldPos.y - parentClippingRect.origin.y;
+            if (bottomOffset < 0.0f)
+            {
+                finalY = parentClippingRect.origin.y;
+                finalHeight += bottomOffset;
+            }
+            if (finalWidth < 0.0f)
+            {
+                finalWidth = 0.0f;
+            }
+            if (finalHeight < 0.0f)
+            {
+                finalHeight = 0.0f;
+            }
+            _rectClippingSupport->_clippingRect.origin.x = finalX;
+            _rectClippingSupport->_clippingRect.origin.y = finalY;
+            _rectClippingSupport->_clippingRect.size.width = finalWidth;
+            _rectClippingSupport->_clippingRect.size.height = finalHeight;
+        }
+        else
+        {
+            _rectClippingSupport->_clippingRect.origin.x = worldPos.x - (scissorWidth * _anchorPoint.x);
+            _rectClippingSupport->_clippingRect.origin.y = worldPos.y - (scissorHeight * _anchorPoint.y);
+            _rectClippingSupport->_clippingRect.size.width = scissorWidth;
+            _rectClippingSupport->_clippingRect.size.height = scissorHeight;
+        }
+        _rectClippingSupport->_clippingRectDirty = false;
+    }
+    return _rectClippingSupport->_clippingRect;
 }
 
 void FUIContainer::visit(cocos2d::Renderer * renderer, const cocos2d::Mat4 & parentTransform, uint32_t parentFlags)
@@ -380,6 +488,10 @@ void FUIContainer::visit(cocos2d::Renderer * renderer, const cocos2d::Mat4 & par
     }
     else if (_rectClippingSupport != nullptr && _rectClippingSupport->_clippingEnabled)
     {
+        if (parentFlags & FLAGS_DIRTY_MASK)
+        {
+            _rectClippingSupport->_clippingRectDirty = true;
+        }
         _rectClippingSupport->_beforeVisitCmdScissor.init(_globalZOrder);
         _rectClippingSupport->_beforeVisitCmdScissor.func = CC_CALLBACK_0(FUIContainer::onBeforeVisitScissor, this);
         renderer->addCommand(&_rectClippingSupport->_beforeVisitCmdScissor);

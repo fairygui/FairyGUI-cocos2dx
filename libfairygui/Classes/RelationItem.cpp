@@ -42,9 +42,9 @@ void RelationItem::add(RelationType relationType, bool usePercent)
         return;
     }
 
-    for (auto it = _defs.begin(); it != _defs.end(); ++it)
+    for (auto &it : _defs)
     {
-        if (it->type == relationType)
+        if (it.type == relationType)
             return;
     }
 
@@ -65,8 +65,6 @@ void RelationItem::internalAdd(RelationType relationType, bool usePercent)
     info.type = relationType;
     _defs.push_back(info);
 
-    //当使用中线关联时，因为需要除以2，很容易因为奇数宽度/高度造成小数点坐标；当使用百分比时，也会造成小数坐标；
-    //所以设置了这类关联的对象，自动启用pixelSnapping
     if (usePercent || relationType == RelationType::Left_Center || relationType == RelationType::Center_Center || relationType == RelationType::Right_Center
         || relationType == RelationType::Top_Middle || relationType == RelationType::Middle_Middle || relationType == RelationType::Bottom_Middle)
         _owner->setPixelSnapping(true);
@@ -96,8 +94,8 @@ void RelationItem::copyFrom(const RelationItem& source)
     setTarget(source._target);
 
     _defs.clear();
-    for (auto it = source._defs.begin(); it != source._defs.end(); ++it)
-        _defs.push_back(*it);
+    for (auto &it : source._defs)
+        _defs.push_back(it);
 }
 
 bool RelationItem::isEmpty() const
@@ -107,17 +105,15 @@ bool RelationItem::isEmpty() const
 
 void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight)
 {
-    int cnt = _defs.size();
-    if (cnt == 0)
+    if (_target == nullptr || _defs.size() == 0)
         return;
 
     float ox = _owner->_position.x;
     float oy = _owner->_position.y;
 
-    for (int i = 0; i < cnt; i++)
+    for (auto &it : _defs)
     {
-        RelationDef info = _defs[i];
-        switch (info.type)
+        switch (it.type)
         {
         case RelationType::Center_Center:
         case RelationType::Right_Center:
@@ -137,6 +133,8 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight)
         case RelationType::Bottom_Bottom:
             _owner->setY(_owner->_position.y - dHeight);
             break;
+        default:
+            break;
         }
     }
 
@@ -147,12 +145,12 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight)
 
         _owner->updateGearFromRelations(1, ox, oy);
 
-        /*if (_owner->_parent != nullptr)
+        if (_owner->_parent != nullptr)
         {
-            int transCount = _owner->parent._transitions.Count;
-            for (int i = 0; i < transCount; i++)
-                _owner->parent._transitions[i].UpdateFromRelations(_owner->id, ox, oy);
-        }*/
+            const Vector<Transition*>& arr = _owner->getParent()->getTransitions();
+            for (auto &it : arr)
+                it->updateFromRelations(_owner->id, ox, oy);
+        }
     }
 }
 
@@ -204,6 +202,8 @@ void RelationItem::applyOnXYChanged(const RelationDef& info, float dx, float dy)
     case RelationType::BottomExt_Top:
     case RelationType::BottomExt_Bottom:
         _owner->setHeight(_owner->_rawSize.height + dy);
+        break;
+    default:
         break;
     }
 }
@@ -394,6 +394,8 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
         else
             _owner->setHeight(targetY + _target->_size.height + v);
         break;
+    default:
+        break;
     }
 }
 
@@ -402,6 +404,8 @@ void RelationItem::addRefTarget(GObject* target)
     if (target != _owner->_parent)
         target->addEventListener(UIEventType::PositionChange, CC_CALLBACK_1(RelationItem::onTargetXYChanged, this), EventTag(this));
     target->addEventListener(UIEventType::SizeChange, CC_CALLBACK_1(RelationItem::onTargetSizeChanged, this), EventTag(this));
+    target->addEventListener(UIEventType::Destroy, CC_CALLBACK_1(RelationItem::onTargetGone, this), EventTag(this));
+
     _targetData.x = _target->_position.x;
     _targetData.y = _target->_position.y;
     _targetData.z = _target->_size.width;
@@ -417,7 +421,7 @@ void RelationItem::releaseRefTarget(GObject* target)
 void RelationItem::onTargetXYChanged(EventContext* context)
 {
     if (_owner->relations()->handling != nullptr
-        || _owner->_group != nullptr && _owner->_group->_updating != 0)
+        || (_owner->_group != nullptr && _owner->_group->_updating != 0))
     {
         _targetData.x = _target->_position.x;
         _targetData.y = _target->_position.y;
@@ -431,8 +435,8 @@ void RelationItem::onTargetXYChanged(EventContext* context)
     float dx = _target->_position.x - _targetData.x;
     float dy = _target->_position.y - _targetData.y;
 
-    for (auto it = _defs.cbegin(); it != _defs.cend(); ++it)
-        applyOnXYChanged(*it, dx, dy);
+    for (auto &it : _defs)
+        applyOnXYChanged(it, dx, dy);
 
     _targetData.x = _target->_position.x;
     _targetData.y = _target->_position.y;
@@ -444,12 +448,12 @@ void RelationItem::onTargetXYChanged(EventContext* context)
 
         _owner->updateGearFromRelations(1, ox, oy);
 
-        /*if (_owner->_parent != nullptr)
+        if (_owner->_parent != nullptr)
         {
-            int transCount = _owner->parent._transitions.Count;
-            for (int i = 0; i < transCount; i++)
-                _owner->parent._transitions[i].UpdateFromRelations(_owner->id, ox, oy);
-        }*/
+            const Vector<Transition*>& arr = _owner->getParent()->getTransitions();
+            for (auto &it : arr)
+                it->updateFromRelations(_owner->id, ox, oy);
+        }
     }
 
     _owner->relations()->handling = nullptr;
@@ -458,7 +462,7 @@ void RelationItem::onTargetXYChanged(EventContext* context)
 void RelationItem::onTargetSizeChanged(EventContext* context)
 {
     if (_owner->relations()->handling != nullptr
-        || _owner->_group != nullptr && _owner->_group->_updating != 0)
+        || (_owner->_group != nullptr && _owner->_group->_updating != 0))
     {
         _targetData.z = _target->_size.width;
         _targetData.w = _target->_size.height;
@@ -472,8 +476,8 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
     float ow = _owner->_rawSize.width;
     float oh = _owner->_rawSize.height;
 
-    for (auto it = _defs.cbegin(); it != _defs.cend(); ++it)
-        applyOnSizeChanged(*it);
+    for (auto &it : _defs)
+        applyOnSizeChanged(it);
 
     _targetData.z = _target->_size.width;
     _targetData.w = _target->_size.height;
@@ -485,12 +489,12 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
 
         _owner->updateGearFromRelations(1, ox, oy);
 
-        /*if (_owner->_parent != nullptr)
+        if (_owner->_parent != nullptr)
         {
-            int transCount = _owner->parent._transitions.Count;
-            for (int i = 0; i < transCount; i++)
-                _owner->parent._transitions[i].UpdateFromRelations(_owner->id, ox, oy);
-        }*/
+            const Vector<Transition*>& arr = _owner->getParent()->getTransitions();
+            for (auto &it : arr)
+                it->updateFromRelations(_owner->id, ox, oy);
+        }
     }
 
     if (ow != _owner->_rawSize.width || oh != _owner->_rawSize.height)
@@ -502,6 +506,11 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
     }
 
     _owner->relations()->handling = nullptr;
+}
+
+void RelationItem::onTargetGone(EventContext *)
+{
+    _target = nullptr;
 }
 
 

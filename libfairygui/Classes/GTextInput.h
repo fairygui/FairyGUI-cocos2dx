@@ -8,7 +8,7 @@
 
 NS_FGUI_BEGIN
 
-class GTextInput : public GTextFieldDelegate
+class GTextInput : public GTextField
 {
 public:
     GTextInput();
@@ -25,13 +25,13 @@ public:
     int getFontSize() const override { return _input->getFontSize(); }
     void setFontSize(int value) override;
 
-    const cocos2d::Color3B& getColor() const { return _color; }
-    void setColor(const cocos2d::Color3B& value) override;
+    virtual const cocos2d::Color3B& getColor() const override { return _color; }
+    virtual void setColor(const cocos2d::Color3B& value) override;
 
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
 
 private:
     cocos2d::ui::EditBox* _input;

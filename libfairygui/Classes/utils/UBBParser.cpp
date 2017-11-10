@@ -37,7 +37,7 @@ std::string UBBParser::parse(const char * text)
     _pString = text;
     _readPos = 0;
 
-    int pos;
+    ssize_t pos;
     bool end;
     string tag, attr;
     string repl;
@@ -91,7 +91,7 @@ std::string UBBParser::parse(const char * text)
 
 void UBBParser::getTagText(std::string& out, bool remove)
 {
-    int pos = strchr(_pString + _readPos, '[') - _pString;
+    ssize_t pos = strchr(_pString + _readPos, '[') - _pString;
     if (pos < 0)
         return;
 

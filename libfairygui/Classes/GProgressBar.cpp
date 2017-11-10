@@ -4,8 +4,6 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
-
 GProgressBar::GProgressBar() :
     _max(100),
     _value(0),
@@ -148,7 +146,7 @@ void GProgressBar::handleSizeChanged()
         update();
 }
 
-void GProgressBar::constructFromXML(tinyxml2::XMLElement * xml)
+void GProgressBar::constructFromXML(TXMLElement * xml)
 {
     xml = xml->FirstChildElement("ProgressBar");
     CCASSERT(xml, "type mismatch");
@@ -177,7 +175,7 @@ void GProgressBar::constructFromXML(tinyxml2::XMLElement * xml)
     }
 }
 
-void GProgressBar::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GProgressBar::setup_AfterAdd(TXMLElement * xml)
 {
     GComponent::setup_AfterAdd(xml);
 

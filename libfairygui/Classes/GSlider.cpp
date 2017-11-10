@@ -4,8 +4,6 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-using namespace tinyxml2;
-
 GSlider::GSlider() :
     changeOnClick(false),
     canDrag(false),
@@ -156,7 +154,7 @@ void GSlider::handleSizeChanged()
         update();
 }
 
-void GSlider::constructFromXML(tinyxml2::XMLElement * xml)
+void GSlider::constructFromXML(TXMLElement * xml)
 {
     xml = xml->FirstChildElement("Slider");
     CCASSERT(xml, "type mismatch");
@@ -194,7 +192,7 @@ void GSlider::constructFromXML(tinyxml2::XMLElement * xml)
     addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GSlider::onTouchBegin, this));
 }
 
-void GSlider::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GSlider::setup_AfterAdd(TXMLElement * xml)
 {
     GComponent::setup_AfterAdd(xml);
 

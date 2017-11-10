@@ -149,14 +149,38 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
-    <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
+    <ClCompile Include="..\Classes\BasicsScene.cpp" />
+    <ClCompile Include="..\Classes\DemoScene.cpp" />
+    <ClCompile Include="..\Classes\GuideScene.cpp" />
+    <ClCompile Include="..\Classes\JoystickModule.cpp" />
+    <ClCompile Include="..\Classes\JoystickScene.cpp" />
+    <ClCompile Include="..\Classes\LoopListScene.cpp" />
+    <ClCompile Include="..\Classes\MailItem.cpp" />
+    <ClCompile Include="..\Classes\MenuScene.cpp" />
+    <ClCompile Include="..\Classes\HitTestScene.cpp" />
+    <ClCompile Include="..\Classes\ModalWaitingScene.cpp" />
+    <ClCompile Include="..\Classes\PullToRefreshScene.cpp" />
+    <ClCompile Include="..\Classes\TransitionDemoScene.cpp" />
+    <ClCompile Include="..\Classes\VirtualListScene.cpp" />
     <ClCompile Include="..\Classes\Window1.cpp" />
     <ClCompile Include="..\Classes\Window2.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
-    <ClInclude Include="..\Classes\HelloWorldScene.h" />
+    <ClInclude Include="..\Classes\BasicsScene.h" />
+    <ClInclude Include="..\Classes\DemoScene.h" />
+    <ClInclude Include="..\Classes\GuideScene.h" />
+    <ClInclude Include="..\Classes\JoystickModule.h" />
+    <ClInclude Include="..\Classes\JoystickScene.h" />
+    <ClInclude Include="..\Classes\LoopListScene.h" />
+    <ClInclude Include="..\Classes\MailItem.h" />
+    <ClInclude Include="..\Classes\MenuScene.h" />
+    <ClInclude Include="..\Classes\HitTestScene.h" />
+    <ClInclude Include="..\Classes\ModalWaitingScene.h" />
+    <ClInclude Include="..\Classes\PullToRefreshScene.h" />
+    <ClInclude Include="..\Classes\TransitionDemoScene.h" />
+    <ClInclude Include="..\Classes\VirtualListScene.h" />
     <ClInclude Include="..\Classes\Window1.h" />
     <ClInclude Include="..\Classes\Window2.h" />
     <ClInclude Include="main.h" />

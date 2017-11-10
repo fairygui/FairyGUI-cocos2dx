@@ -75,7 +75,7 @@ void GLabel::setTitleFontSize(int value)
         ((GButton*)_titleObject)->setTitleFontSize(value);
 }
 
-void GLabel::constructFromXML(tinyxml2::XMLElement * xml)
+void GLabel::constructFromXML(TXMLElement * xml)
 {
     GComponent::constructFromXML(xml);
 
@@ -87,7 +87,7 @@ void GLabel::constructFromXML(tinyxml2::XMLElement * xml)
         _icon = _iconObject->getIcon();
 }
 
-void GLabel::setup_AfterAdd(tinyxml2::XMLElement * xml)
+void GLabel::setup_AfterAdd(TXMLElement * xml)
 {
     GComponent::setup_AfterAdd(xml);
 

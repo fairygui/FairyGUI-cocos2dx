@@ -24,7 +24,7 @@ public:
 
 protected:
     virtual void handleInit() override;
-    virtual void setup_BeforeAdd(tinyxml2::XMLElement* xml) override;
+    virtual void setup_BeforeAdd(TXMLElement* xml) override;
     virtual void handleSizeChanged() override;
 
 private:

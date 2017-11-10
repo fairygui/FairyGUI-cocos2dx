@@ -21,6 +21,8 @@ public:
     bool isUBBEnabled() const { return _ubbEnabled; }
     void setUBBEnabled(bool value) { _ubbEnabled = value; }
 
+    const char* hitTestLink(const cocos2d::Vec2& worldPoint);
+
 protected:
     virtual bool init() override;
 

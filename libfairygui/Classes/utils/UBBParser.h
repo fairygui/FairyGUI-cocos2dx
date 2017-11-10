@@ -35,7 +35,7 @@ protected:
     std::unordered_map<std::string, TagHandler> _handlers;
 
     const char* _pString;
-    int _readPos;
+    ssize_t _readPos;
 
 private:
     static UBBParser* _inst;

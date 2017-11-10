@@ -4,7 +4,7 @@
     <component id="gkq00" name="BOSS.xml" path="/" exported="true"/>
     <image id="gkq01" name="2.png" path="/images/"/>
     <image id="gkq02" name="3.png" path="/images/"/>
-    <sound id="gkq03" name="BUZZ4.wav" path="/images/"/>
+    <sound id="gkq03" name="BUZZ4.mp3" path="/images/"/>
     <component id="gkq04" name="BOSS_SKILL.xml" path="/" exported="true"/>
     <image id="gkq05" name="0.png" path="/images/"/>
     <image id="gkq06" name="1.png" path="/images/"/>

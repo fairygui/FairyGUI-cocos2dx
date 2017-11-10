@@ -216,6 +216,8 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
             src = it->second.asString();
             if (src.find("ui://") != -1)
             {
+                resType = Widget::TextureResType::PLIST;
+
                 src = UIPackage::normalizeURL(src);
                 PackageItem* pi = UIPackage::getItemByURL(src);
                 if (pi && pi->spriteFrame && !pi->addedToCache)
@@ -313,7 +315,7 @@ void FUIXMLVisitor::textHandler(void* /*ctx*/, const char *str, size_t len)
         if (!_ignoreWhiteSpace)
         {
             FastSplitter fs;
-            fs.start(str, len, '\n');
+            fs.start(str, (int)len, '\n');
             bool first = true;
             while (fs.next())
             {
@@ -351,6 +353,17 @@ FUIRichText::FUIRichText() :_ubbEnabled(false)
 
 FUIRichText::~FUIRichText()
 {
+}
+
+const char*  FUIRichText::hitTestLink(const cocos2d::Vec2 & worldPoint)
+{
+    //not able to implement, need to modify cocos2d::UIRichText
+    /*
+    for (auto &child : _children)
+    {
+        
+    }*/
+    return nullptr;
 }
 
 bool FUIRichText::init()

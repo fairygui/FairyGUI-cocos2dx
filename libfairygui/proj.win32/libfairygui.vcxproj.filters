@@ -195,6 +195,9 @@
     <ClInclude Include="..\Classes\utils\SwitchHelper.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\event\HitTest.h">
+      <Filter>src\event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\utils\UBBParser.cpp">
       <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\event\HitTest.cpp">
+      <Filter>src\event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

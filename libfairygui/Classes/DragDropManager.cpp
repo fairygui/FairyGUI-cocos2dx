@@ -42,8 +42,8 @@ void DragDropManager::startDrag(const std::string & icon, Value sourceData, int 
 
     _sourceData = sourceData;
     _agent->setURL(icon);
-    GRoot::getInstance()->addChild(_agent);
-    Vec2 pt = GRoot::getInstance()->globalToLocal(GRoot::getInstance()->getTouchPosition(touchPointID));
+    UIRoot->addChild(_agent);
+    Vec2 pt = UIRoot->globalToLocal(UIRoot->getTouchPosition(touchPointID));
     _agent->setPosition(pt.x, pt.y);
     _agent->startDrag(touchPointID);
 }
@@ -53,7 +53,7 @@ void DragDropManager::cancel()
     if (_agent->getParent() != nullptr)
     {
         _agent->stopDrag();
-        GRoot::getInstance()->removeChild(_agent);
+        UIRoot->removeChild(_agent);
         _sourceData = Value::Null;
     }
 }
@@ -63,9 +63,9 @@ void DragDropManager::onDragEnd(EventContext * context)
     if (_agent->getParent() == nullptr) //cancelled
         return;
 
-    GRoot::getInstance()->removeChild(_agent);
+    UIRoot->removeChild(_agent);
 
-    GObject* obj = GRoot::getInstance()->getTouchTarget();
+    GObject* obj = UIRoot->getTouchTarget();
     while (obj != nullptr)
     {
         if (dynamic_cast<GComponent*>(obj))

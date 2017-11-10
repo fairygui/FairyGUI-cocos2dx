@@ -46,16 +46,16 @@ public:
     bool isSelected() const { return _selected; }
     void setSelected(bool value);
 
-    Controller* getRelatedController() const { return _relatedController; }
-    void setRelatedController(Controller* c);
+    GController* getRelatedController() const { return _relatedController; }
+    void setRelatedController(GController* c);
 
     bool isChangeStateOnClick() { return _changeStateOnClick; }
     void setChangeStateOnClick(bool value) { _changeStateOnClick = value; }
 
 protected:
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
-    virtual void handleControllerChanged(Controller* c) override;
+    virtual void constructFromXML(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void handleControllerChanged(GController* c) override;
 
     void setState(const std::string& value);
     void setCurrentState();
@@ -71,8 +71,8 @@ private:
     ButtonMode _mode;
     GObject* _titleObject;
     GObject* _iconObject;
-    Controller* _buttonController;
-    Controller* _relatedController;
+    GController* _buttonController;
+    GController* _relatedController;
     std::string _relatedPageId;
     std::string _title;
     std::string _selectedTitle;

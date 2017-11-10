@@ -143,7 +143,7 @@ void GGroup::resizeChildren(float dw, float dh)
             remainSize -= child->getWidth();
             if (last == i)
             {
-                if (remainSize >= 1) //可能由于有些元件有宽度限制，导致无法铺满
+                if (remainSize >= 1)
                 {
                     for (j = 0; j <= i; j++)
                     {
@@ -197,7 +197,7 @@ void GGroup::resizeChildren(float dw, float dh)
             remainSize -= child->getHeight();
             if (last == i)
             {
-                if (remainSize >= 1) //可能由于有些元件有宽度限制，导致无法铺满
+                if (remainSize >= 1)
                 {
                     for (j = 0; j <= i; j++)
                     {
@@ -419,7 +419,7 @@ void GGroup::handleAlphaChanged()
     }
 }
 
-void GGroup::setup_BeforeAdd(tinyxml2::XMLElement * xml)
+void GGroup::setup_BeforeAdd(TXMLElement * xml)
 {
     GObject::setup_BeforeAdd(xml);
 

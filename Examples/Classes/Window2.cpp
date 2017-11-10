@@ -10,39 +10,25 @@ void  Window2::doShowAnimation()
 {
     setScale(0.1f, 0.1f);
     setPivot(0.5f, 0.5f);
-    displayObject()->runAction(createEaseAction(tweenfunc::Quad_EaseOut,
-        ActionVec2::create(0.3f, getScale(), Vec2::ONE,
-            [this](const cocos2d::Vec2& value)
-    {
-        setScale(value.x, value.y);
-    },
-            [this]()
-    {
-        onShown();
-    }
-    )));
+
+    ActionInterval* action = ActionFloat2::create(0.3f, getScale(), Vec2::ONE, CC_CALLBACK_2(Window2::setScale, this));
+    action = composeActions(action, tweenfunc::Quad_EaseOut, 0, CC_CALLBACK_0(Window2::onShown, this));
+    displayObject()->runAction(action);
 }
 
 void  Window2::doHideAnimation()
 {
-    displayObject()->runAction(createEaseAction(tweenfunc::Quad_EaseOut, ActionVec2::create(0.3f, getScale(), Vec2(0.1f, 0.1f),
-        [this](const cocos2d::Vec2& value)
-    {
-        setScale(value.x, value.y);
-    },
-        [this]()
-    {
-        hideImmediately();
-    }
-    )));
+    ActionInterval* action = ActionFloat2::create(0.3f, getScale(), Vec2(0.1f, 0.1f), CC_CALLBACK_2(Window2::setScale, this));
+    action = composeActions(action, tweenfunc::Quad_EaseOut, 0, CC_CALLBACK_0(Window2::hideImmediately, this));
+    displayObject()->runAction(action);
 }
 
 void Window2::onShown()
 {
-
+    _contentPane->getTransition("t1")->play();
 }
 
 void Window2::onHide()
 {
-
+    _contentPane->getTransition("t1")->stop();
 }

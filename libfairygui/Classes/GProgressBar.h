@@ -26,8 +26,8 @@ public:
 
 protected:
     virtual void handleSizeChanged() override;
-    virtual void constructFromXML(tinyxml2::XMLElement* xml) override;
-    virtual void setup_AfterAdd(tinyxml2::XMLElement* xml) override;
+    virtual void constructFromXML(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
 
     void update();
 
