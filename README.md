@@ -4,11 +4,19 @@ FairyGUI Cocos2dx SDK
 A flexible UI framework for Unity3D, working with the FREE professional Game UI Editor: FairyGUI Editor.  
 Download the editor from here: [www.fairygui.com](http://www.fairygui.com/product)  
 
-FairyGUI UI编辑器 操作简单，使用习惯与Adobe系列软件保持一致，策划和美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity，Cocos2dx, Starling, Egret, LayaAir, Pixi, Haxe, Flash等多个主流应用和游戏平台。<br>
+FairyGUI编辑器操作简单，使用习惯与Adobe系列软件保持一致，策划和美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity，Cocos2dx, Starling, Egret, LayaAir, Pixi, Haxe, Flash等多个主流应用和游戏平台。
+
 下载UI编辑器：[www.fairygui.com](http://www.fairygui.com/product)
 
 Get Started
 ====
+
+![](http://www.fairygui.com/images/20171111214131.png)
+
+目录结构：
+- libfairygui 这里是fairygui库的源码。
+- Examples 这里是示例的源码。
+  - UIProject 这里是示例用到的UI界面的源码，使用FairyGUI编辑器打开。
 
 请下载3.x版本cocos2dx命名成cocos2d放在Example根目录。
 
