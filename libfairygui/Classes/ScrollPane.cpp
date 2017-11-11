@@ -979,7 +979,7 @@ void ScrollPane::onShowScrollBar()
     if (_vtScrollBar != nullptr)
         _vtScrollBar->setVisible(_scrollBarVisible && !_vScrollNone);
     if (_hzScrollBar != nullptr)
-        _vtScrollBar->setVisible(_scrollBarVisible && !_hScrollNone);
+        _hzScrollBar->setVisible(_scrollBarVisible && !_hScrollNone);
 }
 
 float ScrollPane::getLoopPartSize(float division, int axis)

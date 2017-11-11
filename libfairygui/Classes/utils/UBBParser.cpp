@@ -45,21 +45,25 @@ std::string UBBParser::parse(const char * text)
 
     while (*_pString != '\0')
     {
-        if ((pos = strchr(_pString, '[') - _pString) < 0)
+        const char* p = strchr(_pString, '[');
+        if (!p)
         {
             out.append(_pString);
             break;
         }
 
+        pos = p - _pString;
         out.append(_pString, pos);
         _pString += pos;
 
-        if ((pos = strchr(_pString, ']') - _pString) < 0)
+        p = strchr(_pString, ']');
+        if (!p)
         {
             out.append(_pString);
             break;
         }
 
+        pos = p - _pString;
         end = _pString[1] == '/';
         if (end)
             tag.assign(_pString + 2, pos - 2);
@@ -91,10 +95,11 @@ std::string UBBParser::parse(const char * text)
 
 void UBBParser::getTagText(std::string& out, bool remove)
 {
-    ssize_t pos = strchr(_pString + _readPos, '[') - _pString;
-    if (pos < 0)
+    const char* p = strchr(_pString + _readPos, '[');
+    if (!p)
         return;
 
+    ssize_t pos =  p - _pString;
     out.assign(_pString, _readPos, pos - _readPos);
     if (remove)
         _readPos = pos;

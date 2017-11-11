@@ -358,17 +358,46 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/builds" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-classes" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-runtime-classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-safeguard" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-verifier" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-resources" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-support" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndkBuild" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/reload-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/restart-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/split-apk" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../libfairygui/Classes">
+      <sourceFolder url="file://$MODULE_DIR$/../../../libfairygui/Classes" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../libfairygui/Classes/display">
+      <sourceFolder url="file://$MODULE_DIR$/../../../libfairygui/Classes/display" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../libfairygui/Classes/event">
+      <sourceFolder url="file://$MODULE_DIR$/../../../libfairygui/Classes/event" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../libfairygui/Classes/gears">
+      <sourceFolder url="file://$MODULE_DIR$/../../../libfairygui/Classes/gears" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../libfairygui/Classes/utils">
+      <sourceFolder url="file://$MODULE_DIR$/../../../libfairygui/Classes/utils" isTestSource="false" />
     </content>
     <content url="file://D:/Program/Android/sdk/ndk-bundle/sources/android/cpufeatures">
       <sourceFolder url="file://D:/Program/Android/sdk/ndk-bundle/sources/android/cpufeatures" isTestSource="false" />

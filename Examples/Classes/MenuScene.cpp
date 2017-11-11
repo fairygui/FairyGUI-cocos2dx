@@ -18,7 +18,7 @@ void MenuScene::continueInit()
 
     _view->getChild("n1")->addClickListener([this](EventContext*)
     {
-        TransitionFade* scene = TransitionFade::create(1, BasicsScene::create());
+        TransitionFade* scene = TransitionFade::create(0.5f, BasicsScene::create());
         Director::getInstance()->replaceScene(scene);
     });
     _view->getChild("n2")->addClickListener([this](EventContext*)

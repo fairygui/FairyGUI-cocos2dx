@@ -683,7 +683,7 @@ void UIPackage::loadFont(PackageItem * item)
     char keyBuf[30];
     char valueBuf[50];
 
-    item->bitmapFont = BitmapFont::create(); //ÓÉfontAtlas retain
+    item->bitmapFont = BitmapFont::create(); //fontAtlas retain
 
     FontAtlas* fontAtlas = new FontAtlas(*item->bitmapFont);
     item->bitmapFont->_fontAtlas = fontAtlas;
@@ -743,6 +743,8 @@ void UIPackage::loadFont(PackageItem * item)
         else if (len > 4 && memcmp(line, "char", 4) == 0)
         {
             FontLetterDefinition def;
+            memset(&def, 0, sizeof(def));
+
             int bx = 0, by = 0, charId = 0;
             int bw = 0, bh = 0;
             PackageItem* charImg = nullptr;
@@ -780,6 +782,7 @@ void UIPackage::loadFont(PackageItem * item)
                 def.V = tempRect.origin.y;
                 def.width = tempRect.size.width;
                 def.height = tempRect.size.height;
+                def.validDefinition = true;
             }
             else if (charImg)
             {
@@ -795,8 +798,8 @@ void UIPackage::loadFont(PackageItem * item)
                 def.height = tempRect.size.height;
                 if (mainTexture == nullptr)
                     mainTexture = charImg->spriteFrame->getTexture();
+                def.validDefinition = true;
             }
-            def.textureID = 0;
             fontAtlas->addLetterDefinition(charId, def);
 
             if (size == 0)
