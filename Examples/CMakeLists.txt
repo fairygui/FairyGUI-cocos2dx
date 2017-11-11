@@ -157,13 +157,41 @@ endif ()
 set(GAME_SRC
         ${PLATFORM_SPECIFIC_SRC}
         Classes/AppDelegate.cpp
-        Classes/HelloWorldScene.cpp
+        Classes/BasicsScene.cpp
+        Classes/DemoScene.cpp
+        Classes/GuideScene.cpp
+        Classes/HitTestScene.cpp
+        Classes/JoystickModule.cpp
+        Classes/JoystickScene.cpp
+        Classes/LoopListScene.cpp
+        Classes/MailItem.cpp
+        Classes/MenuScene.cpp
+        Classes/ModalWaitingScene.cpp
+        Classes/PullToRefreshScene.cpp
+        Classes/TransitionDemoScene.cpp
+        Classes/VirtualListScene.cpp
+        Classes/Window1.cpp
+        Classes/Window2.cpp
         )
 
 set(GAME_HEADERS
         ${PLATFORM_SPECIFIC_HEADERS}
         Classes/AppDelegate.h
-        Classes/HelloWorldScene.h
+        Classes/BasicsScene.h
+        Classes/DemoScene.h
+        Classes/GuideScene.h
+        Classes/HitTestScene.h
+        Classes/JoystickModule.h
+        Classes/JoystickScene.h
+        Classes/LoopListScene.h
+        Classes/MailItem.h
+        Classes/MenuScene.h
+        Classes/ModalWaitingScene.h
+        Classes/PullToRefreshScene.h
+        Classes/TransitionDemoScene.h
+        Classes/VirtualListScene.h
+        Classes/Window1.h
+        Classes/Window2.h
         )
 
 # add the executable
