@@ -18,7 +18,6 @@ const unsigned char* emptyTextureData = new unsigned char[16]{ 0,0,0,0,0,0,0,0,0
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstById;
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstByName;
 std::vector<UIPackage*> UIPackage::_packageList;
-std::unordered_map<std::string, FontAtlas*> UIPackage::_bitmapFonts;
 ValueMap UIPackage::_stringsSource;
 Texture2D* UIPackage::_emptyTexture;
 
@@ -687,7 +686,6 @@ void UIPackage::loadFont(PackageItem * item)
 
     FontAtlas* fontAtlas = new FontAtlas(*item->bitmapFont);
     item->bitmapFont->_fontAtlas = fontAtlas;
-    _bitmapFonts[URL_PREFIX + _id + item->id] = fontAtlas;
 
     while (lines.next())
     {

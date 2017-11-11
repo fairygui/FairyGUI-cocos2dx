@@ -77,7 +77,6 @@ private:
     static std::unordered_map<std::string, UIPackage*> _packageInstById;
     static std::unordered_map<std::string, UIPackage*> _packageInstByName;
     static std::vector<UIPackage*> _packageList;
-    static std::unordered_map<std::string, cocos2d::FontAtlas*> _bitmapFonts;
     static ValueMap _stringsSource;
     static Texture2D* _emptyTexture;
 };
