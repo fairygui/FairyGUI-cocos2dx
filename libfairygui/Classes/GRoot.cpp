@@ -41,6 +41,7 @@ GRoot::~GRoot()
     CC_SAFE_RELEASE(_modalWaitPane);
     CC_SAFE_RELEASE(_defaultTooltipWin);
     CC_SAFE_RELEASE(_modalLayer);
+    CALL_LATER_CANCEL(GRoot, doShowTooltipsWin);
 
     if (_windowSizeListener)
         Director::getInstance()->getEventDispatcher()->removeEventListener(_windowSizeListener);

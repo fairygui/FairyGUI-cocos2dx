@@ -2,6 +2,7 @@
 #include "GComponent.h"
 #include "GGroup.h"
 #include "event/UIEventType.h"
+#include "utils/WeakPtr.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -14,22 +15,19 @@ RelationItem::RelationItem(GObject* owner) :
 
 RelationItem::~RelationItem()
 {
-    if (_target != nullptr)
-    {
-        releaseRefTarget(_target);
-        _target = nullptr;
-    }
+    releaseRefTarget(_target.ptr());
 }
 
 void RelationItem::setTarget(GObject * value)
 {
-    if (_target != value)
+    GObject* old = _target.ptr();
+    if (old != value)
     {
-        if (_target != nullptr)
-            releaseRefTarget(_target);
+        if (old)
+            releaseRefTarget(old);
         _target = value;
-        if (_target != nullptr)
-            addRefTarget(_target);
+        if (value)
+            addRefTarget(value);
     }
 }
 
@@ -91,7 +89,7 @@ void RelationItem::remove(RelationType relationType)
 
 void RelationItem::copyFrom(const RelationItem& source)
 {
-    setTarget(source._target);
+    setTarget(source._target.ptr());
 
     _defs.clear();
     for (auto &it : source._defs)
@@ -154,7 +152,7 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight)
     }
 }
 
-void RelationItem::applyOnXYChanged(const RelationDef& info, float dx, float dy)
+void RelationItem::applyOnXYChanged(GObject* target, const RelationDef& info, float dx, float dy)
 {
     switch (info.type)
     {
@@ -208,13 +206,13 @@ void RelationItem::applyOnXYChanged(const RelationDef& info, float dx, float dy)
     }
 }
 
-void RelationItem::applyOnSizeChanged(const RelationDef& info)
+void RelationItem::applyOnSizeChanged(GObject* target, const RelationDef& info)
 {
     float targetX, targetY;
-    if (_target != _owner->_parent)
+    if (target != _owner->_parent)
     {
-        targetX = _target->_position.x;
-        targetY = _target->_position.y;
+        targetX = target->_position.x;
+        targetY = target->_position.y;
     }
     else
     {
@@ -230,45 +228,45 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
         {
             v = _owner->_position.x - targetX;
             if (info.percent)
-                v = v / _targetData.z * _target->_size.width;
+                v = v / _targetData.z * target->_size.width;
             _owner->setX(targetX + v);
         }
         break;
     case RelationType::Left_Center:
         v = _owner->_position.x - (targetX + _targetData.z / 2);
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
-        _owner->setX(targetX + _target->_size.width / 2 + v);
+            v = v / _targetData.z * target->_size.width;
+        _owner->setX(targetX + target->_size.width / 2 + v);
         break;
     case RelationType::Left_Right:
         v = _owner->_position.x - (targetX + _targetData.z);
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
-        _owner->setX(targetX + _target->_size.width + v);
+            v = v / _targetData.z * target->_size.width;
+        _owner->setX(targetX + target->_size.width + v);
         break;
     case RelationType::Center_Center:
         v = _owner->_position.x + _owner->_rawSize.width / 2 - (targetX + _targetData.z / 2);
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
-        _owner->setX(targetX + _target->_size.width / 2 + v - _owner->_rawSize.width / 2);
+            v = v / _targetData.z * target->_size.width;
+        _owner->setX(targetX + target->_size.width / 2 + v - _owner->_rawSize.width / 2);
         break;
     case RelationType::Right_Left:
         v = _owner->_position.x + _owner->_rawSize.width - targetX;
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
+            v = v / _targetData.z * target->_size.width;
         _owner->setX(targetX + v - _owner->_rawSize.width);
         break;
     case RelationType::Right_Center:
         v = _owner->_position.x + _owner->_rawSize.width - (targetX + _targetData.z / 2);
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
-        _owner->setX(targetX + _target->_size.width / 2 + v - _owner->_rawSize.width);
+            v = v / _targetData.z * target->_size.width;
+        _owner->setX(targetX + target->_size.width / 2 + v - _owner->_rawSize.width);
         break;
     case RelationType::Right_Right:
         v = _owner->_position.x + _owner->_rawSize.width - (targetX + _targetData.z);
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
-        _owner->setX(targetX + _target->_size.width + v - _owner->_rawSize.width);
+            v = v / _targetData.z * target->_size.width;
+        _owner->setX(targetX + target->_size.width + v - _owner->_rawSize.width);
         break;
 
     case RelationType::Top_Top:
@@ -276,70 +274,70 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
         {
             v = _owner->_position.y - targetY;
             if (info.percent)
-                v = v / _targetData.w * _target->_size.height;
+                v = v / _targetData.w * target->_size.height;
             _owner->setY(targetY + v);
         }
         break;
     case RelationType::Top_Middle:
         v = _owner->_position.y - (targetY + _targetData.w / 2);
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
-        _owner->setY(targetY + _target->_size.height / 2 + v);
+            v = v / _targetData.w * target->_size.height;
+        _owner->setY(targetY + target->_size.height / 2 + v);
         break;
     case RelationType::Top_Bottom:
         v = _owner->_position.y - (targetY + _targetData.w);
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
-        _owner->setY(targetY + _target->_size.height + v);
+            v = v / _targetData.w * target->_size.height;
+        _owner->setY(targetY + target->_size.height + v);
         break;
     case RelationType::Middle_Middle:
         v = _owner->_position.y + _owner->_rawSize.height / 2 - (targetY + _targetData.w / 2);
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
-        _owner->setY(targetY + _target->_size.height / 2 + v - _owner->_rawSize.height / 2);
+            v = v / _targetData.w * target->_size.height;
+        _owner->setY(targetY + target->_size.height / 2 + v - _owner->_rawSize.height / 2);
         break;
     case RelationType::Bottom_Top:
         v = _owner->_position.y + _owner->_rawSize.height - targetY;
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
+            v = v / _targetData.w * target->_size.height;
         _owner->setY(targetY + v - _owner->_rawSize.height);
         break;
     case RelationType::Bottom_Middle:
         v = _owner->_position.y + _owner->_rawSize.height - (targetY + _targetData.w / 2);
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
-        _owner->setY(targetY + _target->_size.height / 2 + v - _owner->_rawSize.height);
+            v = v / _targetData.w * target->_size.height;
+        _owner->setY(targetY + target->_size.height / 2 + v - _owner->_rawSize.height);
         break;
     case RelationType::Bottom_Bottom:
         v = _owner->_position.y + _owner->_rawSize.height - (targetY + _targetData.w);
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
-        _owner->setY(targetY + _target->_size.height + v - _owner->_rawSize.height);
+            v = v / _targetData.w * target->_size.height;
+        _owner->setY(targetY + target->_size.height + v - _owner->_rawSize.height);
         break;
 
     case RelationType::Width:
-        if (_owner->_underConstruct && _owner == _target->_parent)
-            v = _owner->sourceSize.width - _target->initSize.width;
+        if (_owner->_underConstruct && _owner == target->_parent)
+            v = _owner->sourceSize.width - target->initSize.width;
         else
             v = _owner->_rawSize.width - _targetData.z;
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
+            v = v / _targetData.z * target->_size.width;
         if (_target == _owner->_parent)
-            _owner->setSize(_target->_size.width + v, _owner->_rawSize.height, true);
+            _owner->setSize(target->_size.width + v, _owner->_rawSize.height, true);
         else
-            _owner->setWidth(_target->_size.width + v);
+            _owner->setWidth(target->_size.width + v);
         break;
     case RelationType::Height:
-        if (_owner->_underConstruct && _owner == _target->_parent)
-            v = _owner->sourceSize.height - _target->initSize.height;
+        if (_owner->_underConstruct && _owner == target->_parent)
+            v = _owner->sourceSize.height - target->initSize.height;
         else
             v = _owner->_rawSize.height - _targetData.w;
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
+            v = v / _targetData.w * target->_size.height;
         if (_target == _owner->_parent)
-            _owner->setSize(_owner->_rawSize.width, _target->_size.height + v, true);
+            _owner->setSize(_owner->_rawSize.width, target->_size.height + v, true);
         else
-            _owner->setHeight(_target->_size.height + v);
+            _owner->setHeight(target->_size.height + v);
         break;
 
     case RelationType::LeftExt_Left:
@@ -347,52 +345,52 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
     case RelationType::LeftExt_Right:
         v = _owner->_position.x - (targetX + _targetData.z);
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
+            v = v / _targetData.z * target->_size.width;
         tmp = _owner->_position.x;
-        _owner->setX(targetX + _target->_size.width + v);
+        _owner->setX(targetX + target->_size.width + v);
         _owner->setWidth(_owner->_rawSize.width - (_owner->_position.x - tmp));
         break;
     case RelationType::RightExt_Left:
         break;
     case RelationType::RightExt_Right:
-        if (_owner->_underConstruct && _owner == _target->_parent)
-            v = _owner->sourceSize.width - (targetX + _target->initSize.width);
+        if (_owner->_underConstruct && _owner == target->_parent)
+            v = _owner->sourceSize.width - (targetX + target->initSize.width);
         else
             v = _owner->_rawSize.width - (targetX + _targetData.z);
-        if (_owner != _target->_parent)
+        if (_owner != target->_parent)
             v += _owner->_position.x;
         if (info.percent)
-            v = v / _targetData.z * _target->_size.width;
-        if (_owner != _target->_parent)
-            _owner->setWidth(targetX + _target->_size.width + v - _owner->_position.x);
+            v = v / _targetData.z * target->_size.width;
+        if (_owner != target->_parent)
+            _owner->setWidth(targetX + target->_size.width + v - _owner->_position.x);
         else
-            _owner->setWidth(targetX + _target->_size.width + v);
+            _owner->setWidth(targetX + target->_size.width + v);
         break;
     case RelationType::TopExt_Top:
         break;
     case RelationType::TopExt_Bottom:
         v = _owner->_position.y - (targetY + _targetData.w);
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
+            v = v / _targetData.w * target->_size.height;
         tmp = _owner->_position.y;
-        _owner->setY(targetY + _target->_size.height + v);
+        _owner->setY(targetY + target->_size.height + v);
         _owner->setHeight(_owner->_rawSize.height - (_owner->_position.y - tmp));
         break;
     case RelationType::BottomExt_Top:
         break;
     case RelationType::BottomExt_Bottom:
-        if (_owner->_underConstruct && _owner == _target->_parent)
-            v = _owner->sourceSize.height - (targetY + _target->initSize.height);
+        if (_owner->_underConstruct && _owner == target->_parent)
+            v = _owner->sourceSize.height - (targetY + target->initSize.height);
         else
             v = _owner->_rawSize.height - (targetY + _targetData.w);
-        if (_owner != _target->_parent)
+        if (_owner != target->_parent)
             v += _owner->_position.y;
         if (info.percent)
-            v = v / _targetData.w * _target->_size.height;
-        if (_owner != _target->_parent)
-            _owner->setHeight(targetY + _target->_size.height + v - _owner->_position.y);
+            v = v / _targetData.w * target->_size.height;
+        if (_owner != target->_parent)
+            _owner->setHeight(targetY + target->_size.height + v - _owner->_position.y);
         else
-            _owner->setHeight(targetY + _target->_size.height + v);
+            _owner->setHeight(targetY + target->_size.height + v);
         break;
     default:
         break;
@@ -401,30 +399,36 @@ void RelationItem::applyOnSizeChanged(const RelationDef& info)
 
 void RelationItem::addRefTarget(GObject* target)
 {
+    if (!target)
+        return;
+
     if (target != _owner->_parent)
         target->addEventListener(UIEventType::PositionChange, CC_CALLBACK_1(RelationItem::onTargetXYChanged, this), EventTag(this));
     target->addEventListener(UIEventType::SizeChange, CC_CALLBACK_1(RelationItem::onTargetSizeChanged, this), EventTag(this));
-    target->addEventListener(UIEventType::Destroy, CC_CALLBACK_1(RelationItem::onTargetGone, this), EventTag(this));
 
-    _targetData.x = _target->_position.x;
-    _targetData.y = _target->_position.y;
-    _targetData.z = _target->_size.width;
-    _targetData.w = _target->_size.height;
+    _targetData.x = target->_position.x;
+    _targetData.y = target->_position.y;
+    _targetData.z = target->_size.width;
+    _targetData.w = target->_size.height;
 }
 
 void RelationItem::releaseRefTarget(GObject* target)
 {
+    if (!target)
+        return;
+
     target->removeEventListener(UIEventType::PositionChange, EventTag(this));
     target->removeEventListener(UIEventType::SizeChange, EventTag(this));
 }
 
 void RelationItem::onTargetXYChanged(EventContext* context)
 {
+    GObject* target = (GObject*)context->getSender();
     if (_owner->relations()->handling != nullptr
         || (_owner->_group != nullptr && _owner->_group->_updating != 0))
     {
-        _targetData.x = _target->_position.x;
-        _targetData.y = _target->_position.y;
+        _targetData.x = target->_position.x;
+        _targetData.y = target->_position.y;
         return;
     }
 
@@ -432,14 +436,14 @@ void RelationItem::onTargetXYChanged(EventContext* context)
 
     float ox = _owner->_position.x;
     float oy = _owner->_position.y;
-    float dx = _target->_position.x - _targetData.x;
-    float dy = _target->_position.y - _targetData.y;
+    float dx = target->_position.x - _targetData.x;
+    float dy = target->_position.y - _targetData.y;
 
     for (auto &it : _defs)
-        applyOnXYChanged(it, dx, dy);
+        applyOnXYChanged(target, it, dx, dy);
 
-    _targetData.x = _target->_position.x;
-    _targetData.y = _target->_position.y;
+    _targetData.x = target->_position.x;
+    _targetData.y = target->_position.y;
 
     if (ox != _owner->_position.x || oy != _owner->_position.y)
     {
@@ -461,11 +465,12 @@ void RelationItem::onTargetXYChanged(EventContext* context)
 
 void RelationItem::onTargetSizeChanged(EventContext* context)
 {
+    GObject* target = (GObject*)context->getSender();
     if (_owner->relations()->handling != nullptr
         || (_owner->_group != nullptr && _owner->_group->_updating != 0))
     {
-        _targetData.z = _target->_size.width;
-        _targetData.w = _target->_size.height;
+        _targetData.z = target->_size.width;
+        _targetData.w = target->_size.height;
         return;
     }
 
@@ -477,10 +482,10 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
     float oh = _owner->_rawSize.height;
 
     for (auto &it : _defs)
-        applyOnSizeChanged(it);
+        applyOnSizeChanged(target, it);
 
-    _targetData.z = _target->_size.width;
-    _targetData.w = _target->_size.height;
+    _targetData.z = target->_size.width;
+    _targetData.w = target->_size.height;
 
     if (ox != _owner->_position.x || oy != _owner->_position.y)
     {
@@ -507,11 +512,5 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
 
     _owner->relations()->handling = nullptr;
 }
-
-void RelationItem::onTargetGone(EventContext *)
-{
-    _target = nullptr;
-}
-
 
 NS_FGUI_END

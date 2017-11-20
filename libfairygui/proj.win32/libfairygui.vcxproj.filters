@@ -198,6 +198,9 @@
     <ClInclude Include="..\Classes\event\HitTest.h">
       <Filter>src\event</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\utils\WeakPtr.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -364,6 +367,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\event\HitTest.cpp">
       <Filter>src\event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\WeakPtr.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

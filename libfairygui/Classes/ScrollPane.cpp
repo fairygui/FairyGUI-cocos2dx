@@ -197,10 +197,26 @@ ScrollPane::~ScrollPane()
     CALL_LATER_CANCEL(ScrollPane, refresh);
     CALL_LATER_CANCEL(ScrollPane, onShowScrollBar);
 
-    CC_SAFE_RELEASE(_hzScrollBar);
-    CC_SAFE_RELEASE(_vtScrollBar);
-    CC_SAFE_RELEASE(_header);
-    CC_SAFE_RELEASE(_footer);
+    if (_hzScrollBar)
+    {
+        _hzScrollBar->_parent = nullptr;
+        _hzScrollBar->release();
+    }
+    if (_vtScrollBar)
+    {
+        _vtScrollBar->_parent = nullptr;
+        _vtScrollBar->release();
+    }
+    if (_header)
+    {
+        _header->_parent = nullptr;
+        _header->release();
+    }
+    if (_footer)
+    {
+        _footer->_parent = nullptr;
+        _footer->release();
+    }
 }
 
 void ScrollPane::setScrollStep(float value)

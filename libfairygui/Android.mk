@@ -63,7 +63,8 @@ Classes/gears/GearText.cpp \
 Classes/gears/GearXY.cpp \
 Classes/utils/ByteArray.cpp \
 Classes/utils/ToolSet.cpp \
-Classes/utils/UBBParser.cpp
+Classes/utils/UBBParser.cpp \
+Classes/utils/WeakPtr.cpp
 
 LOCAL_STATIC_LIBRARIES := cocos2dx_static
 

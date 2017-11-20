@@ -70,6 +70,7 @@
     <ClInclude Include="..\Classes\utils\SwitchHelper.h" />
     <ClInclude Include="..\Classes\utils\ToolSet.h" />
     <ClInclude Include="..\Classes\utils\UBBParser.h" />
+    <ClInclude Include="..\Classes\utils\WeakPtr.h" />
     <ClInclude Include="..\Classes\Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +128,7 @@
     <ClCompile Include="..\Classes\utils\ByteArray.cpp" />
     <ClCompile Include="..\Classes\utils\ToolSet.cpp" />
     <ClCompile Include="..\Classes\utils\UBBParser.cpp" />
+    <ClCompile Include="..\Classes\utils\WeakPtr.cpp" />
     <ClCompile Include="..\Classes\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

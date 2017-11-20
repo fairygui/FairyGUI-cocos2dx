@@ -23,8 +23,8 @@ public:
 
     cocos2d::Vec2 getTouchPosition(int touchId);
 
-    void addTouchMonitor(int touchId, UIEventDispatcher* target);
-    void removeTouchMonitor(UIEventDispatcher* target);
+    void addTouchMonitor(int touchId, GObject* target);
+    void removeTouchMonitor(GObject* target);
 
     void cancelClick(int touchId);
 
@@ -40,17 +40,15 @@ private:
     void onMouseScroll(cocos2d::EventMouse* event);
 
     TouchInfo* getTouch(int touchId, bool createIfNotExisits = true);
-    void updateRecentInput(TouchInfo* touch);
-    void handleRollOver(TouchInfo* touch);
-    void setBegin(TouchInfo* touch);
-    void setEnd(TouchInfo* touch);
-    GObject* clickTest(TouchInfo* touch);
+    void updateRecentInput(TouchInfo* touch, GObject* target);
+    void handleRollOver(TouchInfo* touch, GObject* target);
+    void setBegin(TouchInfo* touch, GObject* target);
+    void setEnd(TouchInfo* touch, GObject* target);
+    GObject* clickTest(TouchInfo* touch, GObject* target);
 
     cocos2d::EventListenerTouchOneByOne* _touchListener;
     cocos2d::EventListenerMouse* _mouseListener;
     std::vector<TouchInfo*> _touches;
-    std::vector<GObject*> _rollOutChain;
-    std::vector<GObject*> _rollOverChain;
     GComponent* _owner;
     CaptureEventCallback _captureCallback;
     InputEvent _recentInput;
@@ -59,31 +57,6 @@ private:
 
     friend class UIEventDispatcher;
 };
-
-class TouchInfo
-{
-public:
-    TouchInfo();
-    ~TouchInfo();
-
-    void reset();
-
-    cocos2d::Touch* touch;
-    cocos2d::Vec2 pos;
-    int touchId;
-    int clickCount;
-    int mouseWheelDelta;
-    cocos2d::EventMouse::MouseButton button;
-    cocos2d::Vec2 downPos;
-    bool began;
-    bool clickCancelled;
-    clock_t lastClickTime;
-    GObject* target;
-    cocos2d::Vector<GObject*> downTargets;
-    GObject* lastRollOver;
-    cocos2d::Vector<UIEventDispatcher*> touchMonitors;
-};
-
 
 NS_FGUI_END
 

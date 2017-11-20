@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
+#include "utils/WeakPtr.h"
 
 NS_FGUI_BEGIN
 
@@ -63,7 +64,7 @@ public:
     RelationItem(GObject* owner);
     ~RelationItem();
 
-    GObject* getTarget() { return _target; }
+    GObject* getTarget() { return _target.ptr(); }
     void setTarget(GObject* value);
 
     void add(RelationType relationType, bool usePercent);
@@ -74,17 +75,15 @@ public:
     void applyOnSelfSizeChanged(float dWidth, float dHeight);
 
 private:
-    void applyOnXYChanged(const RelationDef& info, float dx, float dy);
-
-    void applyOnSizeChanged(const RelationDef& info);
+    void applyOnXYChanged(GObject* target, const RelationDef& info, float dx, float dy);
+    void applyOnSizeChanged(GObject* target, const RelationDef& info);
     void addRefTarget(GObject* target);
     void releaseRefTarget(GObject* target);
     void onTargetXYChanged(EventContext* context);
     void onTargetSizeChanged(EventContext* context);
-    void onTargetGone(EventContext*);
 
     GObject* _owner;
-    GObject* _target;
+    WeakPtr _target;
     std::vector<RelationDef> _defs;
     cocos2d::Vec4 _targetData;
 };

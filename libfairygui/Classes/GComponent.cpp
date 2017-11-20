@@ -38,6 +38,8 @@ GComponent::~GComponent()
     CC_SAFE_RELEASE(_container);
     CC_SAFE_RELEASE(_scrollPane);
     CC_SAFE_DELETE(_hitArea);
+    CALL_LATER_CANCEL(GComponent, doUpdateBounds);
+    CALL_LATER_CANCEL(GComponent, buildNativeDisplayList);
 }
 
 void GComponent::handleInit()
@@ -932,7 +934,6 @@ void GComponent::setupScroll(const Margin& scrollBarMargin,
     const std::string& headerRes, const std::string& footerRes)
 {
     _scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
-    _scrollPane->retain();
 }
 
 void GComponent::handleSizeChanged()
@@ -1150,7 +1151,6 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         child->_underConstruct = true;
         child->setup_BeforeAdd(di.desc);
         child->_parent = this;
-        child->retain();
         _children.pushBack(child);
     }
 

@@ -59,9 +59,6 @@ public:
 
     bool isDispatchingEvent(int eventType);
 
-protected:
-    void dispose();
-
 private:
     void doDispatch(int eventType, EventContext* context);
     void doBubble(int eventType, EventContext* context);

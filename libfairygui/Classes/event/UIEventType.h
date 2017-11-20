@@ -11,7 +11,6 @@ public:
     static const int Enter = 0;
     static const int Exit = 1;
     static const int Changed = 2;
-    static const int Destroy = 9;
 
     static const int TouchBegin = 10;
     static const int TouchMove = 11;

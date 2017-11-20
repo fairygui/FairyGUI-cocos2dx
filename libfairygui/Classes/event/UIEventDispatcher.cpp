@@ -1,6 +1,7 @@
 #include "UIEventDispatcher.h"
 #include "GComponent.h"
 #include "InputProcessor.h"
+#include "utils/WeakPtr.h"
 
 USING_NS_CC;
 NS_FGUI_BEGIN
@@ -88,15 +89,6 @@ UIEventDispatcher::UIEventDispatcher() :_dispatching(0)
 
 UIEventDispatcher::~UIEventDispatcher()
 {
-    for (auto it = _callbacks.begin(); it != _callbacks.end(); it++)
-    {
-        if (it->eventType == UIEventType::Destroy && it->callback != nullptr)
-        {
-            //Destroy event we dont provide a EventContext.
-            it->callback(nullptr);
-        }
-    }
-    _callbacks.clear();
 }
 
 void UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, const EventTag& tag)
@@ -215,12 +207,12 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
             context->_touchCapture = 0;
             ci.callback(context);
             ci.dispatching--;
-            if (context->_touchCapture != 0)
+            if (context->_touchCapture != 0 && dynamic_cast<GObject*>(this))
             {
                 if (context->_touchCapture == 1 && eventType == UIEventType::TouchBegin)
-                    context->getInput()->getProcessor()->addTouchMonitor(context->getInput()->getTouchId(), this);
+                    context->getInput()->getProcessor()->addTouchMonitor(context->getInput()->getTouchId(), dynamic_cast<GObject*>(this));
                 else if (context->_touchCapture == 2)
-                    context->getInput()->getProcessor()->removeTouchMonitor(this);
+                    context->getInput()->getProcessor()->removeTouchMonitor(dynamic_cast<GObject*>(this));
             }
         }
     }
@@ -231,13 +223,16 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
         else
             it++;
     }
-    release();
 
     _dispatching--;
+    release();
 }
 
 void UIEventDispatcher::doBubble(int eventType, EventContext* context)
 {
+    //parent maybe disposed in callbacks
+    WeakPtr wptr(((GObject*)this)->getParent());
+
     if (!_callbacks.empty())
     {
         context->_isStopped = false;
@@ -246,7 +241,7 @@ void UIEventDispatcher::doBubble(int eventType, EventContext* context)
             return;
     }
 
-    GComponent* p = ((GObject*)this)->getParent();
+    GObject* p = wptr.ptr();
     if (p)
         p->doBubble(eventType, context);
 }

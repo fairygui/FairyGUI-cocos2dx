@@ -18,6 +18,7 @@ GGroup::GGroup() :
 
 GGroup::~GGroup()
 {
+    CALL_LATER_CANCEL(GGroup, ensureBoundsCorrect);
 }
 
 void GGroup::setLayout(GroupLayoutType value)

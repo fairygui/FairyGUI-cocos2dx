@@ -10,6 +10,7 @@
 #include "gears/GearText.h"
 #include "gears/GearIcon.h"
 #include "utils/ToolSet.h"
+#include "utils/WeakPtr.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -47,10 +48,11 @@ GObject::GObject() :
     _data(nullptr),
     _touchDisabled(false),
     _isAdoptiveChild(false),
-    name("")
+    _weakPtrRef(0)
 {
-    static uint32_t _gInstanceCounter = 0;
-    id = "_n" + Value(_gInstanceCounter++).asString();
+    static uint64_t _gInstanceCounter = 1;
+    _uid = _gInstanceCounter++;
+    id = std::to_string(_uid);
     _relations = new Relations(this);
 }
 
@@ -63,6 +65,9 @@ GObject::~GObject()
         CC_SAFE_DELETE(_gears[i]);
     CC_SAFE_DELETE(_relations);
     CC_SAFE_DELETE(_dragBounds);
+
+    if (_weakPtrRef > 0)
+        WeakPtr::markDisposed(this);
 }
 
 bool GObject::init()
@@ -734,7 +739,6 @@ void GObject::setup_BeforeAdd(TXMLElement * xml)
     p = xml->Attribute("name");
     if (p)
         name = p;
-
 
     p = xml->Attribute("xy");
     if (p)

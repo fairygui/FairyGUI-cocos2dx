@@ -2,6 +2,15 @@
 
 USING_NS_CC;
 
+TransitionDemoScene::~TransitionDemoScene()
+{
+    CC_SAFE_RELEASE(_g1);
+    CC_SAFE_RELEASE(_g2);
+    CC_SAFE_RELEASE(_g3);
+    CC_SAFE_RELEASE(_g4);
+    CC_SAFE_RELEASE(_g5);
+}
+
 void TransitionDemoScene::continueInit()
 {
     UIPackage::addPackage("UI/Transition");

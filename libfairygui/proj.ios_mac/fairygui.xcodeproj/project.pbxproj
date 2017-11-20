@@ -120,6 +120,9 @@
 		445403AA1FB4098900869375 /* ToolSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AA1FB3E9E400869375 /* ToolSet.cpp */; };
 		445403AB1FB4098900869375 /* UBBParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AC1FB3E9E400869375 /* UBBParser.cpp */; };
 		445403AC1FB4098900869375 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AE1FB3E9E400869375 /* Window.cpp */; };
+		44905A4C1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */; };
+		44905A4D1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */; };
+		44905A4E1FC2D5E600C33C88 /* WeakPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A4B1FC2D5E600C33C88 /* WeakPtr.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -257,6 +260,8 @@
 		445402FA1FB3EFFA00869375 /* libfairygui_MAC.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = libfairygui_MAC.hpp; sourceTree = "<group>"; };
 		445402FC1FB3EFFA00869375 /* libfairygui_MACPriv.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = libfairygui_MACPriv.hpp; sourceTree = "<group>"; };
 		445402FE1FB3EFFA00869375 /* libfairygui_MAC.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = libfairygui_MAC.cpp; sourceTree = "<group>"; };
+		44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WeakPtr.cpp; sourceTree = "<group>"; };
+		44905A4B1FC2D5E600C33C88 /* WeakPtr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeakPtr.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -440,6 +445,8 @@
 		445402A61FB3E9E400869375 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */,
+				44905A4B1FC2D5E600C33C88 /* WeakPtr.h */,
 				445402A71FB3E9E400869375 /* ByteArray.cpp */,
 				445402A81FB3E9E400869375 /* ByteArray.h */,
 				445402A91FB3E9E400869375 /* SwitchHelper.h */,
@@ -477,6 +484,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44905A4E1FC2D5E600C33C88 /* WeakPtr.h in Headers */,
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
 				445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */,
 			);
@@ -560,6 +568,7 @@
 			files = (
 				445402B41FB3E9E400869375 /* FUILabel.cpp in Sources */,
 				445402C81FB3E9E400869375 /* GearXY.cpp in Sources */,
+				44905A4C1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */,
 				445402B51FB3E9E400869375 /* FUIRichText.cpp in Sources */,
 				445402E21FB3E9E400869375 /* UIPackage.cpp in Sources */,
 				445402DE1FB3E9E400869375 /* ScrollPane.cpp in Sources */,
@@ -647,6 +656,7 @@
 				4454038E1FB4098900869375 /* GearXY.cpp in Sources */,
 				4454038F1FB4098900869375 /* GGraph.cpp in Sources */,
 				445403901FB4098900869375 /* GGroup.cpp in Sources */,
+				44905A4D1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */,
 				445403911FB4098900869375 /* GImage.cpp in Sources */,
 				445403921FB4098900869375 /* GLabel.cpp in Sources */,
 				445403931FB4098900869375 /* GList.cpp in Sources */,
@@ -859,6 +869,7 @@
 				445403021FB3EFFA00869375 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

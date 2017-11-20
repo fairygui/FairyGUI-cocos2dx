@@ -27,6 +27,7 @@ class GRoot;
 class GTextFieldDelegate;
 class GRichTextField;
 class GTextInput;
+class WeakPtr;
 
 class GObject : public UIEventDispatcher
 {
@@ -230,12 +231,16 @@ private:
     cocos2d::Rect* _dragBounds;
     bool _isAdoptiveChild;
 
+    size_t _uid;
+    size_t _weakPtrRef;
+
     static GObject* _draggingObject;
 
     friend class GComponent;
     friend class GGroup;
     friend class RelationItem;
     friend class UIObjectFactory;
+    friend class WeakPtr;
 };
 
 template<typename T>
