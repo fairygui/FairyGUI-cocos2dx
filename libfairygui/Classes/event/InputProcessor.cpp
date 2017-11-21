@@ -10,24 +10,6 @@ USING_NS_CC;
 
 InputProcessor* InputProcessor::_activeProcessor = nullptr;
 
-static cocos2d::EventMouse::MouseButton __mouseButton__ = EventMouse::MouseButton::BUTTON_LEFT;
-
-#ifdef CC_PLATFORM_PC
-static bool __hook_mouse_event__ = false;
-void __hook_onGLFWMouseCallBack__(GLFWwindow *window, int button, int action, int p)
-{
-    if (action == GLFW_PRESS || action == GLFW_RELEASE)
-        __mouseButton__ = static_cast<cocos2d::EventMouse::MouseButton>(button);
-    else
-        __mouseButton__ = EventMouse::MouseButton::BUTTON_UNSET;
-
-    GLFWEventHandler::onGLFWMouseCallBack(window, button, action, p);
-
-    __mouseButton__ = EventMouse::MouseButton::BUTTON_UNSET;
-}
-#endif
-
-
 class TouchInfo
 {
 public:
@@ -57,15 +39,10 @@ InputProcessor::InputProcessor(GComponent* owner)
     _recentInput._inputProcessor = this;
 
 #ifdef CC_PLATFORM_PC
-    if (!__hook_mouse_event__)
-    {
-        __hook_mouse_event__ = true;
-        GLFWwindow* window = ((GLViewImpl*)Director::getInstance()->getOpenGLView())->getWindow();
-        glfwSetMouseButtonCallback(window, __hook_onGLFWMouseCallBack__);
-    }
-
     _mouseListener = EventListenerMouse::create();
     CC_SAFE_RETAIN(_mouseListener);
+    _mouseListener->onMouseDown = CC_CALLBACK_1(InputProcessor::onMouseDown, this);
+    _mouseListener->onMouseUp = CC_CALLBACK_1(InputProcessor::onMouseUp, this);
     _mouseListener->onMouseMove = CC_CALLBACK_1(InputProcessor::onMouseMove, this);
     _mouseListener->onMouseScroll = CC_CALLBACK_1(InputProcessor::onMouseScroll, this);
     _owner->displayObject()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_mouseListener, _owner->displayObject());
@@ -91,9 +68,7 @@ InputProcessor::~InputProcessor()
     CC_SAFE_RELEASE_NULL(_mouseListener);
 
     for (auto &ti : _touches)
-        ti->reset();
-
-    _owner = nullptr;
+        delete ti;
 }
 
 cocos2d::Vec2 InputProcessor::getTouchPosition(int touchId)
@@ -287,7 +262,7 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->pos = pt;
-    ti->button = __mouseButton__;
+    ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
     setBegin(ti, target);
 
@@ -319,7 +294,7 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
     pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->pos = pt;
-    ti->button = __mouseButton__;
+    ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
 
     updateRecentInput(ti, target);
@@ -365,7 +340,7 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
     pt.y = UIRoot->getHeight() - pt.y;
     TouchInfo* ti = getTouch(touch->getID());
     ti->pos = pt;
-    ti->button = __mouseButton__;
+    ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
     setEnd(ti, target);
 
@@ -464,6 +439,103 @@ void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
     handleRollOver(ti, nullptr);
 
     ti->touchId = -1;
+    ti->button = EventMouse::MouseButton::BUTTON_UNSET;
+    _activeProcessor = nullptr;
+}
+
+void InputProcessor::onMouseDown(cocos2d::EventMouse * event)
+{
+    if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT)
+        return;
+
+    auto camera = Camera::getVisitingCamera();
+    Vec2 pt(event->getCursorX(), event->getCursorY());
+    GObject* target = _owner->hitTest(pt, camera);
+    if (!target)
+        target = _owner;
+    _touchListener->setSwallowTouches(target != _owner);
+
+    pt.y = UIRoot->getHeight() - pt.y;
+    TouchInfo* ti = getTouch(0);
+    ti->pos = pt;
+    ti->button = event->getMouseButton();
+    ti->touch = nullptr;
+    setBegin(ti, target);
+
+    updateRecentInput(ti, target);
+    _activeProcessor = this;
+
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchBegin);
+
+    WeakPtr wptr(target);
+    target->bubbleEvent(UIEventType::TouchBegin, Value::Null);
+
+    _activeProcessor = nullptr;
+}
+
+void InputProcessor::onMouseUp(cocos2d::EventMouse * event)
+{
+    if (event->getMouseButton() == EventMouse::MouseButton::BUTTON_LEFT)
+        return;
+
+    auto camera = Camera::getVisitingCamera();
+    Vec2 pt(event->getCursorX(), event->getCursorY());
+    GObject* target = _owner->hitTest(pt, camera);
+    if (!target)
+        target = _owner;
+
+    pt.y = UIRoot->getHeight() - pt.y;
+    TouchInfo* ti = getTouch(0);
+    ti->pos = pt;
+    ti->button = event->getMouseButton();
+    ti->touch = nullptr;
+    setEnd(ti, target);
+
+    updateRecentInput(ti, target);
+    _activeProcessor = this;
+
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchEnd);
+
+    WeakPtr wptr(target);
+    size_t cnt = ti->touchMonitors.size();
+    if (cnt > 0)
+    {
+        for (size_t i = 0; i < cnt; i++)
+        {
+            GObject* mm = ti->touchMonitors[i].ptr();
+            if (!mm)
+                continue;
+
+            if (mm != target
+                && (!dynamic_cast<GComponent*>(mm) || !((GComponent*)mm)->isAncestorOf(target)))
+                mm->dispatchEvent(UIEventType::TouchEnd, Value::Null);
+        }
+        ti->touchMonitors.clear();
+        target = wptr.ptr();
+    }
+    if (target)
+    {
+        target->bubbleEvent(UIEventType::TouchEnd, Value::Null);
+        target = wptr.ptr();
+    }
+
+    target = clickTest(ti, target);
+    if (target)
+    {
+        wptr = target;
+        updateRecentInput(ti, target);
+
+        if (ti->button == EventMouse::MouseButton::BUTTON_MIDDLE)
+            target->bubbleEvent(UIEventType::MiddleClick);
+        else
+            target->bubbleEvent(UIEventType::RightClick);
+    }
+
+    ti->touchId = -1;
+    ti->button = EventMouse::MouseButton::BUTTON_UNSET;
+
     _activeProcessor = nullptr;
 }
 

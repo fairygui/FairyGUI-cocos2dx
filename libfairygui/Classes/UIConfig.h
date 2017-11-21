@@ -28,6 +28,8 @@ public:
     static std::string tooltipsWin;
     static bool bringWindowToFrontOnClick;
     static std::string windowModalWaiting;
+    static std::string popupMenu;
+    static std::string popupMenu_seperator;
 
     static void registerFont(const std::string& aliasName, const std::string& realName);
     static const std::string& getRealFontName(const std::string& aliasName, bool& isTTF);

@@ -19,6 +19,8 @@ public:
     static const int RollOver = 14;
     static const int RollOut = 15;
     static const int MouseWheel = 16;
+    static const int RightClick = 17;
+    static const int MiddleClick = 18;
 
     static const int PositionChange = 20;
     static const int SizeChange = 21;
@@ -30,6 +32,7 @@ public:
 
     static const int ClickItem = 50;
     static const int ClickLink = 51;
+    static const int ClickMenu = 52;
 
     static const int DragStart = 60;
     static const int DragMove = 61;

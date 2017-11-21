@@ -24,11 +24,13 @@ protected:
 private:
     void runDemo(EventContext* context);
     void onClickBack(EventContext* context);
+    void onClickMenu(EventContext* context);
 
     void playDragDrop();
     void playWindow();
     void playDepth();
     void playText();
+    void playPopup();
 
     GComponent* _view;
     GObject* _backBtn;
@@ -36,6 +38,8 @@ private:
     GController* _cc;
     Window1* _winA;
     Window2* _winB;
+    PopupMenu* _pm;
+    GComponent* _popupCom;
 
     cocos2d::Map<std::string, GComponent*> _demoObjects;
 

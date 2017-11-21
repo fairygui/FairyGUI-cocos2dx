@@ -22,6 +22,8 @@ std::string UIConfig::tooltipsWin = "";
 Color4F UIConfig::modalLayerColor = Color4F::WHITE;
 bool UIConfig::bringWindowToFrontOnClick = true;
 std::string UIConfig::windowModalWaiting = "";
+std::string UIConfig::popupMenu = "";
+std::string UIConfig::popupMenu_seperator = "";
 
 std::unordered_map<std::string, UIConfig::FontNameItem> UIConfig::_fontNames;
 

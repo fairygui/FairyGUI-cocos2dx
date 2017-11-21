@@ -432,7 +432,7 @@ void RelationItem::onTargetXYChanged(EventContext* context)
         return;
     }
 
-    _owner->relations()->handling = (GObject*)context->getSender();
+    _owner->relations()->handling = target;
 
     float ox = _owner->_position.x;
     float oy = _owner->_position.y;
@@ -474,7 +474,7 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
         return;
     }
 
-    _owner->relations()->handling = (GObject*)context->getSender();
+    _owner->relations()->handling = target;
 
     float ox = _owner->_position.x;
     float oy = _owner->_position.y;

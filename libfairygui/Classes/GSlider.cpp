@@ -215,6 +215,9 @@ void GSlider::onTouchBegin(EventContext * context)
         return;
 
     InputEvent* evt = context->getInput();
+    if (evt->getButton() != EventMouse::MouseButton::BUTTON_LEFT)
+        return;
+
     Vec2 pt = _gripObject->globalToLocal(evt->getPosition());
     float percent = (float)(_value / _max);
     float delta = 0;
@@ -241,6 +244,9 @@ void GSlider::onTouchBegin(EventContext * context)
 
 void GSlider::onGripTouchBegin(EventContext * context)
 {
+    if (context->getInput()->getButton() != EventMouse::MouseButton::BUTTON_LEFT)
+        return;
+
     canDrag = true;
     context->stopPropagation();
     context->captureTouch();

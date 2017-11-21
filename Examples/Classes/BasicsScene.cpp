@@ -10,8 +10,8 @@ void BasicsScene::continueInit()
     UIConfig::verticalScrollBar = "ui://Basics/ScrollBar_VT";
     UIConfig::horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
     UIConfig::tooltipsWin = "ui://Basics/WindowFrame";
+    UIConfig::popupMenu = "ui://Basics/PopupMenu";
 
-    
     UIPackage::addPackage("UI/Basics");
     _view = UIPackage::createObject("Basics", "Main")->as<GComponent>();
     _groot->addChild(_view);
@@ -32,9 +32,11 @@ void BasicsScene::continueInit()
     }
 }
 
-BasicsScene::BasicsScene():
+BasicsScene::BasicsScene() :
     _winA(nullptr),
-    _winB(nullptr)
+    _winB(nullptr),
+    _pm(nullptr),
+    _popupCom(nullptr)
 {
 }
 
@@ -42,6 +44,8 @@ BasicsScene::~BasicsScene()
 {
     CC_SAFE_RELEASE(_winA);
     CC_SAFE_RELEASE(_winB);
+    CC_SAFE_RELEASE(_pm);
+    CC_SAFE_RELEASE(_popupCom);
 }
 
 void BasicsScene::onClickBack(EventContext* context)
@@ -76,6 +80,8 @@ void BasicsScene::runDemo(EventContext* context)
         playWindow();
     else if (type == "Drag&Drop")
         playDragDrop();
+    else if (type == "Popup")
+        playPopup();
 }
 
 void BasicsScene::playText()
@@ -90,6 +96,47 @@ void BasicsScene::playText()
     {
         obj->getChild("n24")->setText(obj->getChild("n22")->getText());
     });
+}
+
+void BasicsScene::playPopup()
+{
+    if (_pm == nullptr)
+    {
+        _pm = PopupMenu::create();
+        _pm->retain();
+        _pm->addItem("Item 1", CC_CALLBACK_1(BasicsScene::onClickMenu, this));
+        _pm->addItem("Item 2", CC_CALLBACK_1(BasicsScene::onClickMenu, this));
+        _pm->addItem("Item 3", CC_CALLBACK_1(BasicsScene::onClickMenu, this));
+        _pm->addItem("Item 4", CC_CALLBACK_1(BasicsScene::onClickMenu, this));
+    }
+
+    if (_popupCom == nullptr)
+    {
+        _popupCom = UIPackage::createObject("Basics", "Component12")->as<GComponent>();
+        _popupCom->retain();
+        _popupCom->center();
+    }
+    GComponent* obj = _demoObjects.at("Popup");
+    obj->getChild("n0")->addClickListener([this](EventContext* context)
+    {
+        _pm->show((GObject*)context->getSender(), PopupDirection::DOWN);
+    });
+
+    obj->getChild("n1")->addClickListener([this](EventContext* context)
+    {
+        UIRoot->showPopup(_popupCom);
+    });
+
+    obj->addEventListener(UIEventType::RightClick, [this](EventContext* context)
+    {
+        _pm->show();
+    });
+}
+
+void BasicsScene::onClickMenu(EventContext* context)
+{
+    GObject* itemObject = _pm->getList()->getChildAt(context->getData().asInt());
+    CCLOG("click %s", itemObject->getText().c_str());
 }
 
 void BasicsScene::playWindow()
@@ -147,7 +194,7 @@ void BasicsScene::playDepth()
         graph->setPosition(startPos.x, startPos.y);
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::RED);
         obj->getChild("n22")->as<GComponent>()->addChild(graph);
-    },EventTag(this)); //avoid duplicate register
+    }, EventTag(this)); //avoid duplicate register
 
     obj->getChild("btn1")->addClickListener([obj](EventContext*)
     {

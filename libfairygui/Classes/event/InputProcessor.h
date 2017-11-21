@@ -35,7 +35,9 @@ private:
     void onTouchMoved(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchEnded(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchCancelled(cocos2d::Touch * touch, cocos2d::Event *);
-
+    
+    void onMouseDown(cocos2d::EventMouse* event);
+    void onMouseUp(cocos2d::EventMouse* event);
     void onMouseMove(cocos2d::EventMouse* event);
     void onMouseScroll(cocos2d::EventMouse* event);
 

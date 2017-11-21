@@ -12,34 +12,36 @@ class GComponent;
 class GButton;
 class GList;
 
-class PopupMenu
+class PopupMenu : public cocos2d::Ref
 {
 public:
-    typedef std::function<void()> MenuItemCallback;
+    static PopupMenu* create(const std::string& resourceURL);
+    static PopupMenu* create() { return create(""); }
 
     PopupMenu();
-    PopupMenu(const std::string& resourceURL);
     ~PopupMenu();
 
-    void create(const std::string& resourceURL);
-    GButton* addItem(const std::string& caption, MenuItemCallback callback);
-    GButton* addItemAt(const std::string& caption, int index, MenuItemCallback callback);
+    GButton* addItem(const std::string& caption, EventCallback callback);
+    GButton* addItemAt(const std::string& caption, int index, EventCallback callback);
     void addSeperator();
-    const std::string& getItemName(int index);
+    const std::string& getItemName(int index) const;
     void setItemText(const std::string& name, const std::string& caption);
     void setItemVisible(const std::string& name, bool visible);
     void setItemGrayed(const std::string& name, bool grayed);
     void setItemCheckable(const std::string& name, bool checkable);
     void setItemChecked(const std::string& name, bool check);
-    bool isItemChecked(const std::string& name);
+    bool isItemChecked(const std::string& name) const;
     bool removeItem(const std::string& name);
     void clearItems();
-    GComponent* getContentPane() { return _contentPane; }
-    GList* getList() { return _list; }
-    void show();
+    int getItemCount() const;
+    GComponent* getContentPane() const { return _contentPane; }
+    GList* getList() const { return _list; }
+    void show() { show(nullptr, PopupDirection::AUTO); }
     void show(GObject* target, PopupDirection dir);
 
 protected:
+    bool init(const std::string& resourceURL);
+
     GComponent* _contentPane;
     GList* _list;
 

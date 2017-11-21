@@ -10,6 +10,8 @@
 
 NS_FGUI_BEGIN
 
+class WeakPtr;
+
 class GRoot : public GComponent
 {
 public:
@@ -78,8 +80,8 @@ private:
 
     GGraph* _modalLayer;
     GObject* _modalWaitPane;
-    cocos2d::Vector<GObject*> _popupStack;
-    cocos2d::Vector<GObject*> _justClosedPopups;
+    std::vector<WeakPtr> _popupStack;
+    std::vector<WeakPtr> _justClosedPopups;
     GObject* _tooltipWin;
     GObject* _defaultTooltipWin;
 

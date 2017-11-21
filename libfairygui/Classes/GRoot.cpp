@@ -229,18 +229,9 @@ void GRoot::showPopup(GObject * popup)
 void GRoot::showPopup(GObject * popup, GObject * target, PopupDirection dir)
 {
     if (!_popupStack.empty())
-    {
-        int k = (int)_popupStack.getIndex(popup);
-        if (k != -1)
-        {
-            for (int i = (int)_popupStack.size() - 1; i >= k; i--)
-            {
-                closePopup(_popupStack.back());
-                _popupStack.popBack();
-            }
-        }
-    }
-    _popupStack.pushBack(popup);
+        hidePopup(popup);
+
+    _popupStack.push_back(WeakPtr(popup));
 
     addChild(popup);
     adjustModalLayer();
@@ -259,7 +250,7 @@ void GRoot::togglePopup(GObject * popup)
 
 void GRoot::togglePopup(GObject * popup, GObject * target, PopupDirection dir)
 {
-    if (_justClosedPopups.getIndex(popup) != -1)
+    if (std::find(_justClosedPopups.cbegin(), _justClosedPopups.cend(), popup) != _justClosedPopups.cend())
         return;
 
     showPopup(popup, target, dir);
@@ -274,27 +265,28 @@ void GRoot::hidePopup(GObject * popup)
 {
     if (popup != nullptr)
     {
-        int k = (int)_popupStack.getIndex(popup);
-        if (k != -1)
+        auto it = std::find(_popupStack.cbegin(), _popupStack.cend(), popup);
+        if (it != _popupStack.cend())
         {
+            int k = (int)(it - _popupStack.cbegin());
             for (int i = (int)_popupStack.size() - 1; i >= k; i--)
             {
-                closePopup(_popupStack.back());
-                _popupStack.popBack();
+                closePopup(_popupStack.back().ptr());
+                _popupStack.pop_back();
             }
         }
     }
     else
     {
-        for (const auto &obj : _popupStack)
-            closePopup(obj);
+        for (const auto &it : _popupStack)
+            closePopup(it.ptr());
         _popupStack.clear();
     }
 }
 
 void GRoot::closePopup(GObject * target)
 {
-    if (target->getParent() != nullptr)
+    if (target && target->getParent() != nullptr)
     {
         if (dynamic_cast<Window*>(target))
             ((Window*)target)->hide();
@@ -312,15 +304,14 @@ void GRoot::checkPopups()
         bool handled = false;
         while (mc != this && mc != nullptr)
         {
-            int k = (int)_popupStack.getIndex(mc);
-            if (k != -1)
+            auto it = std::find(_popupStack.cbegin(), _popupStack.cend(), mc);
+            if (it != _popupStack.cend())
             {
+                int k = (int)(it - _popupStack.cbegin());
                 for (int i = (int)_popupStack.size() - 1; i > k; i--)
                 {
-                    GObject* popup = _popupStack.back();
-                    _justClosedPopups.pushBack(popup);
-                    closePopup(popup);
-                    _popupStack.popBack();
+                    closePopup(_popupStack.back().ptr());
+                    _popupStack.pop_back();
                 }
                 handled = true;
                 break;
@@ -332,9 +323,12 @@ void GRoot::checkPopups()
         {
             for (int i = (int)_popupStack.size() - 1; i >= 0; i--)
             {
-                GObject* popup = _popupStack.at(i);
-                _justClosedPopups.pushBack(popup);
-                closePopup(popup);
+                GObject* popup = _popupStack[i].ptr();
+                if (popup)
+                {
+                    _justClosedPopups.push_back(WeakPtr(popup));
+                    closePopup(popup);
+                }
             }
             _popupStack.clear();
         }

@@ -339,6 +339,9 @@ void GComboBox::onRollout(EventContext* context)
 
 void GComboBox::onTouchBegin(EventContext* context)
 {
+    if (context->getInput()->getButton() != EventMouse::MouseButton::BUTTON_LEFT)
+        return;
+
     if (dynamic_cast<GTextInput*>(context->getInput()->getTarget()))
         return;
 
@@ -352,6 +355,9 @@ void GComboBox::onTouchBegin(EventContext* context)
 
 void GComboBox::onTouchEnd(EventContext* context)
 {
+    if (context->getInput()->getButton() != EventMouse::MouseButton::BUTTON_LEFT)
+        return;
+
     if (_down)
     {
         _down = false;

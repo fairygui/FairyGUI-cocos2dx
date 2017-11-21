@@ -565,7 +565,7 @@ void GComponent::setViewHeight(float value)
     if (_scrollPane != nullptr)
         _scrollPane->setViewHeight(value);
     else
-        setWidth(value + _margin.top + _margin.bottom);
+        setHeight(value + _margin.top + _margin.bottom);
 }
 
 void GComponent::setBoundsChangedFlag()
