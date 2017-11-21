@@ -123,6 +123,15 @@
 		44905A4C1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */; };
 		44905A4D1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */; };
 		44905A4E1FC2D5E600C33C88 /* WeakPtr.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A4B1FC2D5E600C33C88 /* WeakPtr.h */; };
+		44905A561FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A501FC3CCCD00C33C88 /* ChangePageAction.cpp */; };
+		44905A571FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A501FC3CCCD00C33C88 /* ChangePageAction.cpp */; };
+		44905A581FC3CCCD00C33C88 /* ChangePageAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A511FC3CCCD00C33C88 /* ChangePageAction.h */; };
+		44905A591FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A521FC3CCCD00C33C88 /* ControllerAction.cpp */; };
+		44905A5A1FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A521FC3CCCD00C33C88 /* ControllerAction.cpp */; };
+		44905A5B1FC3CCCD00C33C88 /* ControllerAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A531FC3CCCD00C33C88 /* ControllerAction.h */; };
+		44905A5C1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */; };
+		44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */; };
+		44905A5E1FC3CCCD00C33C88 /* PlayTransitionAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -262,6 +271,12 @@
 		445402FE1FB3EFFA00869375 /* libfairygui_MAC.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = libfairygui_MAC.cpp; sourceTree = "<group>"; };
 		44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WeakPtr.cpp; sourceTree = "<group>"; };
 		44905A4B1FC2D5E600C33C88 /* WeakPtr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeakPtr.h; sourceTree = "<group>"; };
+		44905A501FC3CCCD00C33C88 /* ChangePageAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChangePageAction.cpp; sourceTree = "<group>"; };
+		44905A511FC3CCCD00C33C88 /* ChangePageAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangePageAction.h; sourceTree = "<group>"; };
+		44905A521FC3CCCD00C33C88 /* ControllerAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControllerAction.cpp; sourceTree = "<group>"; };
+		44905A531FC3CCCD00C33C88 /* ControllerAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerAction.h; sourceTree = "<group>"; };
+		44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlayTransitionAction.cpp; sourceTree = "<group>"; };
+		44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayTransitionAction.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -304,6 +319,7 @@
 		445402381FB3E9E400869375 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				44905A4F1FC3CCCD00C33C88 /* controller_action */,
 				445402391FB3E9E400869375 /* Controller.cpp */,
 				4454023A1FB3E9E400869375 /* Controller.h */,
 				4454023B1FB3E9E400869375 /* display */,
@@ -477,6 +493,19 @@
 			path = "libfairygui MAC";
 			sourceTree = "<group>";
 		};
+		44905A4F1FC3CCCD00C33C88 /* controller_action */ = {
+			isa = PBXGroup;
+			children = (
+				44905A501FC3CCCD00C33C88 /* ChangePageAction.cpp */,
+				44905A511FC3CCCD00C33C88 /* ChangePageAction.h */,
+				44905A521FC3CCCD00C33C88 /* ControllerAction.cpp */,
+				44905A531FC3CCCD00C33C88 /* ControllerAction.h */,
+				44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */,
+				44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */,
+			);
+			path = controller_action;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -484,7 +513,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44905A5B1FC3CCCD00C33C88 /* ControllerAction.h in Headers */,
 				44905A4E1FC2D5E600C33C88 /* WeakPtr.h in Headers */,
+				44905A581FC3CCCD00C33C88 /* ChangePageAction.h in Headers */,
+				44905A5E1FC3CCCD00C33C88 /* PlayTransitionAction.h in Headers */,
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
 				445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */,
 			);
@@ -579,6 +611,7 @@
 				445402D81FB3E9E400869375 /* GTextInput.cpp in Sources */,
 				445402E11FB3E9E400869375 /* UIObjectFactory.cpp in Sources */,
 				445402E61FB3E9E400869375 /* Window.cpp in Sources */,
+				44905A591FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */,
 				445402C11FB3E9E400869375 /* GearBase.cpp in Sources */,
 				445402DF1FB3E9E400869375 /* Transition.cpp in Sources */,
 				445402D01FB3E9E400869375 /* GObject.cpp in Sources */,
@@ -602,6 +635,7 @@
 				445402BE1FB3E9E400869375 /* GComboBox.cpp in Sources */,
 				445402BF1FB3E9E400869375 /* GComponent.cpp in Sources */,
 				445402C91FB3E9E400869375 /* GGraph.cpp in Sources */,
+				44905A561FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
 				445402E31FB3E9E400869375 /* ByteArray.cpp in Sources */,
 				445402D31FB3E9E400869375 /* GRichTextField.cpp in Sources */,
 				445402CB1FB3E9E400869375 /* GImage.cpp in Sources */,
@@ -616,6 +650,7 @@
 				445402B11FB3E9E400869375 /* Actions.cpp in Sources */,
 				445402CA1FB3E9E400869375 /* GGroup.cpp in Sources */,
 				445402D51FB3E9E400869375 /* GScrollBar.cpp in Sources */,
+				44905A5C1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
 				445402D21FB3E9E400869375 /* GProgressBar.cpp in Sources */,
 				445402DC1FB3E9E400869375 /* RelationItem.cpp in Sources */,
 				445402CD1FB3E9E400869375 /* GList.cpp in Sources */,
@@ -668,6 +703,8 @@
 				445403991FB4098900869375 /* GRichTextField.cpp in Sources */,
 				4454039A1FB4098900869375 /* GRoot.cpp in Sources */,
 				4454039B1FB4098900869375 /* GScrollBar.cpp in Sources */,
+				44905A5A1FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */,
+				44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
 				4454039C1FB4098900869375 /* GSlider.cpp in Sources */,
 				4454039D1FB4098900869375 /* GTextField.cpp in Sources */,
 				4454039E1FB4098900869375 /* GTextInput.cpp in Sources */,
@@ -685,6 +722,7 @@
 				445403AA1FB4098900869375 /* ToolSet.cpp in Sources */,
 				445403AB1FB4098900869375 /* UBBParser.cpp in Sources */,
 				445403AC1FB4098900869375 /* Window.cpp in Sources */,
+				44905A571FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
 				445402FF1FB3EFFA00869375 /* libfairygui_MAC.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

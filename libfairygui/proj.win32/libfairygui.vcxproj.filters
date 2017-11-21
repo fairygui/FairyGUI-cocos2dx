@@ -16,6 +16,9 @@
     <Filter Include="src\utils">
       <UniqueIdentifier>{d84c7903-4100-475f-8a09-1f39f343bbb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\controller_action">
+      <UniqueIdentifier>{25bf4a94-95ee-40cb-b00d-ca3dcd2fc55c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\GButton.h">
@@ -201,6 +204,15 @@
     <ClInclude Include="..\Classes\utils\WeakPtr.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\controller_action\ChangePageAction.h">
+      <Filter>src\controller_action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\controller_action\PlayTransitionAction.h">
+      <Filter>src\controller_action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\controller_action\ControllerAction.h">
+      <Filter>src\controller_action</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -370,6 +382,15 @@
     </ClCompile>
     <ClCompile Include="..\Classes\utils\WeakPtr.cpp">
       <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\controller_action\PlayTransitionAction.cpp">
+      <Filter>src\controller_action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\controller_action\ChangePageAction.cpp">
+      <Filter>src\controller_action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\controller_action\ControllerAction.cpp">
+      <Filter>src\controller_action</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

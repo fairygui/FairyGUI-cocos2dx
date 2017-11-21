@@ -409,6 +409,8 @@ void GComponent::applyController(GController * c)
         child->handleControllerChanged(c);
 
     _applyingController = nullptr;
+
+    c->runActions();
 }
 
 void GComponent::applyAllControllers()

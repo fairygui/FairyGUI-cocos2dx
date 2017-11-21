@@ -64,7 +64,10 @@ Classes/gears/GearXY.cpp \
 Classes/utils/ByteArray.cpp \
 Classes/utils/ToolSet.cpp \
 Classes/utils/UBBParser.cpp \
-Classes/utils/WeakPtr.cpp
+Classes/utils/WeakPtr.cpp \
+Classes/controller_action/ControllerAction.cpp \
+Classes/controller_action/ChangePageAction.cpp \
+Classes/controller_action/PlayTransitionAction.cpp
 
 LOCAL_STATIC_LIBRARIES := cocos2dx_static
 

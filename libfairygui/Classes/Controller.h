@@ -8,6 +8,7 @@
 NS_FGUI_BEGIN
 
 class GComponent;
+class ControllerAction;
 
 class GController : public UIEventDispatcher
 {
@@ -37,6 +38,7 @@ public:
     const std::string& getPageNameById(const std::string& value) const;
     const std::string& getPageId(int index) const;
     void setOppositePageId(const std::string& value);
+    void runActions();
 
     void setup(TXMLElement* xml);
 
@@ -50,7 +52,7 @@ private:
     int _previousIndex;
     std::vector<std::string> _pageIds;
     std::vector<std::string> _pageNames;
-    //std::vector<ControllerAction> _actions;
+    std::vector<ControllerAction*> _actions;
 };
 
 NS_FGUI_END

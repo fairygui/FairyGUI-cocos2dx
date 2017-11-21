@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include "GComponent.h"
 #include "utils/ToolSet.h"
+#include "controller_action/ControllerAction.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -16,6 +17,8 @@ GController::GController() :
 
 GController::~GController()
 {
+    for (auto &it : _actions)
+        delete it;
 }
 
 void GController::setSelectedIndex(int value)
@@ -121,6 +124,15 @@ void GController::setOppositePageId(const std::string & value)
         setSelectedIndex(1);
 }
 
+void GController::runActions()
+{
+    if (_actions.empty())
+        return;
+
+    for (auto &it : _actions)
+        it->run(this, getPreviousPageId(), getSelectedPageId());
+}
+
 void GController::setup(TXMLElement * xml)
 {
     const char* p;
@@ -130,7 +142,7 @@ void GController::setup(TXMLElement * xml)
         name = p;
 
     autoRadioGroupDepth = xml->BoolAttribute("autoRadioGroupDepth");
-    
+
     p = xml->Attribute("pages");
     if (p)
     {
@@ -142,6 +154,16 @@ void GController::setup(TXMLElement * xml)
             _pageIds.push_back(elems[i]);
             _pageNames.push_back(elems[i + 1]);
         }
+    }
+
+    TXMLElement* cxml = xml->FirstChildElement("action");
+    while (cxml)
+    {
+        ControllerAction* action = ControllerAction::createAction(cxml->Attribute("type"));
+        action->setup(cxml);
+        _actions.push_back(action);
+
+        cxml = cxml->NextSiblingElement("action");
     }
 
     if (_parent != nullptr && _pageIds.size() > 0)
