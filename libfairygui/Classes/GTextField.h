@@ -35,6 +35,8 @@ public:
     virtual void enableOutline(const cocos2d::Color4B& color, float size) {}
     virtual void enableShadow(const cocos2d::Color4B& color, const cocos2d::Size& offset) {};
 
+    virtual cocos2d::Size getTextSize() { return _size; }
+
     virtual cocos2d::Color4B cg_getColor() const override { return (cocos2d::Color4B)getColor(); }
     virtual void cg_setColor(const cocos2d::Color4B& value) override { setColor((cocos2d::Color3B)value); }
 

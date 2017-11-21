@@ -19,6 +19,8 @@ void GRichTextField::handleInit()
     _richText->setOpenUrlHandler(CC_CALLBACK_1(GRichTextField::handleURL, this));
 
     setFontName(UIConfig::defaultFont);
+    setColor(Color3B::BLACK);
+    setFontSize(12);
     _displayObject = _richText;
 }
 

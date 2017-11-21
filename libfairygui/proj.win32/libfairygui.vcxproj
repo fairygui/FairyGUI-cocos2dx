@@ -18,6 +18,7 @@
     <ClInclude Include="..\Classes\display\Actions.h" />
     <ClInclude Include="..\Classes\display\BitmapFont.h" />
     <ClInclude Include="..\Classes\display\FUIContainer.h" />
+    <ClInclude Include="..\Classes\display\FUIInput.h" />
     <ClInclude Include="..\Classes\display\FUILabel.h" />
     <ClInclude Include="..\Classes\display\FUIRichText.h" />
     <ClInclude Include="..\Classes\display\FUISprite.h" />
@@ -84,6 +85,7 @@
     <ClCompile Include="..\Classes\display\Actions.cpp" />
     <ClCompile Include="..\Classes\display\BitmapFont.cpp" />
     <ClCompile Include="..\Classes\display\FUIContainer.cpp" />
+    <ClCompile Include="..\Classes\display\FUIInput.cpp" />
     <ClCompile Include="..\Classes\display\FUILabel.cpp" />
     <ClCompile Include="..\Classes\display\FUIRichText.cpp" />
     <ClCompile Include="..\Classes\display\FUISprite.cpp" />

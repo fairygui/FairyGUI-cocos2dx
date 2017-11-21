@@ -176,19 +176,28 @@ void GLoader::loadFromPackage()
 
 void GLoader::loadExternal()
 {
-
+    auto tex = Director::getInstance()->getTextureCache()->addImage(_url);
+    if (tex)
+    {
+        auto sf = SpriteFrame::createWithTexture(tex, Rect(Vec2::ZERO, tex->getContentSize()));
+        onExternalLoadSuccess(sf);
+    }
+    else
+        onExternalLoadFailed();
 }
 
 void GLoader::freeExternal(cocos2d::SpriteFrame* spriteFrame)
 {
-    spriteFrame->release();
 }
 
 void GLoader::onExternalLoadSuccess(cocos2d::SpriteFrame* spriteFrame)
 {
     _contentStatus = 4;
-    spriteFrame->retain();
     _content->setSpriteFrame(spriteFrame);
+    Size sz = spriteFrame->getRectInPixels().size;
+    _contentSourceWidth = sz.width;
+    _contentSourceHeight = sz.height;
+    updateLayout();
 }
 
 void GLoader::onExternalLoadFailed()

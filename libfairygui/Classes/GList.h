@@ -12,7 +12,7 @@ class GList : public GComponent
 {
 public:
     typedef std::function<void(int, GObject*)> ListItemRenderer;
-    typedef std::function<const std::string&(int)> ListItemProvider;
+    typedef std::function<std::string(int)> ListItemProvider;
 
     GList();
     ~GList();

@@ -47,6 +47,7 @@ Classes/display/FUIContainer.cpp \
 Classes/display/FUILabel.cpp \
 Classes/display/FUIRichText.cpp \
 Classes/display/FUISprite.cpp \
+Classes/display/FUIInput.cpp \
 Classes/event/EventContext.cpp \
 Classes/event/HitTest.cpp \
 Classes/event/InputEvent.cpp \

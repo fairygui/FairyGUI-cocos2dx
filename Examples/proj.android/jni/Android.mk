@@ -27,6 +27,12 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../Classes/PullToRefreshScene.cpp \
                    $(LOCAL_PATH)/../../Classes/TransitionDemoScene.cpp \
                    $(LOCAL_PATH)/../../Classes/VirtualListScene.cpp \
+                   $(LOCAL_PATH)/../../Classes/BagScene.cpp \
+                   $(LOCAL_PATH)/../../Classes/BagWindow.cpp \
+                   $(LOCAL_PATH)/../../Classes/EmojiParser.cpp \
+                   $(LOCAL_PATH)/../../Classes/ChatScene.cpp \
+                   $(LOCAL_PATH)/../../Classes/ListEffectScene.cpp \
+                   $(LOCAL_PATH)/../../Classes/ScrollPaneScene.cpp \
                    $(LOCAL_PATH)/../../Classes/Window1.cpp \
                    $(LOCAL_PATH)/../../Classes/Window2.cpp
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

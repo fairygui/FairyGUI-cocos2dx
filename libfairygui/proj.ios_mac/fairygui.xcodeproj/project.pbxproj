@@ -132,6 +132,9 @@
 		44905A5C1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */; };
 		44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */; };
 		44905A5E1FC3CCCD00C33C88 /* PlayTransitionAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */; };
+		44905A6B1FC4367600C33C88 /* FUIInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A691FC4367600C33C88 /* FUIInput.cpp */; };
+		44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A691FC4367600C33C88 /* FUIInput.cpp */; };
+		44905A6D1FC4367600C33C88 /* FUIInput.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A6A1FC4367600C33C88 /* FUIInput.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -277,6 +280,8 @@
 		44905A531FC3CCCD00C33C88 /* ControllerAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerAction.h; sourceTree = "<group>"; };
 		44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlayTransitionAction.cpp; sourceTree = "<group>"; };
 		44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayTransitionAction.h; sourceTree = "<group>"; };
+		44905A691FC4367600C33C88 /* FUIInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FUIInput.cpp; sourceTree = "<group>"; };
+		44905A6A1FC4367600C33C88 /* FUIInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUIInput.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -404,6 +409,8 @@
 				4454023E1FB3E9E400869375 /* BitmapFont.cpp */,
 				4454023F1FB3E9E400869375 /* BitmapFont.h */,
 				445402401FB3E9E400869375 /* FUIContainer.cpp */,
+				44905A691FC4367600C33C88 /* FUIInput.cpp */,
+				44905A6A1FC4367600C33C88 /* FUIInput.h */,
 				445402411FB3E9E400869375 /* FUIContainer.h */,
 				445402421FB3E9E400869375 /* FUILabel.cpp */,
 				445402431FB3E9E400869375 /* FUILabel.h */,
@@ -514,6 +521,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44905A5B1FC3CCCD00C33C88 /* ControllerAction.h in Headers */,
+				44905A6D1FC4367600C33C88 /* FUIInput.h in Headers */,
 				44905A4E1FC2D5E600C33C88 /* WeakPtr.h in Headers */,
 				44905A581FC3CCCD00C33C88 /* ChangePageAction.h in Headers */,
 				44905A5E1FC3CCCD00C33C88 /* PlayTransitionAction.h in Headers */,
@@ -607,6 +615,7 @@
 				445402B71FB3E9E400869375 /* DragDropManager.cpp in Sources */,
 				445402D11FB3E9E400869375 /* GObjectPool.cpp in Sources */,
 				445402C01FB3E9E400869375 /* GearAnimation.cpp in Sources */,
+				44905A6B1FC4367600C33C88 /* FUIInput.cpp in Sources */,
 				445402B31FB3E9E400869375 /* FUIContainer.cpp in Sources */,
 				445402D81FB3E9E400869375 /* GTextInput.cpp in Sources */,
 				445402E11FB3E9E400869375 /* UIObjectFactory.cpp in Sources */,
@@ -718,6 +727,7 @@
 				445403A61FB4098900869375 /* UIConfig.cpp in Sources */,
 				445403A71FB4098900869375 /* UIObjectFactory.cpp in Sources */,
 				445403A81FB4098900869375 /* UIPackage.cpp in Sources */,
+				44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */,
 				445403A91FB4098900869375 /* ByteArray.cpp in Sources */,
 				445403AA1FB4098900869375 /* ToolSet.cpp in Sources */,
 				445403AB1FB4098900869375 /* UBBParser.cpp in Sources */,

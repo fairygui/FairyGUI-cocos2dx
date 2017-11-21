@@ -49,8 +49,20 @@
 		445403F11FB59E6900869375 /* JoystickModule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E41FB59A9100869375 /* JoystickModule.cpp */; };
 		445403F21FB59E6900869375 /* JoystickScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E61FB59A9100869375 /* JoystickScene.cpp */; };
 		445403F31FB59E6900869375 /* ModalWaitingScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445403E81FB59A9100869375 /* ModalWaitingScene.cpp */; };
-		46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7619C43A67006E1F66 /* CloseNormal.png */; };
-		46880B7D19C43A67006E1F66 /* CloseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7719C43A67006E1F66 /* CloseSelected.png */; };
+		44905A7A1FC4369A00C33C88 /* BagScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A6E1FC4369A00C33C88 /* BagScene.cpp */; };
+		44905A7B1FC4369A00C33C88 /* BagWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A701FC4369A00C33C88 /* BagWindow.cpp */; };
+		44905A7C1FC4369A00C33C88 /* ChatScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A721FC4369A00C33C88 /* ChatScene.cpp */; };
+		44905A7D1FC4369A00C33C88 /* EmojiParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A741FC4369A00C33C88 /* EmojiParser.cpp */; };
+		44905A7E1FC4369A00C33C88 /* ListEffectScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A761FC4369A00C33C88 /* ListEffectScene.cpp */; };
+		44905A7F1FC4369A00C33C88 /* ScrollPaneScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A781FC4369A00C33C88 /* ScrollPaneScene.cpp */; };
+		44905A801FC4378B00C33C88 /* BagScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A6E1FC4369A00C33C88 /* BagScene.cpp */; };
+		44905A811FC4378B00C33C88 /* BagWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A701FC4369A00C33C88 /* BagWindow.cpp */; };
+		44905A821FC4378B00C33C88 /* ChatScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A721FC4369A00C33C88 /* ChatScene.cpp */; };
+		44905A831FC4378B00C33C88 /* EmojiParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A741FC4369A00C33C88 /* EmojiParser.cpp */; };
+		44905A841FC4378B00C33C88 /* ListEffectScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A761FC4369A00C33C88 /* ListEffectScene.cpp */; };
+		44905A851FC4378B00C33C88 /* ScrollPaneScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A781FC4369A00C33C88 /* ScrollPaneScene.cpp */; };
+		44905A871FC4382300C33C88 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 44905A861FC4382300C33C88 /* icons */; };
+		44905A881FC4382300C33C88 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 44905A861FC4382300C33C88 /* icons */; };
 		46880B8119C43A67006E1F66 /* HelloWorld.png in Resources */ = {isa = PBXBuildFile; fileRef = 46880B7A19C43A67006E1F66 /* HelloWorld.png */; };
 		46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46880B8419C43A87006E1F66 /* AppDelegate.cpp */; };
 		46880B8919C43A87006E1F66 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46880B8419C43A87006E1F66 /* AppDelegate.cpp */; };
@@ -137,6 +149,20 @@
 			remoteGlobalIDString = 507B40FD1C31BDD30067B53E;
 			remoteInfo = "libcocos2d tvOS";
 		};
+		44905A461FC2D4FE00C33C88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 445402321FB3E9D000869375 /* fairygui.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 445402201FB3E8D500869375;
+			remoteInfo = "libfairygui iOS";
+		};
+		44905A481FC2D4FE00C33C88 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 445402321FB3E9D000869375 /* fairygui.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 445402F81FB3EFFA00869375;
+			remoteInfo = "libfairygui Mac";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -183,8 +209,19 @@
 		445403E71FB59A9100869375 /* JoystickScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickScene.h; sourceTree = "<group>"; };
 		445403E81FB59A9100869375 /* ModalWaitingScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModalWaitingScene.cpp; sourceTree = "<group>"; };
 		445403E91FB59A9100869375 /* ModalWaitingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalWaitingScene.h; sourceTree = "<group>"; };
-		46880B7619C43A67006E1F66 /* CloseNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseNormal.png; sourceTree = "<group>"; };
-		46880B7719C43A67006E1F66 /* CloseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CloseSelected.png; sourceTree = "<group>"; };
+		44905A6E1FC4369A00C33C88 /* BagScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BagScene.cpp; sourceTree = "<group>"; };
+		44905A6F1FC4369A00C33C88 /* BagScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BagScene.h; sourceTree = "<group>"; };
+		44905A701FC4369A00C33C88 /* BagWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BagWindow.cpp; sourceTree = "<group>"; };
+		44905A711FC4369A00C33C88 /* BagWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BagWindow.h; sourceTree = "<group>"; };
+		44905A721FC4369A00C33C88 /* ChatScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChatScene.cpp; sourceTree = "<group>"; };
+		44905A731FC4369A00C33C88 /* ChatScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatScene.h; sourceTree = "<group>"; };
+		44905A741FC4369A00C33C88 /* EmojiParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EmojiParser.cpp; sourceTree = "<group>"; };
+		44905A751FC4369A00C33C88 /* EmojiParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmojiParser.h; sourceTree = "<group>"; };
+		44905A761FC4369A00C33C88 /* ListEffectScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListEffectScene.cpp; sourceTree = "<group>"; };
+		44905A771FC4369A00C33C88 /* ListEffectScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListEffectScene.h; sourceTree = "<group>"; };
+		44905A781FC4369A00C33C88 /* ScrollPaneScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScrollPaneScene.cpp; sourceTree = "<group>"; };
+		44905A791FC4369A00C33C88 /* ScrollPaneScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollPaneScene.h; sourceTree = "<group>"; };
+		44905A861FC4382300C33C88 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; path = icons; sourceTree = "<group>"; };
 		46880B7A19C43A67006E1F66 /* HelloWorld.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HelloWorld.png; sourceTree = "<group>"; };
 		46880B8419C43A87006E1F66 /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		46880B8519C43A87006E1F66 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -361,14 +398,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		44905A411FC2D4FE00C33C88 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				44905A471FC2D4FE00C33C88 /* libfairygui iOS.a */,
+				44905A491FC2D4FE00C33C88 /* libfairygui Mac.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				44905A861FC4382300C33C88 /* icons */,
 				445403D91FB4571400869375 /* UI */,
 				521A8EA819F11F5000D177D7 /* fonts */,
 				3EACC98E19EE6D4300EB3C5E /* res */,
-				46880B7619C43A67006E1F66 /* CloseNormal.png */,
-				46880B7719C43A67006E1F66 /* CloseSelected.png */,
 				46880B7A19C43A67006E1F66 /* HelloWorld.png */,
 			);
 			name = Resources;
@@ -378,6 +423,18 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				44905A6E1FC4369A00C33C88 /* BagScene.cpp */,
+				44905A6F1FC4369A00C33C88 /* BagScene.h */,
+				44905A701FC4369A00C33C88 /* BagWindow.cpp */,
+				44905A711FC4369A00C33C88 /* BagWindow.h */,
+				44905A721FC4369A00C33C88 /* ChatScene.cpp */,
+				44905A731FC4369A00C33C88 /* ChatScene.h */,
+				44905A741FC4369A00C33C88 /* EmojiParser.cpp */,
+				44905A751FC4369A00C33C88 /* EmojiParser.h */,
+				44905A761FC4369A00C33C88 /* ListEffectScene.cpp */,
+				44905A771FC4369A00C33C88 /* ListEffectScene.h */,
+				44905A781FC4369A00C33C88 /* ScrollPaneScene.cpp */,
+				44905A791FC4369A00C33C88 /* ScrollPaneScene.h */,
 				445403E01FB59A9100869375 /* DemoScene.cpp */,
 				445403E11FB59A9100869375 /* DemoScene.h */,
 				445403E21FB59A9100869375 /* GuideScene.cpp */,
@@ -526,6 +583,10 @@
 					ProductGroup = 1AC6FAE6180E9839004C840B /* Products */;
 					ProjectRef = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
 				},
+				{
+					ProductGroup = 44905A411FC2D4FE00C33C88 /* Products */;
+					ProjectRef = 445402321FB3E9D000869375 /* fairygui.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -557,6 +618,20 @@
 			remoteRef = 445401191FB3DE8A00869375 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		44905A471FC2D4FE00C33C88 /* libfairygui iOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libfairygui iOS.a";
+			remoteRef = 44905A461FC2D4FE00C33C88 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		44905A491FC2D4FE00C33C88 /* libfairygui Mac.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libfairygui Mac.a";
+			remoteRef = 44905A481FC2D4FE00C33C88 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -571,7 +646,6 @@
 				50EF629917ECD46A001EB2F8 /* Icon-100.png in Resources */,
 				5087E78317EB970100C73F5D /* Icon-152.png in Resources */,
 				46880B8119C43A67006E1F66 /* HelloWorld.png in Resources */,
-				46880B7D19C43A67006E1F66 /* CloseSelected.png in Resources */,
 				5087E77D17EB970100C73F5D /* Default-568h@2x.png in Resources */,
 				5087E78517EB970100C73F5D /* Icon-72.png in Resources */,
 				521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */,
@@ -586,8 +660,8 @@
 				5087E78417EB970100C73F5D /* Icon-57.png in Resources */,
 				5087E77E17EB970100C73F5D /* Default.png in Resources */,
 				521A8E6419F0C34300D177D7 /* Default-667h@2x.png in Resources */,
-				46880B7B19C43A67006E1F66 /* CloseNormal.png in Resources */,
 				50EF629717ECD46A001EB2F8 /* Icon-58.png in Resources */,
+				44905A871FC4382300C33C88 /* icons in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,6 +672,7 @@
 				445403DA1FB4571400869375 /* UI in Resources */,
 				503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */,
 				3EACC99019EE6D4300EB3C5E /* res in Resources */,
+				44905A881FC4382300C33C88 /* icons in Resources */,
 				521A8EAA19F11F5000D177D7 /* fonts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -610,17 +685,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				445403EC1FB59A9100869375 /* JoystickModule.cpp in Sources */,
+				44905A7A1FC4369A00C33C88 /* BagScene.cpp in Sources */,
 				445403EA1FB59A9100869375 /* DemoScene.cpp in Sources */,
+				44905A7D1FC4369A00C33C88 /* EmojiParser.cpp in Sources */,
+				44905A7B1FC4369A00C33C88 /* BagWindow.cpp in Sources */,
 				445401301FB3DE9700869375 /* HitTestScene.cpp in Sources */,
 				445401321FB3DE9700869375 /* MenuScene.cpp in Sources */,
 				445401381FB3DE9700869375 /* Window2.cpp in Sources */,
 				4454012F1FB3DE9700869375 /* BasicsScene.cpp in Sources */,
 				46880B8819C43A87006E1F66 /* AppDelegate.cpp in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
+				44905A7E1FC4369A00C33C88 /* ListEffectScene.cpp in Sources */,
+				44905A7F1FC4369A00C33C88 /* ScrollPaneScene.cpp in Sources */,
 				445403ED1FB59A9100869375 /* JoystickScene.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				445401341FB3DE9700869375 /* TransitionDemoScene.cpp in Sources */,
 				445401361FB3DE9700869375 /* MailItem.cpp in Sources */,
+				44905A7C1FC4369A00C33C88 /* ChatScene.cpp in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				445403EB1FB59A9100869375 /* GuideScene.cpp in Sources */,
 				445401311FB3DE9700869375 /* LoopListScene.cpp in Sources */,
@@ -635,6 +716,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44905A801FC4378B00C33C88 /* BagScene.cpp in Sources */,
+				44905A811FC4378B00C33C88 /* BagWindow.cpp in Sources */,
+				44905A821FC4378B00C33C88 /* ChatScene.cpp in Sources */,
+				44905A831FC4378B00C33C88 /* EmojiParser.cpp in Sources */,
+				44905A841FC4378B00C33C88 /* ListEffectScene.cpp in Sources */,
+				44905A851FC4378B00C33C88 /* ScrollPaneScene.cpp in Sources */,
 				445403EF1FB59E6900869375 /* DemoScene.cpp in Sources */,
 				445403F01FB59E6900869375 /* GuideScene.cpp in Sources */,
 				445403F11FB59E6900869375 /* JoystickModule.cpp in Sources */,

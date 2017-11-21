@@ -231,7 +231,7 @@ private:
     cocos2d::Rect* _dragBounds;
     bool _isAdoptiveChild;
 
-    size_t _uid;
+    uint64_t _uid;
     size_t _weakPtrRef;
 
     static GObject* _draggingObject;

@@ -14,7 +14,7 @@ public:
     static ControllerAction* createAction(const char* types);
 
     ControllerAction();
-    ~ControllerAction();
+    virtual ~ControllerAction();
 
     void run(GController* controller, const std::string& prevPage, const std::string& curPage);
     virtual void setup(TXMLElement * xml);

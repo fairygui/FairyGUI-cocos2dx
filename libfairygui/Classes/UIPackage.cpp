@@ -535,6 +535,7 @@ SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite * sprite)
         CCLOG("FairyGUI: %s not found in %s", sprite->atlas.c_str(), _name.c_str());
     }
 
+    //not using createWithTexture for saving a autorelease call.
     SpriteFrame* spriteFrame = new SpriteFrame();
     spriteFrame->initWithTexture(atlasTexture, sprite->rect, sprite->rotated, Vec2(0, 0), sprite->rect.size);
 

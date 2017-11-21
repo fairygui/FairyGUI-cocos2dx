@@ -213,6 +213,9 @@
     <ClInclude Include="..\Classes\controller_action\ControllerAction.h">
       <Filter>src\controller_action</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\display\FUIInput.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -391,6 +394,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\controller_action\ControllerAction.cpp">
       <Filter>src\controller_action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\FUIInput.cpp">
+      <Filter>src\display</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

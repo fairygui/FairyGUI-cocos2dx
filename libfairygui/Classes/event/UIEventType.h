@@ -25,6 +25,9 @@ public:
     static const int PositionChange = 20;
     static const int SizeChange = 21;
 
+    static const int KeyDown = 30;
+    static const int KeyUp = 31;
+
     static const int Scroll = 40;
     static const int ScrollEnd = 41;
     static const int PullDownRelease = 42;

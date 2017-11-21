@@ -7,7 +7,7 @@
     <graph id="n3" name="dragArea" xy="10,1" size="500,40">
       <relation target="" sidePair="width-width"/>
     </graph>
-    <text id="n1" name="title" xy="101,11" size="412,26" fontSize="22" color="#ffffff" align="center" autoSize="none" strokeColor="#000000" text="窗口标题">
+    <text id="n1" name="title" xy="101,11" size="412,29" fontSize="22" color="#ffffff" align="center" autoSize="none" strokeColor="#000000" text="窗口标题">
       <relation target="" sidePair="width-width"/>
     </text>
     <component id="n2" name="closeButton" src="dwwc4" xy="509,-9">

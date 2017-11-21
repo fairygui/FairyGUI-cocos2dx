@@ -52,7 +52,9 @@ GObject::GObject() :
 {
     static uint64_t _gInstanceCounter = 1;
     _uid = _gInstanceCounter++;
-    id = std::to_string(_uid);
+    std::stringstream ss;
+    ss << _uid;
+    id = ss.str();
     _relations = new Relations(this);
 }
 
@@ -289,16 +291,13 @@ void GObject::setVisible(bool value)
         if (_displayObject)
             _displayObject->setVisible(value);
         if (_parent != nullptr)
-        {
-            _parent->childStateChanged(this);
             _parent->setBoundsChangedFlag();
-        }
     }
 }
 
 bool GObject::finalVisible()
 {
-    return _visible && _internalVisible && (_group == nullptr || _group->finalVisible());
+    return _internalVisible && (_group == nullptr || _group->finalVisible());
 }
 
 void GObject::setTouchable(bool value)
@@ -628,7 +627,7 @@ void GObject::constructFromResource()
 
 GObject* GObject::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
-    if (_touchDisabled || !_touchable || !finalVisible())
+    if (_touchDisabled || !_touchable || !_visible || !finalVisible())
         return nullptr;
 
     Rect rect;

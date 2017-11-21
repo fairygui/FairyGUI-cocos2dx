@@ -32,6 +32,7 @@ public:
     bool isShowing() const { return _parent != nullptr; }
     bool isTop() const;
     bool isModal() const { return _modal; }
+    void setModal(bool value) { _modal = value; }
 
     void showModalWait() { showModalWait(0); }
     void showModalWait(int requestingCmd);

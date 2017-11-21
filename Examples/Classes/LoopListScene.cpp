@@ -12,11 +12,9 @@ void LoopListScene::continueInit()
     _groot->addChild(_view);
 
     _list = _view->getChild("list")->as<GList>();
-    _list->setVirtualAndLoop();
-
     _list->itemRenderer = CC_CALLBACK_2(LoopListScene::renderListItem, this);
+    _list->setVirtualAndLoop();
     _list->setNumItems(5);
-
     _list->addEventListener(UIEventType::Scroll, CC_CALLBACK_1(LoopListScene::doSpecialEffect, this));
 
     doSpecialEffect(nullptr);

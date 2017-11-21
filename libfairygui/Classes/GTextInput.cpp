@@ -1,5 +1,6 @@
 #include "GTextInput.h"
 #include "UIPackage.h"
+#include "ui/UIEditBox/UIEditBox.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -15,8 +16,7 @@ GTextInput::~GTextInput()
 
 void GTextInput::handleInit()
 {
-    _input = ui::EditBox::create(Size(100, 100),
-        (ui::Scale9Sprite*)ui::Scale9Sprite::createWithTexture(UIPackage::getEmptyTexture()));
+    _input = FUIInput::create(this);
     _input->retain();
 
     setFontName(UIConfig::defaultFont);
@@ -25,6 +25,13 @@ void GTextInput::handleInit()
     _input->setPlaceholderFontSize(12);
 
     _displayObject = _input;
+}
+
+const std::string & GTextInput::getText() const
+{
+    std::string& tmp = (std::string&)_text;
+    tmp = _input->getText();
+    return _text;
 }
 
 void GTextInput::setText(const std::string & value)
@@ -42,6 +49,11 @@ void GTextInput::setFontSize(int value)
 {
     _input->setFontSize(value);
     _input->setPlaceholderFontSize(value);
+}
+
+void GTextInput::setSingleLine(bool value)
+{
+    _input->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
 }
 
 void GTextInput::setColor(const cocos2d::Color3B & value)
@@ -74,9 +86,9 @@ void GTextInput::setup_BeforeAdd(TXMLElement * xml)
     if (p)
         _input->setMaxLength(atoi(p));
 
-    p = xml->Attribute("keyboardType");
+    /*p = xml->Attribute("keyboardType");
     if (p)
-        _input->setInputMode((ui::EditBox::InputMode)atoi(p));
+        _input->setInputMode((ui::EditBox::InputMode)atoi(p));*/
 }
 
 NS_FGUI_END

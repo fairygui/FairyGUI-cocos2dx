@@ -848,7 +848,7 @@ cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
 
 GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
-    if (!_touchable || !finalVisible())
+    if (!_touchable || !_visible || !finalVisible())
         return nullptr;
 
     GObject * target = nullptr;

@@ -1172,15 +1172,15 @@ float ScrollPane::alignByPage(float pos, int axis, bool inertialScrolling)
         else if (oldPos < -overlapSize)
             oldPage = ceil(contentSize / pageSize) - 1;
         else
-            oldPage = floor(-oldPos / overlapSize);
-        int startPage = floor(-sp_getField(_containerPos, axis) / overlapSize);
+            oldPage = floor(-oldPos / pageSize);
+        int startPage = floor(-sp_getField(_containerPos, axis) / pageSize);
         if (abs(page - startPage) > 1 && abs(oldPage - startPage) <= 1)
         {
             if (page > startPage)
                 page = startPage + 1;
             else
                 page = startPage - 1;
-            pos = -page * overlapSize;
+            pos = -page * pageSize;
         }
     }
 

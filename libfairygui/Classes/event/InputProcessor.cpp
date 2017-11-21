@@ -3,6 +3,7 @@
 #include "InputEvent.h"
 #include "GRoot.h"
 #include "GRichTextField.h"
+#include "GTextInput.h"
 #include "utils/WeakPtr.h"
 
 NS_FGUI_BEGIN
@@ -33,7 +34,8 @@ public:
     std::vector<WeakPtr> touchMonitors;
 };
 
-InputProcessor::InputProcessor(GComponent* owner)
+InputProcessor::InputProcessor(GComponent* owner) :
+    _keyModifiers(0)
 {
     _owner = owner;
     _recentInput._inputProcessor = this;
@@ -56,6 +58,12 @@ InputProcessor::InputProcessor(GComponent* owner)
     _touchListener->onTouchEnded = CC_CALLBACK_2(InputProcessor::onTouchEnded, this);
     _touchListener->onTouchCancelled = CC_CALLBACK_2(InputProcessor::onTouchCancelled, this);
     _owner->displayObject()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_touchListener, _owner->displayObject());
+
+    _keyboardListener = EventListenerKeyboard::create();
+    CC_SAFE_RETAIN(_keyboardListener);
+    _keyboardListener->onKeyPressed = CC_CALLBACK_2(InputProcessor::onKeyDown, this);
+    _keyboardListener->onKeyReleased = CC_CALLBACK_2(InputProcessor::onKeyUp, this);
+    _owner->displayObject()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_keyboardListener, _owner->displayObject());
 }
 
 InputProcessor::~InputProcessor()
@@ -64,8 +72,10 @@ InputProcessor::~InputProcessor()
     _owner->displayObject()->getEventDispatcher()->removeEventListener(_mouseListener);
 #endif
     _owner->displayObject()->getEventDispatcher()->removeEventListener(_touchListener);
+    _owner->displayObject()->getEventDispatcher()->removeEventListener(_keyboardListener);
     CC_SAFE_RELEASE_NULL(_touchListener);
     CC_SAFE_RELEASE_NULL(_mouseListener);
+    CC_SAFE_RELEASE_NULL(_keyboardListener);
 
     for (auto &ti : _touches)
         delete ti;
@@ -609,6 +619,34 @@ void InputProcessor::onMouseScroll(cocos2d::EventMouse * event)
     ti->mouseWheelDelta = 0;
 
     _activeProcessor = nullptr;
+}
+
+void InputProcessor::onKeyDown(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)
+{
+    if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_CTRL || keyCode == EventKeyboard::KeyCode::KEY_RIGHT_CTRL)
+        _keyModifiers |= 1;
+    else if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_ALT || keyCode == EventKeyboard::KeyCode::KEY_RIGHT_ALT)
+        _keyModifiers |= 2;
+    else if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_SHIFT || keyCode == EventKeyboard::KeyCode::KEY_RIGHT_SHIFT)
+        _keyModifiers |= 4;
+
+    _recentInput._keyCode = keyCode;
+    _recentInput._target = _owner;
+    _recentInput._target->dispatchEvent(UIEventType::KeyDown);
+}
+
+void InputProcessor::onKeyUp(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *)
+{
+    if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_CTRL || keyCode == EventKeyboard::KeyCode::KEY_RIGHT_CTRL)
+        _keyModifiers &= ~1;
+    else if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_ALT || keyCode == EventKeyboard::KeyCode::KEY_RIGHT_ALT)
+        _keyModifiers &= ~2;
+    else if (keyCode == EventKeyboard::KeyCode::KEY_LEFT_SHIFT || keyCode == EventKeyboard::KeyCode::KEY_RIGHT_SHIFT)
+        _keyModifiers &= ~4;
+
+    _recentInput._keyCode = keyCode;
+    _recentInput._target = _owner;
+    _recentInput._target->dispatchEvent(UIEventType::KeyUp);
 }
 
 TouchInfo::TouchInfo() :

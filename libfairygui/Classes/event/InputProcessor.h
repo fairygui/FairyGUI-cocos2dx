@@ -41,6 +41,9 @@ private:
     void onMouseMove(cocos2d::EventMouse* event);
     void onMouseScroll(cocos2d::EventMouse* event);
 
+    void onKeyDown(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
+    void onKeyUp(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event*);
+
     TouchInfo* getTouch(int touchId, bool createIfNotExisits = true);
     void updateRecentInput(TouchInfo* touch, GObject* target);
     void handleRollOver(TouchInfo* touch, GObject* target);
@@ -50,10 +53,12 @@ private:
 
     cocos2d::EventListenerTouchOneByOne* _touchListener;
     cocos2d::EventListenerMouse* _mouseListener;
+    cocos2d::EventListenerKeyboard* _keyboardListener;
     std::vector<TouchInfo*> _touches;
     GComponent* _owner;
     CaptureEventCallback _captureCallback;
     InputEvent _recentInput;
+    uint16_t _keyModifiers;
 
     static InputProcessor* _activeProcessor;
 
