@@ -398,7 +398,7 @@ void UIPackage::loadPackage()
     FileUtils::getInstance()->setPopupNotify(false);
     bool hasHitTestData = FileUtils::getInstance()->isFileExist(hitTestDataFilePath);
     FileUtils::getInstance()->setPopupNotify(tmp);
- 
+
     if (hasHitTestData)
     {
         Data data = FileUtils::getInstance()->getDataFromFile(hitTestDataFilePath);
@@ -491,7 +491,7 @@ void UIPackage::loadPackage()
             UIObjectFactory::resolvePackageItemExtension(pi);
             break;
         }
-                
+
         default:
             break;
         }
@@ -612,6 +612,9 @@ void UIPackage::loadMovieClip(PackageItem * item)
     SpriteFrame* spriteFrame = nullptr;
     const char* p;
 
+    Size mcSizeInPixels = Size(item->width, item->height);
+    Size mcSize = CC_SIZE_PIXELS_TO_POINTS(mcSizeInPixels);
+
     TXMLElement* framesEle = root->FirstChildElement("frames");
     TXMLElement* frameEle = framesEle->FirstChildElement("frame");
     while (frameEle)
@@ -637,13 +640,17 @@ void UIPackage::loadMovieClip(PackageItem * item)
                 sprite = it->second;
                 PackageItem* atlasItem = getItem(sprite->atlas);
                 if (atlasItem)
+                {
                     spriteFrame = createSpriteTexture(sprite);
+                    spriteFrame->setOriginalSizeInPixels(mcSizeInPixels);
+                    spriteFrame->setOriginalSize(mcSize);
+                }
             }
         }
 
         if (spriteFrame == nullptr)
             spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect(Vec2::ZERO, Size::ZERO));
-        spriteFrame->setOffset(Vec2(rect.origin.x, -rect.origin.y));
+        spriteFrame->setOffset(Vec2(rect.origin.x - (mcSize.width - rect.size.width) / 2, -(rect.origin.y - (mcSize.height - rect.size.height) / 2)));
         AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
         frames.pushBack(frame);
         //tranfer to AnimationFrame
