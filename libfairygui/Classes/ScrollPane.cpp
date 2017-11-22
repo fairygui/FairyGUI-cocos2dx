@@ -10,20 +10,20 @@ USING_NS_CC;
 ScrollPane* ScrollPane::_draggingPane = nullptr;
 int ScrollPane::_gestureFlag = 0;
 
-const float TWEEN_TIME_GO = 0.5f; //tween time for SetPos(ani)
-const float TWEEN_TIME_DEFAULT = 0.3f; //min tween time for inertial scroll
-const float PULL_RATIO = 0.5f; //pull down/up ratio
+static const float TWEEN_TIME_GO = 0.5f; //tween time for SetPos(ani)
+static const float TWEEN_TIME_DEFAULT = 0.3f; //min tween time for inertial scroll
+static const float PULL_RATIO = 0.5f; //pull down/up ratio
 
-inline float sp_getField(const Vec2& pt, int axis) { return axis == 0 ? pt.x : pt.y; }
-inline float sp_getField(const cocos2d::Size& sz, int axis) { return axis == 0 ? sz.width : sz.height; }
-void sp_setField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x = value; else pt.y = value; }
-void sp_setField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width = value; else sz.height = value; }
-void sp_incField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x += value; else pt.y += value; }
-void sp_incField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width += value; else sz.height += value; }
+static inline float sp_getField(const Vec2& pt, int axis) { return axis == 0 ? pt.x : pt.y; }
+static inline float sp_getField(const cocos2d::Size& sz, int axis) { return axis == 0 ? sz.width : sz.height; }
+static void sp_setField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x = value; else pt.y = value; }
+static void sp_setField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width = value; else sz.height = value; }
+static void sp_incField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x += value; else pt.y += value; }
+static void sp_incField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width += value; else sz.height += value; }
 
-inline float sp_EaseFunc(float t, float d)
+static inline float sp_EaseFunc(float t, float d)
 {
-    t = t/d - 1;
+    t = t / d - 1;
     return t * t * t + 1;//cubicOut
 }
 
@@ -399,13 +399,13 @@ bool ScrollPane::isChildInView(GObject * obj) const
     if (_overlapSize.height > 0)
     {
         float dist = obj->getY() + _container->getPositionY2();
-        if (dist < -obj->getHeight() - 20 || dist > _viewSize.height + 20)
+        if (dist <= -obj->getHeight() || dist >= _viewSize.height)
             return false;
     }
     if (_overlapSize.width > 0)
     {
         float dist = obj->getX() + _container->getPositionX();
-        if (dist < -obj->getWidth() - 20 || dist > _viewSize.width + 20)
+        if (dist <= -obj->getWidth() || dist >= _viewSize.width)
             return false;
     }
 
@@ -1241,7 +1241,7 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
             float change = (int)(v * duration * 0.4f);
             pos += change;
         }
-}
+    }
 
     if (duration < TWEEN_TIME_DEFAULT)
         duration = TWEEN_TIME_DEFAULT;
@@ -1551,7 +1551,7 @@ void ScrollPane::onTouchMove(EventContext * context)
     {
         if (newPos.y > 0)
         {
-            if (!_bouncebackEffect || _inertiaDisabled)
+            if (!_bouncebackEffect)
                 _container->setPositionY2(0);
             else if (_header != nullptr && _header->maxSize.height != 0)
                 _container->setPositionY2(((int)MIN(newPos.y * 0.5f, _header->maxSize.height)));
@@ -1560,7 +1560,7 @@ void ScrollPane::onTouchMove(EventContext * context)
         }
         else if (newPos.y < -_overlapSize.height)
         {
-            if (!_bouncebackEffect || _inertiaDisabled)
+            if (!_bouncebackEffect)
                 _container->setPositionY2(-_overlapSize.height);
             else if (_footer != nullptr && _footer->maxSize.height > 0)
                 _container->setPositionY2(((int)MAX((newPos.y + _overlapSize.height) * 0.5f, -_footer->maxSize.height) - _overlapSize.height));
@@ -1575,7 +1575,7 @@ void ScrollPane::onTouchMove(EventContext * context)
     {
         if (newPos.x > 0)
         {
-            if (!_bouncebackEffect || _inertiaDisabled)
+            if (!_bouncebackEffect)
                 _container->setPositionX(0);
             else if (_header != nullptr && _header->maxSize.width != 0)
                 _container->setPositionX((int)MIN(newPos.x * 0.5f, _header->maxSize.width));
@@ -1584,7 +1584,7 @@ void ScrollPane::onTouchMove(EventContext * context)
         }
         else if (newPos.x < 0 - _overlapSize.width)
         {
-            if (!_bouncebackEffect || _inertiaDisabled)
+            if (!_bouncebackEffect)
                 _container->setPositionX(-_overlapSize.width);
             else if (_footer != nullptr && _footer->maxSize.width > 0)
                 _container->setPositionX((int)MAX((newPos.x + _overlapSize.width) * 0.5f, -_footer->maxSize.width) - _overlapSize.width);
@@ -1647,7 +1647,7 @@ void ScrollPane::onTouchEnd(EventContext * context)
 
     _gestureFlag = 0;
 
-    if (!_isMouseMoved || !_touchEffect || _inertiaDisabled)
+    if (!_isMouseMoved || !_touchEffect)
     {
         _isMouseMoved = false;
         return;
@@ -1707,12 +1707,17 @@ void ScrollPane::onTouchEnd(EventContext * context)
     }
     else
     {
-        float elapsed = (clock() - _lastMoveTime) / (double)CLOCKS_PER_SEC;
-        elapsed = elapsed * 60 - 1;
-        if (elapsed > 1)
-            _velocity = _velocity * pow(0.833f, elapsed);
+        if (!_inertiaDisabled)
+        {
+            float elapsed = (clock() - _lastMoveTime) / (double)CLOCKS_PER_SEC;
+            elapsed = elapsed * 60 - 1;
+            if (elapsed > 1)
+                _velocity = _velocity * pow(0.833f, elapsed);
 
-        endPos = updateTargetAndDuration(_tweenStart);
+            endPos = updateTargetAndDuration(_tweenStart);
+        }
+        else
+            _tweenDuration.set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
         Vec2 oldChange = endPos - _tweenStart;
 
         loopCheckingTarget(endPos);
