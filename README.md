@@ -11,7 +11,7 @@ FairyGUI编辑器操作简单，使用习惯与Adobe系列软件保持一致，�
 Get Started
 ====
 
-![](http://www.fairygui.com/images/20171111214131.png)
+![](http://www.fairygui.com/images/20171111214132.png)
 
 目录结构：
 - libfairygui 这里是fairygui库的源码。
