@@ -187,7 +187,6 @@ void TreeNode::setChildIndex(TreeNode* child, int index)
     int oldIndex = (int)_children.getIndex(child);
     CCASSERT(oldIndex != -1, "Not a child of this container");
 
-    int cnt = (int)_children.size();
     moveChild(child, oldIndex, index);
 }
 
@@ -198,7 +197,6 @@ int TreeNode::setChildIndexBefore(TreeNode* child, int index)
     int oldIndex = (int)_children.getIndex(child);
     CCASSERT(oldIndex != -1, "Not a child of this container");
 
-    int cnt = (int)_children.size();
     if (oldIndex < index)
         return moveChild(child, oldIndex, index - 1);
     else

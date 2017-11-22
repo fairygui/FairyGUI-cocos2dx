@@ -17,9 +17,7 @@ static const float PULL_RATIO = 0.5f; //pull down/up ratio
 static inline float sp_getField(const Vec2& pt, int axis) { return axis == 0 ? pt.x : pt.y; }
 static inline float sp_getField(const cocos2d::Size& sz, int axis) { return axis == 0 ? sz.width : sz.height; }
 static void sp_setField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x = value; else pt.y = value; }
-static void sp_setField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width = value; else sz.height = value; }
 static void sp_incField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x += value; else pt.y += value; }
-static void sp_incField(cocos2d::Size& sz, int axis, float value) { if (axis == 0) sz.width += value; else sz.height += value; }
 
 static inline float sp_EaseFunc(float t, float d)
 {

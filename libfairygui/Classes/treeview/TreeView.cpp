@@ -113,7 +113,6 @@ void TreeView::updateNode(TreeNode* node)
 void TreeView::expandAll(TreeNode * folderNode)
 {
     folderNode->setExpaned(true);
-    int cnt = folderNode->numChildren();
     for (auto &it : folderNode->_children)
     {
         if (it->isFolder())
@@ -125,7 +124,6 @@ void TreeView::collapseAll(TreeNode * folderNode)
 {
     if (folderNode != _rootNode)
         folderNode->setExpaned(false);
-    int cnt = folderNode->numChildren();
     for (auto &it : folderNode->_children)
     {
         if (it->isFolder())
