@@ -2,6 +2,7 @@
 #include "event/InputProcessor.h"
 #include "UIPackage.h"
 #include "GList.h"
+#include "GScrollBar.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -1595,8 +1596,8 @@ void ScrollPane::onTouchMove(EventContext * context)
     }
 
     auto deltaTime = Director::getInstance()->getDeltaTime();
-    float elapsed_t = (clock() - _lastMoveTime) / CLOCKS_PER_SEC;
-    float elapsed = elapsed_t * 60 - 1;
+    float elapsed = (clock() - _lastMoveTime) / (double)CLOCKS_PER_SEC;
+    elapsed = elapsed * 60 - 1;
     if (elapsed > 1)
         _velocity = _velocity * pow(0.833f, elapsed);
     Vec2 deltaPosition = pt - _lastTouchPos;
@@ -1706,8 +1707,8 @@ void ScrollPane::onTouchEnd(EventContext * context)
     }
     else
     {
-        float elapsed_t = (clock() - _lastMoveTime) / CLOCKS_PER_SEC;
-        float elapsed = elapsed_t * 60 - 1;
+        float elapsed = (clock() - _lastMoveTime) / (double)CLOCKS_PER_SEC;
+        elapsed = elapsed * 60 - 1;
         if (elapsed > 1)
             _velocity = _velocity * pow(0.833f, elapsed);
 

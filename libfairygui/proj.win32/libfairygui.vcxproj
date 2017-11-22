@@ -67,6 +67,8 @@
     <ClInclude Include="..\Classes\Relations.h" />
     <ClInclude Include="..\Classes\ScrollPane.h" />
     <ClInclude Include="..\Classes\Transition.h" />
+    <ClInclude Include="..\Classes\treeview\TreeNode.h" />
+    <ClInclude Include="..\Classes\treeview\TreeView.h" />
     <ClInclude Include="..\Classes\UIConfig.h" />
     <ClInclude Include="..\Classes\UIObjectFactory.h" />
     <ClInclude Include="..\Classes\UIPackage.h" />
@@ -130,6 +132,8 @@
     <ClCompile Include="..\Classes\Relations.cpp" />
     <ClCompile Include="..\Classes\ScrollPane.cpp" />
     <ClCompile Include="..\Classes\Transition.cpp" />
+    <ClCompile Include="..\Classes\treeview\TreeNode.cpp" />
+    <ClCompile Include="..\Classes\treeview\TreeView.cpp" />
     <ClCompile Include="..\Classes\UIConfig.cpp" />
     <ClCompile Include="..\Classes\UIObjectFactory.cpp" />
     <ClCompile Include="..\Classes\UIPackage.cpp" />

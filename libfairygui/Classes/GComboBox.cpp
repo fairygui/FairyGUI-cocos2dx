@@ -314,7 +314,7 @@ void GComboBox::onClickItem(EventContext* context)
     if (dynamic_cast<GRoot*>(_dropdown->getParent()))
         ((GRoot*)_dropdown->getParent())->hidePopup(_dropdown);
     _selectedIndex = INT_MIN;
-    setSelectedIndex(context->getData().asInt());
+    setSelectedIndex(_list->getChildIndex((GObject*)context->getData()));
 
     dispatchEvent(UIEventType::ClickItem);
 }

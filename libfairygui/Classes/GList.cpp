@@ -1,6 +1,5 @@
 #include "GList.h"
 #include "GButton.h"
-#include "ScrollPane.h"
 #include "UIPackage.h"
 #include "utils/ToolSet.h"
 
@@ -185,6 +184,7 @@ GObject * GList::addChildAt(GObject * child, int index)
 
     child->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GList::onItemTouchBegin, this), EventTag(this));
     child->addClickListener(CC_CALLBACK_1(GList::onClickItem, this), EventTag(this));
+    child->addEventListener(UIEventType::RightClick, CC_CALLBACK_1(GList::onClickItem, this), EventTag(this));
 
     return child;
 }
@@ -194,6 +194,7 @@ void GList::removeChildAt(int index)
     GObject* child = _children.at(index);
     child->removeClickListener(EventTag(this));
     child->removeEventListener(UIEventType::TouchBegin, EventTag(this));
+    child->removeEventListener(UIEventType::RightClick, EventTag(this));
 
     GComponent::removeChildAt(index);
 }
@@ -685,7 +686,7 @@ void GList::onClickItem(EventContext * context)
     if (_scrollPane != nullptr && scrollItemToViewOnClick)
         _scrollPane->scrollToView(item, true);
 
-    dispatchEvent(UIEventType::ClickItem, Value(getChildIndex(item)));
+    dispatchEvent(context->getType() == UIEventType::Click ? UIEventType::ClickItem : UIEventType::RightClickItem, item);
 }
 
 void GList::setSelectionOnEvent(GObject * item, InputEvent * evt)
@@ -1750,7 +1751,7 @@ void GList::handleScroll2(bool forceUpdate)
 
         ii.updateFlag = itemInfoVer;
         ii.obj->setPosition(curX, curY);
-        if (curIndex == newFirstIndex) 
+        if (curIndex == newFirstIndex)
             max += ii.size.x;
 
         curY += ii.size.y + _lineGap;

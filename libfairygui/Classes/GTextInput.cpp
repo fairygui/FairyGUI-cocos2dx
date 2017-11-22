@@ -29,8 +29,7 @@ void GTextInput::handleInit()
 
 const std::string & GTextInput::getText() const
 {
-    std::string& tmp = (std::string&)_text;
-    tmp = _input->getText();
+    const_cast<GTextInput*>(this)->_text = _input->getText();
     return _text;
 }
 

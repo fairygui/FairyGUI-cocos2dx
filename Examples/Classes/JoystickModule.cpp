@@ -120,7 +120,7 @@ void JoystickModule::onTouchMove(EventContext * context)
 
         _button->setPosition(buttonX - _button->getWidth() / 2, buttonY - _button->getHeight() / 2);
 
-        dispatchEvent(MOVE, Value(degree));
+        dispatchEvent(MOVE, nullptr, Value(degree));
     }
 }
 

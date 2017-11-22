@@ -68,7 +68,9 @@ Classes/utils/UBBParser.cpp \
 Classes/utils/WeakPtr.cpp \
 Classes/controller_action/ControllerAction.cpp \
 Classes/controller_action/ChangePageAction.cpp \
-Classes/controller_action/PlayTransitionAction.cpp
+Classes/controller_action/PlayTransitionAction.cpp \
+Classes/treeview/TreeView.cpp \
+Classes/treeview/TreeNode.cpp
 
 LOCAL_STATIC_LIBRARIES := cocos2dx_static
 

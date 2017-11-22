@@ -160,14 +160,14 @@ void InputProcessor::handleRollOver(TouchInfo* touch, GObject* target)
     {
         element = wptr.ptr();
         if (element && element->onStage())
-            element->dispatchEvent(UIEventType::RollOut, Value::Null);
+            element->dispatchEvent(UIEventType::RollOut);
     }
 
     for (auto &wptr : rollOverChain)
     {
         element = wptr.ptr();
         if (element && element->onStage())
-            element->dispatchEvent(UIEventType::RollOver, Value::Null);
+            element->dispatchEvent(UIEventType::RollOver);
     }
 }
 
@@ -219,9 +219,9 @@ void InputProcessor::setEnd(TouchInfo* touch, GObject* target)
     touch->began = false;
 
     auto now = clock();
-    float elapsed_t = (now - touch->lastClickTime) / CLOCKS_PER_SEC;
+    float elapsed = (now - touch->lastClickTime) / (double)CLOCKS_PER_SEC;
 
-    if (elapsed_t < 0.35f)
+    if (elapsed < 0.45f)
     {
         if (touch->clickCount == 2)
             touch->clickCount = 1;
@@ -283,7 +283,7 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
         _captureCallback(UIEventType::TouchBegin);
 
     WeakPtr wptr(target);
-    target->bubbleEvent(UIEventType::TouchBegin, Value::Null);
+    target->bubbleEvent(UIEventType::TouchBegin);
     target = wptr.ptr();
 
     handleRollOver(ti, target);
@@ -327,13 +327,13 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
                 if (!mm)
                     continue;
 
-                mm->dispatchEvent(UIEventType::TouchMove, Value::Null);
+                mm->dispatchEvent(UIEventType::TouchMove);
                 if (mm == _owner)
                     done = true;
             }
         }
         if (!done)
-            _owner->dispatchEvent(UIEventType::TouchMove, Value::Null);
+            _owner->dispatchEvent(UIEventType::TouchMove);
     }
 
     _activeProcessor = nullptr;
@@ -372,14 +372,14 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
 
             if (mm != target
                 && (!dynamic_cast<GComponent*>(mm) || !((GComponent*)mm)->isAncestorOf(target)))
-                mm->dispatchEvent(UIEventType::TouchEnd, Value::Null);
+                mm->dispatchEvent(UIEventType::TouchEnd);
         }
         ti->touchMonitors.clear();
         target = wptr.ptr();
     }
     if (target)
     {
-        target->bubbleEvent(UIEventType::TouchEnd, Value::Null);
+        target->bubbleEvent(UIEventType::TouchEnd);
         target = wptr.ptr();
     }
 
@@ -395,7 +395,7 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
             const char* linkHref = dynamic_cast<FUIRichText*>(tf->displayObject())->hitTestLink(pt);
             if (linkHref)
             {
-                tf->bubbleEvent(UIEventType::ClickLink, Value(linkHref));
+                tf->bubbleEvent(UIEventType::ClickLink, nullptr, Value(linkHref));
                 target = wptr.ptr();
             }
         }
@@ -479,7 +479,7 @@ void InputProcessor::onMouseDown(cocos2d::EventMouse * event)
         _captureCallback(UIEventType::TouchBegin);
 
     WeakPtr wptr(target);
-    target->bubbleEvent(UIEventType::TouchBegin, Value::Null);
+    target->bubbleEvent(UIEventType::TouchBegin);
 
     _activeProcessor = nullptr;
 }
@@ -520,14 +520,14 @@ void InputProcessor::onMouseUp(cocos2d::EventMouse * event)
 
             if (mm != target
                 && (!dynamic_cast<GComponent*>(mm) || !((GComponent*)mm)->isAncestorOf(target)))
-                mm->dispatchEvent(UIEventType::TouchEnd, Value::Null);
+                mm->dispatchEvent(UIEventType::TouchEnd);
         }
         ti->touchMonitors.clear();
         target = wptr.ptr();
     }
     if (target)
     {
-        target->bubbleEvent(UIEventType::TouchEnd, Value::Null);
+        target->bubbleEvent(UIEventType::TouchEnd);
         target = wptr.ptr();
     }
 

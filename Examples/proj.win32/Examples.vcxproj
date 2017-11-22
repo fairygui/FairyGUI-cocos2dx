@@ -167,6 +167,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\PullToRefreshScene.cpp" />
     <ClCompile Include="..\Classes\ScrollPaneScene.cpp" />
     <ClCompile Include="..\Classes\TransitionDemoScene.cpp" />
+    <ClCompile Include="..\Classes\TreeViewScene.cpp" />
     <ClCompile Include="..\Classes\VirtualListScene.cpp" />
     <ClCompile Include="..\Classes\Window1.cpp" />
     <ClCompile Include="..\Classes\Window2.cpp" />
@@ -192,6 +193,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\PullToRefreshScene.h" />
     <ClInclude Include="..\Classes\ScrollPaneScene.h" />
     <ClInclude Include="..\Classes\TransitionDemoScene.h" />
+    <ClInclude Include="..\Classes\TreeViewScene.h" />
     <ClInclude Include="..\Classes\VirtualListScene.h" />
     <ClInclude Include="..\Classes\Window1.h" />
     <ClInclude Include="..\Classes\Window2.h" />

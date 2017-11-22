@@ -54,8 +54,8 @@ public:
     bool hasEventListener(int eventType) const { return hasEventListener(eventType, EventTag::None); }
     bool hasEventListener(int eventType, const EventTag& tag) const;
 
-    bool dispatchEvent(int eventType, cocos2d::Value data = cocos2d::Value::Null);
-    bool bubbleEvent(int eventType, cocos2d::Value data = cocos2d::Value::Null);
+    bool dispatchEvent(int eventType, void* data = nullptr, const cocos2d::Value& dataValue = cocos2d::Value::Null);
+    bool bubbleEvent(int eventType, void* data = nullptr, const cocos2d::Value& dataValue = cocos2d::Value::Null);
 
     bool isDispatchingEvent(int eventType);
 

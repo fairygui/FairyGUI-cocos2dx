@@ -19,6 +19,9 @@
     <Filter Include="src\controller_action">
       <UniqueIdentifier>{25bf4a94-95ee-40cb-b00d-ca3dcd2fc55c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\treeview">
+      <UniqueIdentifier>{62d47ed6-2e8e-4e97-8175-5504550149cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\GButton.h">
@@ -216,6 +219,12 @@
     <ClInclude Include="..\Classes\display\FUIInput.h">
       <Filter>src\display</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\treeview\TreeNode.h">
+      <Filter>src\treeview</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\treeview\TreeView.h">
+      <Filter>src\treeview</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -397,6 +406,12 @@
     </ClCompile>
     <ClCompile Include="..\Classes\display\FUIInput.cpp">
       <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\treeview\TreeView.cpp">
+      <Filter>src\treeview</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\treeview\TreeNode.cpp">
+      <Filter>src\treeview</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,7 +2,6 @@
 #include "UIObjectFactory.h"
 #include "Relations.h"
 #include "GGroup.h"
-#include "ScrollPane.h"
 #include "utils/ToolSet.h"
 #include "display/FUIContainer.h"
 
@@ -69,6 +68,7 @@ GObject* GComponent::addChildAt(GObject* child, int index)
     }
     else
     {
+        child->retain();
         child->removeFromParent();
         child->_parent = this;
 
@@ -88,6 +88,8 @@ GObject* GComponent::addChildAt(GObject* child, int index)
             _children.pushBack(child);
         else
             _children.insert(index, child);
+
+        child->release();
 
         childStateChanged(child);
         setBoundsChangedFlag();

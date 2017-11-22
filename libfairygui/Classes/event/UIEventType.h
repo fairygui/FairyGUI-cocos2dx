@@ -36,6 +36,7 @@ public:
     static const int ClickItem = 50;
     static const int ClickLink = 51;
     static const int ClickMenu = 52;
+    static const int RightClickItem = 53;
 
     static const int DragStart = 60;
     static const int DragMove = 61;

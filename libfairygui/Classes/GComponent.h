@@ -6,13 +6,13 @@
 #include "GObject.h"
 #include "Transition.h"
 #include "Margin.h"
+#include "ScrollPane.h"
 #include "event/HitTest.h"
 #include "display/FUIContainer.h"
 
 NS_FGUI_BEGIN
 
 class GController;
-class ScrollPane;
 class GGroup;
 
 class GComponent : public GObject

@@ -2,6 +2,11 @@
 
 USING_NS_CC;
 
+GuideScene::GuideScene():_guideLayer(nullptr)
+{
+
+}
+
 GuideScene::~GuideScene()
 {
     CC_SAFE_RELEASE(_guideLayer);

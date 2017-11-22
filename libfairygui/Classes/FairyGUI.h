@@ -20,10 +20,10 @@
 #include "GRoot.h"
 #include "Window.h"
 #include "PopupMenu.h"
+#include "treeview/TreeView.h"
 #include "UIObjectFactory.h"
 #include "GObjectPool.h"
 #include "DragDropManager.h"
-#include "ScrollPane.h"
 #include "FairyGUIMacros.h"
 
 #endif

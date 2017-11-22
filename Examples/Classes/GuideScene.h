@@ -9,6 +9,7 @@ USING_NS_FGUI;
 class GuideScene : public DemoScene
 {
 public:
+    GuideScene();
     ~GuideScene();
 
     // implement the "static create()" method manually

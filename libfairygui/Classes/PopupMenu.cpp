@@ -204,7 +204,7 @@ void PopupMenu::show(GObject * target, PopupDirection dir)
 
 void PopupMenu::onClickItem(EventContext * context)
 {
-    GButton* item = _list->getChildAt(context->getData().asInt())->as<GButton>();
+    GButton* item = ((GObject*)context->getData())->as<GButton>();
     if (item == nullptr)
         return;
 

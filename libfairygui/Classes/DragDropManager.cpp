@@ -35,7 +35,7 @@ DragDropManager* DragDropManager::getInstance()
     return _inst;
 }
 
-void DragDropManager::startDrag(const std::string & icon, Value sourceData, int touchPointID)
+void DragDropManager::startDrag(const std::string & icon, const Value& sourceData, int touchPointID)
 {
     if (_agent->getParent() != nullptr)
         return;
@@ -73,7 +73,7 @@ void DragDropManager::onDragEnd(EventContext * context)
             if (obj->hasEventListener(UIEventType::Drop))
             {
                 //obj->requestFocus();
-                obj->dispatchEvent(UIEventType::Drop, _sourceData);
+                obj->dispatchEvent(UIEventType::Drop, nullptr, _sourceData);
                 return;
             }
         }

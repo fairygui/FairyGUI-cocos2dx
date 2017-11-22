@@ -51,7 +51,7 @@ void ChatScene::onClickEmojiBtn(EventContext * context)
 
 void ChatScene::onClickEmoji(EventContext * context)
 {
-    GObject* item = ((GList*)context->getSender())->getChildAt(context->getData().asInt());
+    GObject* item = (GObject*)context->getData();
     _input->setText(_input->getText() + "[:" + item->getText() + "]");
 }
 

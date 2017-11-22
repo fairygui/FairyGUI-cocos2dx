@@ -90,7 +90,7 @@ void BasicsScene::playText()
     obj->getChild("n12")->addEventListener(UIEventType::ClickLink, [this](EventContext* context)
     {
         GRichTextField* t = dynamic_cast<GRichTextField*>(context->getSender());
-        t->setText("[img]ui://Basics/long_dead_png[/img][color=#FF0000]You click the link[/color]:" + context->getData().asString());
+        t->setText("[img]ui://Basics/long_dead_png[/img][color=#FF0000]You click the link[/color]:" + context->getDataValue().asString());
     });
     obj->getChild("n25")->addClickListener([this, obj](EventContext* context)
     {
@@ -135,7 +135,7 @@ void BasicsScene::playPopup()
 
 void BasicsScene::onClickMenu(EventContext* context)
 {
-    GObject* itemObject = _pm->getList()->getChildAt(context->getData().asInt());
+    GObject* itemObject = (GObject*)context->getData();
     CCLOG("click %s", itemObject->getText().c_str());
 }
 
@@ -227,7 +227,7 @@ void BasicsScene::playDragDrop()
     c->setIcon("");
     c->addEventListener(UIEventType::Drop, [c](EventContext* context)
     {
-        c->setIcon(context->getData().asString());
+        c->setIcon(context->getDataValue().asString());
     });
 
     GObject* bounds = obj->getChild("n7");

@@ -3,10 +3,16 @@
 
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
-#include "GComponent.h"
-#include "GScrollBar.h"
+#include "Margin.h"
 
 NS_FGUI_BEGIN
+
+class GObject;
+class GComponent;
+class GScrollBar;
+class FUIInnerContainer;
+class GController;
+class EventContext;
 
 class ScrollPane : public cocos2d::Ref
 {

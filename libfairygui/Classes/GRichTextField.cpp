@@ -54,7 +54,7 @@ void GRichTextField::setAlign(cocos2d::TextHAlignment value)
 
 void GRichTextField::handleURL(const std::string & url)
 {
-    bubbleEvent(UIEventType::ClickLink, Value(url));
+    bubbleEvent(UIEventType::ClickLink, nullptr, Value(url));
 }
 
 void GRichTextField::handleSizeChanged()

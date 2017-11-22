@@ -20,7 +20,7 @@ void JoystickScene::continueInit()
     GObject* tf = _view->getChild("n9");
 
     _joystick->addEventListener(JoystickModule::MOVE, [tf](EventContext*context) {
-        tf->setText(context->getData().asString());
+        tf->setText(context->getDataValue().asString());
     });
 
     _joystick->addEventListener(JoystickModule::END, [tf](EventContext*context) {

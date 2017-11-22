@@ -37,7 +37,7 @@ void BagWindow::doHideAnimation()
 
 void BagWindow::onClickItem(EventContext* context)
 {
-    GObject* item = _list->getChildAt(context->getData().asInt());
+    GObject* item = (GObject*)context->getData();
     _contentPane->getChild("n11")->setIcon(item->getIcon());
     _contentPane->getChild("n13")->setText(item->getText());
 }

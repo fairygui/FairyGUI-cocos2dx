@@ -11,6 +11,7 @@
 #include "ChatScene.h"
 #include "ListEffectScene.h"
 #include "ScrollPaneScene.h"
+#include "TreeViewScene.h"
 
 USING_NS_CC;
 
@@ -78,6 +79,11 @@ void MenuScene::continueInit()
     _view->getChild("n13")->addClickListener([this](EventContext*)
     {
         TransitionSplitCols* scene = TransitionSplitCols::create(1, ScrollPaneScene::create());
+        Director::getInstance()->replaceScene(scene);
+    });
+    _view->getChild("n14")->addClickListener([this](EventContext*)
+    {
+        TransitionSplitCols* scene = TransitionSplitCols::create(1, TreeViewScene::create());
         Director::getInstance()->replaceScene(scene);
     });
 }

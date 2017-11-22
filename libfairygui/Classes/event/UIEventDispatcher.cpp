@@ -153,15 +153,17 @@ bool UIEventDispatcher::hasEventListener(int eventType, const EventTag& tag) con
     return false;
 }
 
-bool UIEventDispatcher::dispatchEvent(int eventType, Value data)
+bool UIEventDispatcher::dispatchEvent(int eventType, void* data, const Value& dataValue)
 {
     if (_callbacks.size() == 0)
         return false;
 
     EventContext context;
     context._sender = this;
+    context._type = eventType;
     if (InputProcessor::_activeProcessor)
         context._inputEvent = InputProcessor::_activeProcessor->getRecentInput();
+    context._dataValue = dataValue;
     context._data = data;
 
     doDispatch(eventType, &context);
@@ -169,11 +171,13 @@ bool UIEventDispatcher::dispatchEvent(int eventType, Value data)
     return context._defaultPrevented;
 }
 
-bool UIEventDispatcher::bubbleEvent(int eventType, Value data)
+bool UIEventDispatcher::bubbleEvent(int eventType, void* data, const Value& dataValue)
 {
     EventContext context;
     if (InputProcessor::_activeProcessor)
         context._inputEvent = InputProcessor::_activeProcessor->getRecentInput();
+    context._type = eventType;
+    context._dataValue = dataValue;
     context._data = data;
 
     doBubble(eventType, &context);

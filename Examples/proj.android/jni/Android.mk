@@ -33,6 +33,7 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/hellocpp/main.cpp \
                    $(LOCAL_PATH)/../../Classes/ChatScene.cpp \
                    $(LOCAL_PATH)/../../Classes/ListEffectScene.cpp \
                    $(LOCAL_PATH)/../../Classes/ScrollPaneScene.cpp \
+                   $(LOCAL_PATH)/../../Classes/TreeViewScene.cpp \
                    $(LOCAL_PATH)/../../Classes/Window1.cpp \
                    $(LOCAL_PATH)/../../Classes/Window2.cpp
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
