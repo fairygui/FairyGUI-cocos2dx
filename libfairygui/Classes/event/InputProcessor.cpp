@@ -35,7 +35,10 @@ public:
 };
 
 InputProcessor::InputProcessor(GComponent* owner) :
-    _keyModifiers(0)
+    _keyModifiers(0),
+    _mouseListener(nullptr),
+    _touchListener(nullptr),
+    _keyboardListener(nullptr)
 {
     _owner = owner;
     _recentInput._inputProcessor = this;
