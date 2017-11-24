@@ -32,7 +32,7 @@ public:
     static std::string popupMenu_seperator;
 
     static void registerFont(const std::string& aliasName, const std::string& realName);
-    static const std::string& getRealFontName(const std::string& aliasName, bool& isTTF);
+    static const std::string& getRealFontName(const std::string& aliasName, bool* isTTF = nullptr);
 
 private:
     struct FontNameItem

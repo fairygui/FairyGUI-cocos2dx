@@ -90,7 +90,7 @@ void BasicsScene::playText()
     obj->getChild("n12")->addEventListener(UIEventType::ClickLink, [this](EventContext* context)
     {
         GRichTextField* t = dynamic_cast<GRichTextField*>(context->getSender());
-        t->setText("[img]ui://Basics/long_dead_png[/img][color=#FF0000]You click the link[/color]:" + context->getDataValue().asString());
+        t->setText("[img]ui://Basics/pet[/img][color=#FF0000]You click the link[/color]:" + context->getDataValue().asString());
     });
     obj->getChild("n25")->addClickListener([this, obj](EventContext* context)
     {

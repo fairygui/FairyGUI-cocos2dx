@@ -660,7 +660,7 @@ void GComponent::childStateChanged(GObject* child)
     if (child->_displayObject == nullptr || child == _maskOwner)
         return;
 
-    if (child->finalVisible())
+    if (child->internalVisible())
     {
         if (child->_displayObject->getParent() == nullptr)
         {
@@ -740,7 +740,7 @@ void GComponent::buildNativeDisplayList()
         for (int i = 0; i < cnt; i++)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->internalVisible())
                 _container->addChild(child->_displayObject, i);
         }
     }
@@ -750,7 +750,7 @@ void GComponent::buildNativeDisplayList()
         for (int i = 0; i < cnt; i++)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->internalVisible())
                 _container->addChild(child->_displayObject, cnt - 1 - i);
         }
     }
@@ -761,13 +761,13 @@ void GComponent::buildNativeDisplayList()
         for (int i = 0; i < _apexIndex; i++)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->internalVisible())
                 _container->addChild(child->_displayObject, i);
         }
         for (int i = cnt - 1; i >= _apexIndex; i--)
         {
             GObject* child = _children.at(i);
-            if (child->_displayObject != nullptr && child != _maskOwner && child->finalVisible())
+            if (child->_displayObject != nullptr && child != _maskOwner && child->internalVisible())
                 _container->addChild(child->_displayObject, _apexIndex + cnt - 1 - i);
         }
     }
@@ -850,7 +850,7 @@ cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
 
 GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
-    if (!_touchable || !_visible || !finalVisible())
+    if (!_touchable || !_visible || !internalVisible())
         return nullptr;
 
     GObject * target = nullptr;
@@ -873,10 +873,9 @@ GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
 
     if (_hitArea)
     {
-        rect.size = _displayObject->getContentSize();
-        Vec2 localPoint;
-        //flag = isScreenPointInRect(worldPoint, camera, _displayObject->getWorldToNodeTransform(), rect, &localPoint) ? 1 : 2;
-        localPoint = _displayObject->convertToNodeSpace(worldPoint);
+        Rect rect;
+        rect.size = _size;
+        Vec2 localPoint = _displayObject->convertToNodeSpace(worldPoint);
         flag = rect.containsPoint(localPoint) ? 1 : 2;
 
         if (!_hitArea->hitTest(this, localPoint))
@@ -904,8 +903,7 @@ GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
     {
         if (flag == 0)
         {
-            rect.size = _displayObject->getContentSize();
-            //flag = isScreenPointInRect(worldPoint, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr) ? 1 : 2;
+            rect.size = _size;
             flag = rect.containsPoint(_displayObject->convertToNodeSpace(worldPoint)) ? 1 : 2;
         }
 
@@ -970,11 +968,16 @@ void GComponent::handleSizeChanged()
 
 void GComponent::handleGrayedChanged()
 {
+    GObject::handleGrayedChanged();
+
     GController* cc = getController("grayed");
     if (cc != nullptr)
         cc->setSelectedIndex(isGrayed() ? 1 : 0);
     else
-        GObject::handleGrayedChanged();
+    {
+        for (auto &child : _children)
+            child->handleGrayedChanged();
+    }
 }
 
 void GComponent::handleControllerChanged(GController* c)

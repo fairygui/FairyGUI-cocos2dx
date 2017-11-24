@@ -19,47 +19,46 @@ void GTextInput::handleInit()
     _input = FUIInput::create(this);
     _input->retain();
 
-    setFontName(UIConfig::defaultFont);
-    setColor(Color3B::BLACK);
-    setFontSize(12);
-    _input->setPlaceholderFontSize(12);
-
     _displayObject = _input;
 }
 
-const std::string & GTextInput::getText() const
+bool GTextInput::isSingleLine() const
 {
-    const_cast<GTextInput*>(this)->_text = _input->getText();
-    return _text;
-}
-
-void GTextInput::setText(const std::string & value)
-{
-    _text = value;
-    _input->setText(value.c_str());
-}
-
-void GTextInput::setFontName(const std::string & value)
-{
-    _input->setFontName(value.c_str());
-}
-
-void GTextInput::setFontSize(int value)
-{
-    _input->setFontSize(value);
-    _input->setPlaceholderFontSize(value);
+    return _input->isSingleLine();
 }
 
 void GTextInput::setSingleLine(bool value)
 {
-    _input->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
+    _input->setSingleLine(value);
 }
 
-void GTextInput::setColor(const cocos2d::Color3B & value)
+void GTextInput::applyTextFormat()
 {
-    _color = value;
-    _input->setFontColor((Color4B)value);
-    updateGear(4);
+    _input->applyTextFormat();
+}
+
+void GTextInput::setPrompt(const std::string & value)
+{
+    _input->setPlaceHolder(value.c_str());
+}
+
+void GTextInput::setPassword(bool value)
+{
+    _input->setPassword(value);
+}
+
+void GTextInput::setKeyboardType(int value)
+{
+    _input->setKeyboardType(value);
+}
+
+void GTextInput::setMaxLength(int value)
+{
+    _input->setMaxLength(value);
+}
+
+void GTextInput::setRestrict(const std::string & value)
+{
 }
 
 void GTextInput::handleSizeChanged()
@@ -75,19 +74,22 @@ void GTextInput::setup_BeforeAdd(TXMLElement * xml)
 
     p = xml->Attribute("prompt");
     if (p)
-        _input->setPlaceHolder(p);
+        setPrompt(p);
 
     if (xml->BoolAttribute("password"))
-        _input->setInputFlag(ui::EditBox::InputFlag::PASSWORD);
+        setPassword(true);
 
-    //xml->Attribute("restrict");
+    p = xml->Attribute("restrict");
+    if (p)
+        setRestrict(p);
+
     p = xml->Attribute("maxLength");
     if (p)
-        _input->setMaxLength(atoi(p));
+        setMaxLength(atoi(p));
 
-    /*p = xml->Attribute("keyboardType");
+    p = xml->Attribute("keyboardType");
     if (p)
-        _input->setInputMode((ui::EditBox::InputMode)atoi(p));*/
+        setKeyboardType(atoi(p));
 }
 
 NS_FGUI_END

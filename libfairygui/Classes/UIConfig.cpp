@@ -38,16 +38,25 @@ void UIConfig::registerFont(const std::string& aliasName, const std::string& rea
     _fontNames[aliasName] = fi;
 }
 
-const std::string& UIConfig::getRealFontName(const std::string& aliasName, bool& isTTF)
+const std::string& UIConfig::getRealFontName(const std::string& aliasName, bool* isTTF)
 {
-    auto it = _fontNames.find(aliasName);
+    std::unordered_map<std::string, UIConfig::FontNameItem>::const_iterator it;
+    if (aliasName.empty())
+        it = _fontNames.find(UIConfig::defaultFont);
+    else
+        it = _fontNames.find(aliasName);
     if (it != _fontNames.end())
     {
-        isTTF = it->second.ttf;
+        if(isTTF)
+            *isTTF = it->second.ttf;
         return it->second.name;
     }
     else
+    {
+        if (isTTF)
+            *isTTF = false;
         return aliasName;
+    }
 }
 
 NS_FGUI_END

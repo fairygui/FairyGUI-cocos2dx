@@ -15,6 +15,7 @@ ChatScene::~ChatScene()
 void ChatScene::continueInit()
 {
     UIPackage::addPackage("UI/Emoji");
+    UIConfig::verticalScrollBar = "";
 
     _view = UIPackage::createObject("Emoji", "Main")->as<GComponent>();
     _groot->addChild(_view);
@@ -25,6 +26,7 @@ void ChatScene::continueInit()
     _list->itemRenderer = CC_CALLBACK_2(ChatScene::renderListItem, this);
 
     _input = _view->getChild("input")->as<GTextInput>();
+    _input->addEventListener(UIEventType::Submit, CC_CALLBACK_1(ChatScene::onSubmit, this));
 
     _view->getChild("btnSend")->addClickListener(CC_CALLBACK_1(ChatScene::onClickSendBtn, this));
     _view->getChild("btnEmoji")->addClickListener(CC_CALLBACK_1(ChatScene::onClickEmojiBtn, this));
@@ -55,6 +57,11 @@ void ChatScene::onClickEmoji(EventContext * context)
     _input->setText(_input->getText() + "[:" + item->getText() + "]");
 }
 
+void ChatScene::onSubmit(EventContext * context)
+{
+    onClickSendBtn(nullptr);
+}
+
 void ChatScene::renderListItem(int index, GObject * obj)
 {
     GButton* item = obj->as<GButton>();
@@ -63,8 +70,8 @@ void ChatScene::renderListItem(int index, GObject * obj)
         item->getChild("name")->setText(msg.sender);
     item->setIcon("ui://Emoji/" + msg.senderIcon);
 
-    //Recaculate the text width
     GRichTextField* tf = item->getChild("msg")->as<GRichTextField>();
+    tf->setText("");
     tf->setWidth(tf->initSize.width);
     tf->setText(EmojiParser::getInstance()->parse(msg.msg.c_str()));
     tf->setWidth(tf->getTextSize().width);

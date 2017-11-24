@@ -49,6 +49,13 @@ void GImage::handleSizeChanged()
         _content->setContentSize(_size);
 }
 
+void GImage::handleGrayedChanged()
+{
+    GObject::handleGrayedChanged();
+
+    ((FUISprite*)_content)->setGrayed(_finalGrayed);
+}
+
 void GImage::setColor(const cocos2d::Color3B & value)
 {
     _content->setColor(value);

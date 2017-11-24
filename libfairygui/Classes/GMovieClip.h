@@ -39,6 +39,7 @@ public:
 protected:
     virtual void handleInit() override;
     virtual void setup_BeforeAdd(TXMLElement* xml) override;
+    virtual void handleGrayedChanged() override;
 
 private:
     cocos2d::Sprite* _content;

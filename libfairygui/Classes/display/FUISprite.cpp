@@ -74,4 +74,15 @@ void FUISprite::setScale9Grid(Rect * value)
     setCenterRect(insets);
 }
 
+void FUISprite::setGrayed(bool value)
+{
+    GLProgramState *glState = nullptr;
+    if(value)
+        glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, getTexture());
+    else
+        glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, getTexture());
+
+    setGLProgramState(glState);
+}
+
 NS_FGUI_END

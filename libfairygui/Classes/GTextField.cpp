@@ -4,38 +4,63 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
+void GTextField::setColor(const cocos2d::Color3B & value)
+{
+    getTextFormat()->color = value;
+    applyTextFormat();
+}
+
+void GTextField::setFontSize(float value)
+{
+    getTextFormat()->fontSize = value;
+    applyTextFormat();
+}
+
+void GTextField::cg_setColor(const cocos2d::Color4B & value)
+{
+    getTextFormat()->color = (Color3B)value;
+    applyTextFormat();
+}
+
+void GTextField::cg_setOutlineColor(const cocos2d::Color4B & value)
+{
+    getTextFormat()->outlineColor = (Color3B)value;
+    applyTextFormat();
+}
+
 void GTextField::setup_BeforeAdd(TXMLElement * xml)
 {
     GObject::setup_BeforeAdd(xml);
 
+    TextFormat* tf = getTextFormat();
     const char*p;
     p = xml->Attribute("font");
     if (p)
-        setFontName(p);
+        tf->face = p;
 
     p = xml->Attribute("fontSize");
     if (p)
-        setFontSize(atoi(p));
+        tf->fontSize = atoi(p);
 
     p = xml->Attribute("color");
     if (p)
-        setColor((Color3B)ToolSet::convertFromHtmlColor(p));
+        tf->color = (Color3B)ToolSet::convertFromHtmlColor(p);
 
     p = xml->Attribute("align");
     if (p)
-        setAlign(ToolSet::parseAlign(p));
+        tf->align = ToolSet::parseAlign(p);
 
     p = xml->Attribute("vAlign");
     if (p)
-        setVerticalAlign(ToolSet::parseVerticalAlign(p));
+        tf->verticalAlign = ToolSet::parseVerticalAlign(p);
 
     p = xml->Attribute("leading");
     if (p)
-        setLineSpacing(atoi(p));
+        tf->lineSpacing = atoi(p);
 
     p = xml->Attribute("letterSpacing");
     if (p)
-        setLetterSpacing(atoi(p));
+        tf->letterSpacing = atoi(p);
 
     p = xml->Attribute("ubb");
     if (p)
@@ -47,15 +72,15 @@ void GTextField::setup_BeforeAdd(TXMLElement * xml)
 
     p = xml->Attribute("underline");
     if (p)
-        setUnderline(strcmp(p, "true") == 0);
+        tf->underline = strcmp(p, "true") == 0;
 
     p = xml->Attribute("italic");
     if (p)
-        setItalic(strcmp(p, "true") == 0);
+        tf->italics = strcmp(p, "true") == 0;
 
     p = xml->Attribute("bold");
     if (p)
-        setBold(strcmp(p, "true") == 0);
+        tf->bold = strcmp(p, "true") == 0;
 
     p = xml->Attribute("singleLine");
     if (p)
@@ -64,22 +89,24 @@ void GTextField::setup_BeforeAdd(TXMLElement * xml)
     p = xml->Attribute("strokeColor");
     if (p)
     {
-        Color4B col = ToolSet::convertFromHtmlColor(p);
+        tf->outlineColor = (Color3B)ToolSet::convertFromHtmlColor(p);
         p = xml->Attribute("strokeSize");
-        enableOutline(col, p ? atoi(p) : 1);
+        tf->outlineSize = p ? atoi(p) : 1;
+        tf->enableEffect(TextFormat::OUTLINE);
     }
 
     p = xml->Attribute("shadowColor");
     if (p)
     {
-        Color4B col = ToolSet::convertFromHtmlColor(p);
+        tf->shadowColor = (Color3B)ToolSet::convertFromHtmlColor(p);
 
         Vec2 offset;
         p = xml->Attribute("shadowOffset");
         if (p)
             ToolSet::splitString(p, ',', offset);
         offset.y = -offset.y;
-        enableShadow(col, (cocos2d::Size)offset);
+        tf->shadowOffset = offset;
+        tf->enableEffect(TextFormat::SHADOW);
     }
 }
 
@@ -87,8 +114,9 @@ void GTextField::setup_AfterAdd(TXMLElement * xml)
 {
     GObject::setup_AfterAdd(xml);
 
-    const char* p;
+    applyTextFormat();
 
+    const char* p;
     p = xml->Attribute("text");
     if (p && strlen(p) > 0)
         setText(p);
@@ -106,7 +134,6 @@ GBasicTextField::GBasicTextField() :
 
 GBasicTextField::~GBasicTextField()
 {
-
 }
 
 void GBasicTextField::handleInit()
@@ -114,39 +141,22 @@ void GBasicTextField::handleInit()
     _label = FUILabel::create();
     _label->retain();
 
-    setFontName(UIConfig::defaultFont);
-    setFontSize(12);
-    setColor(Color3B::BLACK);
-
     _displayObject = _label;
 }
 
 void GBasicTextField::setText(const std::string & text)
 {
-    _label->setString(text);
+    _label->setText(text);
     if (!_underConstruct)
         updateSize();
 }
 
-void GBasicTextField::setFontName(const std::string & value)
+void GBasicTextField::applyTextFormat()
 {
-    _label->setFontName(value);
-    if (!_underConstruct)
-        updateSize();
-}
-
-void GBasicTextField::setFontSize(int value)
-{
-    _label->setFontSize(value);
-    if (!_underConstruct)
-        updateSize();
-}
-
-void GBasicTextField::setColor(const Color3B & value)
-{
-    _color = value;
-    _label->setTextColor((Color4B)value);
+    _label->applyTextFormat();
     updateGear(4);
+    if (!_underConstruct)
+        updateSize();
 }
 
 void GBasicTextField::setAutoSize(TextAutoSize value)
@@ -179,79 +189,11 @@ void GBasicTextField::setAutoSize(TextAutoSize value)
         updateSize();
 }
 
-void GBasicTextField::setAlign(cocos2d::TextHAlignment value)
-{
-    _label->setAlignment(value);
-}
-
-void GBasicTextField::setVerticalAlign(cocos2d::TextVAlignment value)
-{
-    _label->setVerticalAlignment(value);
-}
-
-void GBasicTextField::setUnderline(bool value)
-{
-    if (value)
-        _label->enableUnderline();
-    else
-        _label->disableEffect(LabelEffect::UNDERLINE);
-}
-
-void GBasicTextField::setItalic(bool value)
-{
-    if (value)
-        _label->enableItalics();
-    else
-        _label->disableEffect(LabelEffect::ITALICS);
-}
-
-void GBasicTextField::setBold(bool value)
-{
-    if (value)
-        ;// _label->enableBold();
-    else
-        _label->disableEffect(LabelEffect::BOLD);
-}
-
 void GBasicTextField::setSingleLine(bool value)
 {
     _label->enableWrap(!value);
-}
-
-void GBasicTextField::setLetterSpacing(float value)
-{
-}
-
-void GBasicTextField::setLineSpacing(float value)
-{
-    _label->setLineSpacing(value);
-}
-
-void GBasicTextField::enableOutline(const cocos2d::Color4B & color, float size)
-{
-    if (size == 0)
-    {
-        _label->disableEffect(LabelEffect::OUTLINE);
-    }
-    else
-    {
-        _outlineColor = color;
-        _label->enableOutline(_outlineColor, size);
-        updateGear(4);
-    }
-}
-
-void GBasicTextField::enableShadow(const cocos2d::Color4B& color, const cocos2d::Size & offset)
-{
-    if (offset.width != 0 || offset.height != 0)
-        _label->enableShadow(color, offset);
-    else
-        _label->disableEffect(LabelEffect::SHADOW);
-}
-
-void GBasicTextField::cg_setOutlineColor(const cocos2d::Color4B & value)
-{
-    enableOutline(value, _label->getOutlineSize());
+    if (!_underConstruct)
+        updateSize();
 }
 
 void GBasicTextField::updateSize()
@@ -276,13 +218,22 @@ void GBasicTextField::handleSizeChanged()
         return;
 
     if (_autoSize != TextAutoSize::BOTH)
+    {
         _label->setDimensions(_size.width, _size.height);
 
-    if (_autoSize == TextAutoSize::HEIGHT)
-    {
-        if (_label->getString().length() > 0)
-            setSizeDirectly(_size.width, _label->getContentSize().height);
+        if (_autoSize == TextAutoSize::HEIGHT)
+        {
+            if (_label->getString().length() > 0)
+                setSizeDirectly(_size.width, _label->getContentSize().height);
+        }
     }
+}
+
+void GBasicTextField::handleGrayedChanged()
+{
+    GObject::handleGrayedChanged();
+
+    _label->setGrayed(_finalGrayed);
 }
 
 void GBasicTextField::setup_AfterAdd(TXMLElement* xml)

@@ -546,13 +546,16 @@ void UIPackage::loadAtlas(PackageItem * item)
 {
     Image* image = new Image();
     string filePath = _assetNamePrefix + (!item->file.empty() ? item->file : item->id + ".png");
+    Image::setPNGPremultipliedAlphaEnabled(false);
     if (!image->initWithImageFile(filePath))
     {
         item->texture = _emptyTexture;
         delete image;
+        Image::setPNGPremultipliedAlphaEnabled(true);
         CCLOGWARN("FairyGUI: texture '%s' not found in %s", filePath.c_str(), _name.c_str());
         return;
     }
+    Image::setPNGPremultipliedAlphaEnabled(true);
 
     Texture2D* tex = new Texture2D();
     tex->initWithImage(image);
@@ -819,6 +822,7 @@ void UIPackage::loadFont(PackageItem * item)
     fontAtlas->setLineHeight(lineHeight);
     item->bitmapFont->_originalFontSize = size;
     item->bitmapFont->_resizable = resizable;
+    item->bitmapFont->_canTint = canTint;
 }
 
 void UIPackage::loadComponent(PackageItem * item)

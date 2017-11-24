@@ -13,10 +13,6 @@ GLoader::GLoader() :
     _fill(LoaderFillType::NONE),
     _updatingLayout(false),
     _contentItem(nullptr),
-    _contentWidth(0),
-    _contentHeight(0),
-    _contentSourceWidth(0),
-    _contentSourceHeight(0),
     _contentStatus(0),
     _content(nullptr),
     _playAction(nullptr),
@@ -67,6 +63,15 @@ void GLoader::setVerticalAlign(cocos2d::TextVAlignment value)
     if (_verticalAlign != value)
     {
         _verticalAlign = value;
+        updateLayout();
+    }
+}
+
+void GLoader::setAutoSize(bool value)
+{
+    if (_autoSize != value)
+    {
+        _autoSize = value;
         updateLayout();
     }
 }
@@ -135,8 +140,8 @@ void GLoader::loadFromPackage()
         if (_contentItem->type == PackageItemType::IMAGE)
         {
             _contentStatus = 1;
-            _contentSourceWidth = _contentItem->width;
-            _contentSourceHeight = _contentItem->height;
+            _contentSourceSize.width = _contentItem->width;
+            _contentSourceSize.height = _contentItem->height;
             _content->initWithSpriteFrame(_contentItem->spriteFrame);
             if (_contentItem->scale9Grid)
                 ((FUISprite*)_content)->setScale9Grid(_contentItem->scale9Grid);
@@ -145,8 +150,8 @@ void GLoader::loadFromPackage()
         else if (_contentItem->type == PackageItemType::MOVIECLIP)
         {
             _contentStatus = 2;
-            _contentSourceWidth = _contentItem->width;
-            _contentSourceHeight = _contentItem->height;
+            _contentSourceSize.width = _contentItem->width;
+            _contentSourceSize.height = _contentItem->height;
 
             if (_playAction == nullptr)
             {
@@ -195,8 +200,8 @@ void GLoader::onExternalLoadSuccess(cocos2d::SpriteFrame* spriteFrame)
     _contentStatus = 4;
     _content->setSpriteFrame(spriteFrame);
     Size sz = spriteFrame->getRectInPixels().size;
-    _contentSourceWidth = sz.width;
-    _contentSourceHeight = sz.height;
+    _contentSourceSize.width = sz.width;
+    _contentSourceSize.height = sz.height;
     updateLayout();
 }
 
@@ -237,22 +242,23 @@ void GLoader::updateLayout()
         return;
     }
 
-    _contentWidth = _contentSourceWidth;
-    _contentHeight = _contentSourceHeight;
+    _contentSize = _contentSourceSize;
 
     if (_autoSize)
     {
         _updatingLayout = true;
-        if (_contentWidth == 0)
-            _contentWidth = 50;
-        if (_contentHeight == 0)
-            _contentHeight = 30;
-        setSize(_contentWidth, _contentHeight);
+        if (_contentSize.width == 0)
+            _contentSize.width = 50;
+        if (_contentSize.height == 0)
+            _contentSize.height = 30;
+        setSize(_contentSize.width, _contentSize.height);
         _updatingLayout = false;
 
-        if (_size.width == _contentWidth && _size.height == _contentHeight)
+        if (_size.equals(_contentSize))
         {
             _content->setScale(1, 1);
+            _content->setAnchorPoint(Vec2::ZERO);
+            _content->setPosition(0, 0);
             return;
         }
     }
@@ -260,8 +266,8 @@ void GLoader::updateLayout()
     float sx = 1, sy = 1;
     if (_fill != LoaderFillType::NONE)
     {
-        sx = _size.width / _contentSourceWidth;
-        sy = _size.height / _contentSourceHeight;
+        sx = _size.width / _contentSourceSize.width;
+        sy = _size.height / _contentSourceSize.height;
 
         if (sx != 1 || sy != 1)
         {
@@ -276,29 +282,29 @@ void GLoader::updateLayout()
                 else
                     sy = sx;
             }
-            _contentWidth = floor(_contentSourceWidth * sx);
-            _contentHeight = floor(_contentSourceHeight * sy);
+            _contentSize.width = floor(_contentSourceSize.width * sx);
+            _contentSize.height = floor(_contentSourceSize.height * sy);
         }
     }
 
-    _content->setContentSize(Size(_contentSourceWidth, _contentSourceHeight));
+    _content->setContentSize(_contentSourceSize);
     _content->setScale(sx, sy);
     _content->setAnchorPoint(Vec2::ZERO);
 
     float nx;
     float ny;
     if (_align == TextHAlignment::CENTER)
-        nx = floor((_size.width - _contentWidth) / 2);
+        nx = floor((_size.width - _contentSize.width) / 2);
     else if (_align == TextHAlignment::RIGHT)
-        nx = floor(_size.width - _contentWidth);
+        nx = floor(_size.width - _contentSize.width);
     else
         nx = 0;
     if (_verticalAlign == TextVAlignment::CENTER)
-        ny = floor((_size.height - _contentHeight) / 2);
+        ny = floor((_size.height - _contentSize.height) / 2);
     else if (_verticalAlign == TextVAlignment::BOTTOM)
         ny = 0;
     else
-        ny = _size.height - _contentHeight;
+        ny = _size.height - _contentSize.height;
 
     _content->setPosition(nx, ny);
 }
@@ -317,6 +323,13 @@ void GLoader::handleSizeChanged()
 
     if (!_updatingLayout)
         updateLayout();
+}
+
+void GLoader::handleGrayedChanged()
+{
+    GObject::handleGrayedChanged();
+
+    ((FUISprite*)_content)->setGrayed(_finalGrayed);
 }
 
 void GLoader::setup_BeforeAdd(TXMLElement * xml)

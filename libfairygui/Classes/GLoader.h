@@ -28,6 +28,11 @@ public:
     cocos2d::TextVAlignment getVerticalAlign() const { return _verticalAlign; }
     void setVerticalAlign(cocos2d::TextVAlignment value);
 
+    bool getAutoSize() const { return _autoSize; }
+    void setAutoSize(bool value);
+
+    const cocos2d::Size& getContentSize() { return _contentSize; }
+
     const cocos2d::Color3B& getColor() const { return _content->getColor(); }
     void setColor(const cocos2d::Color3B& value);
 
@@ -43,6 +48,7 @@ public:
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
+    virtual void handleGrayedChanged() override;
     virtual void setup_BeforeAdd(TXMLElement* xml) override;
 
     virtual void loadExternal();
@@ -65,10 +71,8 @@ private:
     LoaderFillType _fill;
     bool _updatingLayout;
     PackageItem* _contentItem;
-    float _contentWidth;
-    float _contentHeight;
-    float _contentSourceWidth;
-    float _contentSourceHeight;
+    cocos2d::Size _contentSize;
+    cocos2d::Size _contentSourceSize;
     int _contentStatus;
     bool _playing;
     int _frame;

@@ -3,63 +3,107 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GRichTextField::GRichTextField()
+GRichTextField::GRichTextField() :
+    _richText(nullptr),
+    _updatingSize(false),
+    _autoSize(TextAutoSize::BOTH)
 {
 }
 
 GRichTextField::~GRichTextField()
 {
-
 }
 
 void GRichTextField::handleInit()
 {
     _richText = FUIRichText::create();
     _richText->retain();
-    _richText->setOpenUrlHandler(CC_CALLBACK_1(GRichTextField::handleURL, this));
+    _richText->setCascadeOpacityEnabled(true);
 
-    setFontName(UIConfig::defaultFont);
-    setColor(Color3B::BLACK);
-    setFontSize(12);
     _displayObject = _richText;
 }
 
 void GRichTextField::setText(const std::string & value)
 {
     _richText->setText(value);
+    if (!_underConstruct)
+        updateSize();
 }
 
-void GRichTextField::setFontName(const std::string & value)
+void GRichTextField::applyTextFormat()
 {
-    bool ttf;
-    _richText->setFontFace(UIConfig::getRealFontName(value, ttf));
-}
-
-void GRichTextField::setFontSize(int value)
-{
-    _richText->setFontSize(value);
-}
-
-void GRichTextField::setColor(const cocos2d::Color3B & value)
-{
-    _color = value;
-    _richText->setFontColor(_richText->stringWithColor3B(value));
+    _richText->applyTextFormat();
     updateGear(4);
+    if (!_underConstruct)
+        updateSize();
 }
 
-void GRichTextField::setAlign(cocos2d::TextHAlignment value)
+void GRichTextField::setAutoSize(TextAutoSize value)
 {
-    _richText->setHorizontalAlignment((ui::RichText::HorizontalAlignment)value);
+    _autoSize = value;
+    switch (value)
+    {
+    case TextAutoSize::NONE:
+        _richText->setOverflow(Label::Overflow::CLAMP);
+        break;
+    case TextAutoSize::BOTH:
+        _richText->setOverflow(Label::Overflow::NONE);
+        break;
+    case TextAutoSize::HEIGHT:
+        _richText->setOverflow(Label::Overflow::RESIZE_HEIGHT);
+        break;
+    case TextAutoSize::SHRINK:
+        _richText->setOverflow(Label::Overflow::SHRINK);
+        break;
+    }
+
+    _richText->setDimensions(_size.width, _size.height);
+    if (!_underConstruct)
+        updateSize();
 }
 
-void GRichTextField::handleURL(const std::string & url)
+void GRichTextField::setSingleLine(bool value)
 {
-    bubbleEvent(UIEventType::ClickLink, nullptr, Value(url));
+}
+
+void GRichTextField::updateSize()
+{
+    if (_updatingSize)
+        return;
+
+    _updatingSize = true;
+
+    Size sz = _richText->getContentSize();
+    if (_autoSize == TextAutoSize::BOTH)
+        setSize(sz.width, sz.height);
+    else if (_autoSize == TextAutoSize::HEIGHT)
+        setHeight(sz.height);
+
+    _updatingSize = false;
 }
 
 void GRichTextField::handleSizeChanged()
 {
-    _richText->setContentSize(_size);
+    if (_updatingSize)
+        return;
+
+    if (_autoSize != TextAutoSize::BOTH)
+    {
+        _richText->setDimensions(_size.width, _size.height);
+
+        if (_autoSize == TextAutoSize::HEIGHT)
+        {
+            if (_richText->getText().length() > 0)
+                setSizeDirectly(_size.width, _richText->getContentSize().height);
+        }
+    }
+}
+
+void GRichTextField::setup_AfterAdd(TXMLElement* xml)
+{
+    GTextField::setup_AfterAdd(xml);
+
+    updateSize();
 }
 
 NS_FGUI_END

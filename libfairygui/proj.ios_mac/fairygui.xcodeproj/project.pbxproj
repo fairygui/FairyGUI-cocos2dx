@@ -134,6 +134,9 @@
 		44905A8F1FC574BC00C33C88 /* TreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8A1FC574BC00C33C88 /* TreeNode.cpp */; };
 		44905A911FC574BC00C33C88 /* TreeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8C1FC574BC00C33C88 /* TreeView.cpp */; };
 		44905A921FC574BC00C33C88 /* TreeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8C1FC574BC00C33C88 /* TreeView.cpp */; };
+		44905A9A1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
+		44905A9B1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
+		44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A991FC809AA00C33C88 /* TextFormat.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -285,6 +288,8 @@
 		44905A8B1FC574BC00C33C88 /* TreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeNode.h; sourceTree = "<group>"; };
 		44905A8C1FC574BC00C33C88 /* TreeView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TreeView.cpp; sourceTree = "<group>"; };
 		44905A8D1FC574BC00C33C88 /* TreeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeView.h; sourceTree = "<group>"; };
+		44905A981FC809AA00C33C88 /* TextFormat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextFormat.cpp; sourceTree = "<group>"; };
+		44905A991FC809AA00C33C88 /* TextFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFormat.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -415,6 +420,8 @@
 				445402401FB3E9E400869375 /* FUIContainer.cpp */,
 				44905A691FC4367600C33C88 /* FUIInput.cpp */,
 				44905A6A1FC4367600C33C88 /* FUIInput.h */,
+				44905A981FC809AA00C33C88 /* TextFormat.cpp */,
+				44905A991FC809AA00C33C88 /* TextFormat.h */,
 				445402411FB3E9E400869375 /* FUIContainer.h */,
 				445402421FB3E9E400869375 /* FUILabel.cpp */,
 				445402431FB3E9E400869375 /* FUILabel.h */,
@@ -536,6 +543,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
+				44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */,
 				445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -678,6 +686,7 @@
 				445402B21FB3E9E400869375 /* BitmapFont.cpp in Sources */,
 				445402CE1FB3E9E400869375 /* GLoader.cpp in Sources */,
 				445402BB1FB3E9E400869375 /* InputProcessor.cpp in Sources */,
+				44905A9A1FC809AA00C33C88 /* TextFormat.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -698,6 +707,7 @@
 				4454037F1FB4098900869375 /* HitTest.cpp in Sources */,
 				445403801FB4098900869375 /* InputEvent.cpp in Sources */,
 				445403811FB4098900869375 /* InputProcessor.cpp in Sources */,
+				44905A9B1FC809AA00C33C88 /* TextFormat.cpp in Sources */,
 				445403821FB4098900869375 /* UIEventDispatcher.cpp in Sources */,
 				445403831FB4098900869375 /* GButton.cpp in Sources */,
 				445403841FB4098900869375 /* GComboBox.cpp in Sources */,

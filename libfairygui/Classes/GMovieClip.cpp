@@ -1,5 +1,6 @@
 #include "GMovieClip.h"
 #include "utils/ToolSet.h"
+#include "display/FUISprite.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -20,7 +21,7 @@ GMovieClip::~GMovieClip()
 
 void GMovieClip::handleInit()
 {
-    _content = Sprite::create();
+    _content = FUISprite::create();
     _content->retain();
 
     _playAction = ActionMovieClip::create(nullptr);
@@ -82,6 +83,13 @@ cocos2d::Color4B GMovieClip::cg_getColor() const
 void GMovieClip::cg_setColor(const cocos2d::Color4B& value)
 {
     _content->setColor((Color3B)value);
+}
+
+void GMovieClip::handleGrayedChanged()
+{
+    GObject::handleGrayedChanged();
+
+    ((FUISprite*)_content)->setGrayed(_finalGrayed);
 }
 
 void GMovieClip::constructFromResource()

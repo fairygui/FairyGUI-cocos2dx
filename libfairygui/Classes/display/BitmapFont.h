@@ -21,10 +21,12 @@ public:
     void setFontSize(float fontSize) {}
     int getOriginalFontSize()const { return _originalFontSize; }
     bool isResizable() { return _resizable; }
+    bool canTint() { return _canTint; }
 
 private:
     float _originalFontSize;
     bool _resizable;
+    bool _canTint;
     cocos2d::FontAtlas* _fontAtlas;
 
     friend class UIPackage;

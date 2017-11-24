@@ -32,6 +32,7 @@ GObject::GObject() :
     _handlingController(false),
     _touchable(true),
     _grayed(false),
+    _finalGrayed(false),
     _draggable(false),
     _dragBounds(nullptr),
     _sortingOrder(0),
@@ -259,9 +260,12 @@ void GObject::setSkewY(float value)
 
 void GObject::setRotation(float value)
 {
-    _rotation = value;
-    _displayObject->setRotation(_rotation);
-    updateGear(3);
+    if (_rotation != value)
+    {
+        _rotation = value;
+        _displayObject->setRotation(_rotation);
+        updateGear(3);
+    }
 }
 
 void GObject::setAlpha(float value)
@@ -270,18 +274,19 @@ void GObject::setAlpha(float value)
     {
         _alpha = value;
         handleAlphaChanged();
+        updateGear(3);
     }
 }
 
 void GObject::setGrayed(bool value)
 {
-    if (_grayed != value)
+    if (_grayed != value || _finalGrayed != value)
     {
         _grayed = value;
         handleGrayedChanged();
+        updateGear(3);
     }
 }
-
 
 void GObject::setVisible(bool value)
 {
@@ -291,13 +296,16 @@ void GObject::setVisible(bool value)
         if (_displayObject)
             _displayObject->setVisible(value);
         if (_parent != nullptr)
+        {
+            _parent->childStateChanged(this);
             _parent->setBoundsChangedFlag();
+        }
     }
 }
 
-bool GObject::finalVisible()
+bool GObject::internalVisible()
 {
-    return _internalVisible && (_group == nullptr || _group->finalVisible());
+    return _internalVisible && (_group == nullptr || _group->_visible && _group->internalVisible());
 }
 
 void GObject::setTouchable(bool value)
@@ -627,11 +635,11 @@ void GObject::constructFromResource()
 
 GObject* GObject::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
-    if (_touchDisabled || !_touchable || !_visible || !finalVisible())
+    if (_touchDisabled || !_touchable || !_visible || !internalVisible())
         return nullptr;
 
     Rect rect;
-    rect.size = _displayObject->getContentSize();
+    rect.size = _size;
     //if (isScreenPointInRect(worldPoint, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
     if (rect.containsPoint(_displayObject->convertToNodeSpace(worldPoint)))
         return this;
@@ -704,11 +712,11 @@ void GObject::handleScaleChanged()
 void GObject::handleAlphaChanged()
 {
     _displayObject->setOpacity(_alpha * 255);
-    updateGear(3);
 }
 
 void GObject::handleGrayedChanged()
 {
+    _finalGrayed = (_parent && _parent->_finalGrayed) || _grayed;
 }
 
 void GObject::handleControllerChanged(GController * c)

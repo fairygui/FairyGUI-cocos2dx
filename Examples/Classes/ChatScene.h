@@ -22,6 +22,7 @@ private:
     void onClickSendBtn(EventContext* context);
     void onClickEmojiBtn(EventContext* context);
     void onClickEmoji(EventContext* context);
+    void onSubmit(EventContext* context);
     void renderListItem(int index, GObject* obj);
     std::string getListItemResource(int index);
 

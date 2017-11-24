@@ -11,41 +11,31 @@ GObjectPool::GObjectPool()
 
 GObjectPool::~GObjectPool()
 {
-    for (auto it = _pool.cbegin(); it != _pool.cend(); ++it)
-        delete it->second;
 }
 
-GObject * GObjectPool::getObject(const std::string & url)
+GObject* GObjectPool::getObject(const std::string & url)
 {
     std::string url2 = UIPackage::normalizeURL(url);
     if (url2.length() == 0)
         return nullptr;
 
     GObject* ret;
-    Vector<GObject*>* arr = _pool[url2];
-    if (arr != nullptr && !arr->empty())
+    Vector<GObject*>& arr = _pool[url2];
+    if (!arr.empty())
     {
-        ret = arr->back();
+        ret = arr.back();
         ret->retain();
-        arr->popBack();
-        return ret;
+        arr.popBack();
+        ret->autorelease();
     }
-
-    ret = UIPackage::createObjectFromURL(url2);
+    else
+        ret = UIPackage::createObjectFromURL(url2);
     return ret;
 }
 
-void GObjectPool::returnObject(GObject * obj)
+void GObjectPool::returnObject(GObject* obj)
 {
-    const std::string& url = obj->getResourceURL();
-    Vector<GObject*>* arr = _pool[url];
-    if (arr == nullptr)
-    {
-        arr = new Vector<GObject*>();
-        _pool[url] = arr;
-    }
-
-    arr->pushBack(obj);
+    _pool[obj->getResourceURL()].pushBack(obj);
 }
 
 NS_FGUI_END

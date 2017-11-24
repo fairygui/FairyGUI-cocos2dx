@@ -6,70 +6,106 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-FUILabel::FUILabel()
+FUILabel::FUILabel() :
+    _fontSize(-1),
+    _bmFontCanTint(false),
+    _textFormat(new TextFormat())
 {
 }
 
 FUILabel::~FUILabel()
 {
+    delete _textFormat;
 }
 
-void FUILabel::setFontName(const std::string & value)
+void FUILabel::setText(const std::string & value)
 {
-    _fontName = value;
-    Label::LabelType oldType = _currentLabelType;
+    if (_fontSize < 0)
+        applyTextFormat();
 
-    if (value.find("ui://") != -1)
+    setString(value);
+}
+
+void FUILabel::applyTextFormat()
+{
+    if (_fontSize < 0 /**first time**/ || _fontName != _textFormat->face)
     {
-        setBMFontFilePath(value);
-    }
-    else
-    {
-        bool ttf = false;
-        const std::string& fontName = UIConfig::getRealFontName(value, ttf);
-        if (ttf)
+        _fontName = _textFormat->face;
+        Label::LabelType oldType = _currentLabelType;
+
+        if (_fontName.find("ui://") != -1)
         {
-            _fontConfig.fontFilePath = fontName;
-            _fontConfig.fontSize = _fontSize;
-            setTTFConfig(_fontConfig);
+            setBMFontFilePath(_fontName);
         }
         else
         {
-            setSystemFontName(fontName);
+            bool ttf = false;
+            const std::string& fontName = UIConfig::getRealFontName(_fontName, &ttf);
+            if (ttf)
+            {
+                _fontConfig.fontFilePath = fontName;
+                _fontConfig.fontSize = _textFormat->fontSize;
+                setTTFConfig(_fontConfig);
+            }
+            else
+            {
+                setSystemFontName(fontName);
+            }
+
+            if (oldType == LabelType::BMFONT)
+                setTextColor((Color4B)_textFormat->color);
         }
-
-        if (oldType == LabelType::BMFONT)
-            setTextColor(_textColor);
     }
-}
 
-void FUILabel::setFontSize(int value)
-{
-    if (_fontSize != value)
+    if (_fontSize != _textFormat->fontSize)
     {
-        _fontSize = value;
+        _fontSize = _textFormat->fontSize;
         if (_currentLabelType == LabelType::STRING_TEXTURE)
         {
-            setSystemFontSize(value);
+            setSystemFontSize(_fontSize);
         }
         else if (_currentLabelType == LabelType::BMFONT)
         {
-            setBMFontSize(value);
+            setBMFontSize(_fontSize);
         }
         else
         {
-            _fontConfig.fontSize = value;
+            _fontConfig.fontSize = _fontSize;
             setTTFConfig(_fontConfig);
         }
     }
-}
 
-void FUILabel::setTextColor(const Color4B & color)
-{
-    if (_currentLabelType == LabelType::BMFONT)
-        _textColor = color;
+    if (_currentLabelType != LabelType::BMFONT || _bmFontCanTint)
+        setColor(_textFormat->color);
+
+    if (_textFormat->underline)
+        enableUnderline();
     else
-        Label::setTextColor(color);
+        disableEffect(LabelEffect::UNDERLINE);
+
+    if (_textFormat->italics)
+        enableItalics();
+    else
+        disableEffect(LabelEffect::ITALICS);
+
+    if (_textFormat->bold)
+        enableBold();
+    else
+        disableEffect(LabelEffect::BOLD);
+
+    setLineSpacing(_textFormat->lineSpacing);
+    setHorizontalAlignment(_textFormat->align);
+    setVerticalAlignment(_textFormat->verticalAlign);
+
+    if (_textFormat->hasEffect(TextFormat::OUTLINE))
+        enableOutline((Color4B)_textFormat->outlineColor, _textFormat->outlineSize);
+    else
+        disableEffect(LabelEffect::OUTLINE);
+
+    if (_textFormat->hasEffect(TextFormat::SHADOW))
+        enableShadow((Color4B)_textFormat->shadowColor, _textFormat->shadowOffset);
+    else
+        disableEffect(LabelEffect::SHADOW);
 }
 
 bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 & imageOffset, float fontSize)
@@ -93,11 +129,26 @@ bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 
     }
 
     _bmFontPath = bmfontFilePath;
+    _bmFontCanTint = bmFont->canTint();
 
     _currentLabelType = LabelType::BMFONT;
     setFontAtlas(bmFont->createFontAtlas());
 
     return true;
+}
+
+void FUILabel::setGrayed(bool value)
+{
+    if (_fontAtlas == nullptr)
+        return;
+
+    GLProgramState *glState = nullptr;
+    if (value)
+        glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, _fontAtlas->getTexture(0));
+    else
+        glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, _fontAtlas->getTexture(0));
+
+    setGLProgramState(glState);
 }
 
 void FUILabel::updateBMFontScale()

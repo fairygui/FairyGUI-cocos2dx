@@ -16,6 +16,7 @@ public:
 
     void clearContent();
     void setScale9Grid(cocos2d::Rect* value);
+    void setGrayed(bool value);
 };
 
 NS_FGUI_END

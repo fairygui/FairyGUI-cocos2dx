@@ -24,12 +24,14 @@ public:
     double getValue() const { return _value; }
     void setValue(double value);
 
+    void tweenValue(double value, float duration);
+
 protected:
     virtual void handleSizeChanged() override;
     virtual void constructFromXML(TXMLElement* xml) override;
     virtual void setup_AfterAdd(TXMLElement* xml) override;
 
-    void update();
+    void update(double newValue);
 
 private:
     double _max;

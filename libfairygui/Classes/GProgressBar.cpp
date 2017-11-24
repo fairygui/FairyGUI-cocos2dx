@@ -30,7 +30,7 @@ void GProgressBar::setTitleType(ProgressTitleType value)
     if (_titleType != value)
     {
         _titleType = value;
-        update();
+        update(_value);
     }
 }
 
@@ -39,7 +39,7 @@ void GProgressBar::setMax(double value)
     if (_max != value)
     {
         _max = value;
-        update();
+        update(_value);
     }
 }
 
@@ -48,14 +48,28 @@ void GProgressBar::setValue(double value)
     if (_value != value)
     {
         _value = value;
-        update();
+        update(_value);
     }
 }
 
-
-void GProgressBar::update()
+void GProgressBar::tweenValue(double value, float duration)
 {
-    float percent = MIN(_value / _max, 1);
+    if (_value != value)
+    {
+        _displayObject->stopActionByTag(ActionTag::PROGRESS_ACTION);
+
+        float oldValue = (float)_value;
+        _value = value;
+        Action* action = ActionFloat::create(duration, oldValue, value,
+            [this](float v) { update(v); });
+        action->setTag(ActionTag::PROGRESS_ACTION);
+        _displayObject->runAction(action);
+    }
+}
+
+void GProgressBar::update(double newValue)
+{
+    float percent = MIN(newValue / _max, 1);
 
     if (_titleObject != nullptr)
     {
@@ -67,11 +81,11 @@ void GProgressBar::update()
             break;
 
         case ProgressTitleType::VALUE_MAX:
-            oss << round(_value) << "/" << round(_max);
+            oss << round(newValue) << "/" << round(_max);
             break;
 
         case ProgressTitleType::VALUE:
-            oss << _value;
+            oss << newValue;
             break;
 
         case ProgressTitleType::MAX:
@@ -143,7 +157,7 @@ void GProgressBar::handleSizeChanged()
         _barMaxHeight = getHeight() - _barMaxHeightDelta;
 
     if (!_underConstruct)
-        update();
+        update(_value);
 }
 
 void GProgressBar::constructFromXML(TXMLElement * xml)
@@ -189,7 +203,7 @@ void GProgressBar::setup_AfterAdd(TXMLElement * xml)
         if (xml->QueryIntAttribute("max", &tmp) == 0)
             _max = tmp;
     }
-    update();
+    update(_value);
 }
 
 NS_FGUI_END

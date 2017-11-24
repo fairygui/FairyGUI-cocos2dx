@@ -225,6 +225,9 @@
     <ClInclude Include="..\Classes\treeview\TreeView.h">
       <Filter>src\treeview</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\display\TextFormat.h">
+      <Filter>src\display</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -412,6 +415,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\treeview\TreeNode.cpp">
       <Filter>src\treeview</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\display\TextFormat.cpp">
+      <Filter>src\display</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

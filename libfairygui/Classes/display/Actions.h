@@ -15,7 +15,8 @@ enum ActionTag
     GEAR_SIZE_ACTION,
     GEAR_LOOK_ACTION,
     GEAR_COLOR_ACTION,
-    TRANSITION_ACTION
+    PROGRESS_ACTION,
+    TRANSITION_ACTION //remind:keep TRANSITION_ACTION as the last item
 };
 
 class ActionFloat2 : public cocos2d::ActionInterval

@@ -200,9 +200,10 @@ protected:
     bool _visible;
     bool _touchable;
     bool _grayed;
+    bool _finalGrayed;
 
 private:
-    bool finalVisible();
+    bool internalVisible();
     void updateGearFromRelations(int index, float dx, float dy);
     void transformRectPoint(const cocos2d::Vec2& pt, float rect[], GObject* targetSpace);
 

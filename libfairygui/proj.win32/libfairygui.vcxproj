@@ -22,6 +22,7 @@
     <ClInclude Include="..\Classes\display\FUILabel.h" />
     <ClInclude Include="..\Classes\display\FUIRichText.h" />
     <ClInclude Include="..\Classes\display\FUISprite.h" />
+    <ClInclude Include="..\Classes\display\TextFormat.h" />
     <ClInclude Include="..\Classes\DragDropManager.h" />
     <ClInclude Include="..\Classes\event\EventContext.h" />
     <ClInclude Include="..\Classes\event\HitTest.h" />
@@ -91,6 +92,7 @@
     <ClCompile Include="..\Classes\display\FUILabel.cpp" />
     <ClCompile Include="..\Classes\display\FUIRichText.cpp" />
     <ClCompile Include="..\Classes\display\FUISprite.cpp" />
+    <ClCompile Include="..\Classes\display\TextFormat.cpp" />
     <ClCompile Include="..\Classes\DragDropManager.cpp" />
     <ClCompile Include="..\Classes\event\EventContext.cpp" />
     <ClCompile Include="..\Classes\event\HitTest.cpp" />

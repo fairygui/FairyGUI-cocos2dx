@@ -115,22 +115,25 @@ void GLabel::setup_AfterAdd(TXMLElement * xml)
 
     GTextInput* input = dynamic_cast<GTextInput*>(_titleObject);
     if (input)
-    {/*
+    {
         p = xml->Attribute("prompt");
         if (p)
-            input->setPlaceHolder(p);
+            input->setPrompt(p);
 
         if (xml->BoolAttribute("password"))
-            input->setInputFlag(ui::EditBox::InputFlag::PASSWORD);
+            input->setPassword(true);
 
-        //xml->Attribute("restrict");
+        p = xml->Attribute("restrict");
+        if (p)
+            input->setRestrict(p);
+
         p = xml->Attribute("maxLength");
         if (p)
             input->setMaxLength(atoi(p));
 
         p = xml->Attribute("keyboardType");
         if (p)
-            input->setInputMode((ui::EditBox::InputMode)atoi(p));*/
+            input->setKeyboardType(atoi(p));
     }
 }
 
