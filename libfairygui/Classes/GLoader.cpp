@@ -76,6 +76,15 @@ void GLoader::setAutoSize(bool value)
     }
 }
 
+void GLoader::setFill(LoaderFillType value)
+{
+    if (_fill != value)
+    {
+        _fill = value;
+        updateLayout();
+    }
+}
+
 void GLoader::setColor(const cocos2d::Color3B & value)
 {
     _content->setColor(value);

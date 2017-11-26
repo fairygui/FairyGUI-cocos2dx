@@ -31,6 +31,9 @@ public:
     bool getAutoSize() const { return _autoSize; }
     void setAutoSize(bool value);
 
+    LoaderFillType getFill() const { return _fill; }
+    void setFill(LoaderFillType value);
+
     const cocos2d::Size& getContentSize() { return _contentSize; }
 
     const cocos2d::Color3B& getColor() const { return _content->getColor(); }

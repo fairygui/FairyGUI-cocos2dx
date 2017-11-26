@@ -293,19 +293,15 @@ void GObject::setVisible(bool value)
     if (_visible != value)
     {
         _visible = value;
-        if (_displayObject)
-            _displayObject->setVisible(value);
+        handleVisibleChanged();
         if (_parent != nullptr)
-        {
-            _parent->childStateChanged(this);
             _parent->setBoundsChangedFlag();
-        }
     }
 }
 
 bool GObject::internalVisible()
 {
-    return _internalVisible && (_group == nullptr || _group->_visible && _group->internalVisible());
+    return _internalVisible && (_group == nullptr || _group->internalVisible());
 }
 
 void GObject::setTouchable(bool value)
@@ -717,6 +713,11 @@ void GObject::handleAlphaChanged()
 void GObject::handleGrayedChanged()
 {
     _finalGrayed = (_parent && _parent->_finalGrayed) || _grayed;
+}
+
+void GObject::handleVisibleChanged()
+{
+    _displayObject->setVisible(_visible);
 }
 
 void GObject::handleControllerChanged(GController * c)

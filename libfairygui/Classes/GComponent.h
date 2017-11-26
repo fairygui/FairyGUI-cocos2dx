@@ -35,6 +35,7 @@ public:
     GObject * getChild(const std::string& name) const;
     GObject * getChildInGroup(const GGroup * group, const std::string& name) const;
     GObject * getChildById(const std::string& id) const;
+    const cocos2d::Vector<GObject*>& getChildren() const { return _children; }
 
     int getChildIndex(const GObject* child) const;
     void setChildIndex(GObject* child, int index);
@@ -49,6 +50,7 @@ public:
     virtual int getFirstChildInView();
 
     void addController(GController* c);
+    GController* getControllerAt(int index) const;
     GController* getController(const std::string& name) const;
     const cocos2d::Vector<GController*>& getControllers() const { return _controllers; }
     void removeController(GController* c);
@@ -56,6 +58,7 @@ public:
     void applyAllControllers();
 
     Transition* getTransition(const std::string& name) const;
+    Transition* getTransitionAt(int index) const;
     const cocos2d::Vector<Transition*>& getTransitions() const { return _transitions; }
 
     bool getOpaque() const { return _opaque; }

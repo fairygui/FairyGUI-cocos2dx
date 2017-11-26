@@ -420,6 +420,22 @@ void GGroup::handleAlphaChanged()
     }
 }
 
+void GGroup::handleVisibleChanged()
+{
+    if (!_parent)
+        return;
+
+    int cnt = _parent->numChildren();
+    int i;
+    GObject* child;
+    for (i = 0; i < cnt; i++)
+    {
+        child = _parent->getChildAt(i);
+        if (child->_group == this)
+            child->setVisible(_visible);
+    }
+}
+
 void GGroup::setup_BeforeAdd(TXMLElement * xml)
 {
     GObject::setup_BeforeAdd(xml);
@@ -433,6 +449,14 @@ void GGroup::setup_BeforeAdd(TXMLElement * xml)
         _lineGap = xml->IntAttribute("lineGap");
         _columnGap = xml->IntAttribute("colGap");
     }
+}
+
+void GGroup::setup_AfterAdd(TXMLElement * xml)
+{
+    GObject::setup_AfterAdd(xml);
+
+    if (!_visible)
+        handleVisibleChanged();
 }
 
 NS_FGUI_END

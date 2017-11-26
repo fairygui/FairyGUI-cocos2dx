@@ -391,6 +391,11 @@ void GComponent::addController(GController* c)
     _controllers.pushBack(c);
 }
 
+GController * GComponent::getControllerAt(int index) const
+{
+    return _controllers.at(index);
+}
+
 void GComponent::removeController(GController* c)
 {
     CCASSERT(c != nullptr, "Argument must be non-nil");
@@ -430,6 +435,11 @@ Transition * GComponent::getTransition(const std::string & name) const
     }
 
     return nullptr;
+}
+
+Transition * GComponent::getTransitionAt(int index) const
+{
+    return _transitions.at(index);
 }
 
 void GComponent::adjustRadioGroupDepth(GObject* obj, GController* c)

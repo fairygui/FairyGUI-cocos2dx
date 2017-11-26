@@ -116,7 +116,7 @@ public:
     virtual ~FUIRichElement() {};
 
     Type _type;
-    std::string strValue;
+    std::string text;
     TextFormat textFormat;
     int width;
     int height;
@@ -143,6 +143,7 @@ public:
 
 private:
     ValueMap tagAttrMapWithXMLElement(const char ** attrs);
+    int attributeInt(const ValueMap& vm, const std::string& key, int defaultValue);
 
     void pushTextFormat();
     void popTextFormat();
@@ -195,14 +196,14 @@ void FUIXMLVisitor::addNewLine(bool check)
     FUIRichElement* lastElement = _richText->_richElements.empty() ? nullptr : _richText->_richElements.back();
     if (lastElement && lastElement->_type == FUIRichElement::Type::TEXT)
     {
-        if (!check || lastElement->strValue.back() != '\n')
-            lastElement->strValue += "\n";
+        if (!check || lastElement->text.back() != '\n')
+            lastElement->text += "\n";
         return;
     }
 
     FUIRichElement* element = new FUIRichElement(FUIRichElement::Type::TEXT);
     element->textFormat = _format;
-    element->strValue = "\n";
+    element->text = "\n";
     _richText->_richElements.push_back(element);
     if (!_linkStack.empty())
         element->link = _linkStack.back();
@@ -214,7 +215,7 @@ void FUIXMLVisitor::finishTextBlock()
     {
         FUIRichElement* element = new FUIRichElement(FUIRichElement::Type::TEXT);
         element->textFormat = _format;
-        element->strValue = _textBlock;
+        element->text = _textBlock;
         _textBlock.clear();
         _richText->_richElements.push_back(element);
         if (!_linkStack.empty())
@@ -253,11 +254,9 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
     {
         pushTextFormat();
         ValueMap&& tagAttrValueMap = tagAttrMapWithXMLElement(atts);
-        auto it = tagAttrValueMap.find("size");
-        if (it != tagAttrValueMap.end())
-            _format.fontSize = it->second.asInt();
+        _format.fontSize = attributeInt(tagAttrValueMap, "size", _format.fontSize);
 
-        it = tagAttrValueMap.find("color");
+        auto it = tagAttrValueMap.find("color");
         if (it != tagAttrValueMap.end())
         {
             _format.color = (Color3B)ToolSet::convertFromHtmlColor(it->second.asString().c_str());
@@ -277,31 +276,38 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
         std::string src;
         ValueMap&& tagAttrValueMap = tagAttrMapWithXMLElement(atts);
 
-        int height = 0;
         int width = 0;
+        int height = 0;
 
-        auto it = tagAttrValueMap.find("height");
-        if (it != tagAttrValueMap.end()) {
-            height = it->second.asInt();
-        }
-        it = tagAttrValueMap.find("width");
-        if (it != tagAttrValueMap.end()) {
-            width = it->second.asInt();
-        }
-        it = tagAttrValueMap.find("src");
+        auto it = tagAttrValueMap.find("src");
         if (it != tagAttrValueMap.end()) {
             src = it->second.asString();
         }
 
         if (!src.empty()) {
-            FUIRichElement* element = new FUIRichElement(FUIRichElement::Type::IMAGE);
-            element->width = width;
-            element->height = height;
-            element->strValue = src;
-            _richText->_richElements.push_back(element);
-            if (!_linkStack.empty())
-                element->link = _linkStack.back();
+            PackageItem* pi = UIPackage::getItemByURL(src);
+            if (pi)
+            {
+                width = pi->width;
+                height = pi->height;
+            }
         }
+
+        width = attributeInt(tagAttrValueMap, "width", width);
+        height = attributeInt(tagAttrValueMap, "height", height);
+        if (width == 0)
+            width = 5;
+        if (height == 0)
+            height = 10;
+
+        FUIRichElement* element = new FUIRichElement(FUIRichElement::Type::IMAGE);
+        element->width = width;
+        element->height = height;
+        element->text = src;
+        _richText->_richElements.push_back(element);
+        if (!_linkStack.empty())
+            element->link = _linkStack.back();
+
         break;
     }
 
@@ -316,7 +322,7 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
             href = it->second.asString();
 
         FUIRichElement* element = new FUIRichElement(FUIRichElement::Type::LINK);
-        element->strValue = href;
+        element->text = href;
         _richText->_richElements.push_back(element);
         _linkStack.push_back(element);
 
@@ -406,6 +412,20 @@ ValueMap FUIXMLVisitor::tagAttrMapWithXMLElement(const char ** attrs)
         }
     }
     return tagAttrValueMap;
+}
+
+int FUIXMLVisitor::attributeInt(const ValueMap& valueMap, const std::string& key, int defaultValue)
+{
+    auto it = valueMap.find(key);
+    if (it != valueMap.end()) {
+        string str = it->second.asString();
+        if (!str.empty() && str.back() == '%')
+            return ceil(atoi(str.substr(0, str.size() - 1).c_str()) / 100.0f*defaultValue);
+        else
+            return atoi(str.c_str());
+    }
+    else
+        return defaultValue;
 }
 
 FUIRichText::FUIRichText() :
@@ -512,7 +532,7 @@ const char*  FUIRichText::hitTestLink(const cocos2d::Vec2 & worldPoint)
 
         rect.size = child->getContentSize();
         if (rect.containsPoint(child->convertToNodeSpace(worldPoint)))
-            return element->link->strValue.c_str();
+            return element->link->text.c_str();
     }
     return nullptr;
 }
@@ -555,7 +575,7 @@ void FUIRichText::formatText()
         case FUIRichElement::Type::TEXT:
         {
             FastSplitter fs;
-            fs.start(element->strValue.c_str(), (int)element->strValue.size(), '\n');
+            fs.start(element->text.c_str(), (int)element->text.size(), '\n');
             bool first = true;
             while (fs.next())
             {
@@ -665,18 +685,17 @@ void FUIRichText::handleImageRenderer(FUIRichElement* element)
 {
     GLoader* loader = GLoader::create();
     _imageLoaders.pushBack(loader);
-    if (element->width == 0 || element->height == 0)
-        loader->setAutoSize(true);
-    loader->setURL(element->strValue);
+    loader->setSize(element->width, element->height);
+    loader->setFill(LoaderFillType::SCALE_FREE);
+    loader->setURL(element->text);
     loader->displayObject()->setUserData(element);
 
-    auto imgSize = loader->getContentSize();
-    _leftSpaceWidth -= (imgSize.width + 4);
+    _leftSpaceWidth -= (element->width + 4);
     if (_leftSpaceWidth < 0.0f)
     {
         addNewLine();
         _elementRenders.back().push_back(loader->displayObject());
-        _leftSpaceWidth -= (imgSize.width + 4);
+        _leftSpaceWidth -= (element->width + 4);
     }
     else
     {

@@ -32,7 +32,9 @@ public:
 
 protected:
     virtual void setup_BeforeAdd(TXMLElement* xml) override;
+    virtual void setup_AfterAdd(TXMLElement* xml) override;
     virtual void handleAlphaChanged() override;
+    virtual void handleVisibleChanged() override;
 
 private:
     void updateBounds();

@@ -11,6 +11,7 @@
 #include "GLoader.h"
 #include "GGroup.h"
 #include "GComponent.h"
+#include "GLabel.h"
 #include "GButton.h"
 #include "GComboBox.h"
 #include "GProgressBar.h"

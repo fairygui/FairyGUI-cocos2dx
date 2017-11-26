@@ -175,6 +175,7 @@ protected:
     virtual void handlePositionChanged();
     virtual void handleControllerChanged(GController* c);
     virtual void handleAlphaChanged();
+    virtual void handleVisibleChanged();
 
     virtual void onEnter();
     virtual void onExit();
