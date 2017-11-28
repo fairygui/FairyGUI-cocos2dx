@@ -204,7 +204,8 @@ protected:
     bool _finalGrayed;
 
 private:
-    bool internalVisible();
+    bool internalVisible() const;
+    bool internalVisible2() const;
     void updateGearFromRelations(int index, float dx, float dy);
     void transformRectPoint(const cocos2d::Vec2& pt, float rect[], GObject* targetSpace);
 

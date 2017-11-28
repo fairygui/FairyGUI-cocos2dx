@@ -299,9 +299,14 @@ void GObject::setVisible(bool value)
     }
 }
 
-bool GObject::internalVisible()
+bool GObject::internalVisible() const
 {
     return _internalVisible && (_group == nullptr || _group->internalVisible());
+}
+
+bool GObject::internalVisible2() const
+{
+    return _visible && (_group == nullptr || _group->internalVisible2());
 }
 
 void GObject::setTouchable(bool value)
@@ -331,6 +336,9 @@ void GObject::setGroup(GGroup * value)
         _group = value;
         if (_group != nullptr)
             _group->setBoundsChangedFlag(true);
+        handleVisibleChanged();
+        if (_parent)
+            _parent->childStateChanged(this);
     }
 }
 
@@ -631,7 +639,7 @@ void GObject::constructFromResource()
 
 GObject* GObject::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
-    if (_touchDisabled || !_touchable || !_visible || !internalVisible())
+    if (_touchDisabled || !_touchable || !_displayObject->isVisible() || !_displayObject->getParent())
         return nullptr;
 
     Rect rect;
@@ -717,7 +725,7 @@ void GObject::handleGrayedChanged()
 
 void GObject::handleVisibleChanged()
 {
-    _displayObject->setVisible(_visible);
+    _displayObject->setVisible(internalVisible2());
 }
 
 void GObject::handleControllerChanged(GController * c)

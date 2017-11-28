@@ -17,6 +17,7 @@ public:
     typedef std::function<void(int eventType)> CaptureEventCallback;
 
     InputEvent* getRecentInput() { return &_recentInput; }
+    static bool isTouchOnUI();
 
     InputProcessor(GComponent* owner);
     ~InputProcessor();
@@ -60,6 +61,8 @@ private:
     InputEvent _recentInput;
     uint16_t _keyModifiers;
 
+    static bool _touchOnUI;
+    static unsigned int _touchOnUIFlagFrameId;
     static InputProcessor* _activeProcessor;
 
     friend class UIEventDispatcher;

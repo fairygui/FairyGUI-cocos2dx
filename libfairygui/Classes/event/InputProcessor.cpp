@@ -10,6 +10,8 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 
 InputProcessor* InputProcessor::_activeProcessor = nullptr;
+bool InputProcessor::_touchOnUI = false;
+unsigned int InputProcessor::_touchOnUIFlagFrameId = 0;
 
 class TouchInfo
 {
@@ -127,6 +129,14 @@ void InputProcessor::updateRecentInput(TouchInfo* ti, GObject* target)
     _recentInput._mouseWheelDelta = ti->mouseWheelDelta;
     _recentInput._touch = ti->touch;
     _recentInput._touchId = ti->touch ? ti->touchId : -1;
+
+    int curFrame = Director::getInstance()->getTotalFrames();
+    bool flag = target != _owner;
+    if (curFrame != _touchOnUIFlagFrameId)
+        _touchOnUI = flag;
+    else if (flag)
+        _touchOnUI = true;
+    _touchOnUIFlagFrameId = curFrame;
 }
 
 void InputProcessor::handleRollOver(TouchInfo* touch, GObject* target)
@@ -261,6 +271,11 @@ GObject* InputProcessor::clickTest(TouchInfo* touch, GObject* target)
     }
 
     return obj;
+}
+
+bool InputProcessor::isTouchOnUI()
+{
+    return isTouchOnUI;
 }
 
 bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
@@ -423,7 +438,6 @@ void InputProcessor::onTouchCancelled(Touch* touch, Event* /*unusedEvent*/)
         return;
 
     ti->touch = touch;
-
     updateRecentInput(ti, _owner);
     _activeProcessor = this;
 

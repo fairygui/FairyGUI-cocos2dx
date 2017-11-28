@@ -410,11 +410,9 @@ void GGroup::handleAlphaChanged()
         return;
 
     int cnt = _parent->numChildren();
-    int i;
-    GObject* child;
-    for (i = 0; i < cnt; i++)
+    for (int i = 0; i < cnt; i++)
     {
-        child = _parent->getChildAt(i);
+        GObject* child = _parent->getChildAt(i);
         if (child->_group == this)
             child->setAlpha(_alpha);
     }
@@ -426,13 +424,11 @@ void GGroup::handleVisibleChanged()
         return;
 
     int cnt = _parent->numChildren();
-    int i;
-    GObject* child;
-    for (i = 0; i < cnt; i++)
+    for (int i = 0; i < cnt; i++)
     {
-        child = _parent->getChildAt(i);
+        GObject* child = _parent->getChildAt(i);
         if (child->_group == this)
-            child->setVisible(_visible);
+            child->handleVisibleChanged();
     }
 }
 
