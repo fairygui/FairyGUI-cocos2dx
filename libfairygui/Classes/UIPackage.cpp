@@ -850,7 +850,7 @@ void UIPackage::loadComponentChildren(PackageItem * item)
                 string src = p;
                 string pkgId = (p = cxml->Attribute("pkg")) ? p : "";
                 UIPackage* pkg;
-                if (!pkgId.empty() && pkgId.compare(item->owner->getId()) == 0)
+                if (!pkgId.empty() && pkgId.compare(item->owner->getId()) != 0)
                     pkg = UIPackage::getById(pkgId);
                 else
                     pkg = item->owner;
