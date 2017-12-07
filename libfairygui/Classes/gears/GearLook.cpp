@@ -47,9 +47,9 @@ void GearLook::addStatus(const std::string&  pageId, const std::string& value)
     GearLookValue gv;
     gv.alpha = atof(arr[0].c_str());
     gv.rotation = atof(arr[1].c_str());
-    gv.grayed = arr[2] == "true";
+    gv.grayed = arr[2] == "1";
     if (arr.size() > 3)
-        gv.touchable = arr[3] == "true";
+        gv.touchable = arr[3] == "1";
 
     if (pageId.size() == 0)
         _default = gv;
