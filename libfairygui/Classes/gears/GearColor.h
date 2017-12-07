@@ -23,7 +23,7 @@ class GearColor : public GearBase
 {
 public:
     GearColor(GObject* owner);
-    ~GearColor();
+    virtual ~GearColor();
 
     void apply() override;
     void updateState() override;

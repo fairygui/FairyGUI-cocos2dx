@@ -13,7 +13,7 @@ class GearDisplay : public GearBase
 {
 public:
     GearDisplay(GObject* owner);
-    ~GearDisplay();
+    virtual ~GearDisplay();
 
     void apply() override;
     void updateState() override;

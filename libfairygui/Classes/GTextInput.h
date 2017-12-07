@@ -12,7 +12,7 @@ class GTextInput : public GTextField
 {
 public:
     GTextInput();
-    ~GTextInput();
+    virtual ~GTextInput();
 
     CREATE_FUNC(GTextInput);
 

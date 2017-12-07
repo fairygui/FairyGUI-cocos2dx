@@ -13,7 +13,7 @@ class GearText : public GearBase
 {
 public:
     GearText(GObject* owner);
-    ~GearText();
+    virtual ~GearText();
 
     void apply() override;
     void updateState() override;

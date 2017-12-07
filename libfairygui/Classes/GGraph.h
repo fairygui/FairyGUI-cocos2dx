@@ -11,7 +11,7 @@ class GGraph : public GObject, public IColorGear
 {
 public:
     GGraph();
-    ~GGraph();
+    virtual ~GGraph();
 
     CREATE_FUNC(GGraph);
 

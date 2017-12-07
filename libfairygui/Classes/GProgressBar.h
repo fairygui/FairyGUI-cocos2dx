@@ -11,7 +11,7 @@ class GProgressBar : public GComponent
 {
 public:
     GProgressBar();
-    ~GProgressBar();
+    virtual ~GProgressBar();
 
     CREATE_FUNC(GProgressBar);
 

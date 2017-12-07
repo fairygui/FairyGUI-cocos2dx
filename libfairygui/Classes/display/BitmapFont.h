@@ -11,7 +11,7 @@ class BitmapFont : public cocos2d::Font
 {
 public:
     BitmapFont();
-    ~BitmapFont();
+    virtual ~BitmapFont();
 
     static BitmapFont* create();
 

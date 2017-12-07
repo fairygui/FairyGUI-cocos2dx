@@ -13,7 +13,7 @@ class GearBase
 {
 public:
     GearBase(GObject* owner);
-    ~GearBase();
+    virtual ~GearBase();
 
     GController* getController() const { return _controller; }
     void setController(GController* value);

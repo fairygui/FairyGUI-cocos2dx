@@ -12,7 +12,7 @@ class GRichTextField : public GTextField
 {
 public:
     GRichTextField();
-    ~GRichTextField();
+    virtual ~GRichTextField();
 
     CREATE_FUNC(GRichTextField);
 

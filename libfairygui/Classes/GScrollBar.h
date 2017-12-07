@@ -11,7 +11,7 @@ class GScrollBar : public GComponent
 {
 public:
     GScrollBar();
-    ~GScrollBar();
+    virtual ~GScrollBar();
 
     CREATE_FUNC(GScrollBar);
 

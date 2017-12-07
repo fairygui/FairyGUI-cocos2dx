@@ -11,7 +11,7 @@ class FUILabel : public cocos2d::Label
 {
 public:
     FUILabel();
-    ~FUILabel();
+    virtual ~FUILabel();
 
     CREATE_FUNC(FUILabel);
 

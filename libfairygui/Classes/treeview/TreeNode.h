@@ -15,7 +15,7 @@ public:
     static TreeNode* create(bool isFolder = false);
 
     TreeNode();
-    ~TreeNode();
+    virtual ~TreeNode();
 
     TreeNode* getParent() const { return _parent; }
     TreeView* getRoot() const { return _root; }

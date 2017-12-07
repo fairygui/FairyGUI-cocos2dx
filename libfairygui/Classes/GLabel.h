@@ -11,7 +11,7 @@ class GLabel : public GComponent
 {
 public:
     GLabel();
-    ~GLabel();
+    virtual ~GLabel();
 
     CREATE_FUNC(GLabel);
 

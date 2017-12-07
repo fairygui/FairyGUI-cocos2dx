@@ -19,7 +19,7 @@ class GComponent : public GObject
 {
 public:
     GComponent();
-    ~GComponent();
+    virtual ~GComponent();
 
     CREATE_FUNC(GComponent);
 

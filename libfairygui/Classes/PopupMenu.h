@@ -19,7 +19,7 @@ public:
     static PopupMenu* create() { return create(""); }
 
     PopupMenu();
-    ~PopupMenu();
+    virtual ~PopupMenu();
 
     GButton* addItem(const std::string& caption, EventCallback callback);
     GButton* addItemAt(const std::string& caption, int index, EventCallback callback);

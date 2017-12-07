@@ -16,7 +16,7 @@ class GRoot : public GComponent
 {
 public:
     GRoot();
-    ~GRoot();
+    virtual ~GRoot();
 
     static GRoot* create(cocos2d::Scene* scene, int zOrder = 1000);
     static GRoot* getInstance() { return _inst; }

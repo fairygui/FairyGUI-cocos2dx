@@ -12,7 +12,7 @@ class GMovieClip : public GObject, public IColorGear, public IAnimationGear
 {
 public:
     GMovieClip();
-    ~GMovieClip();
+    virtual ~GMovieClip();
 
     CREATE_FUNC(GMovieClip);
 

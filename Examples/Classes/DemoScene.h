@@ -12,7 +12,7 @@ public:
     bool init();
 
     DemoScene();
-    ~DemoScene();
+    virtual ~DemoScene();
 
 protected:
     virtual void continueInit();

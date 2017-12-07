@@ -44,7 +44,7 @@ class UIEventDispatcher : public cocos2d::Ref
 {
 public:
     UIEventDispatcher();
-    ~UIEventDispatcher();
+    virtual ~UIEventDispatcher();
 
     void addEventListener(int eventType, const EventCallback& callback) { return addEventListener(eventType, callback, EventTag::None); }
     void addEventListener(int eventType, const EventCallback& callback, const EventTag& tag);

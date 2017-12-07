@@ -13,7 +13,7 @@ class GearLook : public GearBase
 {
 public:
     GearLook(GObject* owner);
-    ~GearLook();
+    virtual ~GearLook();
 
     void apply() override;
     void updateState() override;

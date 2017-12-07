@@ -13,7 +13,7 @@ class GearSize : public GearBase
 {
 public:
     GearSize(GObject* owner);
-    ~GearSize();
+    virtual ~GearSize();
 
     void apply() override;
     void updateState() override;

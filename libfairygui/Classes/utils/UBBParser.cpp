@@ -32,6 +32,11 @@ UBBParser::UBBParser():
     _handlers["align"] = UBB_TAG_HANDLER(UBBParser::onTag_ALIGN, this);
 }
 
+UBBParser::~UBBParser()
+{
+
+}
+
 std::string UBBParser::parse(const char * text)
 {
     _pString = text;

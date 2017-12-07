@@ -18,7 +18,7 @@ public:
     static const std::string SELECTED_DISABLED;
 
     GButton();
-    ~GButton();
+    virtual ~GButton();
 
     CREATE_FUNC(GButton);
 

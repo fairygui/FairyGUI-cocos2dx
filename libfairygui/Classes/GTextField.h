@@ -46,7 +46,7 @@ class GBasicTextField : public GTextField
 {
 public:
     GBasicTextField();
-    ~GBasicTextField();
+    virtual ~GBasicTextField();
 
     CREATE_FUNC(GBasicTextField);
 

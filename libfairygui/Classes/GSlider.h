@@ -11,7 +11,7 @@ class GSlider : public GComponent
 {
 public:
     GSlider();
-    ~GSlider();
+    virtual ~GSlider();
 
     CREATE_FUNC(GSlider);
 

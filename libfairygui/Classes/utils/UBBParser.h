@@ -12,6 +12,7 @@ class UBBParser
 {
 public:
     UBBParser();
+    virtual ~UBBParser();
 
     static UBBParser* getInstance();
 

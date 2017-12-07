@@ -23,7 +23,7 @@ class GearAnimation : public GearBase
 {
 public:
     GearAnimation(GObject* owner);
-    ~GearAnimation();
+    virtual ~GearAnimation();
 
     void apply() override;
     void updateState() override;

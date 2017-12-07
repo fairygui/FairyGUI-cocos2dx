@@ -15,7 +15,7 @@ public:
     typedef std::function<std::string(int)> ListItemProvider;
 
     GList();
-    ~GList();
+    virtual ~GList();
 
     CREATE_FUNC(GList);
 

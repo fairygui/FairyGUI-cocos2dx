@@ -35,7 +35,7 @@ public:
     static GObject* getDraggingObject() { return _draggingObject; }
 
     GObject();
-    ~GObject();
+    virtual ~GObject();
 
     CREATE_FUNC(GObject);
 

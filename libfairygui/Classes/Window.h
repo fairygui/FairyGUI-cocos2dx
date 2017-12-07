@@ -20,7 +20,7 @@ class Window : public GComponent
 {
 public:
     Window();
-    ~Window();
+    virtual ~Window();
 
     CREATE_FUNC(Window);
 

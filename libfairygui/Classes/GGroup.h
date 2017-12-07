@@ -11,7 +11,7 @@ class GGroup : public GObject
 {
 public:
     GGroup();
-    ~GGroup();
+    virtual ~GGroup();
 
     CREATE_FUNC(GGroup);
 

@@ -12,7 +12,7 @@ class GComboBox : public GComponent
 {
 public:
     GComboBox();
-    ~GComboBox();
+    virtual ~GComboBox();
 
     CREATE_FUNC(GComboBox);
 

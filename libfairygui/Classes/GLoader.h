@@ -12,7 +12,7 @@ class GLoader : public GObject, public IColorGear, public IAnimationGear
 {
 public:
     GLoader();
-    ~GLoader();
+    virtual ~GLoader();
 
     CREATE_FUNC(GLoader);
 

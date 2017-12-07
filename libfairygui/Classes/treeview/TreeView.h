@@ -21,7 +21,7 @@ public:
     static TreeView* create(GList* list);
 
     TreeView();
-    ~TreeView();
+    virtual ~TreeView();
 
     GList* getList() const { return _list; }
     TreeNode* getRootNode() const { return _rootNode; }

@@ -12,7 +12,7 @@ class GImage : public GObject, public IColorGear
 {
 public:
     GImage();
-    ~GImage();
+    virtual ~GImage();
 
     CREATE_FUNC(GImage);
 

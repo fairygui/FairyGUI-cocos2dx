@@ -40,7 +40,7 @@ class FUIContainer : public cocos2d::Node
 {
 public:
     FUIContainer();
-    ~FUIContainer();
+    virtual ~FUIContainer();
 
     CREATE_FUNC(FUIContainer);
 

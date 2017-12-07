@@ -16,7 +16,7 @@ public:
     static FUIInput* create(GTextInput* owner);
 
     FUIInput();
-    ~FUIInput();
+    virtual ~FUIInput();
     
     const std::string& getText() const;
     void setText(const std::string& value);

@@ -13,7 +13,7 @@ class GearIcon : public GearBase
 {
 public:
     GearIcon(GObject* owner);
-    ~GearIcon();
+    virtual ~GearIcon();
 
     void apply() override;
     void updateState() override;

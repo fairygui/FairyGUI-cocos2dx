@@ -10,7 +10,7 @@ class FUISprite : public cocos2d::Sprite
 {
 public:
     FUISprite();
-    ~FUISprite();
+    virtual ~FUISprite();
 
     CREATE_FUNC(FUISprite);
 
