@@ -891,6 +891,20 @@ GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
         if (!_hitArea->hitTest(this, localPoint))
             return nullptr;
     }
+    else
+    {
+        if (((FUIContainer*)_displayObject)->isClippingEnabled())
+        {
+            Rect rect;
+            rect.size = _size;
+            Vec2 localPoint = _displayObject->convertToNodeSpace(worldPoint);
+            flag = rect.containsPoint(localPoint) ? 1 : 2;
+
+            const Rect& clipRect = ((FUIContainer*)_displayObject)->getClippingRegion();
+            if (!clipRect.containsPoint(localPoint))
+                return nullptr;
+        }
+    }
 
     for (auto it = _children.rbegin(); it != _children.rend(); ++it)
     {
