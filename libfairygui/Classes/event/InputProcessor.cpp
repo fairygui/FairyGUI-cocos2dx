@@ -275,7 +275,7 @@ GObject* InputProcessor::clickTest(TouchInfo* touch, GObject* target)
 
 bool InputProcessor::isTouchOnUI()
 {
-    return isTouchOnUI;
+    return _touchOnUI;
 }
 
 bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
