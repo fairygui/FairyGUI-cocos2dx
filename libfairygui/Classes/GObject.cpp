@@ -877,6 +877,7 @@ void GObject::dragBegin(int touchId)
     sGlobalRect = localToGlobal(Rect(Vec2::ZERO, _size));
 
     _draggingObject = this;
+    _dragTesting = true;
     UIRoot->getInputProcessor()->addTouchMonitor(touchId, this);
 
     addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), EventTag(this));
@@ -887,7 +888,7 @@ void GObject::dragEnd()
 {
     if (_draggingObject == this)
     {
-        UIRoot->getInputProcessor()->removeTouchMonitor(this);
+        _dragTesting = false;
         _draggingObject = nullptr;
     }
 }
@@ -895,6 +896,7 @@ void GObject::dragEnd()
 void GObject::onTouchBegin(EventContext* context)
 {
     _dragTouchStartPos = context->getInput()->getPosition();
+    _dragTesting = true;
     context->captureTouch();
 }
 
@@ -902,7 +904,7 @@ void GObject::onTouchMove(EventContext* context)
 {
     InputEvent* evt = context->getInput();
 
-    if (_draggingObject != this && _draggable)
+    if (_draggingObject != this && _draggable && _dragTesting)
     {
         int sensitivity;
 #ifdef CC_PLATFORM_PC
@@ -914,10 +916,9 @@ void GObject::onTouchMove(EventContext* context)
             && std::abs(_dragTouchStartPos.y - evt->getPosition().y) < sensitivity)
             return;
 
+        _dragTesting = false;
         if (!dispatchEvent(UIEventType::DragStart))
             dragBegin(evt->getTouchId());
-        else
-            context->uncaptureTouch();
     }
 
     if (_draggingObject == this)

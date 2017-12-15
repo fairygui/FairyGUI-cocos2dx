@@ -232,6 +232,7 @@ private:
     void * _data;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
+    bool _dragTesting;
     bool _isAdoptiveChild;
 
     uint64_t _uid;
