@@ -35,6 +35,7 @@ GObject::GObject() :
     _finalGrayed(false),
     _draggable(false),
     _dragBounds(nullptr),
+    _dragTesting(false),
     _sortingOrder(0),
     _focusable(false),
     _pixelSnapping(false),
