@@ -906,19 +906,22 @@ GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
         }
     }
 
+    if (_scrollPane)
+    {
+        target = _scrollPane->hitTest(worldPoint, camera);
+        if (!target)
+            return nullptr;
+
+        if (target != this)
+            return target;
+    }
+
     for (auto it = _children.rbegin(); it != _children.rend(); ++it)
     {
         if (!(*it)->_displayObject || *it == _maskOwner)
             continue;
 
         target = (*it)->hitTest(worldPoint, camera);
-        if (target)
-            return target;
-    }
-
-    if (_scrollPane)
-    {
-        target = _scrollPane->hitTest(worldPoint, camera);
         if (target)
             return target;
     }
