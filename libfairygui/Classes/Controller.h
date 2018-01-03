@@ -14,7 +14,7 @@ class GController : public UIEventDispatcher
 {
 public:
     GController();
-    ~GController();
+    virtual ~GController();
 
     GComponent* getParent() const { return _parent; }
     void setParent(GComponent* value) { _parent = value; }

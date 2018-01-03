@@ -709,7 +709,7 @@ void GList::setSelectionOnEvent(GObject * item, InputEvent * evt)
     }
     else
     {
-        if (evt->isShift())
+        if (evt->isShiftDown())
         {
             if (!button->isSelected())
             {
@@ -746,7 +746,7 @@ void GList::setSelectionOnEvent(GObject * item, InputEvent * evt)
                 }
             }
         }
-        else if (evt->isCtrl() || _selectionMode == ListSelectionMode::MULTIPLE_SINGLECLICK)
+        else if (evt->isCtrlDown() || _selectionMode == ListSelectionMode::MULTIPLE_SINGLECLICK)
         {
             button->setSelected(!button->isSelected());
         }

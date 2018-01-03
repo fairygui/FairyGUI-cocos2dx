@@ -40,7 +40,6 @@ public:
     bool scaleByTile;
     int tileGridIndice;
     cocos2d::SpriteFrame* spriteFrame;
-    bool addedToCache;
 
     //movieclip
     cocos2d::Animation* animation;
@@ -64,7 +63,7 @@ public:
     TXMLElement* desc;
     int listItemCount;
 
-    DisplayListItem(PackageItem* pi, std::string type);
+    DisplayListItem(PackageItem* pi, const std::string& type);
     virtual ~DisplayListItem();
 };
 

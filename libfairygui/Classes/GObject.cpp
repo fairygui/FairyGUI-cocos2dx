@@ -17,9 +17,9 @@ USING_NS_CC;
 
 GObject* GObject::_draggingObject = nullptr;
 
-Vec2 sGlobalDragStart;
-Rect sGlobalRect;
-bool sUpdateInDragging;
+static Vec2 sGlobalDragStart;
+static Rect sGlobalRect;
+static bool sUpdateInDragging;
 
 GObject::GObject() :
     _scale{ 1,1 },

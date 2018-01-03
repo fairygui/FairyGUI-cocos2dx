@@ -83,9 +83,29 @@ void UIPackage::removePackage(const string& packageIdOrName)
         pkg = getById(packageIdOrName);
 
     if (pkg)
+    {
+        auto it = std::find(_packageList.cbegin(), _packageList.cend(), pkg);
+        if (it != _packageList.cend())
+            _packageList.erase(it);
+
+        _packageInstById.erase(pkg->getId());
+        _packageInstById.erase(pkg->_assetPath);
+        _packageInstByName.erase(pkg->getName());
+
         delete pkg;
+    }
     else
         CCLOG("FairyGUI: invalid package name or id: %s", packageIdOrName.c_str());
+}
+
+void UIPackage::removeAllPackages()
+{
+    for (auto &it : _packageList)
+        delete it;
+
+    _packageInstById.clear();
+    _packageInstByName.clear();
+    _packageList.clear();
 }
 
 GObject* UIPackage::createObject(const string& pkgName, const string& resName)
@@ -410,6 +430,7 @@ void UIPackage::loadPackage()
             _hitTestDatas[ba->readString()] = pht;
             pht->load(*ba);
         }
+        CC_SAFE_DELETE(ba);
     }
 
     Data* xmlData = _descPack["package.xml"];

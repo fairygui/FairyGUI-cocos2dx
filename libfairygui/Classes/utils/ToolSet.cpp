@@ -5,7 +5,7 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 using namespace std;
 
-vector<string> helperArray;
+static vector<string> helperArray;
 
 void ToolSet::splitString(const string &s, char delim, vector<string> &elems)
 {

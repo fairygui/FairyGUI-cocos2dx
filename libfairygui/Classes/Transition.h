@@ -37,7 +37,7 @@ public:
     typedef std::function<void()> TransitionHook;
 
     Transition(GComponent* owner, int index);
-    ~Transition();
+    virtual ~Transition();
 
     GComponent* getOwner() { return _owner; }
     bool isAutoPlay() { return _autoPlay; }

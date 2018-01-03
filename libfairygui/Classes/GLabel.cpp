@@ -31,7 +31,7 @@ void GLabel::setIcon(const std::string & value)
     updateGear(7);
 }
 
-const cocos2d::Color3B GLabel::getTitleColor() const
+const cocos2d::Color3B& GLabel::getTitleColor() const
 {
     if (dynamic_cast<GTextField*>(_titleObject))
         return ((GTextField*)_titleObject)->getColor();

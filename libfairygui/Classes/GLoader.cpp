@@ -102,6 +102,7 @@ void GLoader::setPlaying(bool value)
             else
                 _content->stopAction(_playAction);
         }
+        updateGear(5);
     }
 }
 
@@ -110,6 +111,7 @@ void GLoader::setCurrentFrame(int value)
     _frame = value;
     if (_playAction)
         _playAction->setCurrentFrame(value);
+    updateGear(5);
 }
 
 cocos2d::Color4B GLoader::cg_getColor() const

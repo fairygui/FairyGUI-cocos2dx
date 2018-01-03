@@ -20,8 +20,7 @@ PackageItem::PackageItem() :
     componentData(nullptr),
     displayList(nullptr),
     extensionCreator(nullptr),
-    bitmapFont(nullptr),
-    addedToCache(false)
+    bitmapFont(nullptr)
 {
 }
 
@@ -39,8 +38,6 @@ PackageItem::~PackageItem()
         bitmapFont->releaseAtlas();
     CC_SAFE_RELEASE(animation);
     CC_SAFE_RELEASE(texture);
-    if (addedToCache)
-        SpriteFrameCache::getInstance()->removeSpriteFrameByName("ui://" + owner->getId() + id);
     CC_SAFE_RELEASE(spriteFrame);
 }
 
@@ -49,7 +46,7 @@ void PackageItem::load()
     owner->loadItem(this);
 }
 
-DisplayListItem::DisplayListItem(PackageItem* pi, std::string type)
+DisplayListItem::DisplayListItem(PackageItem* pi, const std::string& type)
     :packageItem(pi),
     type(type),
     desc(nullptr),

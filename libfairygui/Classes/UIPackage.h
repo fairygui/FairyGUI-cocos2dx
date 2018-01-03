@@ -23,6 +23,7 @@ public:
     static UIPackage* getByName(const std::string& name);
     static UIPackage* addPackage(const std::string& descFilePath);
     static void removePackage(const std::string& packageIdOrName);
+    static void removeAllPackages();
     static GObject* createObject(const std::string& pkgName, const std::string& resName);
     static GObject* createObjectFromURL(const std::string& url);
     static std::string getItemURL(const std::string& pkgName, const std::string& resName);

@@ -26,7 +26,7 @@ public:
         const std::string& hzScrollBarRes,
         const std::string& headerRes,
         const std::string& footerRes);
-    ~ScrollPane();
+    virtual ~ScrollPane();
 
     GComponent* getOwner() const { return _owner; }
     GComponent* getHeader() const { return _header; }
