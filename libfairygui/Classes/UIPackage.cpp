@@ -422,7 +422,7 @@ void UIPackage::loadPackage()
     if (hasHitTestData)
     {
         Data data = FileUtils::getInstance()->getDataFromFile(hitTestDataFilePath);
-        ByteArray* ba = ByteArray::createWithBuffer((char*)data.getBytes(), data.getSize(), true);
+        ByteArray* ba = ByteArray::createWithBuffer((char*)data.getBytes(), data.getSize(), false);
         ba->setEndian(ByteArray::ENDIAN_BIG);
         while (ba->getBytesAvailable())
         {
