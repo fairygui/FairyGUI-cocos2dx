@@ -1,5 +1,6 @@
 #include "FUIContainer.h"
 #include "base/CCStencilStateManager.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -279,38 +280,33 @@ void FUIContainer::setContentSize(const Size & contentSize)
 void FUIContainer::onBeforeVisitScissor()
 {
     auto glview = Director::getInstance()->getOpenGLView();
-    // apply scissor test
     _rectClippingSupport->_scissorOldState = glview->isScissorEnabled();
+    Rect clippingRect = getClippingRect();
     if (false == _rectClippingSupport->_scissorOldState)
     {
         glEnable(GL_SCISSOR_TEST);
     }
-
-    // apply scissor box
-    Rect clippingRect = getClippingRect();
-    _rectClippingSupport->_clippingOldRect = glview->getScissorRect();
-    if (false == _rectClippingSupport->_clippingOldRect.equals(clippingRect))
+    else
     {
-        glview->setScissorInPoints(clippingRect.origin.x,
-            clippingRect.origin.y,
-            clippingRect.size.width,
-            clippingRect.size.height);
+        _rectClippingSupport->_clippingOldRect = glview->getScissorRect();
+        clippingRect = ToolSet::intersection(clippingRect, _rectClippingSupport->_clippingOldRect);
     }
+
+    glview->setScissorInPoints(clippingRect.origin.x,
+        clippingRect.origin.y,
+        clippingRect.size.width,
+        clippingRect.size.height);
 }
 
 void FUIContainer::onAfterVisitScissor()
 {
     if (_rectClippingSupport->_scissorOldState)
     {
-        // revert scissor box
-        if (false == _rectClippingSupport->_clippingOldRect.equals(_rectClippingSupport->_clippingRect))
-        {
-            auto glview = Director::getInstance()->getOpenGLView();
-            glview->setScissorInPoints(_rectClippingSupport->_clippingOldRect.origin.x,
-                _rectClippingSupport->_clippingOldRect.origin.y,
-                _rectClippingSupport->_clippingOldRect.size.width,
-                _rectClippingSupport->_clippingOldRect.size.height);
-        }
+        auto glview = Director::getInstance()->getOpenGLView();
+        glview->setScissorInPoints(_rectClippingSupport->_clippingOldRect.origin.x,
+            _rectClippingSupport->_clippingOldRect.origin.y,
+            _rectClippingSupport->_clippingOldRect.size.width,
+            _rectClippingSupport->_clippingOldRect.size.height);
     }
     else
     {
@@ -327,73 +323,7 @@ const Rect& FUIContainer::getClippingRect()
         AffineTransform t = getNodeToWorldAffineTransform();
         float scissorWidth = _rectClippingSupport->_clippingRegion.size.width*t.a;
         float scissorHeight = _rectClippingSupport->_clippingRegion.size.height*t.d;
-        Rect parentClippingRect;
-        FUIContainer* parent = this;
-        FUIContainer* clippingParent = nullptr;
-
-        while (parent)
-        {
-            parent = dynamic_cast<FUIContainer*>(parent->getParent());
-            if (parent)
-            {
-                if (parent->isClippingEnabled())
-                {
-                    clippingParent = parent;
-                    break;
-                }
-            }
-        }
-
-        if (clippingParent)
-        {
-            parentClippingRect = clippingParent->getClippingRect();
-            float finalX = worldPos.x - (scissorWidth * _anchorPoint.x);
-            float finalY = worldPos.y - (scissorHeight * _anchorPoint.y);
-            float finalWidth = scissorWidth;
-            float finalHeight = scissorHeight;
-
-            float leftOffset = worldPos.x - parentClippingRect.origin.x;
-            if (leftOffset < 0.0f)
-            {
-                finalX = parentClippingRect.origin.x;
-                finalWidth += leftOffset;
-            }
-            float rightOffset = (worldPos.x + scissorWidth) - (parentClippingRect.origin.x + parentClippingRect.size.width);
-            if (rightOffset > 0.0f)
-            {
-                finalWidth -= rightOffset;
-            }
-            float topOffset = (worldPos.y + scissorHeight) - (parentClippingRect.origin.y + parentClippingRect.size.height);
-            if (topOffset > 0.0f)
-            {
-                finalHeight -= topOffset;
-            }
-            float bottomOffset = worldPos.y - parentClippingRect.origin.y;
-            if (bottomOffset < 0.0f)
-            {
-                finalY = parentClippingRect.origin.y;
-                finalHeight += bottomOffset;
-            }
-            if (finalWidth < 0.0f)
-            {
-                finalWidth = 0.0f;
-            }
-            if (finalHeight < 0.0f)
-            {
-                finalHeight = 0.0f;
-            }
-            _rectClippingSupport->_clippingRect.origin.x = finalX;
-            _rectClippingSupport->_clippingRect.origin.y = finalY;
-            _rectClippingSupport->_clippingRect.size.width = finalWidth;
-            _rectClippingSupport->_clippingRect.size.height = finalHeight;
-        }
-        else
-        {
-            _rectClippingSupport->_clippingRect.origin.x = worldPos.x - (scissorWidth * _anchorPoint.x);
-            _rectClippingSupport->_clippingRect.origin.y = worldPos.y - (scissorHeight * _anchorPoint.y);
-            _rectClippingSupport->_clippingRect.size.width = scissorWidth;
-            _rectClippingSupport->_clippingRect.size.height = scissorHeight;
-        }
+        _rectClippingSupport->_clippingRect.setRect(worldPos.x - (scissorWidth * _anchorPoint.x), worldPos.y - (scissorHeight * _anchorPoint.y), scissorWidth, scissorHeight);
         _rectClippingSupport->_clippingRectDirty = false;
     }
     return _rectClippingSupport->_clippingRect;

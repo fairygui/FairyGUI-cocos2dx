@@ -53,7 +53,7 @@ ScrollPane::ScrollPane(GComponent* owner,
 {
     _owner = owner;
 
-    _maskContainer = ClippingRectangleNode::create();
+    _maskContainer = FUIContainer::create();
     _maskContainer->setCascadeOpacityEnabled(true);
     _owner->displayObject()->addChild(_maskContainer);
 
@@ -85,9 +85,7 @@ ScrollPane::ScrollPane(GComponent* owner,
     else
         _bouncebackEffect = UIConfig::defaultScrollBounceEffect;
     _inertiaDisabled = (flags & 256) != 0;
-    _maskDisabled = (flags & 512) != 0;
-    if (_maskDisabled)
-        _maskContainer->setClippingEnabled(false);
+    _maskContainer->setClippingEnabled((flags & 512) == 0);
 
     _scrollBarVisible = true;
     _mouseWheelEnabled = true;

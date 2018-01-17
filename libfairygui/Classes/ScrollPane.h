@@ -10,6 +10,7 @@ NS_FGUI_BEGIN
 class GObject;
 class GComponent;
 class GScrollBar;
+class FUIContainer;
 class FUIInnerContainer;
 class GController;
 class EventContext;
@@ -164,7 +165,6 @@ private:
     bool _displayInDemand;
     bool _mouseWheelEnabled;
     bool _inertiaDisabled;
-    bool _maskDisabled;
     float _decelerationRate;
     bool _pageMode;
 
@@ -199,7 +199,7 @@ private:
     cocos2d::Vec2 _tweenDuration;
 
     GComponent* _owner;
-    cocos2d::ClippingRectangleNode* _maskContainer;
+    FUIContainer* _maskContainer;
     FUIInnerContainer* _container;
     GScrollBar* _hzScrollBar;
     GScrollBar* _vtScrollBar;

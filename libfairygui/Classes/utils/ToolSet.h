@@ -16,6 +16,7 @@ public:
     static int findInStringArray(const std::vector<std::string>& arr, const std::string& str);
 
     static cocos2d::Color4B convertFromHtmlColor(const char* str);
+    static cocos2d::Rect intersection(const Rect& rect1, const Rect& rect2);
 
     static PackageItemType parsePackageItemType(const char * p);
     static cocos2d::TextHAlignment parseAlign(const char *p);

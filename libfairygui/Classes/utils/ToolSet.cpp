@@ -121,6 +121,22 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
     }
 }
 
+Rect ToolSet::intersection(const Rect& rect1, const Rect& rect2)
+{
+    if (rect1.size.width == 0 || rect1.size.height == 0 || rect2.size.width == 0 || rect2.size.height == 0)
+        return Rect(0, 0, 0, 0);
+
+    float left = rect1.getMinX() > rect2.getMinX() ? rect1.getMinX() : rect2.getMinX();
+    float right = rect1.getMaxX() < rect2.getMaxX() ? rect1.getMaxX() : rect2.getMaxX();
+    float top = rect1.getMinY() > rect2.getMinY() ? rect1.getMinY() : rect2.getMinY();
+    float bottom = rect1.getMaxY() < rect2.getMaxY() ? rect1.getMaxY() : rect2.getMaxY();
+
+    if (left > right || top > bottom)
+        return Rect(0, 0, 0, 0);
+    else
+        return Rect(left, top, right - left, bottom - top);
+}
+
 #pragma warning(once:4307) 
 
 PackageItemType ToolSet::parsePackageItemType(const char* p)
