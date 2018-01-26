@@ -827,6 +827,10 @@ void GObject::setup_BeforeAdd(TXMLElement * xml)
     p = xml->Attribute("tooltips");
     if (p)
         setTooltips(p);
+
+    p = xml->Attribute("customData");
+    if (p)
+        _customData = Value(p);
 }
 
 void GObject::setup_AfterAdd(TXMLElement * xml)
@@ -920,7 +924,7 @@ void GObject::onTouchMove(EventContext* context)
         _dragTesting = false;
         if (!dispatchEvent(UIEventType::DragStart))
             dragBegin(evt->getTouchId());
-    }
+}
 
     if (_draggingObject == this)
     {

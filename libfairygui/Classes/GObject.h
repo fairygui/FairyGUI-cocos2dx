@@ -107,6 +107,8 @@ public:
 
     void* getData() const { return _data; };
     void setData(void* value) { _data = value; }
+    const cocos2d::Value& getCustomData() const { return _customData; }
+    void setCustomData(const cocos2d::Value& value) { _customData = value; }
 
     bool isDraggable() const { return _draggable; }
     void setDraggable(bool value);
@@ -230,6 +232,7 @@ private:
     Relations* _relations;
     GearBase* _gears[8];
     void * _data;
+    cocos2d::Value _customData;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
     bool _dragTesting;
