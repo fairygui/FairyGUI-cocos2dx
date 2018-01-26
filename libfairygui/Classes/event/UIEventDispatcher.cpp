@@ -89,6 +89,8 @@ UIEventDispatcher::UIEventDispatcher() :_dispatching(0)
 
 UIEventDispatcher::~UIEventDispatcher()
 {
+    _dispatching = 0;
+    removeEventListeners();
 }
 
 void UIEventDispatcher::addEventListener(int eventType, const EventCallback& callback, const EventTag& tag)
@@ -97,35 +99,41 @@ void UIEventDispatcher::addEventListener(int eventType, const EventCallback& cal
     {
         for (auto it = _callbacks.begin(); it != _callbacks.end(); it++)
         {
-            if (it->eventType == eventType && it->tag == tag)
+            if ((*it)->eventType == eventType && (*it)->tag == tag)
             {
-                it->callback = callback;
+                (*it)->callback = callback;
                 return;
             }
         }
     }
 
-    EventCallbackItem item;
-    item.callback = callback;
-    item.eventType = eventType;
-    item.tag = tag;
-    item.dispatching = 0;
+    EventCallbackItem* item = new EventCallbackItem();
+    item->callback = callback;
+    item->eventType = eventType;
+    item->tag = tag;
+    item->dispatching = 0;
     _callbacks.push_back(item);
 }
 
 void UIEventDispatcher::removeEventListener(int eventType, const EventTag& tag)
 {
+    if (_callbacks.empty())
+        return;
+
     for (auto it = _callbacks.begin(); it != _callbacks.end(); )
     {
-        if (it->eventType == eventType && (it->tag == tag || tag.isNone()))
+        if ((*it)->eventType == eventType && ((*it)->tag == tag || tag.isNone()))
         {
             if (_dispatching > 0)
             {
-                it->callback = nullptr;
+                (*it)->callback = nullptr;
                 it++;
             }
             else
+            {
+                delete (*it);
                 it = _callbacks.erase(it);
+            }
         }
         else
             it++;
@@ -134,20 +142,30 @@ void UIEventDispatcher::removeEventListener(int eventType, const EventTag& tag)
 
 void UIEventDispatcher::removeEventListeners()
 {
+    if (_callbacks.empty())
+        return;
+
     if (_dispatching > 0)
     {
         for (auto it = _callbacks.begin(); it != _callbacks.end(); ++it)
-            it->callback = nullptr;
+            (*it)->callback = nullptr;
     }
     else
+    {
+        for (auto it = _callbacks.begin(); it != _callbacks.end(); it++)
+            delete (*it);
         _callbacks.clear();
+    }
 }
 
 bool UIEventDispatcher::hasEventListener(int eventType, const EventTag& tag) const
 {
+    if (_callbacks.empty())
+        return false;
+
     for (auto it = _callbacks.cbegin(); it != _callbacks.cend(); ++it)
     {
-        if (it->eventType == eventType && (it->tag == tag || tag.isNone()) && it->callback != nullptr)
+        if ((*it)->eventType == eventType && ((*it)->tag == tag || tag.isNone()) && (*it)->callback != nullptr)
             return true;
     }
     return false;
@@ -189,28 +207,35 @@ bool UIEventDispatcher::isDispatchingEvent(int eventType)
 {
     for (auto it = _callbacks.begin(); it != _callbacks.end(); ++it)
     {
-        if (it->eventType == eventType)
-            return it->dispatching > 0;
+        if ((*it)->eventType == eventType)
+            return (*it)->dispatching > 0;
     }
     return false;
 }
 
 void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 {
-    _dispatching++;
-
     retain();
+
+    _dispatching++;
     context->_sender = this;
+    bool hasDeletedItems = false;
+
     size_t cnt = _callbacks.size(); //dont use iterator, because new item would be added in callback.
     for (size_t i = 0; i < cnt; i++)
     {
-        EventCallbackItem& ci = _callbacks[i];
-        if (ci.eventType == eventType && ci.callback != nullptr)
+        EventCallbackItem* ci = _callbacks[i];
+        if (ci->callback == nullptr)
         {
-            ci.dispatching++;
+            hasDeletedItems = true;
+            continue;
+        }
+        if (ci->eventType == eventType)
+        {
+            ci->dispatching++;
             context->_touchCapture = 0;
-            ci.callback(context);
-            ci.dispatching--;
+            ci->callback(context);
+            ci->dispatching--;
             if (context->_touchCapture != 0 && dynamic_cast<GObject*>(this))
             {
                 if (context->_touchCapture == 1 && eventType == UIEventType::TouchBegin)
@@ -220,15 +245,22 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
             }
         }
     }
-    for (auto it = _callbacks.begin(); it != _callbacks.end(); )
-    {
-        if (it->callback == nullptr)
-            it = _callbacks.erase(it);
-        else
-            it++;
-    }
 
     _dispatching--;
+    if (hasDeletedItems && _dispatching == 0)
+    {
+        for (auto it = _callbacks.begin(); it != _callbacks.end(); )
+        {
+            if ((*it)->callback == nullptr)
+            {
+                delete (*it);
+                it = _callbacks.erase(it);
+            }
+            else
+                it++;
+        }
+    }
+
     release();
 }
 

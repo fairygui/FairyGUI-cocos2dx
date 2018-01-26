@@ -70,7 +70,7 @@ private:
         EventTag tag;
         int dispatching;
     };
-    std::vector<EventCallbackItem> _callbacks;
+    std::vector<EventCallbackItem*> _callbacks;
     int _dispatching;
 };
 
