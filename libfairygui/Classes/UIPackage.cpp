@@ -39,6 +39,10 @@ UIPackage::~UIPackage()
         delete it;
     for (auto &it : _hitTestDatas)
         delete it.second;
+    for (auto &it : _sprites)
+        delete it.second;
+    for (auto &it : _descPack)
+        delete it.second;
 }
 
 UIPackage * UIPackage::getById(const string& id)
@@ -319,9 +323,11 @@ void UIPackage::create(const string& assetPath)
         _emptyTexture = new Texture2D();
         _emptyTexture->initWithImage(emptyImage);
         _emptyTexture->retain();
+        _emptyTexture->autorelease();
         delete emptyImage;
     }
 
+    _assetPath = assetPath;
     _assetNamePrefix = assetPath + "@";
     decodeDesc(data);
 
@@ -582,6 +588,7 @@ void UIPackage::loadAtlas(PackageItem * item)
     tex->initWithImage(image);
     item->texture = tex;
     tex->retain();
+    tex->autorelease();
     delete image;
 
     string ext = FileUtils::getInstance()->getFileExtension(filePath);
@@ -607,6 +614,7 @@ void UIPackage::loadAtlas(PackageItem * item)
         tex = new Texture2D();
         tex->initWithImage(image);
         item->texture->setAlphaTexture(tex);
+        tex->autorelease();
         delete image;
     }
 }

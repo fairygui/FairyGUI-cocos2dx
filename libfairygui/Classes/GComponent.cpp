@@ -1161,6 +1161,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         _controllers.pushBack(controller);
         controller->setParent(this);
         controller->setup(exml);
+        controller->autorelease();
 
         exml = exml->NextSiblingElement("controller");
     }
@@ -1213,6 +1214,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         Transition* trans = new Transition(this, (int)_transitions.size());
         _transitions.pushBack(trans);
         trans->setup(exml);
+        trans->autorelease();
 
         exml = exml->NextSiblingElement("transition");
     }
