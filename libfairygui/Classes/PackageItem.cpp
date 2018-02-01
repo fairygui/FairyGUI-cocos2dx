@@ -20,7 +20,6 @@ PackageItem::PackageItem() :
     componentData(nullptr),
     displayList(nullptr),
     extensionCreator(nullptr),
-    createCallback(nullptr),
     bitmapFont(nullptr)
 {
 }

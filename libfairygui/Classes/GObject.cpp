@@ -64,8 +64,11 @@ GObject::~GObject()
 {
     removeFromParent();
 
-    _displayObject->removeFromParent();
-    CC_SAFE_RELEASE(_displayObject);
+	if(_displayObject)
+	{
+    	_displayObject->removeFromParent();
+    	CC_SAFE_RELEASE(_displayObject);
+	}
     for (int i = 0; i < 8; i++)
         CC_SAFE_DELETE(_gears[i]);
     CC_SAFE_DELETE(_relations);

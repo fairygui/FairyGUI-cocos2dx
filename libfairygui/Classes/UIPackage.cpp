@@ -322,8 +322,6 @@ void UIPackage::create(const string& assetPath)
         emptyImage->initWithRawData(emptyTextureData, 16, 2, 2, 4, false);
         _emptyTexture = new Texture2D();
         _emptyTexture->initWithImage(emptyImage);
-        _emptyTexture->retain();
-        _emptyTexture->autorelease();
         delete emptyImage;
     }
 
@@ -577,6 +575,7 @@ void UIPackage::loadAtlas(PackageItem * item)
     if (!image->initWithImageFile(filePath))
     {
         item->texture = _emptyTexture;
+        _emptyTexture->retain();
         delete image;
         Image::setPNGPremultipliedAlphaEnabled(true);
         CCLOGWARN("FairyGUI: texture '%s' not found in %s", filePath.c_str(), _name.c_str());
@@ -587,8 +586,6 @@ void UIPackage::loadAtlas(PackageItem * item)
     Texture2D* tex = new Texture2D();
     tex->initWithImage(image);
     item->texture = tex;
-    tex->retain();
-    tex->autorelease();
     delete image;
 
     string ext = FileUtils::getInstance()->getFileExtension(filePath);
@@ -614,7 +611,7 @@ void UIPackage::loadAtlas(PackageItem * item)
         tex = new Texture2D();
         tex->initWithImage(image);
         item->texture->setAlphaTexture(tex);
-        tex->autorelease();
+        tex->release();
         delete image;
     }
 }
