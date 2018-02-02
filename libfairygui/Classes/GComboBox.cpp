@@ -316,7 +316,7 @@ void GComboBox::onClickItem(EventContext* context)
     _selectedIndex = INT_MIN;
     setSelectedIndex(_list->getChildIndex((GObject*)context->getData()));
 
-    dispatchEvent(UIEventType::ClickItem);
+    dispatchEvent(UIEventType::Changed);
 }
 
 void GComboBox::onRollover(EventContext* context)
