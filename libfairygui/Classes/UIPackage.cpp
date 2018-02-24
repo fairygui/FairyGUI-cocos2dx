@@ -18,7 +18,7 @@ const unsigned char* emptyTextureData = new unsigned char[16]{ 0,0,0,0,0,0,0,0,0
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstById;
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstByName;
 std::vector<UIPackage*> UIPackage::_packageList;
-ValueMap UIPackage::_stringsSource;
+std::unordered_map<std::string, ValueMap> UIPackage::_stringsSource;
 Texture2D* UIPackage::_emptyTexture;
 
 struct AtlasSprite
@@ -304,6 +304,34 @@ PixelHitTestData * UIPackage::getPixelHitTestData(const std::string & itemId)
         return it->second;
     else
         return nullptr;
+}
+
+void UIPackage::setStringsSource(const char *xmlString, size_t nBytes)
+{
+    _stringsSource.clear();
+
+    TXMLDocument* xml = new TXMLDocument();
+    xml->Parse(xmlString, nBytes);
+
+    TXMLElement* root = xml->RootElement();
+    TXMLElement* ele = root->FirstChildElement("string");
+    while (ele)
+    {
+        std::string key = ele->Attribute("name");
+        std::string text = ele->GetText();
+        size_t i = key.find("-");
+        if (i == std::string::npos)
+            continue;
+
+        std::string key2 = key.substr(0, i);
+        std::string key3 = key.substr(i + 1);
+        ValueMap& col = _stringsSource[key2];
+        col[key3] = text;
+
+        ele = ele->NextSiblingElement("string");
+    }
+
+    delete xml;
 }
 
 void UIPackage::create(const string& assetPath)
@@ -905,6 +933,136 @@ void UIPackage::loadComponentChildren(PackageItem * item)
 
 void UIPackage::translateComponent(PackageItem * item)
 {
+    if (_stringsSource.empty())
+        return;
+
+    auto it = _stringsSource.find(_id + item->id);
+    if (it == _stringsSource.end())
+        return;
+
+    const ValueMap& strings = it->second;
+    std::string ename, elementId, value;
+    const char* p;
+    int dcnt = item->displayList->size();
+    for (int i = 0; i < dcnt; i++)
+    {
+        TXMLElement* cxml = item->displayList->at(i)->desc;
+        ename = cxml->Name();
+        elementId = (p = cxml->Attribute("id")) ? p : STD_STRING_EMPTY;
+        if (p = cxml->Attribute("tooltips"))
+        {
+            auto it = strings.find(elementId + "-tips");
+            if (it != strings.end())
+                cxml->SetAttribute("tooltips", it->second.asString().c_str());
+        }
+
+        TXMLElement* dxml = cxml->FirstChildElement("gearText");
+        if (dxml != nullptr)
+        {
+            {
+                auto it = strings.find(elementId + "-texts");
+                if (it != strings.end())
+                    dxml->SetAttribute("values", it->second.asString().c_str());
+            }
+
+            {
+                auto it = strings.find(elementId + "-texts_def");
+                if (it != strings.end())
+                    dxml->SetAttribute("default", it->second.asString().c_str());
+            }
+        }
+
+        if (ename == "text" || ename == "richtext")
+        {
+            {
+                auto it = strings.find(elementId);
+                if (it != strings.end())
+                    cxml->SetAttribute("text", it->second.asString().c_str());
+            }
+
+            {
+                auto it = strings.find(elementId + "-prompt");
+                if (it != strings.end())
+                    cxml->SetAttribute("prompt", it->second.asString().c_str());
+            }
+        }
+        else if (ename == "list")
+        {
+            TXMLElement* exml = cxml->FirstChildElement("item");
+            int j = 0;
+            while (exml)
+            {
+                auto it = strings.find(elementId + "-" + Value(j).asString());
+                if (it != strings.end())
+                    exml->SetAttribute("title", it->second.asString().c_str());
+
+                exml = exml->NextSiblingElement("item");
+                j++;
+            }
+        }
+        else if (ename == "component")
+        {
+            dxml = cxml->FirstChildElement("Button");
+            if (dxml != nullptr)
+            {
+                {
+                    auto it = strings.find(elementId);
+                    if (it != strings.end())
+                        dxml->SetAttribute("title", it->second.asString().c_str());
+                }
+
+                {
+                    auto it = strings.find(elementId + "-0");
+                    if (it != strings.end())
+                        dxml->SetAttribute("selectedTitle", it->second.asString().c_str());
+                }
+
+                continue;
+            }
+
+            dxml = cxml->FirstChildElement("Label");
+            if (dxml != nullptr)
+            {
+                {
+                    auto it = strings.find(elementId);
+                    if (it != strings.end())
+                        dxml->SetAttribute("title", it->second.asString().c_str());
+                }
+
+                {
+                    auto it = strings.find(elementId + "-prompt");
+                    if (it != strings.end())
+                        dxml->SetAttribute("prompt", it->second.asString().c_str());
+                }
+
+                continue;
+            }
+
+            dxml = cxml->FirstChildElement("ComboBox");
+            if (dxml != nullptr)
+            {
+                {
+                    auto it = strings.find(elementId);
+                    if (it != strings.end())
+                        dxml->SetAttribute("title", it->second.asString().c_str());
+                }
+
+                TXMLElement* exml = dxml->FirstChildElement("item");
+                int j = 0;
+                while (exml)
+                {
+                    auto it = strings.find(elementId + "-" + Value(j).asString());
+                    if (it != strings.end())
+                        exml->SetAttribute("title", it->second.asString().c_str());
+
+                    exml = exml->NextSiblingElement("item");
+                    j++;
+                }
+
+                continue;
+            }
+        }
+    }
 }
 
 GObject * UIPackage::createObject(const string & resName)
