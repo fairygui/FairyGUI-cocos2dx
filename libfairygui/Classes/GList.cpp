@@ -285,13 +285,14 @@ void GList::getSelection(std::vector<int>& result)
             if ((dynamic_cast<GButton*>(ii.obj) != nullptr && ((GButton*)ii.obj)->isSelected())
                 || (ii.obj == nullptr && ii.selected))
             {
+                int j = i;
                 if (_loop)
                 {
-                    i = i % _numItems;
-                    if (std::find(result.cbegin(), result.cend(), i) != result.cend())
+                    j = i % _numItems;
+                    if (std::find(result.cbegin(), result.cend(), j) != result.cend())
                         continue;
                 }
-                result.push_back(i);
+                result.push_back(j);
             }
         }
     }
