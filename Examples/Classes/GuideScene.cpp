@@ -22,6 +22,7 @@ void GuideScene::continueInit()
     _guideLayer = UIPackage::createObject("Guide", "GuideLayer")->as<GComponent>();
     _guideLayer->makeFullScreen();
     _guideLayer->addRelation(_groot, RelationType::Size);
+    _guideLayer->retain();
 
     GObject* bagBtn = _view->getChild("bagBtn");
     bagBtn->addClickListener([this](EventContext*)
