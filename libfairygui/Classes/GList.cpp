@@ -2518,6 +2518,9 @@ void GList::setup_BeforeAdd(TXMLElement * xml)
             p = ix->Attribute("name");
             if (p)
                 obj->name = p;
+            p = ix->Attribute("selectedIcon");
+            if (p && dynamic_cast<GButton*>(obj))
+                dynamic_cast<GButton*>(obj)->setSelectedIcon(p);
         }
 
         ix = ix->NextSiblingElement("item");
