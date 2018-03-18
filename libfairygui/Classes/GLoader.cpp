@@ -365,6 +365,8 @@ void GLoader::setup_BeforeAdd(TXMLElement * xml)
     if (p)
         _fill = ToolSet::parseFillType(p);
 
+    _autoSize = xml->BoolAttribute("autoSize");
+
     p = xml->Attribute("color");
     if (p)
         setColor((Color3B)ToolSet::convertFromHtmlColor(p));
