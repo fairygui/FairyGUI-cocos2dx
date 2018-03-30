@@ -246,6 +246,8 @@ LoaderFillType ToolSet::parseFillType(const char * p)
         return LoaderFillType::SCALE_MATCH_WIDTH;
     case "scaleFree"_hash:
         return LoaderFillType::SCALE_FREE;
+    case "scaleNoBorder"_hash:
+        return LoaderFillType::SCALE_NO_BORDER;
     default:
         return LoaderFillType::NONE;
     }

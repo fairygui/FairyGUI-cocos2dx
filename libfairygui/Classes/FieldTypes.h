@@ -58,7 +58,8 @@ enum class LoaderFillType
     SCALE,
     SCALE_MATCH_HEIGHT,
     SCALE_MATCH_WIDTH,
-    SCALE_FREE
+    SCALE_FREE,
+    SCALE_NO_BORDER
 };
 
 enum class ProgressTitleType

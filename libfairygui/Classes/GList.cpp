@@ -37,7 +37,9 @@ GList::GList() :
     _realNumItems(0),
     _firstIndex(-1),
     _virtualListChanged(false),
-    _eventLocked(false)
+    _eventLocked(false),
+    _enterCounter(0),
+    _itemInfoVer(0)
 {
     _trackBounds = true;
     setOpaque(true);
@@ -1432,6 +1434,7 @@ void GList::handleScroll(bool forceUpdate)
     if (_eventLocked)
         return;
 
+    _enterCounter = 0;
     if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
     {
         handleScroll1(forceUpdate);
@@ -1450,13 +1453,10 @@ void GList::handleScroll(bool forceUpdate)
     _boundsChanged = false;
 }
 
-static uint32_t itemInfoVer = 0;
-static uint32_t enterCounter = 0;
-
 void GList::handleScroll1(bool forceUpdate)
 {
-    enterCounter++;
-    if (enterCounter > 3)
+    _enterCounter++;
+    if (_enterCounter > 3)
         return;
 
     float pos = _scrollPane->getScrollingPosY();
@@ -1465,10 +1465,7 @@ void GList::handleScroll1(bool forceUpdate)
 
     int newFirstIndex = getIndexOnPos1(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
-    {
-        enterCounter--;
         return;
-    }
 
     int oldFirstIndex = _firstIndex;
     _firstIndex = newFirstIndex;
@@ -1484,7 +1481,7 @@ void GList::handleScroll1(bool forceUpdate)
     std::string url = _defaultItem;
     int partSize = (int)((_scrollPane->getViewSize().width - _columnGap * (_curLineItemCount - 1)) / _curLineItemCount);
 
-    itemInfoVer++;
+    _itemInfoVer++;
     while (curIndex < _realNumItems && (end || curY < max))
     {
         ItemInfo& ii = _virtualItems[curIndex];
@@ -1515,7 +1512,7 @@ void GList::handleScroll1(bool forceUpdate)
                 for (int j = reuseIndex; j >= oldFirstIndex; j--)
                 {
                     ItemInfo& ii2 = _virtualItems[j];
-                    if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
+                    if (ii2.obj != nullptr && ii2.updateFlag != _itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
                             ii2.selected = ((GButton*)ii2.obj)->isSelected();
@@ -1532,7 +1529,7 @@ void GList::handleScroll1(bool forceUpdate)
                 for (int j = reuseIndex; j <= lastIndex; j++)
                 {
                     ItemInfo& ii2 = _virtualItems[j];
-                    if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
+                    if (ii2.obj != nullptr && ii2.updateFlag != _itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
                             ii2.selected = ((GButton*)ii2.obj)->isSelected();
@@ -1583,7 +1580,7 @@ void GList::handleScroll1(bool forceUpdate)
             ii.size.y = ceil(ii.obj->getHeight());
         }
 
-        ii.updateFlag = itemInfoVer;
+        ii.updateFlag = _itemInfoVer;
         ii.obj->setPosition(curX, curY);
         if (curIndex == newFirstIndex)
             max += ii.size.y;
@@ -1601,7 +1598,7 @@ void GList::handleScroll1(bool forceUpdate)
     for (int i = 0; i < oldCount; i++)
     {
         ItemInfo& ii = _virtualItems[oldFirstIndex + i];
-        if (ii.updateFlag != itemInfoVer && ii.obj != nullptr)
+        if (ii.updateFlag != _itemInfoVer && ii.obj != nullptr)
         {
             if (dynamic_cast<GButton*>(ii.obj))
                 ii.selected = ((GButton*)ii.obj)->isSelected();
@@ -1616,14 +1613,12 @@ void GList::handleScroll1(bool forceUpdate)
     if (curIndex > 0 && numChildren() > 0
         && _container->getPositionY2() < 0 && getChildAt(0)->getY() > -_container->getPositionY2())
         handleScroll1(false);
-
-    enterCounter--;
 }
 
 void GList::handleScroll2(bool forceUpdate)
 {
-    enterCounter++;
-    if (enterCounter > 3)
+    _enterCounter++;
+    if (_enterCounter > 3)
         return;
 
     float pos = _scrollPane->getScrollingPosX();
@@ -1632,10 +1627,7 @@ void GList::handleScroll2(bool forceUpdate)
 
     int newFirstIndex = getIndexOnPos2(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
-    {
-        enterCounter--;
         return;
-    }
 
     int oldFirstIndex = _firstIndex;
     _firstIndex = newFirstIndex;
@@ -1651,7 +1643,7 @@ void GList::handleScroll2(bool forceUpdate)
     string url = _defaultItem;
     int partSize = (int)((_scrollPane->getViewSize().height - _lineGap * (_curLineItemCount - 1)) / _curLineItemCount);
 
-    itemInfoVer++;
+    _itemInfoVer++;
     while (curIndex < _realNumItems && (end || curX < max))
     {
         ItemInfo& ii = _virtualItems[curIndex];
@@ -1682,7 +1674,7 @@ void GList::handleScroll2(bool forceUpdate)
                 for (int j = reuseIndex; j >= oldFirstIndex; j--)
                 {
                     ItemInfo& ii2 = _virtualItems[j];
-                    if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
+                    if (ii2.obj != nullptr && ii2.updateFlag != _itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
                             ii2.selected = ((GButton*)ii2.obj)->isSelected();
@@ -1699,7 +1691,7 @@ void GList::handleScroll2(bool forceUpdate)
                 for (int j = reuseIndex; j <= lastIndex; j++)
                 {
                     ItemInfo& ii2 = _virtualItems[j];
-                    if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
+                    if (ii2.obj != nullptr && ii2.updateFlag != _itemInfoVer && ii2.obj->getResourceURL().compare(url) == 0)
                     {
                         if (dynamic_cast<GButton*>(ii2.obj))
                             ii2.selected = ((GButton*)ii2.obj)->isSelected();
@@ -1750,7 +1742,7 @@ void GList::handleScroll2(bool forceUpdate)
             ii.size.y = ceil(ii.obj->getHeight());
         }
 
-        ii.updateFlag = itemInfoVer;
+        ii.updateFlag = _itemInfoVer;
         ii.obj->setPosition(curX, curY);
         if (curIndex == newFirstIndex)
             max += ii.size.x;
@@ -1768,7 +1760,7 @@ void GList::handleScroll2(bool forceUpdate)
     for (int i = 0; i < oldCount; i++)
     {
         ItemInfo& ii = _virtualItems[oldFirstIndex + i];
-        if (ii.updateFlag != itemInfoVer && ii.obj != nullptr)
+        if (ii.updateFlag != _itemInfoVer && ii.obj != nullptr)
         {
             if (dynamic_cast<GButton*>(ii.obj))
                 ii.selected = ((GButton*)ii.obj)->isSelected();
@@ -1783,8 +1775,6 @@ void GList::handleScroll2(bool forceUpdate)
     if (curIndex > 0 && numChildren() > 0 && _container->getPositionX() < 0
         && getChildAt(0)->getX() > -_container->getPositionX())
         handleScroll2(false);
-
-    enterCounter--;
 }
 
 void GList::handleScroll3(bool forceUpdate)
@@ -1810,7 +1800,7 @@ void GList::handleScroll3(bool forceUpdate)
     string url = _defaultItem;
     int partWidth = (int)((_scrollPane->getViewSize().width - _columnGap * (_curLineItemCount - 1)) / _curLineItemCount);
     int partHeight = (int)((_scrollPane->getViewSize().height - _lineGap * (_curLineItemCount2 - 1)) / _curLineItemCount2);
-    itemInfoVer++;
+    _itemInfoVer++;
 
     for (int i = startIndex; i < lastIndex; i++)
     {
@@ -1830,7 +1820,7 @@ void GList::handleScroll3(bool forceUpdate)
         }
 
         ItemInfo& ii = _virtualItems[i];
-        ii.updateFlag = itemInfoVer;
+        ii.updateFlag = _itemInfoVer;
     }
 
     GObject* lastObj = nullptr;
@@ -1841,7 +1831,7 @@ void GList::handleScroll3(bool forceUpdate)
             continue;
 
         ItemInfo& ii = _virtualItems[i];
-        if (ii.updateFlag != itemInfoVer)
+        if (ii.updateFlag != _itemInfoVer)
             continue;
 
         if (ii.obj == nullptr)
@@ -1849,7 +1839,7 @@ void GList::handleScroll3(bool forceUpdate)
             while (reuseIndex < virtualItemCount)
             {
                 ItemInfo& ii2 = _virtualItems[reuseIndex];
-                if (ii2.obj != nullptr && ii2.updateFlag != itemInfoVer)
+                if (ii2.obj != nullptr && ii2.updateFlag != _itemInfoVer)
                 {
                     if (dynamic_cast<GButton*>(ii2.obj))
                         ii2.selected = ((GButton*)ii2.obj)->isSelected();
@@ -1922,7 +1912,7 @@ void GList::handleScroll3(bool forceUpdate)
             continue;
 
         ItemInfo& ii = _virtualItems[i];
-        if (ii.updateFlag == itemInfoVer)
+        if (ii.updateFlag == _itemInfoVer)
             ii.obj->setPosition(xx, yy);
 
         if (ii.size.y > lineHeight)
@@ -1947,7 +1937,7 @@ void GList::handleScroll3(bool forceUpdate)
     for (int i = reuseIndex; i < virtualItemCount; i++)
     {
         ItemInfo& ii = _virtualItems[i];
-        if (ii.updateFlag != itemInfoVer && ii.obj != nullptr)
+        if (ii.updateFlag != _itemInfoVer && ii.obj != nullptr)
         {
             if (dynamic_cast<GButton*>(ii.obj))
                 ii.selected = ((GButton*)ii.obj)->isSelected();

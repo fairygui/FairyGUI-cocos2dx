@@ -293,6 +293,13 @@ void GLoader::updateLayout()
                 else
                     sy = sx;
             }
+            else if (_fill == LoaderFillType::SCALE_NO_BORDER)
+            {
+                if (sx > sy)
+                    sy = sx;
+                else
+                    sx = sy;
+            }
             _contentSize.width = floor(_contentSourceSize.width * sx);
             _contentSize.height = floor(_contentSourceSize.height * sy);
         }
