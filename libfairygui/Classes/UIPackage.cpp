@@ -239,7 +239,10 @@ void UIPackage::loadItem(PackageItem * item)
                 item->spriteFrame = createSpriteTexture(sprite);
             }
             else
-                item->spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect());
+            {
+                item->spriteFrame = new (std::nothrow) SpriteFrame();
+                item->spriteFrame->initWithTexture(_emptyTexture, Rect());
+            }
             if (item->scaleByTile)
             {
                 Texture2D::TexParams tp = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
@@ -706,7 +709,11 @@ void UIPackage::loadMovieClip(PackageItem * item)
         }
 
         if (spriteFrame == nullptr)
-            spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect(Vec2::ZERO, Size::ZERO));
+        {
+            //dont use createWithTexture
+            SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
+            spriteFrame->initWithTexture(_emptyTexture, Rect());
+        }
         spriteFrame->setOffset(Vec2(rect.origin.x - (mcSize.width - rect.size.width) / 2, -(rect.origin.y - (mcSize.height - rect.size.height) / 2)));
         AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
         frames.pushBack(frame);
