@@ -291,87 +291,87 @@ void Transition::setValue(const std::string & label, const ValueVector& values)
 {
     for (auto &item : _items)
     {
-        TransitionValue& value = item->startValue;
         if (item->label == label)
         {
             if (item->tween)
-                value = item->startValue;
+                setValue(item, item->startValue, values);
             else
-                value = item->value;
+                setValue(item, item->value, values);
         }
         else if (item->label2 == label)
         {
-            value = item->endValue;
+            setValue(item, item->endValue, values);
         }
-        else
-            continue;
+    }
+}
 
-        switch (item->type)
-        {
-        case TransitionActionType::XY:
-        case TransitionActionType::Size:
-        case TransitionActionType::Pivot:
-        case TransitionActionType::Scale:
-        case TransitionActionType::Skew:
-            value.b1 = true;
-            value.b2 = true;
-            value.f1 = values[0].asFloat();
-            value.f2 = values[1].asFloat();
-            break;
+void Transition::setValue(TransitionItem* item, TransitionValue& value, const ValueVector& values)
+{
+    switch (item->type)
+    {
+    case TransitionActionType::XY:
+    case TransitionActionType::Size:
+    case TransitionActionType::Pivot:
+    case TransitionActionType::Scale:
+    case TransitionActionType::Skew:
+        value.b1 = true;
+        value.b2 = true;
+        value.f1 = values[0].asFloat();
+        value.f2 = values[1].asFloat();
+        break;
 
-        case TransitionActionType::Alpha:
-            value.f1 = values[0].asFloat();
-            break;
+    case TransitionActionType::Alpha:
+        value.f1 = values[0].asFloat();
+        break;
 
-        case TransitionActionType::Rotation:
-            value.f1 = values[0].asFloat();
-            break;
+    case TransitionActionType::Rotation:
+        value.f1 = values[0].asFloat();
+        break;
 
-        case TransitionActionType::Color:
-        {
-            uint32_t v = values[0].asUnsignedInt();
-            value.c = Color4B((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF, (v >> 24) & 0xFF);
-            break;
-        }
+    case TransitionActionType::Color:
+    {
+        uint32_t v = values[0].asUnsignedInt();
+        value.c = Color4B((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF, (v >> 24) & 0xFF);
+        break;
+    }
 
-        case TransitionActionType::Animation:
-            value.i = values[0].asInt();
-            if (values.size() > 1)
-                value.b = values[1].asBool();
-            break;
+    case TransitionActionType::Animation:
+        value.i = values[0].asInt();
+        if (values.size() > 1)
+            value.b = values[1].asBool();
+        break;
 
-        case TransitionActionType::Visible:
-            value.b = values[0].asBool();
-            break;
+    case TransitionActionType::Visible:
+        value.b = values[0].asBool();
+        break;
 
-        case TransitionActionType::Sound:
-            value.s = values[0].asString();
-            if (values.size() > 1)
-                value.f1 = values[1].asFloat();
-            break;
-
-        case TransitionActionType::Transition:
-            value.s = values[0].asString();
-            if (values.size() > 1)
-                value.i = values[1].asInt();
-            break;
-
-        case TransitionActionType::Shake:
-            value.f1 = values[0].asFloat();
-            if (values.size() > 1)
-                value.f2 = values[1].asFloat();
-            break;
-
-        case TransitionActionType::ColorFilter:
+    case TransitionActionType::Sound:
+        value.s = values[0].asString();
+        if (values.size() > 1)
             value.f1 = values[1].asFloat();
-            value.f2 = values[2].asFloat();
-            value.f3 = values[3].asFloat();
-            value.f4 = values[4].asFloat();
-            break;
-                
-        default:
-            break;
-        }
+        break;
+
+    case TransitionActionType::Transition:
+        value.s = values[0].asString();
+        if (values.size() > 1)
+            value.i = values[1].asInt();
+        break;
+
+    case TransitionActionType::Shake:
+        value.f1 = values[0].asFloat();
+        if (values.size() > 1)
+            value.f2 = values[1].asFloat();
+        break;
+
+    case TransitionActionType::ColorFilter:
+        value.f1 = values[1].asFloat();
+        value.f2 = values[2].asFloat();
+        value.f3 = values[3].asFloat();
+        value.f4 = values[4].asFloat();
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -523,15 +523,14 @@ void Transition::internalPlay(float delay)
 
 void Transition::startTween(TransitionItem * item, float delay)
 {
-    TransitionValue& startValue = item->startValue;
-    TransitionValue& endValue = item->endValue;
-
     if (_reversed)
-    {
-        startValue = item->endValue;
-        endValue = item->startValue;
-    }
+        startTween(item, delay, item->endValue, item->startValue);
+    else
+        startTween(item, delay, item->startValue, item->endValue);
+}
 
+void Transition::startTween(TransitionItem * item, float delay, TransitionValue& startValue, TransitionValue& endValue)
+{
     ActionInterval* mainAction = nullptr;
 
     switch (item->type)
@@ -867,7 +866,7 @@ void Transition::applyValue(TransitionItem * item, TransitionValue & value)
 
     case TransitionActionType::ColorFilter:
         break;
-            
+
     default:
         break;
     }

@@ -79,6 +79,8 @@ private:
     void shakeItem(float dt, TransitionItem* item);
 
     void decodeValue(TransitionActionType type, const char* pValue, TransitionValue& value);
+    void setValue(TransitionItem* item, TransitionValue& value, const cocos2d::ValueVector& values);
+    void startTween(TransitionItem * item, float delay, TransitionValue& startValue, TransitionValue& endValue);
 
     GComponent* _owner;
     std::vector<TransitionItem*> _items;
