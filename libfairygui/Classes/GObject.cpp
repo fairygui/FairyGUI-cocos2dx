@@ -64,11 +64,11 @@ GObject::~GObject()
 {
     removeFromParent();
 
-	if(_displayObject)
-	{
-    	_displayObject->removeFromParent();
-    	CC_SAFE_RELEASE(_displayObject);
-	}
+    if (_displayObject)
+    {
+        _displayObject->removeFromParent();
+        CC_SAFE_RELEASE(_displayObject);
+    }
     for (int i = 0; i < 8; i++)
         CC_SAFE_DELETE(_gears[i]);
     CC_SAFE_DELETE(_relations);
@@ -133,6 +133,32 @@ void GObject::setPosition(float xv, float yv)
     }
 }
 
+float GObject::getXMin() const
+{
+    return _pivotAsAnchor ? (_position.x - _size.width * _pivot.x) : _position.x;
+}
+
+void GObject::setXMin(float value)
+{
+    if (_pivotAsAnchor)
+        setPosition(value + _size.width * _pivot.x, _position.y);
+    else
+        setPosition(value, _position.y);
+}
+
+float GObject::getYMin() const
+{
+    return _pivotAsAnchor ? (_position.y - _size.height * _pivot.y) : _position.y;
+}
+
+void GObject::setYMin(float value)
+{
+    if (_pivotAsAnchor)
+        setPosition(_position.x, value + _size.height * _pivot.y);
+    else
+        setPosition(_position.x, value);
+}
+
 void GObject::setPixelSnapping(bool value)
 {
     if (_pixelSnapping != value)
@@ -186,7 +212,7 @@ void GObject::setSize(float wv, float hv, bool ignorePivot /*= false*/)
 
         if (_parent != nullptr)
         {
-            _relations->onOwnerSizeChanged(dWidth, dHeight);
+            _relations->onOwnerSizeChanged(dWidth, dHeight, _pivotAsAnchor || !ignorePivot);
             _parent->setBoundsChangedFlag();
             if (_group != nullptr)
                 _group->setBoundsChangedFlag(true);
@@ -928,7 +954,7 @@ void GObject::onTouchMove(EventContext* context)
         _dragTesting = false;
         if (!dispatchEvent(UIEventType::DragStart))
             dragBegin(evt->getTouchId());
-}
+    }
 
     if (_draggingObject == this)
     {

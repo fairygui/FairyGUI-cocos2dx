@@ -285,10 +285,10 @@ void Relations::copyFrom(const Relations & source)
     }
 }
 
-void Relations::onOwnerSizeChanged(float dWidth, float dHeight)
+void Relations::onOwnerSizeChanged(float dWidth, float dHeight, bool applyPivot)
 {
     for (auto it = _items.begin(); it != _items.end(); ++it)
-        (*it)->applyOnSelfSizeChanged(dWidth, dHeight);
+        (*it)->applyOnSelfSizeChanged(dWidth, dHeight, applyPivot);
 }
 
 bool Relations::isEmpty() const

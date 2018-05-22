@@ -48,6 +48,7 @@ class RelationDef
 public:
     bool percent;
     RelationType type;
+    int axis;
 
     RelationDef() {}
 
@@ -55,6 +56,7 @@ public:
     {
         this->percent = source.percent;
         this->type = source.type;
+        this->axis = source.axis;
     }
 };
 
@@ -72,7 +74,7 @@ public:
     void remove(RelationType relationType);
     void copyFrom(const RelationItem& source);
     bool isEmpty() const;
-    void applyOnSelfSizeChanged(float dWidth, float dHeight);
+    void applyOnSelfSizeChanged(float dWidth, float dHeight, bool applyPivot);
 
 private:
     void applyOnXYChanged(GObject* target, const RelationDef& info, float dx, float dy);

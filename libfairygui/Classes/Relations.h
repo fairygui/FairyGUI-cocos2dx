@@ -23,7 +23,7 @@ public:
     void clearFor(GObject* target);
     void clearAll();
     void copyFrom(const Relations& source);
-    void onOwnerSizeChanged(float dWidth, float dHeight);
+    void onOwnerSizeChanged(float dWidth, float dHeight, bool applyPivot);
     bool isEmpty() const;
     void setup(TXMLElement* xml);
 
