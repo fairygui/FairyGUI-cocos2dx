@@ -536,9 +536,9 @@ void ScrollPane::handleControllerChanged(GController * c)
     if (_pageController == c)
     {
         if (_scrollType == ScrollType::HORIZONTAL)
-            setPageX(c->getSelectedIndex());
+            setPageX(c->getSelectedIndex(), true);
         else
-            setPageY(c->getSelectedIndex());
+            setPageY(c->getSelectedIndex(), true);
     }
 }
 
