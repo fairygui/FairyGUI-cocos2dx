@@ -8,6 +8,8 @@
 
 NS_FGUI_BEGIN
 
+class GComponent;
+
 class GLoader : public GObject, public IColorGear, public IAnimationGear
 {
 public:
@@ -34,6 +36,9 @@ public:
     LoaderFillType getFill() const { return _fill; }
     void setFill(LoaderFillType value);
 
+    bool isShrinkOnly() const { return _shrinkOnly; }
+    void setShrinkOnly(bool value);
+
     const cocos2d::Size& getContentSize() { return _contentSize; }
 
     const cocos2d::Color3B& getColor() const { return _content->getColor(); }
@@ -47,6 +52,8 @@ public:
 
     cocos2d::Color4B cg_getColor() const override;
     void cg_setColor(const cocos2d::Color4B& value) override;
+
+    GComponent* getComponent() const { return _content2; }
 
 protected:
     virtual void handleInit() override;
@@ -72,6 +79,7 @@ private:
     cocos2d::TextVAlignment _verticalAlign;
     bool _autoSize;
     LoaderFillType _fill;
+    bool _shrinkOnly;
     bool _updatingLayout;
     PackageItem* _contentItem;
     cocos2d::Size _contentSize;
@@ -81,6 +89,7 @@ private:
     int _frame;
 
     cocos2d::Sprite* _content;
+    GComponent* _content2;
     ActionMovieClip* _playAction;
 };
 
