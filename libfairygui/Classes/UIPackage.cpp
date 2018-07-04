@@ -854,21 +854,27 @@ void UIPackage::loadFont(PackageItem * item)
                 def.height = tempRect.size.height;
                 def.validDefinition = true;
             }
-            else if (charImg)
+            else
             {
-                loadItem(charImg);
+                if (charImg)
+                {
+                    loadItem(charImg);
 
-                Rect tempRect = charImg->spriteFrame->getRectInPixels();
-                bw = tempRect.size.width;
-                bh = tempRect.size.height;
-                tempRect = CC_RECT_PIXELS_TO_POINTS(tempRect);
-                def.U = tempRect.origin.x;
-                def.V = tempRect.origin.y;
-                def.width = tempRect.size.width;
-                def.height = tempRect.size.height;
-                if (mainTexture == nullptr)
-                    mainTexture = charImg->spriteFrame->getTexture();
-                def.validDefinition = true;
+                    Rect tempRect = charImg->spriteFrame->getRectInPixels();
+                    bw = tempRect.size.width;
+                    bh = tempRect.size.height;
+                    tempRect = CC_RECT_PIXELS_TO_POINTS(tempRect);
+                    def.U = tempRect.origin.x;
+                    def.V = tempRect.origin.y;
+                    def.width = tempRect.size.width;
+                    def.height = tempRect.size.height;
+                    if (mainTexture == nullptr)
+                        mainTexture = charImg->spriteFrame->getTexture();
+                    def.validDefinition = true;
+                }
+
+                if (def.xAdvance == 0)
+                     def.xAdvance = xadvance;
             }
             fontAtlas->addLetterDefinition(charId, def);
 
