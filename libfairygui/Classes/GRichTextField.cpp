@@ -1,12 +1,12 @@
 #include "GRichTextField.h"
+#include "utils/UBBParser.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 GRichTextField::GRichTextField() :
     _richText(nullptr),
-    _updatingSize(false),
-    _autoSize(TextAutoSize::BOTH)
+    _updatingSize(false)
 {
 }
 
@@ -21,13 +21,6 @@ void GRichTextField::handleInit()
     _richText->setCascadeOpacityEnabled(true);
 
     _displayObject = _richText;
-}
-
-void GRichTextField::setText(const std::string & value)
-{
-    _richText->setText(value);
-    if (!_underConstruct)
-        updateSize();
 }
 
 void GRichTextField::applyTextFormat()
@@ -66,6 +59,24 @@ void GRichTextField::setSingleLine(bool value)
 {
 }
 
+void GRichTextField::setTextFieldText()
+{
+    if (_ubbEnabled)
+    {
+        std::string parsedText = UBBParser::getInstance()->parse(_text.c_str());
+        if (_templateVars != nullptr)
+            parsedText = parseTemplate(parsedText.c_str());
+        _richText->setText(parsedText);
+    }
+    else
+    {
+        if (_templateVars != nullptr)
+            _richText->setText(parseTemplate(_text.c_str()));
+        else
+            _richText->setText(_text);
+    }
+}
+
 void GRichTextField::updateSize()
 {
     if (_updatingSize)
@@ -93,17 +104,10 @@ void GRichTextField::handleSizeChanged()
 
         if (_autoSize == TextAutoSize::HEIGHT)
         {
-            if (_richText->getText().length() > 0)
+            if (!_text.empty())
                 setSizeDirectly(_size.width, _richText->getContentSize().height);
         }
     }
-}
-
-void GRichTextField::setup_AfterAdd(TXMLElement* xml)
-{
-    GTextField::setup_AfterAdd(xml);
-
-    updateSize();
 }
 
 NS_FGUI_END

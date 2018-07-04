@@ -11,7 +11,6 @@ GTextInput::GTextInput()
 
 GTextInput::~GTextInput()
 {
-
 }
 
 void GTextInput::handleInit()
@@ -20,6 +19,14 @@ void GTextInput::handleInit()
     _input->retain();
 
     _displayObject = _input;
+}
+
+const std::string & GTextInput::getText() const
+{
+    std::string* tmp = const_cast<std::string*>(&_text);
+    tmp->clear();
+    tmp->append(_input->getText());
+    return _text;
 }
 
 bool GTextInput::isSingleLine() const
@@ -36,6 +43,7 @@ void GTextInput::applyTextFormat()
 {
     _input->applyTextFormat();
 }
+
 
 void GTextInput::setPrompt(const std::string & value)
 {
@@ -90,6 +98,14 @@ void GTextInput::setup_BeforeAdd(TXMLElement * xml)
     p = xml->Attribute("keyboardType");
     if (p)
         setKeyboardType(atoi(p));
+}
+
+void GTextInput::setTextFieldText()
+{
+    if (_templateVars != nullptr)
+        _input->setText(parseTemplate(_text.c_str()));
+    else
+        _input->setText(_text);
 }
 
 NS_FGUI_END

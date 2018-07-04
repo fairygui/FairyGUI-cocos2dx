@@ -16,8 +16,7 @@ public:
 
     CREATE_FUNC(GTextInput);
 
-    const std::string& getText() const override { return _input->getText(); }
-    void setText(const std::string& value) override { _input->setText(value); }
+    const std::string& getText() const override;
 
     virtual bool isSingleLine() const override;
     virtual void setSingleLine(bool value) override;
@@ -35,6 +34,8 @@ protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
     virtual void setup_BeforeAdd(TXMLElement* xml) override;
+
+    virtual void setTextFieldText() override;
 
 private:
     FUIInput* _input;

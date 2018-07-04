@@ -4,6 +4,36 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
+GTextField::GTextField()
+    :_templateVars(nullptr),
+    _ubbEnabled(false),
+    _autoSize(TextAutoSize::BOTH)
+{
+}
+
+GTextField::~GTextField()
+{
+    CC_SAFE_DELETE(_templateVars);
+}
+
+void GTextField::setText(const std::string & value)
+{
+    _text = value;
+    setTextFieldText();
+    updateGear(6);
+    updateSize();
+}
+
+void GTextField::setUBBEnabled(bool value)
+{
+    if (_ubbEnabled != value)
+    {
+        _ubbEnabled = value;
+        setTextFieldText();
+        updateSize();
+    }
+}
+
 void GTextField::setColor(const cocos2d::Color3B & value)
 {
     getTextFormat()->color = value;
@@ -26,6 +56,43 @@ void GTextField::cg_setOutlineColor(const cocos2d::Color4B & value)
 {
     getTextFormat()->outlineColor = (Color3B)value;
     applyTextFormat();
+}
+
+void GTextField::setTemplateVars(cocos2d::ValueMap* value)
+{
+    if (_templateVars == nullptr && value == nullptr)
+        return;
+
+    if (value == nullptr)
+        CC_SAFE_DELETE(_templateVars);
+    else
+    {
+        if (_templateVars == nullptr)
+            _templateVars = new cocos2d::ValueMap();
+        *_templateVars = *value;
+    }
+
+    flushVars();
+}
+
+GTextField* GTextField::setVar(const std::string& name, const cocos2d::Value& value)
+{
+    if (_templateVars == nullptr)
+        _templateVars = new cocos2d::ValueMap();
+
+    _templateVars->insert_or_assign(name, value);
+
+    return this;
+}
+
+void GTextField::flushVars()
+{
+    setTextFieldText();
+    updateSize();
+}
+
+void GTextField::updateSize()
+{
 }
 
 void GTextField::setup_BeforeAdd(TXMLElement * xml)
@@ -64,7 +131,7 @@ void GTextField::setup_BeforeAdd(TXMLElement * xml)
 
     p = xml->Attribute("ubb");
     if (p)
-        setUBBEnabled(strcmp(p, "true") == 0);
+        _ubbEnabled = strcmp(p, "true") == 0;
 
     p = xml->Attribute("autoSize");
     if (p)
@@ -108,6 +175,9 @@ void GTextField::setup_BeforeAdd(TXMLElement * xml)
         tf->shadowOffset = offset;
         tf->enableEffect(TextFormat::SHADOW);
     }
+
+    if (xml->BoolAttribute("vars") && _templateVars == nullptr)
+        _templateVars = new cocos2d::ValueMap();
 }
 
 void GTextField::setup_AfterAdd(TXMLElement * xml)
@@ -122,11 +192,80 @@ void GTextField::setup_AfterAdd(TXMLElement * xml)
         setText(p);
 }
 
+std::string GTextField::parseTemplate(const char* text)
+{
+    const char* pString = text;
+
+    ssize_t pos;
+    ssize_t pos2;
+    std::string tag, attr;
+    std::string repl;
+    std::string out;
+
+    while (*pString != '\0')
+    {
+        const char* p = strchr(pString, '{');
+        if (!p)
+        {
+            out.append(pString);
+            break;
+        }
+
+        pos = p - pString;
+        if (pos > 0 && *(p - 1) == '\\')
+        {
+            out.append(pString, pos - 1);
+            out.append("{");
+            pString += pos + 1;
+            continue;
+        }
+
+        out.append(pString, pos);
+        pString += pos;
+
+        p = strchr(pString, '}');
+        if (!p)
+        {
+            out.append(pString);
+            break;
+        }
+
+        pos = p - pString;
+        if (pos == 1)
+        {
+            out.append(pString, 0, 2);
+            pString += 2;
+            continue;
+        }
+
+        tag.assign(pString + 1, pos - 1);
+
+        attr.clear();
+        repl.clear();
+        pos2 = tag.find('=');
+        if (pos2 != -1)
+        {
+            auto it = _templateVars->find(tag.substr(0, pos2));
+            if (it != _templateVars->end())
+                out.append(it->second.asString());
+            else
+                out.append(tag.substr(pos2 + 1));
+        }
+        else
+        {
+            auto it = _templateVars->find(tag);
+            if (it != _templateVars->end())
+                out.append(it->second.asString());
+        }
+        pString += pos + 1;
+    }
+    return out;
+}
+
 //---------------------------
 
 GBasicTextField::GBasicTextField() :
     _label(nullptr),
-    _autoSize(TextAutoSize::BOTH),
     _updatingSize(false)
 {
     _touchDisabled = true;
@@ -142,13 +281,6 @@ void GBasicTextField::handleInit()
     _label->retain();
 
     _displayObject = _label;
-}
-
-void GBasicTextField::setText(const std::string & text)
-{
-    _label->setText(text);
-    if (!_underConstruct)
-        updateSize();
 }
 
 void GBasicTextField::applyTextFormat()
@@ -196,6 +328,14 @@ void GBasicTextField::setSingleLine(bool value)
         updateSize();
 }
 
+void GBasicTextField::setTextFieldText()
+{
+    if (_templateVars != nullptr)
+        _label->setText(parseTemplate(_text.c_str()));
+    else
+        _label->setText(_text);
+}
+
 void GBasicTextField::updateSize()
 {
     if (_updatingSize)
@@ -223,7 +363,7 @@ void GBasicTextField::handleSizeChanged()
 
         if (_autoSize == TextAutoSize::HEIGHT)
         {
-            if (_label->getString().length() > 0)
+            if (!_text.empty())
                 setSizeDirectly(_size.width, _label->getContentSize().height);
         }
     }
@@ -234,13 +374,6 @@ void GBasicTextField::handleGrayedChanged()
     GObject::handleGrayedChanged();
 
     _label->setGrayed(_finalGrayed);
-}
-
-void GBasicTextField::setup_AfterAdd(TXMLElement* xml)
-{
-    GTextField::setup_AfterAdd(xml);
-
-    updateSize();
 }
 
 NS_FGUI_END
