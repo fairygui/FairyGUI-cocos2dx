@@ -498,7 +498,11 @@ void Transition::internalPlay(float delay)
             else
                 startTime += item->time;
             if (startTime == 0)
+            {
                 applyValue(item, item->value);
+                if (item->hook)
+                    item->hook();
+            }
             else
             {
                 item->completed = false;
@@ -951,7 +955,7 @@ void Transition::decodeValue(TransitionActionType type, const char* pValue, Tran
         break;
 
     case TransitionActionType::Rotation:
-        value.f1 = atoi(str.c_str());
+        value.f1 = atof(str.c_str());
         break;
 
     case TransitionActionType::Scale:
