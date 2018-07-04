@@ -829,7 +829,7 @@ void GObject::setup_BeforeAdd(TXMLElement * xml)
 
     p = xml->Attribute("rotation");
     if (p)
-        setRotation(atoi(p));
+        setRotation(atof(p));
 
     p = xml->Attribute("pivot");
     if (p)
