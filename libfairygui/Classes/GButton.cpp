@@ -155,7 +155,26 @@ void GButton::setState(const std::string& value)
 
     if (_downEffect == 1)
     {
-
+        int cnt = this->numChildren();
+        if (value == DOWN || value == SELECTED_OVER || value == SELECTED_DISABLED)
+        {
+            Color4B color(_downEffectValue * 255, _downEffectValue * 255, _downEffectValue * 255, 255);
+            for (int i = 0; i < cnt; i++)
+            {
+                GObject* obj = this->getChildAt(i);
+                if (dynamic_cast<IColorGear*>(obj) != nullptr && dynamic_cast<GTextField*>(obj) == nullptr)
+                    dynamic_cast<IColorGear*>(obj)->cg_setColor(color);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < cnt; i++)
+            {
+                GObject* obj = this->getChildAt(i);
+                if (dynamic_cast<IColorGear*>(obj) != nullptr && dynamic_cast<GTextField*>(obj) == nullptr)
+                    dynamic_cast<IColorGear*>(obj)->cg_setColor(Color4B::WHITE);
+            }
+        }
     }
     else if (_downEffect == 2)
     {
