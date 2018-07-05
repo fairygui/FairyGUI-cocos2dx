@@ -728,7 +728,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
     if (swing)
     {
         int cnt = (int)frames.size();
-        for (int i = cnt - 1; i >= 1; i++)
+        for (int i = cnt - 1; i >= 1; i--)
         {
             AnimationFrame* frame = frames.at(i);
             frames.pushBack(frame);
