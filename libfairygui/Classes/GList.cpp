@@ -2511,6 +2511,22 @@ void GList::setup_BeforeAdd(TXMLElement * xml)
             p = ix->Attribute("selectedIcon");
             if (p && dynamic_cast<GButton*>(obj))
                 dynamic_cast<GButton*>(obj)->setSelectedIcon(p);
+            p = ix->Attribute("selectedTitle");
+            if (p && dynamic_cast<GButton*>(obj))
+                dynamic_cast<GButton*>(obj)->setSelectedTitle(p);
+            p = ix->Attribute("controllers");
+            if (p && dynamic_cast<GComponent*>(obj))
+            {
+                std::vector<std::string> arr;
+                ToolSet::splitString(p, ',', arr);
+                size_t cnt = arr.size();
+                for (size_t i = 0; i < cnt; i += 2)
+                {
+                    GController* cc = dynamic_cast<GComponent*>(obj)->getController(arr[i]);
+                    if (cc != nullptr)
+                        cc->setSelectedPageId(arr[i + 1]);
+                }
+            }
         }
 
         ix = ix->NextSiblingElement("item");
