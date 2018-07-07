@@ -56,6 +56,7 @@ void Relations::addItems(GObject * target, const char * sidePairs)
         if (p2)
         {
             strncpy(temp, p, p2 - p);
+            temp[p2 - p] = 0; // strncpy may copy without null-terminator at the end
             p = p2 + 1;
         }
         else
