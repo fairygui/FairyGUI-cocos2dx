@@ -301,7 +301,7 @@ void GLoader::updateLayout()
             if (_content2 != nullptr)
             {
                 _content2->setScale(1, 1);
-                _content2->setPosition(0, 0);
+                _content2->setPosition(0, -_size.height);
             }
             else
             {
