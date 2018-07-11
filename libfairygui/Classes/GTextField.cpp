@@ -80,7 +80,7 @@ GTextField* GTextField::setVar(const std::string& name, const cocos2d::Value& va
     if (_templateVars == nullptr)
         _templateVars = new cocos2d::ValueMap();
 
-    _templateVars->insert_or_assign(name, value);
+    (*_templateVars)[name] = value;
 
     return this;
 }

@@ -200,6 +200,10 @@ void GLoader::loadFromPackage()
             {
                 _content2 = obj->as<GComponent>();
                 _content2->retain();
+                _content2->addEventListener(UIEventType::SizeChange, [this](EventContext*) { 
+                    if(!_updatingLayout)
+                        updateLayout(); 
+                });
                 _displayObject->addChild(_content2->displayObject());
                 updateLayout();
             }
