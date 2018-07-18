@@ -56,9 +56,15 @@ void GGraph::updateShape()
         if (_lineSize > 0)
         {
             _shape->setLineWidth(_lineSize);
-            _shape->drawRect(Vec2::ZERO, _size, _lineColor);
+
+            float tmp = floor(_lineSize*0.5f);
+            float tmp2 = ceil(_lineSize*0.5f);
+            _shape->drawLine(Vec2(1, tmp), Vec2(_size.width, tmp), _lineColor);
+            _shape->drawLine(Vec2(_size.width - tmp, 0), Vec2(_size.width - tmp, _size.height), _lineColor);
+            _shape->drawLine(Vec2(_size.width - 1, _size.height - tmp2), Vec2(0, _size.height - tmp2), _lineColor);
+            _shape->drawLine(Vec2(tmp2, _size.height - 1), Vec2(tmp2, 0), _lineColor);
         }
-        _shape->drawSolidRect(Vec2::ZERO, _size, _fillColor);
+        _shape->drawSolidRect(Vec2(_lineSize, _lineSize), Vec2(_size.width - _lineSize, _size.height - _lineSize), _fillColor);
         _touchDisabled = false;
     }
     else if (_type == 2)
