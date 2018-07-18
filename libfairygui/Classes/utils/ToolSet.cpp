@@ -104,6 +104,7 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
         return Color4B::BLACK;
 
     char temp[3];
+    memset(temp, 0, 3);
 
     if (len == 9)
     {

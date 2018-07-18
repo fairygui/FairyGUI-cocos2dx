@@ -711,7 +711,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
         if (spriteFrame == nullptr)
         {
             //dont use createWithTexture
-            SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
+            spriteFrame = new (std::nothrow) SpriteFrame();
             spriteFrame->initWithTexture(_emptyTexture, Rect());
         }
         spriteFrame->setOffset(Vec2(rect.origin.x - (mcSize.width - rect.size.width) / 2, -(rect.origin.y - (mcSize.height - rect.size.height) / 2)));

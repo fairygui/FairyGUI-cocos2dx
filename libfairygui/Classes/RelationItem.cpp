@@ -116,6 +116,7 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight, bool appl
         {
         case RelationType::Center_Center:
             _owner->setX(_owner->_position.x - (0.5 - (applyPivot ? _owner->_pivot.x : 0)) * dWidth);
+            break;
 
         case RelationType::Right_Center:
         case RelationType::Right_Left:
@@ -125,6 +126,7 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight, bool appl
 
         case RelationType::Middle_Middle:
             _owner->setY(_owner->_position.y - (0.5 - (applyPivot ? _owner->_pivot.y : 0)) * dHeight);
+            break;
 
         case RelationType::Bottom_Middle:
         case RelationType::Bottom_Top:
