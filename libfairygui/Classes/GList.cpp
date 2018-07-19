@@ -2271,6 +2271,15 @@ void GList::updateBounds()
                 if (foldInvisibleItems && !child->isVisible())
                     continue;
 
+                if (j == 0 && ((_lineCount != 0 && k >= _lineCount)
+                    || (_lineCount == 0 && curY + (_lineCount > 0 ? eachHeight : child->getHeight()) > viewHeight)))
+                {
+                    //new page
+                    page++;
+                    curY = 0;
+                    k = 0;
+                }
+
                 lineSize += child->sourceSize.width;
                 j++;
                 if (j == _columnCount || i == cnt - 1)
@@ -2306,15 +2315,6 @@ void GList::updateBounds()
                     lineSize = 0;
 
                     k++;
-
-                    if ((_lineCount != 0 && k >= _lineCount)
-                        || (_lineCount == 0 && curY + child->getHeight() > viewHeight))
-                    {
-                        //new page
-                        page++;
-                        curY = 0;
-                        k = 0;
-                    }
                 }
             }
         }
