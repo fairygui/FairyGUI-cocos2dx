@@ -749,7 +749,7 @@ void FUIRichText::formarRenderers()
     }
     if (textWidth == GUTTER_X + GUTTER_X)
         textWidth = 0;
-    else if (_numLines > 1)
+    else if (_numLines > 1 || (_defaultTextFormat->align != TextHAlignment::LEFT && _overflow != Label::Overflow::NONE))
         textWidth = MAX(_dimensions.width, textWidth);
     if (nextPosY != GUTTER_Y)
         textHeight = nextPosY + GUTTER_Y;
