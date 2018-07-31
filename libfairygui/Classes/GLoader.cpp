@@ -200,9 +200,9 @@ void GLoader::loadFromPackage()
             {
                 _content2 = obj->as<GComponent>();
                 _content2->retain();
-                _content2->addEventListener(UIEventType::SizeChange, [this](EventContext*) { 
-                    if(!_updatingLayout)
-                        updateLayout(); 
+                _content2->addEventListener(UIEventType::SizeChange, [this](EventContext*) {
+                    if (!_updatingLayout)
+                        updateLayout();
                 });
                 _displayObject->addChild(_content2->displayObject());
                 updateLayout();
@@ -264,7 +264,11 @@ void GLoader::clearContent()
         _content->stopAction(_playAction);
     }
 
-    CC_SAFE_RELEASE(_content2);
+    if (_content2 != nullptr)
+    {
+        _displayObject->removeChild(_content2->displayObject());
+        CC_SAFE_RELEASE(_content2);
+    }
     ((FUISprite*)_content)->clearContent();
 
     _contentItem = nullptr;
