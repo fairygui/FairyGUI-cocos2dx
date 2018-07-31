@@ -833,7 +833,7 @@ void ScrollPane::handleSizeChanged()
             _footer->setWidth(_viewSize.width);
     }
 
-    syncScrollBar();
+    syncScrollBar(true);
     checkRefreshBar();
     if (_pageMode)
         updatePageController();
