@@ -38,6 +38,6 @@ void GuideScene::continueInit()
         GObject* window = _guideLayer->getChild("window");
         window->setSize((int)rect.size.width, (int)rect.size.height);
 
-        GTween::To(window->getPosition(), rect.origin, 0.5f)->SetTarget(window, TweenPropType::Position);
+        GTween::to(window->getPosition(), rect.origin, 0.5f)->setTarget(window, TweenPropType::Position);
     });
 }

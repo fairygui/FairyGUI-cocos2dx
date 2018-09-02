@@ -12,13 +12,13 @@ class GTweener;
 class TweenManager
 {
 public:
-    static GTweener* CreateTween();
-    static bool IsTweening(cocos2d::Ref* target, TweenPropType propType);
-    static bool KillTweens(cocos2d::Ref* target, TweenPropType propType, bool completed);
-    static GTweener* GetTween(cocos2d::Ref* target, TweenPropType propType);
-    static void Update(float dt);
-    static void Clean();
-    static void Init();
+    static GTweener* createTween();
+    static bool isTweening(cocos2d::Ref* target, TweenPropType propType);
+    static bool killTweens(cocos2d::Ref* target, TweenPropType propType, bool completed);
+    static GTweener* getTween(cocos2d::Ref* target, TweenPropType propType);
+    static void update(float dt);
+    static void clean();
+    static void init();
 
 private:
     static GTweener** _activeTweens;

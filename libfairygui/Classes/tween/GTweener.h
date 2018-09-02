@@ -17,35 +17,35 @@ public:
 
     GTweener();
     ~GTweener();
-    GTweener* SetDelay(float value);
-    float GetDelay() const { return _delay; }
-    GTweener* SetDuration(float value);
-    float GetDuration() const { return _duration; }
-    GTweener* SetBreakpoint(float value);
-    GTweener* SetEase(EaseType value);
-    GTweener* SetEasePeriod(float value);
-    GTweener* SetEaseOvershootOrAmplitude(float value);
-    GTweener* SetRepeat(int repeat, bool yoyo = false);
-    int GetRepeat() const { return _repeat; }
-    GTweener* SetTimeScale(float value);
-    GTweener* SetSnapping(bool value);
-    GTweener* SetTargetAny(void* value);
-    GTweener* SetTarget(cocos2d::Ref* target);
-    GTweener* SetTarget(cocos2d::Ref* target, TweenPropType propType);
-    void* GetTarget() const { return _target; }
-    GTweener* SetUserData(const cocos2d::Value& value);
-    const cocos2d::Value& GetUserData() const { return _userData; }
-    GTweener* OnUpdate(GTweenCallback callback);
-    GTweener* OnStart(GTweenCallback callback);
-    GTweener* OnComplete(GTweenCallback callback);
-    GTweener* OnComplete0(GTweenCallback0 callback);
+    GTweener* setDelay(float value);
+    float getDelay() const { return _delay; }
+    GTweener* setDuration(float value);
+    float getDuration() const { return _duration; }
+    GTweener* setBreakpoint(float value);
+    GTweener* setEase(EaseType value);
+    GTweener* setEasePeriod(float value);
+    GTweener* setEaseOvershootOrAmplitude(float value);
+    GTweener* setRepeat(int repeat, bool yoyo = false);
+    int getRepeat() const { return _repeat; }
+    GTweener* setTimeScale(float value);
+    GTweener* setSnapping(bool value);
+    GTweener* setTargetAny(void* value);
+    GTweener* setTarget(cocos2d::Ref* target);
+    GTweener* setTarget(cocos2d::Ref* target, TweenPropType propType);
+    void* getTarget() const { return _target; }
+    GTweener* setUserData(const cocos2d::Value& value);
+    const cocos2d::Value& getUserData() const { return _userData; }
+    GTweener* onUpdate(GTweenCallback callback);
+    GTweener* onStart(GTweenCallback callback);
+    GTweener* onComplete(GTweenCallback0 callback);
+    GTweener* onComplete1(GTweenCallback callback);
 
-    float GetNormalizedTime() const { return _normalizedTime; }
+    float getNormalizedTime() const { return _normalizedTime; }
     bool isCompleted() const { return _ended != 0; }
     bool allCompleted() const { return _ended == 1; }
-    GTweener* SetPaused(bool paused);
-    void Seek(float time);
-    void Kill(bool complete = false);
+    GTweener* setPaused(bool paused);
+    void seek(float time);
+    void kill(bool complete = false);
 
     TweenValue startValue;
     TweenValue endValue;
@@ -53,20 +53,20 @@ public:
     TweenValue deltaValue;
 
 private:
-    GTweener* _To(float start, float end, float duration);
-    GTweener* _To(const cocos2d::Vec2& start, const cocos2d::Vec2& end, float duration);
-    GTweener* _To(const cocos2d::Vec3& start, const cocos2d::Vec3& end, float duration);
-    GTweener* _To(const cocos2d::Vec4& start, const cocos2d::Vec4& end, float duration);
-    GTweener* _To(const cocos2d::Color4B& start, const cocos2d::Color4B& end, float duration);
-    GTweener* _To(double start, double end, float duration);
-    GTweener* _Shake(const cocos2d::Vec2& start, float amplitude, float duration);
-    void _Init();
-    void _Reset();
-    void _Update(float dt);
-    void Update();
-    void CallStartCallback();
-    void CallUpdateCallback();
-    void CallCompleteCallback();
+    GTweener* _to(float start, float end, float duration);
+    GTweener* _to(const cocos2d::Vec2& start, const cocos2d::Vec2& end, float duration);
+    GTweener* _to(const cocos2d::Vec3& start, const cocos2d::Vec3& end, float duration);
+    GTweener* _to(const cocos2d::Vec4& start, const cocos2d::Vec4& end, float duration);
+    GTweener* _to(const cocos2d::Color4B& start, const cocos2d::Color4B& end, float duration);
+    GTweener* _to(double start, double end, float duration);
+    GTweener* _shake(const cocos2d::Vec2& start, float amplitude, float duration);
+    void _init();
+    void _reset();
+    void _update(float dt);
+    void update();
+    void callStartCallback();
+    void callUpdateCallback();
+    void callCompleteCallback();
 
 private:
     void* _target;

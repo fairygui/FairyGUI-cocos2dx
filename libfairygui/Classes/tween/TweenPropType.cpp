@@ -6,7 +6,7 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-void TweenPropTypeUtils::SetProps(GObject * target, TweenPropType propType, const TweenValue & value)
+void TweenPropTypeUtils::setProps(GObject * target, TweenPropType propType, const TweenValue & value)
 {
     GObject* g = dynamic_cast<GObject*>(target);
     if (g == nullptr)
@@ -64,7 +64,7 @@ void TweenPropTypeUtils::SetProps(GObject * target, TweenPropType propType, cons
     }
 }
 
-void TweenPropTypeUtils::SetProps(cocos2d::Node * target, TweenPropType propType, const TweenValue & value)
+void TweenPropTypeUtils::setProps(cocos2d::Node * target, TweenPropType propType, const TweenValue & value)
 {
     GObject* g = dynamic_cast<GObject*>(target);
     if (g == nullptr)

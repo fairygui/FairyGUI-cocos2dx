@@ -27,7 +27,7 @@ GearLook::GearLook(GObject * owner) :GearBase(owner), _tweener(nullptr)
 GearLook::~GearLook()
 {
     if (_tweener != nullptr)
-        _tweener->Kill();
+        _tweener->kill();
 }
 
 void GearLook::init()
@@ -73,7 +73,7 @@ void GearLook::apply()
         {
             if (_tweener->endValue.x != gv.alpha || _tweener->endValue.y != gv.rotation)
             {
-                _tweener->Kill(true);
+                _tweener->kill(true);
                 _tweener = nullptr;
             }
             else
@@ -87,13 +87,13 @@ void GearLook::apply()
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::To(Vec2(_owner->getAlpha(), _owner->getRotation()), Vec2(gv.alpha, gv.rotation), tweenTime)
-                ->SetDelay(delay)
-                ->SetEase(easeType)
-                ->SetTargetAny(this)
-                ->SetUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
-                ->OnUpdate(CC_CALLBACK_1(GearLook::onTweenUpdate, this))
-                ->OnComplete(CC_CALLBACK_1(GearLook::onTweenComplete, this));
+            _tweener = GTween::to(Vec2(_owner->getAlpha(), _owner->getRotation()), Vec2(gv.alpha, gv.rotation), tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->setUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
+                ->onUpdate(CC_CALLBACK_1(GearLook::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearLook::onTweenComplete, this));
         }
     }
     else
@@ -109,7 +109,7 @@ void GearLook::apply()
 
 void GearLook::onTweenUpdate(GTweener* tweener)
 {
-    int flag = _tweener->GetUserData().asInt();
+    int flag = _tweener->getUserData().asInt();
     _owner->_gearLocked = false;
     if ((flag & 1) != 0)
         _owner->setAlpha(_tweener->value.x);
@@ -118,7 +118,7 @@ void GearLook::onTweenUpdate(GTweener* tweener)
     _owner->_gearLocked = false;
 }
 
-void GearLook::onTweenComplete(GTweener* tweener)
+void GearLook::onTweenComplete()
 {
     if (_displayLockToken != 0)
     {

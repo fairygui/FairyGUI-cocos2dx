@@ -83,7 +83,7 @@ void TransitionDemoScene::__play5(EventContext* context)
 
 void TransitionDemoScene::playNum()
 {
-    GTween::To(_startValue, _endValue, 0.3f)->OnUpdate([this](GTweener* tweener)
+    GTween::to(_startValue, _endValue, 0.3f)->onUpdate([this](GTweener* tweener)
     {
         _g5->getChild("value")->setText(Value((int)floor(tweener->value.x)).asString());
     });

@@ -62,12 +62,12 @@ public:
     bool b2;
 
     TValue();
-    cocos2d::Vec2 GetVec2() const;
-    void SetVec2(const cocos2d::Vec2& value);
-    cocos2d::Vec4 GetVec4() const;
-    void SetVec4(const cocos2d::Vec4& value);
-    cocos2d::Color4B GetColor() const;
-    void SetColor(const cocos2d::Color4B& value);
+    cocos2d::Vec2 getVec2() const;
+    void setVec2(const cocos2d::Vec2& value);
+    cocos2d::Vec4 getVec4() const;
+    void setVec4(const cocos2d::Vec4& value);
+    cocos2d::Color4B getColor() const;
+    void setColor(const cocos2d::Color4B& value);
 };
 
 TValue::TValue()
@@ -76,23 +76,23 @@ TValue::TValue()
     b1 = b2 = true;
 }
 
-cocos2d::Vec2 TValue::GetVec2() const
+cocos2d::Vec2 TValue::getVec2() const
 {
     return cocos2d::Vec2(f1, f2);
 }
 
-void TValue::SetVec2(const cocos2d::Vec2 & value)
+void TValue::setVec2(const cocos2d::Vec2 & value)
 {
     f1 = value.x;
     f2 = value.y;
 }
 
-cocos2d::Vec4 TValue::GetVec4() const
+cocos2d::Vec4 TValue::getVec4() const
 {
     return cocos2d::Vec4(f1, f2, f3, f4);
 }
 
-void TValue::SetVec4(const cocos2d::Vec4 & value)
+void TValue::setVec4(const cocos2d::Vec4 & value)
 {
     f1 = value.x;
     f2 = value.y;
@@ -100,12 +100,12 @@ void TValue::SetVec4(const cocos2d::Vec4 & value)
     f4 = value.w;
 }
 
-cocos2d::Color4B TValue::GetColor() const
+cocos2d::Color4B TValue::getColor() const
 {
     return cocos2d::Color4B(f1, f2, f3, f4);
 }
 
-void TValue::SetColor(const cocos2d::Color4B & value)
+void TValue::setColor(const cocos2d::Color4B & value)
 {
     f1 = value.r;
     f2 = value.g;
@@ -228,13 +228,13 @@ Transition::Transition(GComponent* owner) :
 Transition::~Transition()
 {
     if (_playing)
-        GTween::Kill(this);//delay start
+        GTween::kill(this);//delay start
 
     for (auto &item : _items)
     {
         if (item->tweener != nullptr)
         {
-            item->tweener->Kill();
+            item->tweener->kill();
             item->tweener = nullptr;
         }
 
@@ -338,7 +338,7 @@ void Transition::play(int times, float delay, float startTime, float endTime, Pl
     if (delay == 0)
         onDelayedPlay();
     else
-        GTween::DelayedCall(delay)->SetTarget(this)->OnComplete0(CC_CALLBACK_0(Transition::onDelayedPlay, this));
+        GTween::delayedCall(delay)->setTarget(this)->onComplete(CC_CALLBACK_0(Transition::onDelayedPlay, this));
 }
 
 void Transition::changePlayTimes(int value)
@@ -419,7 +419,7 @@ void Transition::stopItem(TransitionItem * item, bool setToComplete)
 
     if (item->tweener != nullptr)
     {
-        item->tweener->Kill(setToComplete);
+        item->tweener->kill(setToComplete);
         item->tweener = nullptr;
 
         if (item->type == TransitionActionType::Shake && !setToComplete) //震动必须归位，否则下次就越震越远了。
@@ -437,9 +437,9 @@ void Transition::setPaused(bool paused)
         return;
 
     _paused = paused;
-    GTweener* tweener = GTween::GetTween(this);
+    GTweener* tweener = GTween::getTween(this);
     if (tweener != nullptr)
-        tweener->SetPaused(paused);
+        tweener->setPaused(paused);
 
     for (auto &item : _items)
     {
@@ -463,7 +463,7 @@ void Transition::setPaused(bool paused)
         }
 
         if (item->tweener != nullptr)
-            item->tweener->SetPaused(paused);
+            item->tweener->setPaused(paused);
     }
 }
 
@@ -510,7 +510,7 @@ void Transition::setValue(const std::string & label, const ValueVector& values)
         case TransitionActionType::Color:
         {
             uint32_t v = values[0].asUnsignedInt();
-            ((TValue*)value)->SetColor(Color4B((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF, (v >> 24) & 0xFF));
+            ((TValue*)value)->setColor(Color4B((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF, (v >> 24) & 0xFF));
             break;
         }
 
@@ -637,7 +637,7 @@ void Transition::setTimeScale(float value)
         for (auto &item : _items)
         {
             if (item->tweener != nullptr)
-                item->tweener->SetTimeScale(value);
+                item->tweener->setTimeScale(value);
             else if (item->type == TransitionActionType::Transition)
             {
                 if (((TValue_Transition*)item->value)->trans != nullptr)
@@ -791,34 +791,34 @@ void Transition::playItem(TransitionItem* item)
             case TransitionActionType::Size:
             case TransitionActionType::Scale:
             case TransitionActionType::Skew:
-                item->tweener = GTween::To(startValue->GetVec2(), endValue->GetVec2(), item->tweenConfig->duration);
+                item->tweener = GTween::to(startValue->getVec2(), endValue->getVec2(), item->tweenConfig->duration);
                 break;
 
             case TransitionActionType::Alpha:
             case TransitionActionType::Rotation:
-                item->tweener = GTween::To(startValue->f1, endValue->f1, item->tweenConfig->duration);
+                item->tweener = GTween::to(startValue->f1, endValue->f1, item->tweenConfig->duration);
                 break;
 
             case TransitionActionType::Color:
-                item->tweener = GTween::To(startValue->GetColor(), endValue->GetColor(), item->tweenConfig->duration);
+                item->tweener = GTween::to(startValue->getColor(), endValue->getColor(), item->tweenConfig->duration);
                 break;
 
             case TransitionActionType::ColorFilter:
-                item->tweener = GTween::To(startValue->GetVec4(), endValue->GetVec4(), item->tweenConfig->duration);
+                item->tweener = GTween::to(startValue->getVec4(), endValue->getVec4(), item->tweenConfig->duration);
                 break;
             }
 
-            item->tweener->SetDelay(time)
-                ->SetEase(item->tweenConfig->easeType)
-                ->SetRepeat(item->tweenConfig->repeat, item->tweenConfig->yoyo)
-                ->SetTimeScale(_timeScale)
-                ->SetTargetAny(item)
-                ->OnStart(CC_CALLBACK_1(Transition::onTweenStart, this))
-                ->OnUpdate(CC_CALLBACK_1(Transition::onTweenUpdate, this))
-                ->OnComplete(CC_CALLBACK_1(Transition::onTweenComplete, this));
+            item->tweener->setDelay(time)
+                ->setEase(item->tweenConfig->easeType)
+                ->setRepeat(item->tweenConfig->repeat, item->tweenConfig->yoyo)
+                ->setTimeScale(_timeScale)
+                ->setTargetAny(item)
+                ->onStart(CC_CALLBACK_1(Transition::onTweenStart, this))
+                ->onUpdate(CC_CALLBACK_1(Transition::onTweenUpdate, this))
+                ->onComplete1(CC_CALLBACK_1(Transition::onTweenComplete, this));
 
             if (_endTime >= 0)
-                item->tweener->SetBreakpoint(_endTime - time);
+                item->tweener->setBreakpoint(_endTime - time);
 
             _totalTasks++;
         }
@@ -836,16 +836,16 @@ void Transition::playItem(TransitionItem* item)
         {
             value->lastOffset.setZero();
             value->offset.setZero();
-            item->tweener = GTween::Shake(Vec2::ZERO, value->amplitude, value->duration)
-                ->SetDelay(time)
-                ->SetTimeScale(_timeScale)
-                ->SetTargetAny(item)
-                ->OnStart(CC_CALLBACK_1(Transition::onTweenStart, this))
-                ->OnUpdate(CC_CALLBACK_1(Transition::onTweenUpdate, this))
-                ->OnComplete(CC_CALLBACK_1(Transition::onTweenComplete, this));
+            item->tweener = GTween::shake(Vec2::ZERO, value->amplitude, value->duration)
+                ->setDelay(time)
+                ->setTimeScale(_timeScale)
+                ->setTargetAny(item)
+                ->onStart(CC_CALLBACK_1(Transition::onTweenStart, this))
+                ->onUpdate(CC_CALLBACK_1(Transition::onTweenUpdate, this))
+                ->onComplete1(CC_CALLBACK_1(Transition::onTweenComplete, this));
 
             if (_endTime >= 0)
-                item->tweener->SetBreakpoint(_endTime - item->time);
+                item->tweener->setBreakpoint(_endTime - item->time);
 
             _totalTasks++;
         }
@@ -865,15 +865,15 @@ void Transition::playItem(TransitionItem* item)
         else if (_endTime == -1 || time <= _endTime)
         {
             _totalTasks++;
-            item->tweener = GTween::DelayedCall(time)
-                ->SetTimeScale(_timeScale)
-                ->SetTargetAny(item)
-                ->OnComplete(CC_CALLBACK_1(Transition::onDelayedPlayItem, this));
+            item->tweener = GTween::delayedCall(time)
+                ->setTimeScale(_timeScale)
+                ->setTargetAny(item)
+                ->onComplete1(CC_CALLBACK_1(Transition::onDelayedPlayItem, this));
         }
     }
 
     if (item->tweener != nullptr)
-        item->tweener->Seek(_startTime);
+        item->tweener->seek(_startTime);
 }
 
 void Transition::skipAnimations()
@@ -949,7 +949,7 @@ void Transition::skipAnimations()
 
 void Transition::onDelayedPlayItem(GTweener* tweener)
 {
-    TransitionItem* item = (TransitionItem*)tweener->GetTarget();
+    TransitionItem* item = (TransitionItem*)tweener->getTarget();
     item->tweener = nullptr;
     _totalTasks--;
 
@@ -961,7 +961,7 @@ void Transition::onDelayedPlayItem(GTweener* tweener)
 
 void Transition::onTweenStart(GTweener* tweener)
 {
-    TransitionItem* item = (TransitionItem*)tweener->GetTarget();
+    TransitionItem* item = (TransitionItem*)tweener->getTarget();
 
     if (item->type == TransitionActionType::XY || item->type == TransitionActionType::Size) //位置和大小要到start才最终确认起始值
     {
@@ -1002,8 +1002,8 @@ void Transition::onTweenStart(GTweener* tweener)
         if (!endValue->b2)
             endValue->f2 = startValue->f2;
 
-        tweener->startValue.SetVec2(startValue->GetVec2());
-        tweener->endValue.SetVec2(endValue->GetVec2());
+        tweener->startValue.setVec2(startValue->getVec2());
+        tweener->endValue.setVec2(endValue->getVec2());
     }
 
     callHook(item, false);
@@ -1011,14 +1011,14 @@ void Transition::onTweenStart(GTweener* tweener)
 
 void Transition::onTweenUpdate(GTweener* tweener)
 {
-    TransitionItem* item = (TransitionItem*)tweener->GetTarget();
+    TransitionItem* item = (TransitionItem*)tweener->getTarget();
     switch (item->type)
     {
     case TransitionActionType::XY:
     case TransitionActionType::Size:
     case TransitionActionType::Scale:
     case TransitionActionType::Skew:
-        ((TValue*)item->value)->SetVec2(tweener->value.GetVec2());
+        ((TValue*)item->value)->setVec2(tweener->value.getVec2());
         break;
 
     case TransitionActionType::Alpha:
@@ -1027,15 +1027,15 @@ void Transition::onTweenUpdate(GTweener* tweener)
         break;
 
     case TransitionActionType::Color:
-        ((TValue*)item->value)->SetColor(tweener->value.GetColor());
+        ((TValue*)item->value)->setColor(tweener->value.getColor());
         break;
 
     case TransitionActionType::ColorFilter:
-        ((TValue*)item->value)->SetVec4(tweener->value.GetVec4());
+        ((TValue*)item->value)->setVec4(tweener->value.getVec4());
         break;
 
     case TransitionActionType::Shake:
-        ((TValue_Shake*)item->value)->offset = tweener->deltaValue.GetVec2();
+        ((TValue_Shake*)item->value)->offset = tweener->deltaValue.getVec2();
         break;
     }
     applyValue(item);
@@ -1043,7 +1043,7 @@ void Transition::onTweenUpdate(GTweener* tweener)
 
 void Transition::onTweenComplete(GTweener* tweener)
 {
-    TransitionItem* item = (TransitionItem*)tweener->GetTarget();
+    TransitionItem* item = (TransitionItem*)tweener->getTarget();
     item->tweener = nullptr;
     _totalTasks--;
 
@@ -1177,7 +1177,7 @@ void Transition::applyValue(TransitionItem* item)
         break;
 
     case TransitionActionType::Color:
-        (dynamic_cast<IColorGear*>(item->target))->setColor((Color3B)((TValue*)item->value)->GetColor());
+        (dynamic_cast<IColorGear*>(item->target))->setColor((Color3B)((TValue*)item->value)->getColor());
         break;
 
     case TransitionActionType::Animation:
@@ -1357,12 +1357,12 @@ void Transition::decodeValue(TransitionActionType type, const char* pValue, void
     {
         Vec2 v2;
         ToolSet::splitString(str, ',', v2);
-        ((TValue*)value)->SetVec2(v2);
+        ((TValue*)value)->setVec2(v2);
         break;
     }
 
     case TransitionActionType::Color:
-        ((TValue*)value)->SetColor(ToolSet::convertFromHtmlColor(str.c_str()));
+        ((TValue*)value)->setColor(ToolSet::convertFromHtmlColor(str.c_str()));
         break;
 
     case TransitionActionType::Animation:
@@ -1427,7 +1427,7 @@ void Transition::decodeValue(TransitionActionType type, const char* pValue, void
         TValue * tvalue = (TValue*)value;
         Vec4 v4;
         ToolSet::splitString(str, ',', v4);
-        tvalue->SetVec4(v4);
+        tvalue->setVec4(v4);
         break;
     }
     default:

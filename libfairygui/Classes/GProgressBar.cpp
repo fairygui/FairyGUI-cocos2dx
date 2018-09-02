@@ -25,7 +25,7 @@ GProgressBar::GProgressBar() :
 GProgressBar::~GProgressBar()
 {
     if (_tweening)
-        GTween::Kill(this);
+        GTween::kill(this);
 }
 
 void GProgressBar::setTitleType(ProgressTitleType value)
@@ -50,7 +50,7 @@ void GProgressBar::setValue(double value)
 {
     if (_tweening)
     {
-        GTween::Kill(this, TweenPropType::Progress, true);
+        GTween::kill(this, TweenPropType::Progress, true);
         _tweening = false;
     }
 
@@ -67,12 +67,12 @@ void GProgressBar::tweenValue(double value, float duration)
     _value = value;
 
     if (_tweening)
-        GTween::Kill(this, TweenPropType::Progress, false);
+        GTween::kill(this, TweenPropType::Progress, false);
     _tweening = true;
-    GTween::ToDouble(oldValule, _value, duration)
-        ->SetEase(EaseType::Linear)
-        ->SetTarget(this, TweenPropType::Progress)
-        ->OnComplete([this](GTweener* tweener) { _tweening = false; });
+    GTween::toDouble(oldValule, _value, duration)
+        ->setEase(EaseType::Linear)
+        ->setTarget(this, TweenPropType::Progress)
+        ->onComplete([this]() { _tweening = false; });
 }
 
 void GProgressBar::update(double newValue)

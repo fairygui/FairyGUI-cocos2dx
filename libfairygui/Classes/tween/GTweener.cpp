@@ -21,62 +21,62 @@ GTweener::~GTweener()
 
 }
 
-GTweener * GTweener::SetDelay(float value)
+GTweener * GTweener::setDelay(float value)
 {
     _delay = value;
     return this;
 }
 
-GTweener * GTweener::SetDuration(float value)
+GTweener * GTweener::setDuration(float value)
 {
     _duration = value;
     return this;
 }
 
-GTweener * GTweener::SetBreakpoint(float value)
+GTweener * GTweener::setBreakpoint(float value)
 {
     _breakpoint = value;
     return this;
 }
 
-GTweener * GTweener::SetEase(EaseType value)
+GTweener * GTweener::setEase(EaseType value)
 {
     _easeType = value;
     return this;
 }
 
-GTweener * GTweener::SetEasePeriod(float value)
+GTweener * GTweener::setEasePeriod(float value)
 {
     _easePeriod = value;
     return this;
 }
 
-GTweener * GTweener::SetEaseOvershootOrAmplitude(float value)
+GTweener * GTweener::setEaseOvershootOrAmplitude(float value)
 {
     _easeOvershootOrAmplitude = value;
     return this;
 }
 
-GTweener * GTweener::SetRepeat(int repeat, bool yoyo)
+GTweener * GTweener::setRepeat(int repeat, bool yoyo)
 {
     _repeat = repeat;
     _yoyo = yoyo;
     return this;
 }
 
-GTweener * GTweener::SetTimeScale(float value)
+GTweener * GTweener::setTimeScale(float value)
 {
     _timeScale = value;
     return this;
 }
 
-GTweener * GTweener::SetSnapping(bool value)
+GTweener * GTweener::setSnapping(bool value)
 {
     _snapping = value;
     return this;
 }
 
-GTweener * GTweener::SetTargetAny(void * value)
+GTweener * GTweener::setTargetAny(void * value)
 {
     CC_SAFE_RELEASE(_refTarget);
     _refTarget = nullptr;
@@ -84,12 +84,12 @@ GTweener * GTweener::SetTargetAny(void * value)
     return this;
 }
 
-GTweener * GTweener::SetTarget(cocos2d::Ref* value)
+GTweener * GTweener::setTarget(cocos2d::Ref* value)
 {
-    return SetTarget(value, TweenPropType::None);
+    return setTarget(value, TweenPropType::None);
 }
 
-GTweener * GTweener::SetTarget(cocos2d::Ref * target, TweenPropType propType)
+GTweener * GTweener::setTarget(cocos2d::Ref * target, TweenPropType propType)
 {
     CC_SAFE_RELEASE(_refTarget);
     _target = _refTarget = target;
@@ -98,43 +98,43 @@ GTweener * GTweener::SetTarget(cocos2d::Ref * target, TweenPropType propType)
     return this;
 }
 
-GTweener * GTweener::SetUserData(const Value& value)
+GTweener * GTweener::setUserData(const Value& value)
 {
     _userData = value;
     return this;
 }
 
-GTweener * GTweener::OnUpdate(GTweenCallback callback)
+GTweener * GTweener::onUpdate(GTweenCallback callback)
 {
     _onUpdate = callback;
     return this;
 }
 
-GTweener * GTweener::OnStart(GTweenCallback callback)
+GTweener * GTweener::onStart(GTweenCallback callback)
 {
     _onStart = callback;
     return this;
 }
 
-GTweener * GTweener::OnComplete(GTweenCallback callback)
-{
-    _onComplete = callback;
-    return this;
-}
-
-GTweener * GTweener::OnComplete0(GTweenCallback0 callback)
+GTweener * GTweener::onComplete(GTweenCallback0 callback)
 {
     _onComplete0 = callback;
     return this;
 }
 
-GTweener * GTweener::SetPaused(bool paused)
+GTweener * GTweener::onComplete1(GTweenCallback callback)
+{
+    _onComplete = callback;
+    return this;
+}
+
+GTweener * GTweener::setPaused(bool paused)
 {
     _paused = paused;
     return this;
 }
 
-void GTweener::Seek(float time)
+void GTweener::seek(float time)
 {
     if (_killed)
         return;
@@ -148,10 +148,10 @@ void GTweener::Seek(float time)
             return;
     }
 
-    Update();
+    update();
 }
 
-void GTweener::Kill(bool complete)
+void GTweener::kill(bool complete)
 {
     if (_killed)
         return;
@@ -166,16 +166,16 @@ void GTweener::Kill(bool complete)
                 _elapsedTime = _delay + _duration * (_repeat + 1);
             else
                 _elapsedTime = _delay + _duration * 2;
-            Update();
+            update();
         }
 
-        CallCompleteCallback();
+        callCompleteCallback();
     }
 
     _killed = true;
 }
 
-GTweener * GTweener::_To(float start, float end, float duration)
+GTweener * GTweener::_to(float start, float end, float duration)
 {
     _valueSize = 1;
     startValue.x = start;
@@ -184,43 +184,43 @@ GTweener * GTweener::_To(float start, float end, float duration)
     return this;
 }
 
-GTweener * GTweener::_To(const cocos2d::Vec2 & start, const cocos2d::Vec2 & end, float duration)
+GTweener * GTweener::_to(const cocos2d::Vec2 & start, const cocos2d::Vec2 & end, float duration)
 {
     _valueSize = 2;
-    startValue.SetVec2(start);
-    endValue.SetVec2(end);
+    startValue.setVec2(start);
+    endValue.setVec2(end);
     _duration = duration;
     return this;
 }
 
-GTweener * GTweener::_To(const cocos2d::Vec3 & start, const cocos2d::Vec3 & end, float duration)
+GTweener * GTweener::_to(const cocos2d::Vec3 & start, const cocos2d::Vec3 & end, float duration)
 {
     _valueSize = 3;
-    startValue.SetVec3(start);
-    endValue.SetVec3(end);
+    startValue.setVec3(start);
+    endValue.setVec3(end);
     _duration = duration;
     return this;
 }
 
-GTweener * GTweener::_To(const cocos2d::Vec4 & start, const cocos2d::Vec4 & end, float duration)
+GTweener * GTweener::_to(const cocos2d::Vec4 & start, const cocos2d::Vec4 & end, float duration)
 {
     _valueSize = 4;
-    startValue.SetVec4(start);
-    endValue.SetVec4(end);
+    startValue.setVec4(start);
+    endValue.setVec4(end);
     _duration = duration;
     return this;
 }
 
-GTweener * GTweener::_To(const cocos2d::Color4B & start, const cocos2d::Color4B & end, float duration)
+GTweener * GTweener::_to(const cocos2d::Color4B & start, const cocos2d::Color4B & end, float duration)
 {
     _valueSize = 4;
-    startValue.SetColor(start);
-    endValue.SetColor(end);
+    startValue.setColor(start);
+    endValue.setColor(end);
     _duration = duration;
     return this;
 }
 
-GTweener * GTweener::_To(double start, double end, float duration)
+GTweener * GTweener::_to(double start, double end, float duration)
 {
     _valueSize = 5;
     startValue.d = start;
@@ -229,17 +229,17 @@ GTweener * GTweener::_To(double start, double end, float duration)
     return this;
 }
 
-GTweener * GTweener::_Shake(const cocos2d::Vec2 & start, float amplitude, float duration)
+GTweener * GTweener::_shake(const cocos2d::Vec2 & start, float amplitude, float duration)
 {
     _valueSize = 6;
-    startValue.SetVec2(start);
+    startValue.setVec2(start);
     startValue.w = amplitude;
     _duration = duration;
     _easeType = EaseType::Linear;
     return this;
 }
 
-void GTweener::_Init()
+void GTweener::_init()
 {
     _delay = 0;
     _duration = 0;
@@ -258,13 +258,13 @@ void GTweener::_Init()
     _elapsedTime = 0;
     _normalizedTime = 0;
     _ended = 0;
-    startValue.SetZero();
-    endValue.SetZero();
-    value.SetZero();
-    deltaValue.SetZero();
+    startValue.setZero();
+    endValue.setZero();
+    value.setZero();
+    deltaValue.setZero();
 }
 
-void GTweener::_Reset()
+void GTweener::_reset()
 {
     CC_SAFE_RELEASE(_refTarget);
     _target = nullptr;
@@ -274,11 +274,11 @@ void GTweener::_Reset()
     _onComplete0 = nullptr;
 }
 
-void GTweener::_Update(float dt)
+void GTweener::_update(float dt)
 {
     if (_ended != 0) //Maybe completed by seek
     {
-        CallCompleteCallback();
+        callCompleteCallback();
         _killed = true;
         return;
     }
@@ -289,19 +289,19 @@ void GTweener::_Update(float dt)
         return;
 
     _elapsedTime += dt;
-    Update();
+    update();
 
     if (_ended != 0)
     {
         if (!_killed)
         {
-            CallCompleteCallback();
+            callCompleteCallback();
             _killed = true;
         }
     }
 }
 
-void GTweener::Update()
+void GTweener::update()
 {
     _ended = 0;
 
@@ -319,7 +319,7 @@ void GTweener::Update()
             return;
 
         _started = true;
-        CallStartCallback();
+        callStartCallback();
         if (_killed)
             return;
     }
@@ -353,11 +353,11 @@ void GTweener::Update()
         _ended = 1;
     }
 
-    _normalizedTime = EaseManager::Evaluate(_easeType, reversed ? (_duration - tt) : tt, _duration,
+    _normalizedTime = EaseManager::evaluate(_easeType, reversed ? (_duration - tt) : tt, _duration,
         _easeOvershootOrAmplitude, _easePeriod);
 
-    value.SetZero();
-    deltaValue.SetZero();
+    value.setZero();
+    deltaValue.setZero();
 
     if (_valueSize == 5)
     {
@@ -383,7 +383,7 @@ void GTweener::Update()
             value.y = startValue.y + ry;
         }
         else
-            value.SetVec3(startValue.GetVec3());
+            value.setVec3(startValue.getVec3());
     }
     else
     {
@@ -403,31 +403,31 @@ void GTweener::Update()
     {
         GObject* gobj = dynamic_cast<GObject*>(_refTarget);
         if (gobj != nullptr)
-            TweenPropTypeUtils::SetProps(gobj, _propType, value);
+            TweenPropTypeUtils::setProps(gobj, _propType, value);
         else
         {
             Node* node = dynamic_cast<Node*>(_refTarget);
             if (node != nullptr)
-                TweenPropTypeUtils::SetProps(node, _propType, value);
+                TweenPropTypeUtils::setProps(node, _propType, value);
         }
     }
 
-    CallUpdateCallback();
+    callUpdateCallback();
 }
 
-void GTweener::CallStartCallback()
+void GTweener::callStartCallback()
 {
     if (_onStart != nullptr)
         _onStart(this);
 }
 
-void GTweener::CallUpdateCallback()
+void GTweener::callUpdateCallback()
 {
     if (_onUpdate != nullptr)
         _onUpdate(this);
 }
 
-void GTweener::CallCompleteCallback()
+void GTweener::callCompleteCallback()
 {
     if (_onComplete != nullptr)
         _onComplete(this);

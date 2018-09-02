@@ -29,8 +29,8 @@ enum class TweenPropType
 class TweenPropTypeUtils
 {
 public:
-    static void SetProps(GObject* target, TweenPropType propType, const TweenValue& value);
-    static void SetProps(cocos2d::Node* target, TweenPropType propType, const TweenValue& value);
+    static void setProps(GObject* target, TweenPropType propType, const TweenValue& value);
+    static void setProps(cocos2d::Node* target, TweenPropType propType, const TweenValue& value);
 };
 
 

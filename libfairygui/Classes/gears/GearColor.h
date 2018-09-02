@@ -32,7 +32,7 @@ protected:
 
 private:
     void onTweenUpdate(GTweener* tweener);
-    void onTweenComplete(GTweener* tweener);
+    void onTweenComplete();
 
     class GearColorValue
     {

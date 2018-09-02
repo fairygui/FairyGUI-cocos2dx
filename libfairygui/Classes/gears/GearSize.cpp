@@ -13,7 +13,7 @@ GearSize::GearSize(GObject * owner) :GearBase(owner), _tweener(nullptr)
 GearSize::~GearSize()
 {
     if (_tweener != nullptr)
-        _tweener->Kill();
+        _tweener->kill();
 }
 
 void GearSize::init()
@@ -50,9 +50,9 @@ void GearSize::apply()
     {
         if (_tweener != nullptr)
         {
-            if (_tweener->endValue.GetVec4() != gv)
+            if (_tweener->endValue.getVec4() != gv)
             {
-                _tweener->Kill(true);
+                _tweener->kill(true);
                 _tweener = nullptr;
             }
             else
@@ -66,13 +66,13 @@ void GearSize::apply()
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::To(Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()), gv, tweenTime)
-                ->SetDelay(delay)
-                ->SetEase(easeType)
-                ->SetTargetAny(this)
-                ->SetUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
-                ->OnUpdate(CC_CALLBACK_1(GearSize::onTweenUpdate, this))
-                ->OnComplete(CC_CALLBACK_1(GearSize::onTweenComplete, this));
+            _tweener = GTween::to(Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()), gv, tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->setUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
+                ->onUpdate(CC_CALLBACK_1(GearSize::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearSize::onTweenComplete, this));
         }
     }
     else
@@ -86,7 +86,7 @@ void GearSize::apply()
 
 void GearSize::onTweenUpdate(GTweener* tweener)
 {
-    int flag = tweener->GetUserData().asInt();
+    int flag = tweener->getUserData().asInt();
     _owner->_gearLocked = false;
     if ((flag & 1) != 0)
         _owner->setSize(tweener->value.x, tweener->value.y, _owner->checkGearController(1, _controller));
@@ -95,7 +95,7 @@ void GearSize::onTweenUpdate(GTweener* tweener)
     _owner->_gearLocked = false;
 }
 
-void GearSize::onTweenComplete(GTweener* tweener)
+void GearSize::onTweenComplete()
 {
     if (_displayLockToken != 0)
     {

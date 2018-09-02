@@ -50,7 +50,7 @@ void JoystickModule::onTouchBegin(EventContext * context)
 
         if (_tweener != nullptr)
         {
-            _tweener->Kill();
+            _tweener->kill();
             _tweener = nullptr;
         }
 
@@ -138,9 +138,9 @@ void JoystickModule::onTouchEnd(EventContext * context)
         _thumb->setRotation(_thumb->getRotation() + 180);
         _center->setVisible(false);
 
-        _tweener = GTween::To(_button->getPosition(), Vec2(_InitX - _button->getWidth() / 2, _InitY - _button->getHeight() / 2), 0.3f)
-            ->SetTarget(_button, TweenPropType::Position)
-            ->OnComplete0([this]()
+        _tweener = GTween::to(_button->getPosition(), Vec2(_InitX - _button->getWidth() / 2, _InitY - _button->getHeight() / 2), 0.3f)
+            ->setTarget(_button, TweenPropType::Position)
+            ->onComplete([this]()
         {
             _button->setSelected(false);
             _thumb->setRotation(0);

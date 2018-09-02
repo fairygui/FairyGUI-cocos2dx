@@ -14,7 +14,7 @@ GearXY::GearXY(GObject * owner) : GearBase(owner),_tweener(nullptr)
 GearXY::~GearXY()
 {
     if (_tweener != nullptr)
-        _tweener->Kill();
+        _tweener->kill();
 }
 
 void GearXY::init()
@@ -52,7 +52,7 @@ void GearXY::apply()
         {
             if (_tweener->endValue.x != gv.x || _tweener->endValue.y != gv.y)
             {
-                _tweener->Kill(true);
+                _tweener->kill(true);
                 _tweener = nullptr;
             }
             else
@@ -64,12 +64,12 @@ void GearXY::apply()
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::To(_owner->getPosition(), gv, tweenTime)
-                ->SetDelay(delay)
-                ->SetEase(easeType)
-                ->SetTargetAny(this)
-                ->OnUpdate(CC_CALLBACK_1(GearXY::onTweenUpdate, this))
-                ->OnComplete(CC_CALLBACK_1(GearXY::onTweenComplete, this));
+            _tweener = GTween::to(_owner->getPosition(), gv, tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->onUpdate(CC_CALLBACK_1(GearXY::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearXY::onTweenComplete, this));
         }
     }
     else
@@ -87,7 +87,7 @@ void GearXY::onTweenUpdate(GTweener* tweener)
     _owner->_gearLocked = false;
 }
 
-void GearXY::onTweenComplete(GTweener* tweener)
+void GearXY::onTweenComplete()
 {
     if (_displayLockToken != 0)
     {

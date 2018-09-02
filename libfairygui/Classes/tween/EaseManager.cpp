@@ -4,18 +4,18 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-static const float _PiOver2 = M_PI * 0.5f;
-static const float _TwoPi = M_PI * 2;
+static const float _PiOver2 = (float)(M_PI * 0.5f);
+static const float _TwoPi = (float)(M_PI * 2);
 
 class Bounce
 {
 public:
-    static float EaseIn(float time, float duration);
-    static float EaseOut(float time, float duration);
-    static float EaseInOut(float time, float duration);
+    static float easeIn(float time, float duration);
+    static float easeOut(float time, float duration);
+    static float easeInOut(float time, float duration);
 };
 
-float EaseManager::Evaluate(EaseType easeType, float time, float duration, float overshootOrAmplitude, float period)
+float EaseManager::evaluate(EaseType easeType, float time, float duration, float overshootOrAmplitude, float period)
 {
     switch (easeType)
     {
@@ -117,23 +117,23 @@ float EaseManager::Evaluate(EaseType easeType, float time, float duration, float
         if ((time /= duration * 0.5f) < 1) return 0.5f * (time * time * (((overshootOrAmplitude *= (1.525f)) + 1) * time - overshootOrAmplitude));
         return 0.5f * ((time -= 2) * time * (((overshootOrAmplitude *= (1.525f)) + 1) * time + overshootOrAmplitude) + 2);
     case EaseType::BounceIn:
-        return Bounce::EaseIn(time, duration);
+        return Bounce::easeIn(time, duration);
     case EaseType::BounceOut:
-        return Bounce::EaseOut(time, duration);
+        return Bounce::easeOut(time, duration);
     case EaseType::BounceInOut:
-        return Bounce::EaseInOut(time, duration);
+        return Bounce::easeInOut(time, duration);
 
     default:
         return -(time /= duration) * (time - 2);
     }
 }
 
-float Bounce::EaseIn(float time, float duration)
+float Bounce::easeIn(float time, float duration)
 {
-    return 1 - EaseOut(duration - time, duration);
+    return 1 - easeOut(duration - time, duration);
 }
 
-float Bounce::EaseOut(float time, float duration)
+float Bounce::easeOut(float time, float duration)
 {
     if ((time /= duration) < (1 / 2.75f))
     {
@@ -150,13 +150,13 @@ float Bounce::EaseOut(float time, float duration)
     return (7.5625f * (time -= (2.625f / 2.75f)) * time + 0.984375f);
 }
 
-float Bounce::EaseInOut(float time, float duration)
+float Bounce::easeInOut(float time, float duration)
 {
     if (time < duration * 0.5f)
     {
-        return EaseIn(time * 2, duration) * 0.5f;
+        return easeIn(time * 2, duration) * 0.5f;
     }
-    return EaseOut(time * 2 - duration, duration) * 0.5f + 0.5f;
+    return easeOut(time * 2 - duration, duration) * 0.5f + 0.5f;
 }
 
 NS_FGUI_END

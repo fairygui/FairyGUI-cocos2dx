@@ -26,7 +26,7 @@ protected:
 
 private:
     void onTweenUpdate(GTweener* tweener);
-    void onTweenComplete(GTweener* tweener);
+    void onTweenComplete();
 
     std::unordered_map<std::string, cocos2d::Vec4> _storage;
     cocos2d::Vec4 _default;

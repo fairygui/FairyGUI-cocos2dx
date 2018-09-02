@@ -9,7 +9,7 @@ NS_FGUI_BEGIN
 class EaseManager
 {
 public:
-    static float Evaluate(EaseType easeType, float time, float duration, float overshootOrAmplitude, float period);
+    static float evaluate(EaseType easeType, float time, float duration, float overshootOrAmplitude, float period);
 };
 
 NS_FGUI_END

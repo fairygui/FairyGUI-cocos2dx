@@ -11,12 +11,12 @@ void  Window2::doShowAnimation()
     setScale(0.1f, 0.1f);
     setPivot(0.5f, 0.5f);
 
-    GTween::To(getScale(), Vec2::ONE, 0.3f)->SetTarget(this, TweenPropType::Scale)->OnComplete0(CC_CALLBACK_0(Window2::onShown, this));
+    GTween::to(getScale(), Vec2::ONE, 0.3f)->setTarget(this, TweenPropType::Scale)->onComplete(CC_CALLBACK_0(Window2::onShown, this));
 }
 
 void  Window2::doHideAnimation()
 {
-    GTween::To(getScale(), Vec2(0.1f, 0.1f), 0.3f)->SetTarget(this, TweenPropType::Scale)->OnComplete0(CC_CALLBACK_0(Window2::hideImmediately, this));
+    GTween::to(getScale(), Vec2(0.1f, 0.1f), 0.3f)->setTarget(this, TweenPropType::Scale)->onComplete(CC_CALLBACK_0(Window2::hideImmediately, this));
 }
 
 void Window2::onShown()

@@ -25,7 +25,7 @@ GearColor::GearColor(GObject * owner) :GearBase(owner), _tweener(nullptr)
 GearColor::~GearColor()
 {
     if (_tweener != nullptr)
-        _tweener->Kill();
+        _tweener->kill();
 }
 
 void GearColor::init()
@@ -81,9 +81,9 @@ void GearColor::apply()
 
         if (_tweener != nullptr)
         {
-            if (_tweener->endValue.GetColor() != gv.color)
+            if (_tweener->endValue.getColor() != gv.color)
             {
-                _tweener->Kill(true);
+                _tweener->kill(true);
                 _tweener = nullptr;
             }
             else
@@ -96,12 +96,12 @@ void GearColor::apply()
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::To((Color4B)curColor, (Color4B)gv.color, tweenTime)
-                ->SetDelay(delay)
-                ->SetEase(easeType)
-                ->SetTargetAny(this)
-                ->OnUpdate(CC_CALLBACK_1(GearColor::onTweenUpdate, this))
-                ->OnComplete(CC_CALLBACK_1(GearColor::onTweenComplete, this));
+            _tweener = GTween::to((Color4B)curColor, (Color4B)gv.color, tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->onUpdate(CC_CALLBACK_1(GearColor::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearColor::onTweenComplete, this));
         }
     }
     else
@@ -119,11 +119,11 @@ void GearColor::onTweenUpdate(GTweener* tweener)
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
 
     _owner->_gearLocked = true;
-    cg->setColor((Color3B)_tweener->value.GetColor());
+    cg->setColor((Color3B)_tweener->value.getColor());
     _owner->_gearLocked = false;
 }
 
-void GearColor::onTweenComplete(GTweener* tweener)
+void GearColor::onTweenComplete()
 {
     if (_displayLockToken != 0)
     {

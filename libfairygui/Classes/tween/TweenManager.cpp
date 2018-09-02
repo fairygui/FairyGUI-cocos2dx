@@ -15,15 +15,15 @@ class TweenEngine
 public:
     void update(float dt)
     {
-        TweenManager::Update(dt);
+        TweenManager::update(dt);
     }
 };
 static TweenEngine tweenEngine;
 
-GTweener* TweenManager::CreateTween()
+GTweener* TweenManager::createTween()
 {
     if (!_inited)
-        Init();
+        init();
 
     GTweener* tweener;
     int cnt = _tweenerPool.size();
@@ -34,7 +34,7 @@ GTweener* TweenManager::CreateTween()
     }
     else
         tweener = new GTweener();
-    tweener->_Init();
+    tweener->_init();
     _activeTweens[_totalActiveTweens++] = tweener;
 
     if (_totalActiveTweens == _arrayLength)
@@ -50,7 +50,7 @@ GTweener* TweenManager::CreateTween()
     return tweener;
 }
 
-bool TweenManager::IsTweening(cocos2d::Ref * target, TweenPropType propType)
+bool TweenManager::isTweening(cocos2d::Ref * target, TweenPropType propType)
 {
     if (target == nullptr)
         return false;
@@ -67,7 +67,7 @@ bool TweenManager::IsTweening(cocos2d::Ref * target, TweenPropType propType)
     return false;
 }
 
-bool TweenManager::KillTweens(cocos2d::Ref * target, TweenPropType propType, bool completed)
+bool TweenManager::killTweens(cocos2d::Ref * target, TweenPropType propType, bool completed)
 {
     if (target == nullptr)
         return false;
@@ -81,7 +81,7 @@ bool TweenManager::KillTweens(cocos2d::Ref * target, TweenPropType propType, boo
         if (tweener != nullptr && tweener->_target == target && !tweener->_killed
             && (anyType || tweener->_propType == propType))
         {
-            tweener->Kill(completed);
+            tweener->kill(completed);
             flag = true;
         }
     }
@@ -89,7 +89,7 @@ bool TweenManager::KillTweens(cocos2d::Ref * target, TweenPropType propType, boo
     return flag;
 }
 
-GTweener * TweenManager::GetTween(cocos2d::Ref * target, TweenPropType propType)
+GTweener * TweenManager::getTween(cocos2d::Ref * target, TweenPropType propType)
 {
     if (target == nullptr)
         return nullptr;
@@ -109,7 +109,7 @@ GTweener * TweenManager::GetTween(cocos2d::Ref * target, TweenPropType propType)
     return nullptr;
 }
 
-void TweenManager::Update(float dt)
+void TweenManager::update(float dt)
 {
     int cnt = _totalActiveTweens;
     int freePosStart = -1;
@@ -125,7 +125,7 @@ void TweenManager::Update(float dt)
         }
         else if (tweener->_killed)
         {
-            tweener->_Reset();
+            tweener->_reset();
             _tweenerPool.push_back(tweener);
             _activeTweens[i] = nullptr;
 
@@ -136,7 +136,7 @@ void TweenManager::Update(float dt)
         else
         {
             if (!tweener->_paused)
-                tweener->_Update(dt);
+                tweener->_update(dt);
 
             if (freePosStart != -1)
             {
@@ -160,14 +160,14 @@ void TweenManager::Update(float dt)
     }
 }
 
-void TweenManager::Clean()
+void TweenManager::clean()
 {
     for (auto it = _tweenerPool.begin(); it != _tweenerPool.end(); it++)
         delete *it;
     _tweenerPool.clear();
 }
 
-void TweenManager::Init()
+void TweenManager::init()
 {
     _inited = true;
 
