@@ -1,5 +1,6 @@
 #include "GProgressBar.h"
 #include "utils/ToolSet.h"
+#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -16,13 +17,15 @@ GProgressBar::GProgressBar() :
     _barMaxWidthDelta(0),
     _barMaxHeightDelta(0),
     _barStartX(0),
-    _barStartY(0)
+    _barStartY(0),
+    _tweening(false)
 {
 }
 
 GProgressBar::~GProgressBar()
 {
-
+    if (_tweening)
+        GTween::Kill(this);
 }
 
 void GProgressBar::setTitleType(ProgressTitleType value)
@@ -45,6 +48,12 @@ void GProgressBar::setMax(double value)
 
 void GProgressBar::setValue(double value)
 {
+    if (_tweening)
+    {
+        GTween::Kill(this, TweenPropType::Progress, true);
+        _tweening = false;
+    }
+
     if (_value != value)
     {
         _value = value;
@@ -54,17 +63,16 @@ void GProgressBar::setValue(double value)
 
 void GProgressBar::tweenValue(double value, float duration)
 {
-    if (_value != value)
-    {
-        _displayObject->stopActionByTag(ActionTag::PROGRESS_ACTION);
+    double oldValule = _value;
+    _value = value;
 
-        float oldValue = (float)_value;
-        _value = value;
-        Action* action = ActionFloat::create(duration, oldValue, value,
-            [this](float v) { update(v); });
-        action->setTag(ActionTag::PROGRESS_ACTION);
-        _displayObject->runAction(action);
-    }
+    if (_tweening)
+        GTween::Kill(this, TweenPropType::Progress, false);
+    _tweening = true;
+    GTween::ToDouble(oldValule, _value, duration)
+        ->SetEase(EaseType::Linear)
+        ->SetTarget(this, TweenPropType::Progress)
+        ->OnComplete([this](GTweener* tweener) { _tweening = false; });
 }
 
 void GProgressBar::update(double newValue)

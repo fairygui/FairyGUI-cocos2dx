@@ -61,16 +61,6 @@ void GImage::setColor(const cocos2d::Color3B & value)
     _content->setColor(value);
 }
 
-cocos2d::Color4B GImage::cg_getColor() const
-{
-    return (Color4B)_content->getColor();
-}
-
-void GImage::cg_setColor(const cocos2d::Color4B& value)
-{
-    _content->setColor((Color3B)value);
-}
-
 void GImage::constructFromResource()
 {
     sourceSize.width = _packageItem->width;

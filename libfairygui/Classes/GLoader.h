@@ -4,11 +4,11 @@
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GObject.h"
-#include "display/Actions.h"
 
 NS_FGUI_BEGIN
 
 class GComponent;
+class ActionMovieClip;
 
 class GLoader : public GObject, public IColorGear, public IAnimationGear
 {
@@ -41,17 +41,19 @@ public:
 
     const cocos2d::Size& getContentSize() { return _contentSize; }
 
-    const cocos2d::Color3B& getColor() const { return _content->getColor(); }
+    cocos2d::Color3B getColor() const { return _content->getColor(); }
     void setColor(const cocos2d::Color3B& value);
 
     bool isPlaying() const override { return _playing; }
     void setPlaying(bool value) override;
 
-    int getCurrentFrame() const override { return _playAction->getCurrentFrame(); }
-    void setCurrentFrame(int value) override;
+    int getFrame() const override;
+    void setFrame(int value) override;
 
-    cocos2d::Color4B cg_getColor() const override;
-    void cg_setColor(const cocos2d::Color4B& value) override;
+    float getTimeScale() const override;
+    void setTimeScale(float value) override;
+
+    void advance(float time) override;
 
     GComponent* getComponent() const { return _content2; }
 

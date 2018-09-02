@@ -12,7 +12,7 @@ GearBase::GearBase(GObject * owner) :
     tweenTime(0.3f),
     tween(false),
     delay(0),
-    easeType(tweenfunc::Quad_EaseOut)
+    easeType(EaseType::QuadOut)
 {
     _owner = owner;
 }

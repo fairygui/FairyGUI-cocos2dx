@@ -30,7 +30,7 @@ void GearAnimation::init()
 {
     IAnimationGear *ag = dynamic_cast<IAnimationGear*>(_owner);
 
-    _default = GearAnimationValue(ag->isPlaying(), ag->getCurrentFrame());
+    _default = GearAnimationValue(ag->isPlaying(), ag->getFrame());
     _storage.clear();
 }
 
@@ -65,7 +65,7 @@ void GearAnimation::apply()
     IAnimationGear *ag = dynamic_cast<IAnimationGear*>(_owner);
 
     ag->setPlaying(gv.playing);
-    ag->setCurrentFrame(gv.frame);
+    ag->setFrame(gv.frame);
 
     _owner->_gearLocked = false;
 }
@@ -74,7 +74,7 @@ void GearAnimation::updateState()
 {
     IAnimationGear *ag = dynamic_cast<IAnimationGear*>(_owner);
 
-    _storage[_controller->getSelectedPageId()] = GearAnimationValue(ag->isPlaying(), ag->getCurrentFrame());
+    _storage[_controller->getSelectedPageId()] = GearAnimationValue(ag->isPlaying(), ag->getFrame());
 }
 
 NS_FGUI_END

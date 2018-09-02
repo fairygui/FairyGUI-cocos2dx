@@ -118,22 +118,40 @@ void GLoader::setPlaying(bool value)
     }
 }
 
-void GLoader::setCurrentFrame(int value)
+int GLoader::getFrame() const
 {
-    _frame = value;
+    return _playAction->getFrame();
+}
+
+void GLoader::setFrame(int value)
+{
+    if (_frame != value)
+    {
+        _frame = value;
+        if (_playAction)
+            _playAction->setFrame(value);
+        updateGear(5);
+    }
+}
+
+float GLoader::getTimeScale() const
+{
     if (_playAction)
-        _playAction->setCurrentFrame(value);
-    updateGear(5);
+        return _playAction->getTimeScale();
+    else
+        return 1;
 }
 
-cocos2d::Color4B GLoader::cg_getColor() const
+void GLoader::setTimeScale(float value)
 {
-    return (Color4B)_content->getColor();
+    if (_playAction)
+        _playAction->setTimeScale(value);
 }
 
-void GLoader::cg_setColor(const cocos2d::Color4B& value)
+void GLoader::advance(float time)
 {
-    _content->setColor((Color3B)value);
+    if (_playAction)
+        _playAction->advance(time);
 }
 
 void GLoader::loadContent()
@@ -183,7 +201,7 @@ void GLoader::loadFromPackage()
             if (_playing)
                 _content->runAction(_playAction);
             else
-                _playAction->setCurrentFrame(_frame);
+                _playAction->setFrame(_frame);
 
             updateLayout();
         }

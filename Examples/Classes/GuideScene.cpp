@@ -38,7 +38,6 @@ void GuideScene::continueInit()
         GObject* window = _guideLayer->getChild("window");
         window->setSize((int)rect.size.width, (int)rect.size.height);
 
-        ActionFloat2* action = ActionFloat2::create(0.5f, window->getPosition(), rect.origin, CC_CALLBACK_2(GObject::setPosition, window));
-        window->displayObject()->runAction(action);
+        GTween::To(window->getPosition(), rect.origin, 0.5f)->SetTarget(window, TweenPropType::Position);
     });
 }

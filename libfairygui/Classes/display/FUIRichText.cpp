@@ -550,7 +550,7 @@ void FUIRichText::formatText()
     else
         _textRectWidth = _dimensions.width - GUTTER_X * 2;
 
-    auto size = _richElements.size();
+    int size = (int)_richElements.size();
     if (size == 0)
     {
         formarRenderers();
@@ -559,7 +559,7 @@ void FUIRichText::formatText()
     }
 
     addNewLine();
-    for (ssize_t i = 0; i < size; ++i)
+    for (int i = 0; i < size; ++i)
     {
         FUIRichElement* element = static_cast<FUIRichElement*>(_richElements.at(i));
         switch (element->_type)

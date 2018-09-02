@@ -19,8 +19,8 @@ public:
     void drawEllipse(float aWidth, float aHeight, int lineSize, const cocos2d::Color4F& lineColor, const cocos2d::Color4F& fillColor);
     bool isEmpty() const { return _type == 0; }
 
-    cocos2d::Color4B cg_getColor() const override;
-    void cg_setColor(const cocos2d::Color4B& value) override;
+    cocos2d::Color3B getColor() const override;
+    void setColor(const cocos2d::Color3B& value) override;
 
 protected:
     virtual void handleInit() override;

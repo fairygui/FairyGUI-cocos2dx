@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "FairyGUI.h"
+#include "tween/EaseType.h"
 
 NS_FGUI_BEGIN
 
@@ -36,7 +37,7 @@ public:
     static TextAutoSize parseTextAutoSize(const char*p);
     static FlipType parseFlipType(const char*p);
     static TransitionActionType parseTransitionActionType(const char*p);
-    static cocos2d::tweenfunc::TweenType parseEaseType(const char*p);
+    static EaseType parseEaseType(const char*p);
 };
 
 class FastSplitter

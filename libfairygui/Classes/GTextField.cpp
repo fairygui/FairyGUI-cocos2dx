@@ -46,15 +46,9 @@ void GTextField::setFontSize(float value)
     applyTextFormat();
 }
 
-void GTextField::cg_setColor(const cocos2d::Color4B & value)
+void GTextField::setOutlineColor(const cocos2d::Color3B & value)
 {
-    getTextFormat()->color = (Color3B)value;
-    applyTextFormat();
-}
-
-void GTextField::cg_setOutlineColor(const cocos2d::Color4B & value)
-{
-    getTextFormat()->outlineColor = (Color3B)value;
+    getTextFormat()->outlineColor = value;
     applyTextFormat();
 }
 

@@ -36,7 +36,7 @@ void PlayTransitionAction::enter(GController * controller)
     if (trans != nullptr)
     {
         if (_currentTransition != nullptr && _currentTransition->isPlaying())
-            trans->changeRepeat(repeat);
+            trans->changePlayTimes(repeat);
         else
             trans->play(repeat, delay, nullptr);
         _currentTransition = trans;

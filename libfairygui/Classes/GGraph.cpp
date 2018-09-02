@@ -81,14 +81,14 @@ void GGraph::updateShape()
         _touchDisabled = true;
 }
 
-cocos2d::Color4B GGraph::cg_getColor() const
+cocos2d::Color3B GGraph::getColor() const
 {
-    return (Color4B)_fillColor;
+    return (Color3B)_fillColor;
 }
 
-void GGraph::cg_setColor(const cocos2d::Color4B& value)
+void GGraph::setColor(const cocos2d::Color3B& value)
 {
-    _fillColor = (Color4F)value;
+    _fillColor = Color4F(value, _fillColor.a);
     updateShape();
 }
 

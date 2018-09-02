@@ -661,7 +661,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
 
     float interval = root->FloatAttribute("interval") / 1000.0f;
     item->repeatDelay = root->FloatAttribute("repeatDelay") / 1000.0f;
-    bool swing = root->BoolAttribute("swing");
+    item->swing = root->BoolAttribute("swing");
 
     int frameCount = root->IntAttribute("frameCount");
     Vector<AnimationFrame*> frames(frameCount);
@@ -724,16 +724,6 @@ void UIPackage::loadMovieClip(PackageItem * item)
         frameEle = frameEle->NextSiblingElement("frame");
     }
     delete xml;
-
-    if (swing)
-    {
-        int cnt = (int)frames.size();
-        for (int i = cnt - 1; i >= 1; i--)
-        {
-            AnimationFrame* frame = frames.at(i);
-            frames.pushBack(frame);
-        }
-    }
 
     item->animation->initWithAnimationFrames(frames, interval, 1);
 }

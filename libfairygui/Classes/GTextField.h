@@ -31,17 +31,14 @@ public:
 
     virtual const cocos2d::Size& getTextSize() { return _displayObject->getContentSize(); }
 
-    const cocos2d::Color3B& getColor() const { return getTextFormat()->color; }
+    cocos2d::Color3B getColor() const { return getTextFormat()->color; }
     void setColor(const cocos2d::Color3B& value);
 
     float getFontSize() const { return getTextFormat()->fontSize; }
     void setFontSize(float value);
 
-    cocos2d::Color4B cg_getColor() const override { return (cocos2d::Color4B)getTextFormat()->color; }
-    void cg_setColor(const cocos2d::Color4B& value) override;
-
-    cocos2d::Color4B cg_getOutlineColor() const override { return (cocos2d::Color4B)getTextFormat()->outlineColor; }
-    void cg_setOutlineColor(const cocos2d::Color4B& value) override;
+    cocos2d::Color3B getOutlineColor() const { return getTextFormat()->outlineColor; }
+    void setOutlineColor(const cocos2d::Color3B& value);
 
     cocos2d::ValueMap* getTemplateVars() { return _templateVars; }
     void setTemplateVars(cocos2d::ValueMap* value);

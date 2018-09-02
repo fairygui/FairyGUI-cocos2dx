@@ -3,6 +3,7 @@
 
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
+#include "tween/EaseType.h"
 
 NS_FGUI_BEGIN
 
@@ -26,7 +27,7 @@ public:
 
     static bool disableAllTweenEffect;
     bool tween;
-    cocos2d::tweenfunc::TweenType easeType;
+    EaseType easeType;
     float tweenTime;
     float delay;
 

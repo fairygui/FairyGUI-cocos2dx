@@ -33,6 +33,7 @@ private:
     GObject* _touchArea;
     GObject* _thumb;
     GObject* _center;
+    GTweener* _tweener;
     int touchId;
 };
 

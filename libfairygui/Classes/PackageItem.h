@@ -45,6 +45,7 @@ public:
     cocos2d::Animation* animation;
     float delayPerUnit;
     float repeatDelay;
+    bool swing;
 
     //component
     TXMLDocument* componentData;

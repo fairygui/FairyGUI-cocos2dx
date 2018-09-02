@@ -518,81 +518,81 @@ TransitionActionType ToolSet::parseTransitionActionType(const char * p)
     }
 }
 
-cocos2d::tweenfunc::TweenType ToolSet::parseEaseType(const char * p)
+EaseType ToolSet::parseEaseType(const char * p)
 {
     if (!p)
-        return tweenfunc::Expo_EaseOut;
+        return EaseType::QuadOut;
 
     switch (hash_(p))
     {
     case "Linear"_hash:
-        return tweenfunc::Linear;
+        return EaseType::Linear;
 
     case "Elastic.In"_hash:
-        return tweenfunc::Elastic_EaseIn;
+        return EaseType::ElasticIn;
     case "Elastic.Out"_hash:
-        return tweenfunc::Elastic_EaseOut;
+        return EaseType::ElasticOut;
     case "Elastic.InOut"_hash:
-        return tweenfunc::Elastic_EaseInOut;
+        return EaseType::ElasticInOut;
 
     case "Quad.In"_hash:
-        return tweenfunc::Quad_EaseIn;
+        return EaseType::QuadIn;
     case "Quad.Out"_hash:
-        return tweenfunc::Quad_EaseOut;
+        return EaseType::QuadOut;
     case "Quad.InOut"_hash:
-        return tweenfunc::Quad_EaseInOut;
+        return EaseType::QuadInOut;
 
     case "Cube.In"_hash:
-        return tweenfunc::Cubic_EaseIn;
+        return EaseType::CubicIn;
     case "Cube.Out"_hash:
-        return tweenfunc::Cubic_EaseOut;
+        return EaseType::CubicOut;
     case "Cube.InOut"_hash:
-        return tweenfunc::Cubic_EaseInOut;
+        return EaseType::CubicInOut;
 
     case "Quart.In"_hash:
-        return tweenfunc::Quart_EaseIn;
+        return EaseType::QuartIn;
     case "Quart.Out"_hash:
-        return tweenfunc::Quart_EaseOut;
+        return EaseType::QuartOut;
     case "Quart.InOut"_hash:
-        return tweenfunc::Quart_EaseInOut;
+        return EaseType::QuartInOut;
 
     case "Sine.In"_hash:
-        return tweenfunc::Sine_EaseIn;
+        return EaseType::SineIn;
     case "Sine.Out"_hash:
-        return tweenfunc::Sine_EaseOut;
+        return EaseType::SineOut;
     case "Sine.InOut"_hash:
-        return tweenfunc::Sine_EaseInOut;
+        return EaseType::SineInOut;
 
     case "Bounce.In"_hash:
-        return tweenfunc::Bounce_EaseIn;
+        return EaseType::BounceIn;
     case "Bounce.Out"_hash:
-        return tweenfunc::Bounce_EaseOut;
+        return EaseType::BounceOut;
     case "Bounce.InOut"_hash:
-        return tweenfunc::Bounce_EaseInOut;
+        return EaseType::BounceInOut;
 
     case "Circ.In"_hash:
-        return tweenfunc::Circ_EaseIn;
+        return EaseType::CircIn;
     case "Circ.Out"_hash:
-        return tweenfunc::Circ_EaseOut;
+        return EaseType::CircOut;
     case "Circ.InOut"_hash:
-        return tweenfunc::Circ_EaseInOut;
+        return EaseType::CircInOut;
 
     case "Expo.In"_hash:
-        return tweenfunc::Expo_EaseIn;
+        return EaseType::ExpoIn;
     case "Expo.Out"_hash:
-        return tweenfunc::Expo_EaseOut;
+        return EaseType::ExpoOut;
     case "Expo.InOut"_hash:
-        return tweenfunc::Expo_EaseInOut;
+        return EaseType::ExpoInOut;
 
     case "Back.In"_hash:
-        return tweenfunc::Back_EaseIn;
+        return EaseType::BackIn;
     case "Back.Out"_hash:
-        return tweenfunc::Back_EaseOut;
+        return EaseType::BackOut;
     case "Back.InOut"_hash:
-        return tweenfunc::Back_EaseInOut;
+        return EaseType::BackInOut;
 
     default:
-        return tweenfunc::Expo_EaseOut;
+        return EaseType::QuadOut;
     }
 }
 
