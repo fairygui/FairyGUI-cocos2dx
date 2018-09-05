@@ -5,7 +5,6 @@
 #include <locale>
 #include <algorithm>
 
-#include "utils/UBBParser.h"
 #include "utils/SwitchHelper.h"
 #include "utils/ToolSet.h"
 #include "UIPackage.h"
@@ -429,7 +428,6 @@ int FUIXMLVisitor::attributeInt(const ValueMap& valueMap, const std::string& key
 }
 
 FUIRichText::FUIRichText() :
-    _ubbEnabled(false),
     _formatTextDirty(true),
     _leftSpaceWidth(0.0f),
     _textRectWidth(0.0f),
@@ -464,7 +462,6 @@ void FUIRichText::setDimensions(float width, float height)
 
 void FUIRichText::setText(const std::string & value)
 {
-    _text = value;
     _formatTextDirty = true;
     _richElements.clear();
     _numLines = 0;
@@ -472,16 +469,11 @@ void FUIRichText::setText(const std::string & value)
     if (value.empty())
         return;
 
-    string parsedText;
-    if (_ubbEnabled)
-        parsedText = UBBParser::getInstance()->parse(_text.c_str());
-    else
-        parsedText = _text;
-    parsedText = "<dummy>" + parsedText + "</dummy>";
+    string xmlText = "<dummy>" + value + "</dummy>";
     FUIXMLVisitor visitor(this);
     SAXParser parser;
     parser.setDelegator(&visitor);
-    parser.parseIntrusive(&parsedText.front(), parsedText.length());
+    parser.parseIntrusive(&xmlText.front(), xmlText.length());
 }
 
 void FUIRichText::applyTextFormat()
@@ -558,7 +550,7 @@ void FUIRichText::formatText()
     else
         _textRectWidth = _dimensions.width - GUTTER_X * 2;
 
-    auto size = _richElements.size();
+    int size = (int)_richElements.size();
     if (size == 0)
     {
         formarRenderers();
@@ -567,7 +559,7 @@ void FUIRichText::formatText()
     }
 
     addNewLine();
-    for (ssize_t i = 0; i < size; ++i)
+    for (int i = 0; i < size; ++i)
     {
         FUIRichElement* element = static_cast<FUIRichElement*>(_richElements.at(i));
         switch (element->_type)
@@ -581,7 +573,8 @@ void FUIRichText::formatText()
             {
                 if (!first)
                     addNewLine();
-                handleTextRenderer(element, element->textFormat, string(fs.getText(), fs.getTextLength()));
+                if (fs.getTextLength() > 0)
+                    handleTextRenderer(element, element->textFormat, string(fs.getText(), fs.getTextLength()));
                 first = false;
             }
             break;
@@ -641,8 +634,11 @@ void FUIRichText::handleTextRenderer(FUIRichElement* element, const TextFormat& 
         _elementRenders.back().push_back(leftRenderer);
     }
 
-    addNewLine();
-    handleTextRenderer(element, format, cutWords);
+    if (cutWords.length() > 0)
+    {
+        addNewLine();
+        handleTextRenderer(element, format, cutWords);
+    }
 }
 
 int FUIRichText::findSplitPositionForWord(cocos2d::Label* label, const std::string& text)
@@ -753,7 +749,7 @@ void FUIRichText::formarRenderers()
     }
     if (textWidth == GUTTER_X + GUTTER_X)
         textWidth = 0;
-    else if (_numLines > 1)
+    else if (_numLines > 1 || (_defaultTextFormat->align != TextHAlignment::LEFT && _overflow != Label::Overflow::NONE))
         textWidth = MAX(_dimensions.width, textWidth);
     if (nextPosY != GUTTER_Y)
         textHeight = nextPosY + GUTTER_Y;

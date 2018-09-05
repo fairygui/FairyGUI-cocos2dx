@@ -19,13 +19,10 @@ public:
     FlipType getFlip() const;
     void setFlip(FlipType value);
 
-    const cocos2d::Color3B& getColor() const { return _content->getColor(); }
+    cocos2d::Color3B getColor() const { return _content->getColor(); }
     void setColor(const cocos2d::Color3B& value);
 
     virtual void constructFromResource() override;
-
-    cocos2d::Color4B cg_getColor() const override;
-    void cg_setColor(const cocos2d::Color4B& value) override;
 
 protected:
     virtual void handleInit() override;

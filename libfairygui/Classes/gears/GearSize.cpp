@@ -2,17 +2,18 @@
 #include "GObject.h"
 #include "utils/ToolSet.h"
 #include "UIPackage.h"
-#include "display/Actions.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearSize::GearSize(GObject * owner) :GearBase(owner)
+GearSize::GearSize(GObject * owner) :GearBase(owner), _tweener(nullptr)
 {
 }
 
 GearSize::~GearSize()
 {
+    if (_tweener != nullptr)
+        _tweener->kill();
 }
 
 void GearSize::init()
@@ -47,12 +48,12 @@ void GearSize::apply()
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_SIZE_ACTION) != nullptr)
+        if (_tweener != nullptr)
         {
-            if (_tweenTarget != gv)
+            if (_tweener->endValue.getVec4() != gv)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_SIZE_ACTION);
-                onTweenComplete();
+                _tweener->kill(true);
+                _tweener = nullptr;
             }
             else
                 return;
@@ -64,15 +65,14 @@ void GearSize::apply()
         {
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
-            _tweenTarget = gv;
 
-            ActionInterval* action = ActionVec4::create(tweenTime,
-                Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()),
-                gv,
-                CC_CALLBACK_1(GearSize::onTweenUpdate, this, a, b));
-
-            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearSize::onTweenComplete, this), ActionTag::GEAR_SIZE_ACTION);
-            _owner->displayObject()->runAction(action);
+            _tweener = GTween::to(Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()), gv, tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->setUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
+                ->onUpdate(CC_CALLBACK_1(GearSize::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearSize::onTweenComplete, this));
         }
     }
     else
@@ -84,13 +84,14 @@ void GearSize::apply()
     }
 }
 
-void GearSize::onTweenUpdate(const Vec4& v, bool a, bool b)
+void GearSize::onTweenUpdate(GTweener* tweener)
 {
-    _owner->_gearLocked = true;
-    if (a)
-        _owner->setSize(v.x, v.y, _owner->checkGearController(1, _controller));
-    if (b)
-        _owner->setScale(v.z, v.w);
+    int flag = tweener->getUserData().asInt();
+    _owner->_gearLocked = false;
+    if ((flag & 1) != 0)
+        _owner->setSize(tweener->value.x, tweener->value.y, _owner->checkGearController(1, _controller));
+    if ((flag & 2) != 0)
+        _owner->setScale(tweener->value.z, tweener->value.w);
     _owner->_gearLocked = false;
 }
 
@@ -101,6 +102,7 @@ void GearSize::onTweenComplete()
         _owner->releaseDisplayLock(_displayLockToken);
         _displayLockToken = 0;
     }
+    _tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

@@ -13,9 +13,9 @@ UBBParser * UBBParser::getInstance()
     return _inst;
 }
 
-UBBParser::UBBParser():
-    defaultImgWidth(0), 
-    defaultImgHeight(0), 
+UBBParser::UBBParser() :
+    defaultImgWidth(0),
+    defaultImgHeight(0),
     _pString(nullptr),
     _readPos(0)
 {
@@ -58,6 +58,14 @@ std::string UBBParser::parse(const char * text)
         }
 
         pos = p - _pString;
+        if (pos > 0 && *(p - 1) == '\\')
+        {
+            out.append(_pString, pos - 1);
+            out.append("[");
+            _pString += pos + 1;
+            continue;
+        }
+
         out.append(_pString, pos);
         _pString += pos;
 
@@ -69,6 +77,13 @@ std::string UBBParser::parse(const char * text)
         }
 
         pos = p - _pString;
+        if (pos == 1)
+        {
+            out.append(_pString, 0, 2);
+            _pString += 2;
+            continue;
+        }
+
         end = _pString[1] == '/';
         if (end)
             tag.assign(_pString + 2, pos - 2);
@@ -104,7 +119,7 @@ void UBBParser::getTagText(std::string& out, bool remove)
     if (!p)
         return;
 
-    ssize_t pos =  p - _pString;
+    ssize_t pos = p - _pString;
     out.assign(_pString, _readPos, pos - _readPos);
     if (remove)
         _readPos = pos;

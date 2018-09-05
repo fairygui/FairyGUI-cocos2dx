@@ -2,18 +2,19 @@
 #include "GObject.h"
 #include "utils/ToolSet.h"
 #include "UIPackage.h"
-#include "display/Actions.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearXY::GearXY(GObject * owner) : GearBase(owner)
+GearXY::GearXY(GObject * owner) : GearBase(owner),_tweener(nullptr)
 {
 
 }
 
 GearXY::~GearXY()
 {
+    if (_tweener != nullptr)
+        _tweener->kill();
 }
 
 void GearXY::init()
@@ -47,12 +48,12 @@ void GearXY::apply()
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_XY_ACTION) != nullptr)
+        if (_tweener != nullptr)
         {
-            if (_tweenTarget.x != gv.x || _tweenTarget.y != gv.y)
+            if (_tweener->endValue.x != gv.x || _tweener->endValue.y != gv.y)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_XY_ACTION);
-                onTweenComplete();
+                _tweener->kill(true);
+                _tweener = nullptr;
             }
             else
                 return;
@@ -62,14 +63,13 @@ void GearXY::apply()
         {
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
-            _tweenTarget = gv;
 
-            ActionInterval* action = ActionVec2::create(tweenTime,
-                _owner->getPosition(),
-                gv,
-                CC_CALLBACK_1(GearXY::onTweenUpdate, this));
-            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearXY::onTweenComplete, this), ActionTag::GEAR_XY_ACTION);
-            _owner->displayObject()->runAction(action);
+            _tweener = GTween::to(_owner->getPosition(), gv, tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->onUpdate(CC_CALLBACK_1(GearXY::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearXY::onTweenComplete, this));
         }
     }
     else
@@ -80,10 +80,10 @@ void GearXY::apply()
     }
 }
 
-void GearXY::onTweenUpdate(const Vec2& v)
+void GearXY::onTweenUpdate(GTweener* tweener)
 {
     _owner->_gearLocked = true;
-    _owner->setPosition(v.x, v.y);
+    _owner->setPosition(_tweener->value.x, _tweener->value.y);
     _owner->_gearLocked = false;
 }
 
@@ -94,6 +94,7 @@ void GearXY::onTweenComplete()
         _owner->releaseDisplayLock(_displayLockToken);
         _displayLockToken = 0;
     }
+    _tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

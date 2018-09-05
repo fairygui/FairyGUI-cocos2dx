@@ -45,8 +45,12 @@ public:
     void setY(float value);
     const cocos2d::Vec2& getPosition()const { return _position; }
     void setPosition(float xv, float yv);
+    float getXMin() const;
+    void setXMin(float value);
+    float getYMin() const;
+    void setYMin(float value);
 
-    bool getPixelSnapping() const { return _pixelSnapping; }
+    bool isPixelSnapping() const { return _pixelSnapping; }
     void setPixelSnapping(bool value);
 
     float getWidth() const { return _size.width; }
@@ -61,6 +65,7 @@ public:
 
     const cocos2d::Vec2& getPivot() const { return _pivot; }
     void setPivot(float xv, float yv, bool asAnchor = false);
+    bool isPivotAsAnchor() const { return _pivotAsAnchor; }
 
     float getScaleX() const { return _scale.x; }
     void setScaleX(float value) { setScale(value, _scale.y); }
@@ -107,6 +112,8 @@ public:
 
     void* getData() const { return _data; };
     void setData(void* value) { _data = value; }
+    const cocos2d::Value& getCustomData() const { return _customData; }
+    void setCustomData(const cocos2d::Value& value) { _customData = value; }
 
     bool isDraggable() const { return _draggable; }
     void setDraggable(bool value);
@@ -230,8 +237,10 @@ private:
     Relations* _relations;
     GearBase* _gears[8];
     void * _data;
+    cocos2d::Value _customData;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
+    bool _dragTesting;
     bool _isAdoptiveChild;
 
     uint64_t _uid;

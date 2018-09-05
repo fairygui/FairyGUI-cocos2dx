@@ -39,7 +39,7 @@ PixelHitTest::PixelHitTest(PixelHitTestData * data, int offsetX, int offsetY) :
 bool PixelHitTest::hitTest(GComponent * obj, const cocos2d::Vec2 & localPoint)
 {
     int x = floor((localPoint.x / scaleX - offsetX) * _data->scale);
-    int y = floor((localPoint.y / scaleY - offsetY) * _data->scale);
+    int y = floor(((obj->getHeight() - localPoint.y) / scaleY - offsetY) * _data->scale);
     if (x < 0 || y < 0 || x >= _data->pixelWidth)
         return false;
 

@@ -10,8 +10,10 @@ class TextFormat
 {
 public:
     TextFormat();
-    void setFormat(const TextFormat& format);
+    TextFormat(const TextFormat & other);
+    TextFormat &operator =(const TextFormat & other);
 
+	void setFormat(const TextFormat& format);
     void enableEffect(int effectFlag) { effect |= effectFlag; }
     void disableEffect(int effectFlag) { effect &= ~effectFlag; }
     bool hasEffect(int effectFlag) const { return (effect & effectFlag) != 0; }

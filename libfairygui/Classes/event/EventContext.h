@@ -21,6 +21,7 @@ public:
     InputEvent* getInput() const { return _inputEvent; }
     void stopPropagation() { _isStopped = true; }
     void preventDefault() { _defaultPrevented = true; }
+    bool isDefaultPrevented() { return _defaultPrevented; }
     void captureTouch() { _touchCapture = 1; }
     void uncaptureTouch() { _touchCapture = 2; }
 

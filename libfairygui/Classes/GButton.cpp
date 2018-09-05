@@ -66,7 +66,7 @@ void GButton::setSelectedIcon(const std::string & value)
         _iconObject->setIcon((_selected && _selectedIcon.length() > 0) ? _selectedIcon : _icon);
 }
 
-const cocos2d::Color3B GButton::getTitleColor() const
+const cocos2d::Color3B& GButton::getTitleColor() const
 {
     if (dynamic_cast<GTextField*>(_titleObject))
         return ((GTextField*)_titleObject)->getColor();
@@ -155,7 +155,26 @@ void GButton::setState(const std::string& value)
 
     if (_downEffect == 1)
     {
-
+        int cnt = this->numChildren();
+        if (value == DOWN || value == SELECTED_OVER || value == SELECTED_DISABLED)
+        {
+            Color3B color(_downEffectValue * 255, _downEffectValue * 255, _downEffectValue * 255);
+            for (int i = 0; i < cnt; i++)
+            {
+                GObject* obj = this->getChildAt(i);
+                if (dynamic_cast<IColorGear*>(obj) != nullptr && dynamic_cast<GTextField*>(obj) == nullptr)
+                    dynamic_cast<IColorGear*>(obj)->setColor(color);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < cnt; i++)
+            {
+                GObject* obj = this->getChildAt(i);
+                if (dynamic_cast<IColorGear*>(obj) != nullptr && dynamic_cast<GTextField*>(obj) == nullptr)
+                    dynamic_cast<IColorGear*>(obj)->setColor(Color3B::WHITE);
+            }
+        }
     }
     else if (_downEffect == 2)
     {

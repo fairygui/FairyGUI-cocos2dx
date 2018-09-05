@@ -23,16 +23,12 @@ void BagWindow::doShowAnimation()
     setScale(0.1f, 0.1f);
     setPivot(0.5f, 0.5f);
 
-    ActionInterval* action = ActionFloat2::create(0.3f, getScale(), Vec2::ONE, CC_CALLBACK_2(BagWindow::setScale, this));
-    action = composeActions(action, tweenfunc::Quad_EaseOut, 0, CC_CALLBACK_0(BagWindow::onShown, this));
-    displayObject()->runAction(action);
+    GTween::to(getScale(), Vec2::ONE, 0.3f)->setTarget(this, TweenPropType::Scale)->onComplete(CC_CALLBACK_0(BagWindow::onShown, this));
 }
 
 void BagWindow::doHideAnimation()
 {
-    ActionInterval* action = ActionFloat2::create(0.3f, getScale(), Vec2(0.1f, 0.1f), CC_CALLBACK_2(BagWindow::setScale, this));
-    action = composeActions(action, tweenfunc::Quad_EaseOut, 0, CC_CALLBACK_0(BagWindow::hideImmediately, this));
-    displayObject()->runAction(action);
+    GTween::to(getScale(), Vec2(0.1f, 0.1f), 0.3f)->setTarget(this, TweenPropType::Scale)->onComplete(CC_CALLBACK_0(BagWindow::hideImmediately, this));
 }
 
 void BagWindow::onClickItem(EventContext* context)

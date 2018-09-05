@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "FairyGUI.h"
+#include "tween/EaseType.h"
 
 NS_FGUI_BEGIN
 
@@ -16,6 +17,7 @@ public:
     static int findInStringArray(const std::vector<std::string>& arr, const std::string& str);
 
     static cocos2d::Color4B convertFromHtmlColor(const char* str);
+    static cocos2d::Rect intersection(const Rect& rect1, const Rect& rect2);
 
     static PackageItemType parsePackageItemType(const char * p);
     static cocos2d::TextHAlignment parseAlign(const char *p);
@@ -35,7 +37,7 @@ public:
     static TextAutoSize parseTextAutoSize(const char*p);
     static FlipType parseFlipType(const char*p);
     static TransitionActionType parseTransitionActionType(const char*p);
-    static cocos2d::tweenfunc::TweenType parseEaseType(const char*p);
+    static EaseType parseEaseType(const char*p);
 };
 
 class FastSplitter

@@ -16,13 +16,6 @@ public:
 
     CREATE_FUNC(GRichTextField);
 
-    const std::string& getText() const override { return _richText->getText(); }
-    void setText(const std::string& value) override;
-
-    virtual bool isUBBEnabled() const override { return _richText->isUBBEnabled(); }
-    virtual void setUBBEnabled(bool value) override { _richText->setUBBEnabled(value); }
-
-    virtual TextAutoSize getAutoSize() const override { return _autoSize; }
     virtual void setAutoSize(TextAutoSize value) override;
 
     virtual bool isSingleLine() const override { return false; }
@@ -34,13 +27,12 @@ public:
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
 
-    void updateSize();
+    virtual void setTextFieldText() override;
+    virtual void updateSize() override;
 
 private:
     FUIRichText* _richText;
-    TextAutoSize _autoSize;
     bool _updatingSize;
 };
 

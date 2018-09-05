@@ -233,6 +233,23 @@ void GRoot::showPopup(GObject * popup, GObject * target, PopupDirection dir)
 
     _popupStack.push_back(WeakPtr(popup));
 
+    if (target != nullptr)
+    {
+        GObject* p = target;
+        while (p != nullptr)
+        {
+            if (p->getParent() == this)
+            {
+                if (popup->getSortingOrder() < p->getSortingOrder())
+                {
+                    popup->setSortingOrder(p->getSortingOrder());
+                }
+                break;
+            }
+            p = p->getParent();
+        }
+    }
+
     addChild(popup);
     adjustModalLayer();
 

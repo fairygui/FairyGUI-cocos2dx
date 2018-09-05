@@ -5,7 +5,7 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 using namespace std;
 
-vector<string> helperArray;
+static vector<string> helperArray;
 
 void ToolSet::splitString(const string &s, char delim, vector<string> &elems)
 {
@@ -104,6 +104,7 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
         return Color4B::BLACK;
 
     char temp[3];
+    memset(temp, 0, 3);
 
     if (len == 9)
     {
@@ -119,6 +120,22 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
             strtol(strncpy(temp, str + 5, 2), NULL, 16),
             255);
     }
+}
+
+Rect ToolSet::intersection(const Rect& rect1, const Rect& rect2)
+{
+    if (rect1.size.width == 0 || rect1.size.height == 0 || rect2.size.width == 0 || rect2.size.height == 0)
+        return Rect(0, 0, 0, 0);
+
+    float left = rect1.getMinX() > rect2.getMinX() ? rect1.getMinX() : rect2.getMinX();
+    float right = rect1.getMaxX() < rect2.getMaxX() ? rect1.getMaxX() : rect2.getMaxX();
+    float top = rect1.getMinY() > rect2.getMinY() ? rect1.getMinY() : rect2.getMinY();
+    float bottom = rect1.getMaxY() < rect2.getMaxY() ? rect1.getMaxY() : rect2.getMaxY();
+
+    if (left > right || top > bottom)
+        return Rect(0, 0, 0, 0);
+    else
+        return Rect(left, top, right - left, bottom - top);
 }
 
 #pragma warning(once:4307) 
@@ -230,6 +247,8 @@ LoaderFillType ToolSet::parseFillType(const char * p)
         return LoaderFillType::SCALE_MATCH_WIDTH;
     case "scaleFree"_hash:
         return LoaderFillType::SCALE_FREE;
+    case "scaleNoBorder"_hash:
+        return LoaderFillType::SCALE_NO_BORDER;
     default:
         return LoaderFillType::NONE;
     }
@@ -499,81 +518,81 @@ TransitionActionType ToolSet::parseTransitionActionType(const char * p)
     }
 }
 
-cocos2d::tweenfunc::TweenType ToolSet::parseEaseType(const char * p)
+EaseType ToolSet::parseEaseType(const char * p)
 {
     if (!p)
-        return tweenfunc::Expo_EaseOut;
+        return EaseType::QuadOut;
 
     switch (hash_(p))
     {
     case "Linear"_hash:
-        return tweenfunc::Linear;
+        return EaseType::Linear;
 
     case "Elastic.In"_hash:
-        return tweenfunc::Elastic_EaseIn;
+        return EaseType::ElasticIn;
     case "Elastic.Out"_hash:
-        return tweenfunc::Elastic_EaseOut;
+        return EaseType::ElasticOut;
     case "Elastic.InOut"_hash:
-        return tweenfunc::Elastic_EaseInOut;
+        return EaseType::ElasticInOut;
 
     case "Quad.In"_hash:
-        return tweenfunc::Quad_EaseIn;
+        return EaseType::QuadIn;
     case "Quad.Out"_hash:
-        return tweenfunc::Quad_EaseOut;
+        return EaseType::QuadOut;
     case "Quad.InOut"_hash:
-        return tweenfunc::Quad_EaseInOut;
+        return EaseType::QuadInOut;
 
     case "Cube.In"_hash:
-        return tweenfunc::Cubic_EaseIn;
+        return EaseType::CubicIn;
     case "Cube.Out"_hash:
-        return tweenfunc::Cubic_EaseOut;
+        return EaseType::CubicOut;
     case "Cube.InOut"_hash:
-        return tweenfunc::Cubic_EaseInOut;
+        return EaseType::CubicInOut;
 
     case "Quart.In"_hash:
-        return tweenfunc::Quart_EaseIn;
+        return EaseType::QuartIn;
     case "Quart.Out"_hash:
-        return tweenfunc::Quart_EaseOut;
+        return EaseType::QuartOut;
     case "Quart.InOut"_hash:
-        return tweenfunc::Quart_EaseInOut;
+        return EaseType::QuartInOut;
 
     case "Sine.In"_hash:
-        return tweenfunc::Sine_EaseIn;
+        return EaseType::SineIn;
     case "Sine.Out"_hash:
-        return tweenfunc::Sine_EaseOut;
+        return EaseType::SineOut;
     case "Sine.InOut"_hash:
-        return tweenfunc::Sine_EaseInOut;
+        return EaseType::SineInOut;
 
     case "Bounce.In"_hash:
-        return tweenfunc::Bounce_EaseIn;
+        return EaseType::BounceIn;
     case "Bounce.Out"_hash:
-        return tweenfunc::Bounce_EaseOut;
+        return EaseType::BounceOut;
     case "Bounce.InOut"_hash:
-        return tweenfunc::Bounce_EaseInOut;
+        return EaseType::BounceInOut;
 
     case "Circ.In"_hash:
-        return tweenfunc::Circ_EaseIn;
+        return EaseType::CircIn;
     case "Circ.Out"_hash:
-        return tweenfunc::Circ_EaseOut;
+        return EaseType::CircOut;
     case "Circ.InOut"_hash:
-        return tweenfunc::Circ_EaseInOut;
+        return EaseType::CircInOut;
 
     case "Expo.In"_hash:
-        return tweenfunc::Expo_EaseIn;
+        return EaseType::ExpoIn;
     case "Expo.Out"_hash:
-        return tweenfunc::Expo_EaseOut;
+        return EaseType::ExpoOut;
     case "Expo.InOut"_hash:
-        return tweenfunc::Expo_EaseInOut;
+        return EaseType::ExpoInOut;
 
     case "Back.In"_hash:
-        return tweenfunc::Back_EaseIn;
+        return EaseType::BackIn;
     case "Back.Out"_hash:
-        return tweenfunc::Back_EaseOut;
+        return EaseType::BackOut;
     case "Back.InOut"_hash:
-        return tweenfunc::Back_EaseInOut;
+        return EaseType::BackInOut;
 
     default:
-        return tweenfunc::Expo_EaseOut;
+        return EaseType::QuadOut;
     }
 }
 

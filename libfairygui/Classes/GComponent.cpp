@@ -1022,10 +1022,7 @@ void GComponent::onEnter()
     if (!_transitions.empty())
     {
         for (auto &trans : _transitions)
-        {
-            if (trans->isAutoPlay())
-                trans->play(trans->autoPlayRepeat, trans->autoPlayDelay, nullptr);
-        }
+            trans->onOwnerAddedToStage();
     }
 }
 
@@ -1036,7 +1033,7 @@ void GComponent::onExit()
     if (!_transitions.empty())
     {
         for (auto &trans : _transitions)
-            trans->OnOwnerRemovedFromStage();
+            trans->onOwnerRemovedFromStage();
     }
 }
 
@@ -1161,6 +1158,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         _controllers.pushBack(controller);
         controller->setParent(this);
         controller->setup(exml);
+        controller->release();
 
         exml = exml->NextSiblingElement("controller");
     }
@@ -1210,9 +1208,10 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     exml = xml->FirstChildElement("transition");
     while (exml)
     {
-        Transition* trans = new Transition(this, (int)_transitions.size());
+        Transition* trans = new Transition(this);
         _transitions.pushBack(trans);
         trans->setup(exml);
+        trans->release();
 
         exml = exml->NextSiblingElement("transition");
     }

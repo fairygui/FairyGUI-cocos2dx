@@ -22,6 +22,7 @@ void GuideScene::continueInit()
     _guideLayer = UIPackage::createObject("Guide", "GuideLayer")->as<GComponent>();
     _guideLayer->makeFullScreen();
     _guideLayer->addRelation(_groot, RelationType::Size);
+    _guideLayer->retain();
 
     GObject* bagBtn = _view->getChild("bagBtn");
     bagBtn->addClickListener([this](EventContext*)
@@ -37,7 +38,6 @@ void GuideScene::continueInit()
         GObject* window = _guideLayer->getChild("window");
         window->setSize((int)rect.size.width, (int)rect.size.height);
 
-        ActionFloat2* action = ActionFloat2::create(0.5f, window->getPosition(), rect.origin, CC_CALLBACK_2(GObject::setPosition, window));
-        window->displayObject()->runAction(action);
+        GTween::to(window->getPosition(), rect.origin, 0.5f)->setTarget(window, TweenPropType::Position);
     });
 }

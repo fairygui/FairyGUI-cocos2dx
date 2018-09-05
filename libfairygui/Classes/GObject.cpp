@@ -17,9 +17,9 @@ USING_NS_CC;
 
 GObject* GObject::_draggingObject = nullptr;
 
-Vec2 sGlobalDragStart;
-Rect sGlobalRect;
-bool sUpdateInDragging;
+static Vec2 sGlobalDragStart;
+static Rect sGlobalRect;
+static bool sUpdateInDragging;
 
 GObject::GObject() :
     _scale{ 1,1 },
@@ -35,6 +35,7 @@ GObject::GObject() :
     _finalGrayed(false),
     _draggable(false),
     _dragBounds(nullptr),
+    _dragTesting(false),
     _sortingOrder(0),
     _focusable(false),
     _pixelSnapping(false),
@@ -63,7 +64,11 @@ GObject::~GObject()
 {
     removeFromParent();
 
-    CC_SAFE_RELEASE(_displayObject);
+    if (_displayObject)
+    {
+        _displayObject->removeFromParent();
+        CC_SAFE_RELEASE(_displayObject);
+    }
     for (int i = 0; i < 8; i++)
         CC_SAFE_DELETE(_gears[i]);
     CC_SAFE_DELETE(_relations);
@@ -128,6 +133,32 @@ void GObject::setPosition(float xv, float yv)
     }
 }
 
+float GObject::getXMin() const
+{
+    return _pivotAsAnchor ? (_position.x - _size.width * _pivot.x) : _position.x;
+}
+
+void GObject::setXMin(float value)
+{
+    if (_pivotAsAnchor)
+        setPosition(value + _size.width * _pivot.x, _position.y);
+    else
+        setPosition(value, _position.y);
+}
+
+float GObject::getYMin() const
+{
+    return _pivotAsAnchor ? (_position.y - _size.height * _pivot.y) : _position.y;
+}
+
+void GObject::setYMin(float value)
+{
+    if (_pivotAsAnchor)
+        setPosition(_position.x, value + _size.height * _pivot.y);
+    else
+        setPosition(_position.x, value);
+}
+
 void GObject::setPixelSnapping(bool value)
 {
     if (_pixelSnapping != value)
@@ -181,7 +212,7 @@ void GObject::setSize(float wv, float hv, bool ignorePivot /*= false*/)
 
         if (_parent != nullptr)
         {
-            _relations->onOwnerSizeChanged(dWidth, dHeight);
+            _relations->onOwnerSizeChanged(dWidth, dHeight, _pivotAsAnchor || !ignorePivot);
             _parent->setBoundsChangedFlag();
             if (_group != nullptr)
                 _group->setBoundsChangedFlag(true);
@@ -798,7 +829,7 @@ void GObject::setup_BeforeAdd(TXMLElement * xml)
 
     p = xml->Attribute("rotation");
     if (p)
-        setRotation(atoi(p));
+        setRotation(atof(p));
 
     p = xml->Attribute("pivot");
     if (p)
@@ -826,6 +857,10 @@ void GObject::setup_BeforeAdd(TXMLElement * xml)
     p = xml->Attribute("tooltips");
     if (p)
         setTooltips(p);
+
+    p = xml->Attribute("customData");
+    if (p)
+        _customData = Value(p);
 }
 
 void GObject::setup_AfterAdd(TXMLElement * xml)
@@ -877,6 +912,7 @@ void GObject::dragBegin(int touchId)
     sGlobalRect = localToGlobal(Rect(Vec2::ZERO, _size));
 
     _draggingObject = this;
+    _dragTesting = true;
     UIRoot->getInputProcessor()->addTouchMonitor(touchId, this);
 
     addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GObject::onTouchMove, this), EventTag(this));
@@ -887,7 +923,7 @@ void GObject::dragEnd()
 {
     if (_draggingObject == this)
     {
-        UIRoot->getInputProcessor()->removeTouchMonitor(this);
+        _dragTesting = false;
         _draggingObject = nullptr;
     }
 }
@@ -895,6 +931,7 @@ void GObject::dragEnd()
 void GObject::onTouchBegin(EventContext* context)
 {
     _dragTouchStartPos = context->getInput()->getPosition();
+    _dragTesting = true;
     context->captureTouch();
 }
 
@@ -902,7 +939,7 @@ void GObject::onTouchMove(EventContext* context)
 {
     InputEvent* evt = context->getInput();
 
-    if (_draggingObject != this && _draggable)
+    if (_draggingObject != this && _draggable && _dragTesting)
     {
         int sensitivity;
 #ifdef CC_PLATFORM_PC
@@ -914,10 +951,9 @@ void GObject::onTouchMove(EventContext* context)
             && std::abs(_dragTouchStartPos.y - evt->getPosition().y) < sensitivity)
             return;
 
+        _dragTesting = false;
         if (!dispatchEvent(UIEventType::DragStart))
             dragBegin(evt->getTouchId());
-        else
-            context->uncaptureTouch();
     }
 
     if (_draggingObject == this)

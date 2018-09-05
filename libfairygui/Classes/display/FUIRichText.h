@@ -22,11 +22,7 @@ public:
     const cocos2d::Size& getDimensions() const { return _dimensions; }
     void setDimensions(float width, float height);
 
-    const std::string& getText() const { return _text; }
     void setText(const std::string& value);
-
-    bool isUBBEnabled() const { return _ubbEnabled; }
-    void setUBBEnabled(bool value) { _ubbEnabled = value; }
 
     TextFormat* getTextFormat() const { return _defaultTextFormat; }
     void applyTextFormat();
@@ -63,8 +59,6 @@ protected:
     float _leftSpaceWidth;
     float _textRectWidth;
     int _numLines;
-    std::string _text;
-    bool _ubbEnabled;
     cocos2d::Label::Overflow _overflow;
     TextFormat* _defaultTextFormat;
     bool _anchorTextUnderline;

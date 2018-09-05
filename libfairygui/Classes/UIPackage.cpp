@@ -18,7 +18,7 @@ const unsigned char* emptyTextureData = new unsigned char[16]{ 0,0,0,0,0,0,0,0,0
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstById;
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstByName;
 std::vector<UIPackage*> UIPackage::_packageList;
-ValueMap UIPackage::_stringsSource;
+std::unordered_map<std::string, ValueMap> UIPackage::_stringsSource;
 Texture2D* UIPackage::_emptyTexture;
 
 struct AtlasSprite
@@ -38,6 +38,10 @@ UIPackage::~UIPackage()
     for (auto &it : _items)
         delete it;
     for (auto &it : _hitTestDatas)
+        delete it.second;
+    for (auto &it : _sprites)
+        delete it.second;
+    for (auto &it : _descPack)
         delete it.second;
 }
 
@@ -83,9 +87,29 @@ void UIPackage::removePackage(const string& packageIdOrName)
         pkg = getById(packageIdOrName);
 
     if (pkg)
+    {
+        auto it = std::find(_packageList.cbegin(), _packageList.cend(), pkg);
+        if (it != _packageList.cend())
+            _packageList.erase(it);
+
+        _packageInstById.erase(pkg->getId());
+        _packageInstById.erase(pkg->_assetPath);
+        _packageInstByName.erase(pkg->getName());
+
         delete pkg;
+    }
     else
         CCLOG("FairyGUI: invalid package name or id: %s", packageIdOrName.c_str());
+}
+
+void UIPackage::removeAllPackages()
+{
+    for (auto &it : _packageList)
+        delete it;
+
+    _packageInstById.clear();
+    _packageInstByName.clear();
+    _packageList.clear();
 }
 
 GObject* UIPackage::createObject(const string& pkgName, const string& resName)
@@ -215,7 +239,10 @@ void UIPackage::loadItem(PackageItem * item)
                 item->spriteFrame = createSpriteTexture(sprite);
             }
             else
-                item->spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect());
+            {
+                item->spriteFrame = new (std::nothrow) SpriteFrame();
+                item->spriteFrame->initWithTexture(_emptyTexture, Rect());
+            }
             if (item->scaleByTile)
             {
                 Texture2D::TexParams tp = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
@@ -282,6 +309,34 @@ PixelHitTestData * UIPackage::getPixelHitTestData(const std::string & itemId)
         return nullptr;
 }
 
+void UIPackage::setStringsSource(const char *xmlString, size_t nBytes)
+{
+    _stringsSource.clear();
+
+    TXMLDocument* xml = new TXMLDocument();
+    xml->Parse(xmlString, nBytes);
+
+    TXMLElement* root = xml->RootElement();
+    TXMLElement* ele = root->FirstChildElement("string");
+    while (ele)
+    {
+        std::string key = ele->Attribute("name");
+        std::string text = ele->GetText();
+        size_t i = key.find("-");
+        if (i == std::string::npos)
+            continue;
+
+        std::string key2 = key.substr(0, i);
+        std::string key3 = key.substr(i + 1);
+        ValueMap& col = _stringsSource[key2];
+        col[key3] = text;
+
+        ele = ele->NextSiblingElement("string");
+    }
+
+    delete xml;
+}
+
 void UIPackage::create(const string& assetPath)
 {
     Data data;
@@ -298,10 +353,10 @@ void UIPackage::create(const string& assetPath)
         emptyImage->initWithRawData(emptyTextureData, 16, 2, 2, 4, false);
         _emptyTexture = new Texture2D();
         _emptyTexture->initWithImage(emptyImage);
-        _emptyTexture->retain();
         delete emptyImage;
     }
 
+    _assetPath = assetPath;
     _assetNamePrefix = assetPath + "@";
     decodeDesc(data);
 
@@ -402,7 +457,7 @@ void UIPackage::loadPackage()
     if (hasHitTestData)
     {
         Data data = FileUtils::getInstance()->getDataFromFile(hitTestDataFilePath);
-        ByteArray* ba = ByteArray::createWithBuffer((char*)data.getBytes(), data.getSize(), true);
+        ByteArray* ba = ByteArray::createWithBuffer((char*)data.getBytes(), data.getSize(), false);
         ba->setEndian(ByteArray::ENDIAN_BIG);
         while (ba->getBytesAvailable())
         {
@@ -410,6 +465,7 @@ void UIPackage::loadPackage()
             _hitTestDatas[ba->readString()] = pht;
             pht->load(*ba);
         }
+        CC_SAFE_DELETE(ba);
     }
 
     Data* xmlData = _descPack["package.xml"];
@@ -550,6 +606,7 @@ void UIPackage::loadAtlas(PackageItem * item)
     if (!image->initWithImageFile(filePath))
     {
         item->texture = _emptyTexture;
+        _emptyTexture->retain();
         delete image;
         Image::setPNGPremultipliedAlphaEnabled(true);
         CCLOGWARN("FairyGUI: texture '%s' not found in %s", filePath.c_str(), _name.c_str());
@@ -560,7 +617,6 @@ void UIPackage::loadAtlas(PackageItem * item)
     Texture2D* tex = new Texture2D();
     tex->initWithImage(image);
     item->texture = tex;
-    tex->retain();
     delete image;
 
     string ext = FileUtils::getInstance()->getFileExtension(filePath);
@@ -586,6 +642,7 @@ void UIPackage::loadAtlas(PackageItem * item)
         tex = new Texture2D();
         tex->initWithImage(image);
         item->texture->setAlphaTexture(tex);
+        tex->release();
         delete image;
     }
 }
@@ -604,7 +661,7 @@ void UIPackage::loadMovieClip(PackageItem * item)
 
     float interval = root->FloatAttribute("interval") / 1000.0f;
     item->repeatDelay = root->FloatAttribute("repeatDelay") / 1000.0f;
-    bool swing = root->BoolAttribute("swing");
+    item->swing = root->BoolAttribute("swing");
 
     int frameCount = root->IntAttribute("frameCount");
     Vector<AnimationFrame*> frames(frameCount);
@@ -652,7 +709,11 @@ void UIPackage::loadMovieClip(PackageItem * item)
         }
 
         if (spriteFrame == nullptr)
-            spriteFrame = SpriteFrame::createWithTexture(_emptyTexture, Rect(Vec2::ZERO, Size::ZERO));
+        {
+            //dont use createWithTexture
+            spriteFrame = new (std::nothrow) SpriteFrame();
+            spriteFrame->initWithTexture(_emptyTexture, Rect());
+        }
         spriteFrame->setOffset(Vec2(rect.origin.x - (mcSize.width - rect.size.width) / 2, -(rect.origin.y - (mcSize.height - rect.size.height) / 2)));
         AnimationFrame* frame = AnimationFrame::create(spriteFrame, addDelay / interval + 1, ValueMapNull);
         frames.pushBack(frame);
@@ -663,16 +724,6 @@ void UIPackage::loadMovieClip(PackageItem * item)
         frameEle = frameEle->NextSiblingElement("frame");
     }
     delete xml;
-
-    if (swing)
-    {
-        int cnt = (int)frames.size();
-        for (int i = cnt - 1; i >= 1; i++)
-        {
-            AnimationFrame* frame = frames.at(i);
-            frames.pushBack(frame);
-        }
-    }
 
     item->animation->initWithAnimationFrames(frames, interval, 1);
 }
@@ -793,21 +844,27 @@ void UIPackage::loadFont(PackageItem * item)
                 def.height = tempRect.size.height;
                 def.validDefinition = true;
             }
-            else if (charImg)
+            else
             {
-                loadItem(charImg);
+                if (charImg)
+                {
+                    loadItem(charImg);
 
-                Rect tempRect = charImg->spriteFrame->getRectInPixels();
-                bw = tempRect.size.width;
-                bh = tempRect.size.height;
-                tempRect = CC_RECT_PIXELS_TO_POINTS(tempRect);
-                def.U = tempRect.origin.x;
-                def.V = tempRect.origin.y;
-                def.width = tempRect.size.width;
-                def.height = tempRect.size.height;
-                if (mainTexture == nullptr)
-                    mainTexture = charImg->spriteFrame->getTexture();
-                def.validDefinition = true;
+                    Rect tempRect = charImg->spriteFrame->getRectInPixels();
+                    bw = tempRect.size.width;
+                    bh = tempRect.size.height;
+                    tempRect = CC_RECT_PIXELS_TO_POINTS(tempRect);
+                    def.U = tempRect.origin.x;
+                    def.V = tempRect.origin.y;
+                    def.width = tempRect.size.width;
+                    def.height = tempRect.size.height;
+                    if (mainTexture == nullptr)
+                        mainTexture = charImg->spriteFrame->getTexture();
+                    def.validDefinition = true;
+                }
+
+                if (def.xAdvance == 0)
+                     def.xAdvance = xadvance;
             }
             fontAtlas->addLetterDefinition(charId, def);
 
@@ -879,6 +936,136 @@ void UIPackage::loadComponentChildren(PackageItem * item)
 
 void UIPackage::translateComponent(PackageItem * item)
 {
+    if (_stringsSource.empty())
+        return;
+
+    auto it = _stringsSource.find(_id + item->id);
+    if (it == _stringsSource.end())
+        return;
+
+    const ValueMap& strings = it->second;
+    std::string ename, elementId, value;
+    const char* p;
+    int dcnt = item->displayList->size();
+    for (int i = 0; i < dcnt; i++)
+    {
+        TXMLElement* cxml = item->displayList->at(i)->desc;
+        ename = cxml->Name();
+        elementId = (p = cxml->Attribute("id")) ? p : STD_STRING_EMPTY;
+        if (p = cxml->Attribute("tooltips"))
+        {
+            auto it = strings.find(elementId + "-tips");
+            if (it != strings.end())
+                cxml->SetAttribute("tooltips", it->second.asString().c_str());
+        }
+
+        TXMLElement* dxml = cxml->FirstChildElement("gearText");
+        if (dxml != nullptr)
+        {
+            {
+                auto it = strings.find(elementId + "-texts");
+                if (it != strings.end())
+                    dxml->SetAttribute("values", it->second.asString().c_str());
+            }
+
+            {
+                auto it = strings.find(elementId + "-texts_def");
+                if (it != strings.end())
+                    dxml->SetAttribute("default", it->second.asString().c_str());
+            }
+        }
+
+        if (ename == "text" || ename == "richtext")
+        {
+            {
+                auto it = strings.find(elementId);
+                if (it != strings.end())
+                    cxml->SetAttribute("text", it->second.asString().c_str());
+            }
+
+            {
+                auto it = strings.find(elementId + "-prompt");
+                if (it != strings.end())
+                    cxml->SetAttribute("prompt", it->second.asString().c_str());
+            }
+        }
+        else if (ename == "list")
+        {
+            TXMLElement* exml = cxml->FirstChildElement("item");
+            int j = 0;
+            while (exml)
+            {
+                auto it = strings.find(elementId + "-" + Value(j).asString());
+                if (it != strings.end())
+                    exml->SetAttribute("title", it->second.asString().c_str());
+
+                exml = exml->NextSiblingElement("item");
+                j++;
+            }
+        }
+        else if (ename == "component")
+        {
+            dxml = cxml->FirstChildElement("Button");
+            if (dxml != nullptr)
+            {
+                {
+                    auto it = strings.find(elementId);
+                    if (it != strings.end())
+                        dxml->SetAttribute("title", it->second.asString().c_str());
+                }
+
+                {
+                    auto it = strings.find(elementId + "-0");
+                    if (it != strings.end())
+                        dxml->SetAttribute("selectedTitle", it->second.asString().c_str());
+                }
+
+                continue;
+            }
+
+            dxml = cxml->FirstChildElement("Label");
+            if (dxml != nullptr)
+            {
+                {
+                    auto it = strings.find(elementId);
+                    if (it != strings.end())
+                        dxml->SetAttribute("title", it->second.asString().c_str());
+                }
+
+                {
+                    auto it = strings.find(elementId + "-prompt");
+                    if (it != strings.end())
+                        dxml->SetAttribute("prompt", it->second.asString().c_str());
+                }
+
+                continue;
+            }
+
+            dxml = cxml->FirstChildElement("ComboBox");
+            if (dxml != nullptr)
+            {
+                {
+                    auto it = strings.find(elementId);
+                    if (it != strings.end())
+                        dxml->SetAttribute("title", it->second.asString().c_str());
+                }
+
+                TXMLElement* exml = dxml->FirstChildElement("item");
+                int j = 0;
+                while (exml)
+                {
+                    auto it = strings.find(elementId + "-" + Value(j).asString());
+                    if (it != strings.end())
+                        exml->SetAttribute("title", it->second.asString().c_str());
+
+                    exml = exml->NextSiblingElement("item");
+                    j++;
+                }
+
+                continue;
+            }
+        }
+    }
 }
 
 GObject * UIPackage::createObject(const string & resName)

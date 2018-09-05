@@ -25,6 +25,7 @@
 #include "UIObjectFactory.h"
 #include "GObjectPool.h"
 #include "DragDropManager.h"
+#include "tween/GTween.h"
 #include "FairyGUIMacros.h"
 
 #endif

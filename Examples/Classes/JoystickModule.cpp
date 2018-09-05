@@ -36,6 +36,7 @@ bool JoystickModule::init(GComponent * mainView)
     _touchArea->addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(JoystickModule::onTouchMove, this));
     _touchArea->addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(JoystickModule::onTouchEnd, this));
 
+    _tweener = nullptr;
 
     return true;
 }
@@ -47,7 +48,11 @@ void JoystickModule::onTouchBegin(EventContext * context)
         InputEvent* evt = (InputEvent*)context->getInput();
         touchId = evt->getTouchId();
 
-        _button->displayObject()->stopActionByTag(1);
+        if (_tweener != nullptr)
+        {
+            _tweener->kill();
+            _tweener = nullptr;
+        }
 
         Vec2 pt = UIRoot->globalToLocal(evt->getPosition());
         float bx = pt.x;
@@ -133,19 +138,16 @@ void JoystickModule::onTouchEnd(EventContext * context)
         _thumb->setRotation(_thumb->getRotation() + 180);
         _center->setVisible(false);
 
-        Action* action = Sequence::createWithTwoActions(ActionFloat2::create(0.3f,
-            _button->getPosition(),
-            Vec2(_InitX - _button->getWidth() / 2, _InitY - _button->getHeight() / 2), CC_CALLBACK_2(GObject::setPosition, _button)),
-        CallFunc::create([this]()
+        _tweener = GTween::to(_button->getPosition(), Vec2(_InitX - _button->getWidth() / 2, _InitY - _button->getHeight() / 2), 0.3f)
+            ->setTarget(_button, TweenPropType::Position)
+            ->onComplete([this]()
         {
             _button->setSelected(false);
             _thumb->setRotation(0);
             _center->setVisible(true);
             _center->setPosition(_InitX - _center->getWidth() / 2, _InitY - _center->getHeight() / 2);
-        }));
-        action->setTag(1);
+        });
 
-        _button->displayObject()->runAction(action);
         dispatchEvent(END);
     }
 }

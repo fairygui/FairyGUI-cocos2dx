@@ -29,9 +29,6 @@ public:
     bool isShiftDown() const { return (_keyModifiers & 4) != 0; }
     int getMouseWheelDelta() const { return _mouseWheelDelta; }
 
-    bool isShift() const { return false; }
-    bool isCtrl()  const { return false; }
-
     InputProcessor* getProcessor() const { return _inputProcessor; }
 
 private:

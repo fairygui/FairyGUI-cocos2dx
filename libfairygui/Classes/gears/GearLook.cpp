@@ -2,7 +2,6 @@
 #include "GObject.h"
 #include "utils/ToolSet.h"
 #include "UIPackage.h"
-#include "display/Actions.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -20,13 +19,15 @@ GearLook::GearLookValue::GearLookValue(float alpha, float rotation, bool grayed,
     this->touchable = touchable;
 }
 
-GearLook::GearLook(GObject * owner) :GearBase(owner)
+GearLook::GearLook(GObject * owner) :GearBase(owner), _tweener(nullptr)
 {
 
 }
 
 GearLook::~GearLook()
 {
+    if (_tweener != nullptr)
+        _tweener->kill();
 }
 
 void GearLook::init()
@@ -68,12 +69,12 @@ void GearLook::apply()
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_LOOK_ACTION) != nullptr)
+        if (_tweener != nullptr)
         {
-            if (_tweenTarget.x != gv.alpha || _tweenTarget.y != gv.rotation)
+            if (_tweener->endValue.x != gv.alpha || _tweener->endValue.y != gv.rotation)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_LOOK_ACTION);
-                onTweenComplete();
+                _tweener->kill(true);
+                _tweener = nullptr;
             }
             else
                 return;
@@ -85,14 +86,14 @@ void GearLook::apply()
         {
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
-            _tweenTarget.set(gv.alpha, gv.rotation);
 
-            ActionInterval* action = ActionVec2::create(tweenTime,
-                Vec2(_owner->getAlpha(), _owner->getRotation()),
-                _tweenTarget,
-                CC_CALLBACK_1(GearLook::onTweenUpdate, this, a, b));
-            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearLook::onTweenComplete, this), ActionTag::GEAR_LOOK_ACTION);
-            _owner->displayObject()->runAction(action);
+            _tweener = GTween::to(Vec2(_owner->getAlpha(), _owner->getRotation()), Vec2(gv.alpha, gv.rotation), tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->setUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
+                ->onUpdate(CC_CALLBACK_1(GearLook::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearLook::onTweenComplete, this));
         }
     }
     else
@@ -106,13 +107,14 @@ void GearLook::apply()
     }
 }
 
-void GearLook::onTweenUpdate(const Vec2& v, bool a, bool b)
+void GearLook::onTweenUpdate(GTweener* tweener)
 {
-    _owner->_gearLocked = true;
-    if (a)
-        _owner->setAlpha(v.x);
-    if (b)
-        _owner->setRotation(v.y);
+    int flag = _tweener->getUserData().asInt();
+    _owner->_gearLocked = false;
+    if ((flag & 1) != 0)
+        _owner->setAlpha(_tweener->value.x);
+    if ((flag & 2) != 0)
+        _owner->setRotation(_tweener->value.y);
     _owner->_gearLocked = false;
 }
 
@@ -123,6 +125,7 @@ void GearLook::onTweenComplete()
         _owner->releaseDisplayLock(_displayLockToken);
         _displayLockToken = 0;
     }
+    _tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

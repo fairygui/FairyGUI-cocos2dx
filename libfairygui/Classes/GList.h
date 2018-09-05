@@ -167,6 +167,8 @@ private:
     cocos2d::Vec2 _itemSize;
     int _virtualListChanged; //1-content changed, 2-size changed
     bool _eventLocked;
+    uint32_t _itemInfoVer;
+    uint32_t _enterCounter;
 
     struct ItemInfo
     {

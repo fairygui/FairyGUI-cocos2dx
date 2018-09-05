@@ -18,7 +18,7 @@ public:
     FUIInput();
     virtual ~FUIInput();
     
-    const std::string& getText() const;
+    std::string getText() const;
     void setText(const std::string& value);
 
     TextFormat* getTextFormat() const { return _textFormat; }
@@ -40,7 +40,6 @@ private:
     void editBoxReturn(cocos2d::ui::EditBox* editBox);
 
     GTextInput* _owner;
-    std::string _text;
     TextFormat* _textFormat;
     bool _password;
     int _keyboardType;

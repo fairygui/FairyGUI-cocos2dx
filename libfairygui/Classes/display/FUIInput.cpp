@@ -23,7 +23,10 @@ FUIInput * FUIInput::create(GTextInput* owner)
     return pRet;
 }
 
-FUIInput::FUIInput():_textFormat(new TextFormat())
+FUIInput::FUIInput():
+    _textFormat(new TextFormat()),
+    _password(false),
+    _keyboardType(0)
 {
 }
 
@@ -32,15 +35,13 @@ FUIInput::~FUIInput()
     delete _textFormat;
 }
 
-const std::string & FUIInput::getText() const
+std::string FUIInput::getText() const
 {
-    const_cast<FUIInput*>(this)->_text = ui::EditBox::getText();
-    return _text;
+    return ui::EditBox::getText();
 }
 
 void FUIInput::setText(const std::string & value)
 {
-    _text = value;
     ui::EditBox::setText(value.c_str());
 }
 

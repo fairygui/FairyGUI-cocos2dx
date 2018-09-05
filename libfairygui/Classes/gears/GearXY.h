@@ -4,6 +4,7 @@
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
 #include "GearBase.h"
+#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 
@@ -24,12 +25,12 @@ protected:
     void init() override;
 
 private:
-    void onTweenUpdate(const cocos2d::Vec2& v);
+    void onTweenUpdate(GTweener* tweener);
     void onTweenComplete();
 
     std::unordered_map<std::string, cocos2d::Vec2> _storage;
     cocos2d::Vec2 _default;
-    cocos2d::Vec2 _tweenTarget;
+    GTweener* _tweener;
     
 };
 

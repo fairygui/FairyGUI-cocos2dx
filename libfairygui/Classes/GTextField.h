@@ -11,10 +11,16 @@ NS_FGUI_BEGIN
 class GTextField : public GObject, public IColorGear
 {
 public:
-    virtual bool isUBBEnabled() const { return false; }
-    virtual void setUBBEnabled(bool value) {}
+    GTextField();
+    virtual ~GTextField();
 
-    virtual TextAutoSize getAutoSize() const { return TextAutoSize::NONE; }
+    virtual const std::string& getText() const override { return _text; }
+    void setText(const std::string& value) override;
+
+    bool isUBBEnabled() const { return _ubbEnabled; }
+    virtual void setUBBEnabled(bool value);
+
+    TextAutoSize getAutoSize() const { return _autoSize; }
     virtual void setAutoSize(TextAutoSize value) {};
 
     virtual bool isSingleLine() const { return false; }
@@ -25,21 +31,34 @@ public:
 
     virtual const cocos2d::Size& getTextSize() { return _displayObject->getContentSize(); }
 
-    const cocos2d::Color3B& getColor() const { return getTextFormat()->color; }
+    cocos2d::Color3B getColor() const { return getTextFormat()->color; }
     void setColor(const cocos2d::Color3B& value);
 
     float getFontSize() const { return getTextFormat()->fontSize; }
     void setFontSize(float value);
 
-    cocos2d::Color4B cg_getColor() const override { return (cocos2d::Color4B)getTextFormat()->color; }
-    void cg_setColor(const cocos2d::Color4B& value) override;
+    cocos2d::Color3B getOutlineColor() const { return getTextFormat()->outlineColor; }
+    void setOutlineColor(const cocos2d::Color3B& value);
 
-    cocos2d::Color4B cg_getOutlineColor() const override { return (cocos2d::Color4B)getTextFormat()->outlineColor; }
-    void cg_setOutlineColor(const cocos2d::Color4B& value) override;
+    cocos2d::ValueMap* getTemplateVars() { return _templateVars; }
+    void setTemplateVars(cocos2d::ValueMap* value);
+
+    GTextField* setVar(const std::string& name, const cocos2d::Value& value);
+    void flushVars();
 
 protected:
+    virtual void setTextFieldText() = 0;
+    virtual void updateSize();
+
     virtual void setup_BeforeAdd(TXMLElement* xml) override;
     virtual void setup_AfterAdd(TXMLElement* xml) override;
+
+    std::string parseTemplate(const char* text);
+
+    std::string _text;
+    bool _ubbEnabled;
+    TextAutoSize _autoSize;
+    cocos2d::ValueMap* _templateVars;
 };
 
 class GBasicTextField : public GTextField
@@ -50,10 +69,6 @@ public:
 
     CREATE_FUNC(GBasicTextField);
 
-    const std::string& getText() const override { return _label->getString(); }
-    void setText(const std::string& value) override;
-
-    virtual TextAutoSize getAutoSize() const override { return _autoSize; }
     virtual void setAutoSize(TextAutoSize value) override;
 
     virtual bool isSingleLine() const override { return _label->isWrapEnabled(); }
@@ -66,13 +81,12 @@ protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
     virtual void handleGrayedChanged() override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
 
-    void updateSize();
+    virtual void setTextFieldText() override;
+    virtual void updateSize() override;
 
 private:
     FUILabel* _label;
-    TextAutoSize _autoSize;
     bool _updatingSize;
 };
 

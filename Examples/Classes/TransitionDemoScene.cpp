@@ -83,9 +83,8 @@ void TransitionDemoScene::__play5(EventContext* context)
 
 void TransitionDemoScene::playNum()
 {
-    ActionFloat* action = ActionFloat::create(0.3f, _startValue, _endValue, [this](float value)
+    GTween::to(_startValue, _endValue, 0.3f)->onUpdate([this](GTweener* tweener)
     {
-        _g5->getChild("value")->setText(Value(floor(value)).asString());
+        _g5->getChild("value")->setText(Value((int)floor(tweener->value.x)).asString());
     });
-    _view->displayObject()->runAction(action);
 }

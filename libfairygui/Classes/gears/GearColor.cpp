@@ -11,26 +11,29 @@ GearColor::GearColorValue::GearColorValue()
 
 }
 
-GearColor::GearColorValue::GearColorValue(const Color4B& color, const Color4B& strokeColor)
+GearColor::GearColorValue::GearColorValue(const Color3B& color, const Color3B& strokeColor)
 {
     this->color = color;
     this->outlineColor = strokeColor;
 }
 
-GearColor::GearColor(GObject * owner) :GearBase(owner)
+GearColor::GearColor(GObject * owner) :GearBase(owner), _tweener(nullptr)
 {
 
 }
 
 GearColor::~GearColor()
 {
+    if (_tweener != nullptr)
+        _tweener->kill();
 }
 
 void GearColor::init()
 {
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
+    GTextField* tf = dynamic_cast<GTextField*>(_owner);
 
-    _default = GearColorValue(cg->cg_getColor(), cg->cg_getOutlineColor());
+    _default = GearColorValue(cg->getColor(), tf != nullptr ? tf->getOutlineColor() : Color3B::BLACK);
     _storage.clear();
 }
 
@@ -43,11 +46,11 @@ void GearColor::addStatus(const std::string&  pageId, const std::string& value)
     ToolSet::splitString(value, ',', arr);
 
     GearColorValue gv;
-    gv.color = ToolSet::convertFromHtmlColor(arr[0].c_str());
+    gv.color = (Color3B)ToolSet::convertFromHtmlColor(arr[0].c_str());
     if (arr.size() == 1)
-        gv.outlineColor = Color4B(0, 0, 0, 0);
+        gv.outlineColor = _default.outlineColor;
     else
-        gv.outlineColor = ToolSet::convertFromHtmlColor(arr[1].c_str());
+        gv.outlineColor = (Color3B)ToolSet::convertFromHtmlColor(arr[1].c_str());
 
     if (pageId.size() == 0)
         _default = gv;
@@ -65,58 +68,58 @@ void GearColor::apply()
         gv = _default;
 
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
+    GTextField* tf = dynamic_cast<GTextField*>(_owner);
 
     if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (gv.outlineColor.a > 0)
+        if (tf != nullptr && gv.outlineColor != tf->getOutlineColor())
         {
             _owner->_gearLocked = true;
-            cg->cg_setOutlineColor(gv.outlineColor);
+            tf->setOutlineColor(gv.outlineColor);
             _owner->_gearLocked = false;
         }
 
-        if (_owner->displayObject()->getActionByTag(ActionTag::GEAR_COLOR_ACTION) != nullptr)
+        if (_tweener != nullptr)
         {
-            if (_tweenTarget.x != gv.color.r || _tweenTarget.y != gv.color.g || _tweenTarget.z != gv.color.b)
+            if (_tweener->endValue.getColor() != gv.color)
             {
-                _owner->displayObject()->stopActionByTag(ActionTag::GEAR_COLOR_ACTION);
-                onTweenComplete();
+                _tweener->kill(true);
+                _tweener = nullptr;
             }
             else
                 return;
         }
 
-        if (gv.color != cg->cg_getColor())
+        Color3B curColor = cg->getColor();
+        if (gv.color != curColor)
         {
             if (_owner->checkGearController(0, _controller))
                 _displayLockToken = _owner->addDisplayLock();
-            _tweenTarget.set(gv.color.r, gv.color.g, gv.color.b, gv.color.a);
-            const Color4B& curColor = cg->cg_getColor();
 
-            ActionInterval* action = ActionVec4::create(tweenTime,
-                Vec4(curColor.r, curColor.g, curColor.b, curColor.a),
-                _tweenTarget,
-                CC_CALLBACK_1(GearColor::onTweenUpdate, this));
-            action = composeActions(action, easeType, delay, CC_CALLBACK_0(GearColor::onTweenComplete, this), ActionTag::GEAR_COLOR_ACTION);
-            _owner->displayObject()->runAction(action);
+            _tweener = GTween::to((Color4B)curColor, (Color4B)gv.color, tweenTime)
+                ->setDelay(delay)
+                ->setEase(easeType)
+                ->setTargetAny(this)
+                ->onUpdate(CC_CALLBACK_1(GearColor::onTweenUpdate, this))
+                ->onComplete(CC_CALLBACK_0(GearColor::onTweenComplete, this));
         }
     }
     else
     {
         _owner->_gearLocked = true;
-        cg->cg_setColor(gv.color);
-        if (gv.outlineColor.a > 0)
-            cg->cg_setOutlineColor(gv.outlineColor);
+        cg->setColor(gv.color);
+        if (tf != nullptr  && gv.outlineColor != tf->getOutlineColor())
+            tf->setOutlineColor(gv.outlineColor);
         _owner->_gearLocked = false;
     }
 }
 
-void GearColor::onTweenUpdate(const Vec4& v)
+void GearColor::onTweenUpdate(GTweener* tweener)
 {
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
 
     _owner->_gearLocked = true;
-    cg->cg_setColor(Color4B(v.x, v.y, v.z, v.w));
+    cg->setColor((Color3B)_tweener->value.getColor());
     _owner->_gearLocked = false;
 }
 
@@ -127,13 +130,16 @@ void GearColor::onTweenComplete()
         _owner->releaseDisplayLock(_displayLockToken);
         _displayLockToken = 0;
     }
+    _tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 
 void GearColor::updateState()
 {
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
-    _storage[_controller->getSelectedPageId()] = GearColorValue(cg->cg_getColor(), cg->cg_getOutlineColor());
+    GTextField* tf = dynamic_cast<GTextField*>(_owner);
+
+    _storage[_controller->getSelectedPageId()] = GearColorValue(cg->getColor(), tf != nullptr ? tf->getOutlineColor() : _default.outlineColor);
 }
 
 NS_FGUI_END

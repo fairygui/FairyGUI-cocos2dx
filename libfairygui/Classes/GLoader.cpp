@@ -11,10 +11,12 @@ GLoader::GLoader() :
     _align(TextHAlignment::LEFT),
     _verticalAlign(TextVAlignment::TOP),
     _fill(LoaderFillType::NONE),
+    _shrinkOnly(false),
     _updatingLayout(false),
     _contentItem(nullptr),
     _contentStatus(0),
     _content(nullptr),
+    _content2(nullptr),
     _playAction(nullptr),
     _playing(true),
     _frame(0)
@@ -25,6 +27,7 @@ GLoader::~GLoader()
 {
     CC_SAFE_RELEASE(_playAction);
     CC_SAFE_RELEASE(_content);
+    CC_SAFE_RELEASE(_content2);
 }
 
 void GLoader::handleInit()
@@ -85,6 +88,15 @@ void GLoader::setFill(LoaderFillType value)
     }
 }
 
+void GLoader::setShrinkOnly(bool value)
+{
+    if (_shrinkOnly != value)
+    {
+        _shrinkOnly = value;
+        updateLayout();
+    }
+}
+
 void GLoader::setColor(const cocos2d::Color3B & value)
 {
     _content->setColor(value);
@@ -102,24 +114,44 @@ void GLoader::setPlaying(bool value)
             else
                 _content->stopAction(_playAction);
         }
+        updateGear(5);
     }
 }
 
-void GLoader::setCurrentFrame(int value)
+int GLoader::getFrame() const
 {
-    _frame = value;
+    return _playAction->getFrame();
+}
+
+void GLoader::setFrame(int value)
+{
+    if (_frame != value)
+    {
+        _frame = value;
+        if (_playAction)
+            _playAction->setFrame(value);
+        updateGear(5);
+    }
+}
+
+float GLoader::getTimeScale() const
+{
     if (_playAction)
-        _playAction->setCurrentFrame(value);
+        return _playAction->getTimeScale();
+    else
+        return 1;
 }
 
-cocos2d::Color4B GLoader::cg_getColor() const
+void GLoader::setTimeScale(float value)
 {
-    return (Color4B)_content->getColor();
+    if (_playAction)
+        _playAction->setTimeScale(value);
 }
 
-void GLoader::cg_setColor(const cocos2d::Color4B& value)
+void GLoader::advance(float time)
 {
-    _content->setColor((Color3B)value);
+    if (_playAction)
+        _playAction->advance(time);
 }
 
 void GLoader::loadContent()
@@ -145,12 +177,12 @@ void GLoader::loadFromPackage()
     if (_contentItem != nullptr)
     {
         _contentItem->load();
+        _contentSourceSize.width = _contentItem->width;
+        _contentSourceSize.height = _contentItem->height;
 
         if (_contentItem->type == PackageItemType::IMAGE)
         {
             _contentStatus = 1;
-            _contentSourceSize.width = _contentItem->width;
-            _contentSourceSize.height = _contentItem->height;
             _content->initWithSpriteFrame(_contentItem->spriteFrame);
             if (_contentItem->scale9Grid)
                 ((FUISprite*)_content)->setScale9Grid(_contentItem->scale9Grid);
@@ -159,9 +191,6 @@ void GLoader::loadFromPackage()
         else if (_contentItem->type == PackageItemType::MOVIECLIP)
         {
             _contentStatus = 2;
-            _contentSourceSize.width = _contentItem->width;
-            _contentSourceSize.height = _contentItem->height;
-
             if (_playAction == nullptr)
             {
                 _playAction = ActionMovieClip::create(_contentItem->animation, _contentItem->repeatDelay);
@@ -172,9 +201,30 @@ void GLoader::loadFromPackage()
             if (_playing)
                 _content->runAction(_playAction);
             else
-                _playAction->setCurrentFrame(_frame);
+                _playAction->setFrame(_frame);
 
             updateLayout();
+        }
+        else if (_contentItem->type == PackageItemType::COMPONENT)
+        {
+            GObject* obj = UIPackage::createObjectFromURL(_url);
+            if (obj == nullptr)
+                setErrorState();
+            else if (dynamic_cast<GComponent*>(obj) == nullptr)
+            {
+                setErrorState();
+            }
+            else
+            {
+                _content2 = obj->as<GComponent>();
+                _content2->retain();
+                _content2->addEventListener(UIEventType::SizeChange, [this](EventContext*) {
+                    if (!_updatingLayout)
+                        updateLayout();
+                });
+                _displayObject->addChild(_content2->displayObject());
+                updateLayout();
+            }
         }
         else
         {
@@ -232,15 +282,20 @@ void GLoader::clearContent()
         _content->stopAction(_playAction);
     }
 
+    if (_content2 != nullptr)
+    {
+        _displayObject->removeChild(_content2->displayObject());
+        CC_SAFE_RELEASE(_content2);
+    }
     ((FUISprite*)_content)->clearContent();
-    _contentItem = nullptr;
 
+    _contentItem = nullptr;
     _contentStatus = 0;
 }
 
 void GLoader::updateLayout()
 {
-    if (_contentStatus == 0)
+    if (_content2 == nullptr && _contentStatus == 0)
     {
         if (_autoSize)
         {
@@ -265,9 +320,17 @@ void GLoader::updateLayout()
 
         if (_size.equals(_contentSize))
         {
-            _content->setScale(1, 1);
-            _content->setAnchorPoint(Vec2::ZERO);
-            _content->setPosition(0, 0);
+            if (_content2 != nullptr)
+            {
+                _content2->setScale(1, 1);
+                _content2->setPosition(0, -_size.height);
+            }
+            else
+            {
+                _content->setScale(1, 1);
+                _content->setAnchorPoint(Vec2::ZERO);
+                _content->setPosition(0, 0);
+            }
             return;
         }
     }
@@ -291,14 +354,36 @@ void GLoader::updateLayout()
                 else
                     sy = sx;
             }
+            else if (_fill == LoaderFillType::SCALE_NO_BORDER)
+            {
+                if (sx > sy)
+                    sy = sx;
+                else
+                    sx = sy;
+            }
+
+            if (_shrinkOnly)
+            {
+                if (sx > 1)
+                    sx = 1;
+                if (sy > 1)
+                    sy = 1;
+            }
             _contentSize.width = floor(_contentSourceSize.width * sx);
             _contentSize.height = floor(_contentSourceSize.height * sy);
         }
     }
 
-    _content->setContentSize(_contentSourceSize);
-    _content->setScale(sx, sy);
-    _content->setAnchorPoint(Vec2::ZERO);
+    if (_content2 != nullptr)
+    {
+        _content2->setScale(sx, sy);
+    }
+    else
+    {
+        _content->setContentSize(_contentSourceSize);
+        _content->setScale(sx, sy);
+        _content->setAnchorPoint(Vec2::ZERO);
+    }
 
     float nx;
     float ny;
@@ -308,14 +393,29 @@ void GLoader::updateLayout()
         nx = floor(_size.width - _contentSize.width);
     else
         nx = 0;
-    if (_verticalAlign == TextVAlignment::CENTER)
-        ny = floor((_size.height - _contentSize.height) / 2);
-    else if (_verticalAlign == TextVAlignment::BOTTOM)
-        ny = 0;
-    else
-        ny = _size.height - _contentSize.height;
 
-    _content->setPosition(nx, ny);
+    if (_content2 != nullptr)
+    {
+        if (_verticalAlign == TextVAlignment::CENTER)
+            ny = floor(-_contentSize.height - (_size.height - _contentSize.height) / 2);
+        else if (_verticalAlign == TextVAlignment::BOTTOM)
+            ny = -_contentSize.height;
+        else
+            ny = -_size.height;
+
+        _content2->setPosition(nx, ny);
+    }
+    else
+    {
+        if (_verticalAlign == TextVAlignment::CENTER)
+            ny = floor((_size.height - _contentSize.height) / 2);
+        else if (_verticalAlign == TextVAlignment::BOTTOM)
+            ny = 0;
+        else
+            ny = _size.height - _contentSize.height;
+
+        _content->setPosition(nx, ny);
+    }
 }
 
 void GLoader::setErrorState()
@@ -339,6 +439,8 @@ void GLoader::handleGrayedChanged()
     GObject::handleGrayedChanged();
 
     ((FUISprite*)_content)->setGrayed(_finalGrayed);
+    if (_content2 != nullptr)
+        _content2->setGrayed(_finalGrayed);
 }
 
 void GLoader::setup_BeforeAdd(TXMLElement * xml)
@@ -362,6 +464,9 @@ void GLoader::setup_BeforeAdd(TXMLElement * xml)
     p = xml->Attribute("fill");
     if (p)
         _fill = ToolSet::parseFillType(p);
+
+    _shrinkOnly = xml->BoolAttribute("shrinkOnly");
+    _autoSize = xml->BoolAttribute("autoSize");
 
     p = xml->Attribute("color");
     if (p)
