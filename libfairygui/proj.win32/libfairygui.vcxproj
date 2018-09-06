@@ -15,7 +15,6 @@
     <ClInclude Include="..\Classes\controller_action\ChangePageAction.h" />
     <ClInclude Include="..\Classes\controller_action\ControllerAction.h" />
     <ClInclude Include="..\Classes\controller_action\PlayTransitionAction.h" />
-    <ClInclude Include="..\Classes\display\Actions.h" />
     <ClInclude Include="..\Classes\display\BitmapFont.h" />
     <ClInclude Include="..\Classes\display\FUIContainer.h" />
     <ClInclude Include="..\Classes\display\FUIInput.h" />
@@ -85,7 +84,6 @@
     <ClCompile Include="..\Classes\controller_action\ChangePageAction.cpp" />
     <ClCompile Include="..\Classes\controller_action\ControllerAction.cpp" />
     <ClCompile Include="..\Classes\controller_action\PlayTransitionAction.cpp" />
-    <ClCompile Include="..\Classes\display\Actions.cpp" />
     <ClCompile Include="..\Classes\display\BitmapFont.cpp" />
     <ClCompile Include="..\Classes\display\FUIContainer.cpp" />
     <ClCompile Include="..\Classes\display\FUIInput.cpp" />

@@ -22,6 +22,9 @@
     <Filter Include="src\treeview">
       <UniqueIdentifier>{62d47ed6-2e8e-4e97-8175-5504550149cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\tween">
+      <UniqueIdentifier>{b7cfd7cb-ec46-4881-bd61-5ec0975a74e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\GButton.h">
@@ -159,9 +162,6 @@
     <ClInclude Include="..\Classes\utils\ToolSet.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\utils\ByteArray.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\event\UIEventType.h">
       <Filter>src\event</Filter>
     </ClInclude>
@@ -176,9 +176,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\DragDropManager.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\display\Actions.h">
-      <Filter>src\display</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\display\FUIRichText.h">
       <Filter>src\display</Filter>
@@ -196,9 +193,6 @@
       <Filter>src\display</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\utils\UBBParser.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\utils\SwitchHelper.h">
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\event\HitTest.h">
@@ -227,6 +221,36 @@
     </ClInclude>
     <ClInclude Include="..\Classes\display\TextFormat.h">
       <Filter>src\display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\GTween.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\GTweener.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\TweenManager.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\TweenValue.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\EaseManager.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\EaseType.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\TweenPropType.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\TranslationHelper.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AsyncCreationHelper.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\ByteBuffer.h">
+      <Filter>src\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -359,9 +383,6 @@
     <ClCompile Include="..\Classes\utils\ToolSet.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\utils\ByteArray.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Margin.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -370,9 +391,6 @@
     </ClCompile>
     <ClCompile Include="..\Classes\DragDropManager.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\display\Actions.cpp">
-      <Filter>src\display</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\display\FUISprite.cpp">
       <Filter>src\display</Filter>
@@ -418,6 +436,33 @@
     </ClCompile>
     <ClCompile Include="..\Classes\display\TextFormat.cpp">
       <Filter>src\display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\GTween.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\GTweener.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\TweenManager.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\TweenValue.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\EaseManager.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\TweenPropType.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\TranslationHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AsyncCreationHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\ByteBuffer.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
