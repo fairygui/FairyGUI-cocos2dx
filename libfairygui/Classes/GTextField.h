@@ -31,8 +31,8 @@ public:
 
     virtual const cocos2d::Size& getTextSize() { return _displayObject->getContentSize(); }
 
-    cocos2d::Color3B getColor() const { return getTextFormat()->color; }
-    void setColor(const cocos2d::Color3B& value);
+    cocos2d::Color3B getColor() const override { return getTextFormat()->color; }
+    void setColor(const cocos2d::Color3B& value) override;
 
     float getFontSize() const { return getTextFormat()->fontSize; }
     void setFontSize(float value);

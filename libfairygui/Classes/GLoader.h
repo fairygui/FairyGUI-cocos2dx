@@ -41,8 +41,8 @@ public:
 
     const cocos2d::Size& getContentSize() { return _contentSize; }
 
-    cocos2d::Color3B getColor() const { return _content->getColor(); }
-    void setColor(const cocos2d::Color3B& value);
+    cocos2d::Color3B getColor() const override { return _content->getColor(); }
+    void setColor(const cocos2d::Color3B& value) override;
 
     bool isPlaying() const override { return _playing; }
     void setPlaying(bool value) override;

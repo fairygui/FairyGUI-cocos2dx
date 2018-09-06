@@ -26,7 +26,7 @@ GTweener* TweenManager::createTween()
         init();
 
     GTweener* tweener;
-    int cnt = _tweenerPool.size();
+    int cnt = (int)_tweenerPool.size();
     if (cnt > 0)
     {
         tweener = _tweenerPool[cnt - 1];

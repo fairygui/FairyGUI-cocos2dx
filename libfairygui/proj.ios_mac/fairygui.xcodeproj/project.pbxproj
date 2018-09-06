@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		445402B01FB3E9E400869375 /* Controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402391FB3E9E400869375 /* Controller.cpp */; };
-		445402B11FB3E9E400869375 /* Actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454023C1FB3E9E400869375 /* Actions.cpp */; };
 		445402B21FB3E9E400869375 /* BitmapFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454023E1FB3E9E400869375 /* BitmapFont.cpp */; };
 		445402B31FB3E9E400869375 /* FUIContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402401FB3E9E400869375 /* FUIContainer.cpp */; };
 		445402B41FB3E9E400869375 /* FUILabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402421FB3E9E400869375 /* FUILabel.cpp */; };
@@ -66,7 +65,6 @@
 		445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 445402FC1FB3EFFA00869375 /* libfairygui_MACPriv.hpp */; };
 		445402FF1FB3EFFA00869375 /* libfairygui_MAC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402FE1FB3EFFA00869375 /* libfairygui_MAC.cpp */; };
 		445403761FB4098900869375 /* Controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402391FB3E9E400869375 /* Controller.cpp */; };
-		445403771FB4098900869375 /* Actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454023C1FB3E9E400869375 /* Actions.cpp */; };
 		445403781FB4098900869375 /* BitmapFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4454023E1FB3E9E400869375 /* BitmapFont.cpp */; };
 		445403791FB4098900869375 /* FUIContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402401FB3E9E400869375 /* FUIContainer.cpp */; };
 		4454037A1FB4098900869375 /* FUILabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402421FB3E9E400869375 /* FUILabel.cpp */; };
@@ -137,6 +135,25 @@
 		44905A9A1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
 		44905A9B1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
 		44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A991FC809AA00C33C88 /* TextFormat.h */; };
+		4496999321416A9700B6412E /* EaseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998621416A9700B6412E /* EaseManager.cpp */; };
+		4496999421416A9700B6412E /* EaseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998621416A9700B6412E /* EaseManager.cpp */; };
+		4496999521416A9700B6412E /* EaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998721416A9700B6412E /* EaseManager.h */; };
+		4496999621416A9700B6412E /* EaseType.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998821416A9700B6412E /* EaseType.h */; };
+		4496999721416A9700B6412E /* GTween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998921416A9700B6412E /* GTween.cpp */; };
+		4496999821416A9700B6412E /* GTween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998921416A9700B6412E /* GTween.cpp */; };
+		4496999921416A9700B6412E /* GTween.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998A21416A9700B6412E /* GTween.h */; };
+		4496999A21416A9700B6412E /* GTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998B21416A9700B6412E /* GTweener.cpp */; };
+		4496999B21416A9700B6412E /* GTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998B21416A9700B6412E /* GTweener.cpp */; };
+		4496999C21416A9700B6412E /* GTweener.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998C21416A9700B6412E /* GTweener.h */; };
+		4496999D21416A9700B6412E /* TweenManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998D21416A9700B6412E /* TweenManager.cpp */; };
+		4496999E21416A9700B6412E /* TweenManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998D21416A9700B6412E /* TweenManager.cpp */; };
+		4496999F21416A9700B6412E /* TweenManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998E21416A9700B6412E /* TweenManager.h */; };
+		449699A021416A9700B6412E /* TweenPropType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998F21416A9700B6412E /* TweenPropType.cpp */; };
+		449699A121416A9700B6412E /* TweenPropType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998F21416A9700B6412E /* TweenPropType.cpp */; };
+		449699A221416A9700B6412E /* TweenPropType.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496999021416A9700B6412E /* TweenPropType.h */; };
+		449699A321416A9700B6412E /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496999121416A9700B6412E /* TweenValue.cpp */; };
+		449699A421416A9700B6412E /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496999121416A9700B6412E /* TweenValue.cpp */; };
+		449699A521416A9700B6412E /* TweenValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496999221416A9700B6412E /* TweenValue.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -155,8 +172,6 @@
 		445402201FB3E8D500869375 /* libfairygui iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libfairygui iOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		445402391FB3E9E400869375 /* Controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Controller.cpp; sourceTree = "<group>"; };
 		4454023A1FB3E9E400869375 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
-		4454023C1FB3E9E400869375 /* Actions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Actions.cpp; sourceTree = "<group>"; };
-		4454023D1FB3E9E400869375 /* Actions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Actions.h; sourceTree = "<group>"; };
 		4454023E1FB3E9E400869375 /* BitmapFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitmapFont.cpp; sourceTree = "<group>"; };
 		4454023F1FB3E9E400869375 /* BitmapFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitmapFont.h; sourceTree = "<group>"; };
 		445402401FB3E9E400869375 /* FUIContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FUIContainer.cpp; sourceTree = "<group>"; };
@@ -290,6 +305,19 @@
 		44905A8D1FC574BC00C33C88 /* TreeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeView.h; sourceTree = "<group>"; };
 		44905A981FC809AA00C33C88 /* TextFormat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextFormat.cpp; sourceTree = "<group>"; };
 		44905A991FC809AA00C33C88 /* TextFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFormat.h; sourceTree = "<group>"; };
+		4496998621416A9700B6412E /* EaseManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EaseManager.cpp; sourceTree = "<group>"; };
+		4496998721416A9700B6412E /* EaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EaseManager.h; sourceTree = "<group>"; };
+		4496998821416A9700B6412E /* EaseType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EaseType.h; sourceTree = "<group>"; };
+		4496998921416A9700B6412E /* GTween.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTween.cpp; sourceTree = "<group>"; };
+		4496998A21416A9700B6412E /* GTween.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTween.h; sourceTree = "<group>"; };
+		4496998B21416A9700B6412E /* GTweener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTweener.cpp; sourceTree = "<group>"; };
+		4496998C21416A9700B6412E /* GTweener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTweener.h; sourceTree = "<group>"; };
+		4496998D21416A9700B6412E /* TweenManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenManager.cpp; sourceTree = "<group>"; };
+		4496998E21416A9700B6412E /* TweenManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenManager.h; sourceTree = "<group>"; };
+		4496998F21416A9700B6412E /* TweenPropType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenPropType.cpp; sourceTree = "<group>"; };
+		4496999021416A9700B6412E /* TweenPropType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenPropType.h; sourceTree = "<group>"; };
+		4496999121416A9700B6412E /* TweenValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenValue.cpp; sourceTree = "<group>"; };
+		4496999221416A9700B6412E /* TweenValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenValue.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -332,6 +360,7 @@
 		445402381FB3E9E400869375 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				4496998521416A9700B6412E /* tween */,
 				44905A891FC574BC00C33C88 /* treeview */,
 				44905A4F1FC3CCCD00C33C88 /* controller_action */,
 				445402391FB3E9E400869375 /* Controller.cpp */,
@@ -413,8 +442,6 @@
 		4454023B1FB3E9E400869375 /* display */ = {
 			isa = PBXGroup;
 			children = (
-				4454023C1FB3E9E400869375 /* Actions.cpp */,
-				4454023D1FB3E9E400869375 /* Actions.h */,
 				4454023E1FB3E9E400869375 /* BitmapFont.cpp */,
 				4454023F1FB3E9E400869375 /* BitmapFont.h */,
 				445402401FB3E9E400869375 /* FUIContainer.cpp */,
@@ -535,6 +562,26 @@
 			path = treeview;
 			sourceTree = "<group>";
 		};
+		4496998521416A9700B6412E /* tween */ = {
+			isa = PBXGroup;
+			children = (
+				4496998621416A9700B6412E /* EaseManager.cpp */,
+				4496998721416A9700B6412E /* EaseManager.h */,
+				4496998821416A9700B6412E /* EaseType.h */,
+				4496998921416A9700B6412E /* GTween.cpp */,
+				4496998A21416A9700B6412E /* GTween.h */,
+				4496998B21416A9700B6412E /* GTweener.cpp */,
+				4496998C21416A9700B6412E /* GTweener.h */,
+				4496998D21416A9700B6412E /* TweenManager.cpp */,
+				4496998E21416A9700B6412E /* TweenManager.h */,
+				4496998F21416A9700B6412E /* TweenPropType.cpp */,
+				4496999021416A9700B6412E /* TweenPropType.h */,
+				4496999121416A9700B6412E /* TweenValue.cpp */,
+				4496999221416A9700B6412E /* TweenValue.h */,
+			);
+			path = tween;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -542,8 +589,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4496999521416A9700B6412E /* EaseManager.h in Headers */,
+				4496999C21416A9700B6412E /* GTweener.h in Headers */,
+				4496999F21416A9700B6412E /* TweenManager.h in Headers */,
+				4496999621416A9700B6412E /* EaseType.h in Headers */,
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
 				44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */,
+				449699A221416A9700B6412E /* TweenPropType.h in Headers */,
+				4496999921416A9700B6412E /* GTween.h in Headers */,
+				449699A521416A9700B6412E /* TweenValue.h in Headers */,
 				445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -629,6 +683,8 @@
 				44905A4C1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */,
 				445402B51FB3E9E400869375 /* FUIRichText.cpp in Sources */,
 				445402E21FB3E9E400869375 /* UIPackage.cpp in Sources */,
+				4496999721416A9700B6412E /* GTween.cpp in Sources */,
+				4496999A21416A9700B6412E /* GTweener.cpp in Sources */,
 				445402DE1FB3E9E400869375 /* ScrollPane.cpp in Sources */,
 				445402B71FB3E9E400869375 /* DragDropManager.cpp in Sources */,
 				445402D11FB3E9E400869375 /* GObjectPool.cpp in Sources */,
@@ -651,6 +707,7 @@
 				44905A8E1FC574BC00C33C88 /* TreeNode.cpp in Sources */,
 				445402C51FB3E9E400869375 /* GearLook.cpp in Sources */,
 				445402C21FB3E9E400869375 /* GearColor.cpp in Sources */,
+				4496999321416A9700B6412E /* EaseManager.cpp in Sources */,
 				445402E41FB3E9E400869375 /* ToolSet.cpp in Sources */,
 				445402D41FB3E9E400869375 /* GRoot.cpp in Sources */,
 				445402D71FB3E9E400869375 /* GTextField.cpp in Sources */,
@@ -664,19 +721,21 @@
 				445402BE1FB3E9E400869375 /* GComboBox.cpp in Sources */,
 				445402BF1FB3E9E400869375 /* GComponent.cpp in Sources */,
 				445402C91FB3E9E400869375 /* GGraph.cpp in Sources */,
+				449699A321416A9700B6412E /* TweenValue.cpp in Sources */,
 				44905A561FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
 				445402E31FB3E9E400869375 /* ByteArray.cpp in Sources */,
 				445402D31FB3E9E400869375 /* GRichTextField.cpp in Sources */,
 				445402CB1FB3E9E400869375 /* GImage.cpp in Sources */,
 				445402C31FB3E9E400869375 /* GearDisplay.cpp in Sources */,
 				445402E51FB3E9E400869375 /* UBBParser.cpp in Sources */,
+				4496999D21416A9700B6412E /* TweenManager.cpp in Sources */,
 				445402B91FB3E9E400869375 /* HitTest.cpp in Sources */,
 				445402C41FB3E9E400869375 /* GearIcon.cpp in Sources */,
+				449699A021416A9700B6412E /* TweenPropType.cpp in Sources */,
 				445402BD1FB3E9E400869375 /* GButton.cpp in Sources */,
 				445402D91FB3E9E400869375 /* Margin.cpp in Sources */,
 				445402C61FB3E9E400869375 /* GearSize.cpp in Sources */,
 				445402BC1FB3E9E400869375 /* UIEventDispatcher.cpp in Sources */,
-				445402B11FB3E9E400869375 /* Actions.cpp in Sources */,
 				445402CA1FB3E9E400869375 /* GGroup.cpp in Sources */,
 				445402D51FB3E9E400869375 /* GScrollBar.cpp in Sources */,
 				44905A5C1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
@@ -694,8 +753,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4496999B21416A9700B6412E /* GTweener.cpp in Sources */,
 				445403761FB4098900869375 /* Controller.cpp in Sources */,
-				445403771FB4098900869375 /* Actions.cpp in Sources */,
 				44905A921FC574BC00C33C88 /* TreeView.cpp in Sources */,
 				445403781FB4098900869375 /* BitmapFont.cpp in Sources */,
 				445403791FB4098900869375 /* FUIContainer.cpp in Sources */,
@@ -741,8 +800,10 @@
 				4454039C1FB4098900869375 /* GSlider.cpp in Sources */,
 				4454039D1FB4098900869375 /* GTextField.cpp in Sources */,
 				4454039E1FB4098900869375 /* GTextInput.cpp in Sources */,
+				449699A421416A9700B6412E /* TweenValue.cpp in Sources */,
 				4454039F1FB4098900869375 /* Margin.cpp in Sources */,
 				445403A01FB4098900869375 /* PackageItem.cpp in Sources */,
+				4496999821416A9700B6412E /* GTween.cpp in Sources */,
 				445403A11FB4098900869375 /* PopupMenu.cpp in Sources */,
 				445403A21FB4098900869375 /* RelationItem.cpp in Sources */,
 				445403A31FB4098900869375 /* Relations.cpp in Sources */,
@@ -751,7 +812,10 @@
 				445403A61FB4098900869375 /* UIConfig.cpp in Sources */,
 				445403A71FB4098900869375 /* UIObjectFactory.cpp in Sources */,
 				445403A81FB4098900869375 /* UIPackage.cpp in Sources */,
+				4496999E21416A9700B6412E /* TweenManager.cpp in Sources */,
 				44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */,
+				449699A121416A9700B6412E /* TweenPropType.cpp in Sources */,
+				4496999421416A9700B6412E /* EaseManager.cpp in Sources */,
 				445403A91FB4098900869375 /* ByteArray.cpp in Sources */,
 				445403AA1FB4098900869375 /* ToolSet.cpp in Sources */,
 				445403AB1FB4098900869375 /* UBBParser.cpp in Sources */,

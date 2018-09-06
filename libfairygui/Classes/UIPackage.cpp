@@ -952,7 +952,7 @@ void UIPackage::translateComponent(PackageItem * item)
         TXMLElement* cxml = item->displayList->at(i)->desc;
         ename = cxml->Name();
         elementId = (p = cxml->Attribute("id")) ? p : STD_STRING_EMPTY;
-        if (p = cxml->Attribute("tooltips"))
+        if ((p = cxml->Attribute("tooltips")))
         {
             auto it = strings.find(elementId + "-tips");
             if (it != strings.end())

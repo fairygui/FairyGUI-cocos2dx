@@ -37,7 +37,7 @@ public:
     const std::string& getSelectedIcon() const { return _selectedIcon; }
     void setSelectedIcon(const std::string& value);
 
-    const cocos2d::Color3B& getTitleColor() const;
+    cocos2d::Color3B getTitleColor() const;
     void setTitleColor(const cocos2d::Color3B& value);
 
     int getTitleFontSize() const;

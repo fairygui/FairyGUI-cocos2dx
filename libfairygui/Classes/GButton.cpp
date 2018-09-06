@@ -66,7 +66,7 @@ void GButton::setSelectedIcon(const std::string & value)
         _iconObject->setIcon((_selected && _selectedIcon.length() > 0) ? _selectedIcon : _icon);
 }
 
-const cocos2d::Color3B& GButton::getTitleColor() const
+cocos2d::Color3B GButton::getTitleColor() const
 {
     if (dynamic_cast<GTextField*>(_titleObject))
         return ((GTextField*)_titleObject)->getColor();
