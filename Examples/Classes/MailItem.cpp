@@ -1,9 +1,7 @@
 #include "MailItem.h"
 
-void MailItem::constructFromXML(TXMLElement *xml)
+void MailItem::onConstruct()
 {
-    GButton::constructFromXML(xml);
-
     _timeText = getChild("timeText")->as<GTextField>();
     _readController = getController("IsRead");
     _fetchController = getController("c1");

@@ -1,6 +1,8 @@
 #include "GLoader.h"
 #include "UIPackage.h"
-#include "utils/ToolSet.h"
+#include "GComponent.h"
+#include "GMovieClip.h"
+#include "utils/Bytebuffer.h"
 #include "display/FUISprite.h"
 
 NS_FGUI_BEGIN
@@ -443,42 +445,27 @@ void GLoader::handleGrayedChanged()
         _content2->setGrayed(_finalGrayed);
 }
 
-void GLoader::setup_BeforeAdd(TXMLElement * xml)
+void GLoader::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_BeforeAdd(xml);
+    GObject::setup_beforeAdd(buffer, beginPos);
 
-    const char*p;
+    buffer->Seek(beginPos, 5);
 
-    p = xml->Attribute("url");
-    if (p)
-        _url = p;
+    _url = buffer->ReadS();
+    _align = (TextHAlignment)buffer->ReadByte();
+    _verticalAlign = (TextVAlignment)buffer->ReadByte();
+    _fill = (LoaderFillType)buffer->ReadByte();
+    _shrinkOnly = buffer->ReadBool();
+    _autoSize = buffer->ReadBool();
+    buffer->ReadBool();//_showErrorSign
+    _playing = buffer->ReadBool();
+    _frame = buffer->ReadInt();
 
-    p = xml->Attribute("align");
-    if (p)
-        _align = ToolSet::parseAlign(p);
-
-    p = xml->Attribute("vAlign");
-    if (p)
-        _verticalAlign = ToolSet::parseVerticalAlign(p);
-
-    p = xml->Attribute("fill");
-    if (p)
-        _fill = ToolSet::parseFillType(p);
-
-    _shrinkOnly = xml->BoolAttribute("shrinkOnly");
-    _autoSize = xml->BoolAttribute("autoSize");
-
-    p = xml->Attribute("color");
-    if (p)
-        setColor((Color3B)ToolSet::convertFromHtmlColor(p));
-
-    p = xml->Attribute("frame");
-    if (p)
-        _frame = atoi(p);
-
-    p = xml->Attribute("playing");
-    if (p)
-        _playing = strcmp(p, "false") != 0;
+    if (buffer->ReadBool())
+        setColor((Color3B)buffer->ReadColor());
+    int fillMethod = buffer->ReadByte();
+    if (fillMethod != 0)
+        buffer->Skip(6);
 
     if (_url.length() > 0)
         loadContent();

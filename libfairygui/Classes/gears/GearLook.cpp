@@ -1,7 +1,8 @@
 #include "GearLook.h"
 #include "GObject.h"
-#include "utils/ToolSet.h"
 #include "UIPackage.h"
+#include "utils/ByteBuffer.h"
+#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -19,15 +20,15 @@ GearLook::GearLookValue::GearLookValue(float alpha, float rotation, bool grayed,
     this->touchable = touchable;
 }
 
-GearLook::GearLook(GObject * owner) :GearBase(owner), _tweener(nullptr)
+GearLook::GearLook(GObject * owner) :GearBase(owner)
 {
 
 }
 
 GearLook::~GearLook()
 {
-    if (_tweener != nullptr)
-        _tweener->kill();
+    if (_tweenConfig && _tweenConfig->_tweener)
+        _tweenConfig->_tweener->kill();
 }
 
 void GearLook::init()
@@ -37,20 +38,13 @@ void GearLook::init()
     _storage.clear();
 }
 
-void GearLook::addStatus(const std::string&  pageId, const std::string& value)
+void GearLook::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
-    if (value == "-" || value.length() == 0)
-        return;
-
-    std::vector<std::string> arr;
-    ToolSet::splitString(value, ',', arr);
-
     GearLookValue gv;
-    gv.alpha = atof(arr[0].c_str());
-    gv.rotation = atof(arr[1].c_str());
-    gv.grayed = arr[2] == "1";
-    if (arr.size() > 3)
-        gv.touchable = arr[3] == "1";
+    gv.alpha = buffer->ReadFloat();
+    gv.rotation = buffer->ReadFloat();
+    gv.grayed = buffer->ReadBool();
+    gv.touchable = buffer->ReadBool();
 
     if (pageId.size() == 0)
         _default = gv;
@@ -67,14 +61,14 @@ void GearLook::apply()
     else
         gv = _default;
 
-    if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
+    if (_tweenConfig && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_tweener != nullptr)
+        if (_tweenConfig->_tweener != nullptr)
         {
-            if (_tweener->endValue.x != gv.alpha || _tweener->endValue.y != gv.rotation)
+            if (_tweenConfig->_tweener->endValue.x != gv.alpha || _tweenConfig->_tweener->endValue.y != gv.rotation)
             {
-                _tweener->kill(true);
-                _tweener = nullptr;
+                _tweenConfig->_tweener->kill(true);
+                _tweenConfig->_tweener = nullptr;
             }
             else
                 return;
@@ -85,11 +79,11 @@ void GearLook::apply()
         if (a || b)
         {
             if (_owner->checkGearController(0, _controller))
-                _displayLockToken = _owner->addDisplayLock();
+                _tweenConfig->_displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::to(Vec2(_owner->getAlpha(), _owner->getRotation()), Vec2(gv.alpha, gv.rotation), tweenTime)
-                ->setDelay(delay)
-                ->setEase(easeType)
+            _tweenConfig->_tweener = GTween::to(Vec2(_owner->getAlpha(), _owner->getRotation()), Vec2(gv.alpha, gv.rotation), _tweenConfig->duration)
+                ->setDelay(_tweenConfig->delay)
+                ->setEase(_tweenConfig->easeType)
                 ->setTargetAny(this)
                 ->setUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
                 ->onUpdate(CC_CALLBACK_1(GearLook::onTweenUpdate, this))
@@ -109,23 +103,23 @@ void GearLook::apply()
 
 void GearLook::onTweenUpdate(GTweener* tweener)
 {
-    int flag = _tweener->getUserData().asInt();
+    int flag = _tweenConfig->_tweener->getUserData().asInt();
     _owner->_gearLocked = false;
     if ((flag & 1) != 0)
-        _owner->setAlpha(_tweener->value.x);
+        _owner->setAlpha(_tweenConfig->_tweener->value.x);
     if ((flag & 2) != 0)
-        _owner->setRotation(_tweener->value.y);
+        _owner->setRotation(_tweenConfig->_tweener->value.y);
     _owner->_gearLocked = false;
 }
 
 void GearLook::onTweenComplete()
 {
-    if (_displayLockToken != 0)
+    if (_tweenConfig->_displayLockToken != 0)
     {
-        _owner->releaseDisplayLock(_displayLockToken);
-        _displayLockToken = 0;
+        _owner->releaseDisplayLock(_tweenConfig->_displayLockToken);
+        _tweenConfig->_displayLockToken = 0;
     }
-    _tweener = nullptr;
+    _tweenConfig->_tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

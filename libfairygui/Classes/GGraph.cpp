@@ -1,5 +1,5 @@
 #include "GGraph.h"
-#include "utils/ToolSet.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -99,32 +99,18 @@ void GGraph::handleSizeChanged()
     updateShape();
 }
 
-void GGraph::setup_BeforeAdd(TXMLElement * xml)
+void GGraph::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_BeforeAdd(xml);
+    GObject::setup_beforeAdd(buffer, beginPos);
 
-    const char* p = xml->Attribute("type");
-    if (p)
-    {
-        if (strcmp(p, "rect") == 0)
-            _type = 1;
-        else if (strcmp(p, "eclipse") == 0)
-            _type = 2;
-    }
+    buffer->Seek(beginPos, 5);
 
+    _type = buffer->ReadByte();
     if (_type != 0)
     {
-        p = xml->Attribute("lineSize");
-        if (p)
-            _lineSize = atoi(p);
-
-        p = xml->Attribute("lineColor");
-        if (p)
-            _lineColor = (Color4F)ToolSet::convertFromHtmlColor(p);
-
-        p = xml->Attribute("fillColor");
-        if (p)
-            _fillColor = (Color4F)ToolSet::convertFromHtmlColor(p);
+        _lineSize = buffer->ReadInt();
+        _lineColor = (Color4F)buffer->ReadColor();
+        _fillColor = (Color4F)buffer->ReadColor();
 
         updateShape();
     }

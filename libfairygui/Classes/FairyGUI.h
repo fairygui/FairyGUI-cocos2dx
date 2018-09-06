@@ -1,6 +1,7 @@
 #ifndef __FAIRYGUI_H__
 #define __FAIRYGUI_H__
 
+#include "UIConfig.h"
 #include "UIPackage.h"
 #include "GImage.h"
 #include "GMovieClip.h"

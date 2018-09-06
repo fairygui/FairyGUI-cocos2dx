@@ -16,7 +16,7 @@ public:
 
     CREATE_FUNC(GRichTextField);
 
-    virtual void setAutoSize(TextAutoSize value) override;
+    virtual void setAutoSize(AutoSizeType value) override;
 
     virtual bool isSingleLine() const override { return false; }
     virtual void setSingleLine(bool value) override;

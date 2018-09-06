@@ -12,9 +12,6 @@
 
 NS_FGUI_BEGIN
 
-class GController;
-class GGroup;
-
 class GComponent : public GObject
 {
 public:
@@ -102,8 +99,9 @@ public:
     bool _buildingDisplayList;
 
 protected:
-    virtual void constructFromXML(TXMLElement* xml);
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void constructExtension(ByteBuffer* buffer);
+    virtual void onConstruct();
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
     virtual void handleGrayedChanged() override;
@@ -116,10 +114,7 @@ protected:
     void setBounds(float ax, float ay, float aw, float ah);
 
     void setupOverflow(OverflowType overflow);
-    void setupScroll(const Margin& scrollBarMargin,
-        ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
-        const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
-        const std::string& headerRes, const std::string& footerRes);
+    void setupScroll(ByteBuffer* buffer);
 
     cocos2d::Vector<GObject*> _children;
     cocos2d::Vector<GController*> _controllers;

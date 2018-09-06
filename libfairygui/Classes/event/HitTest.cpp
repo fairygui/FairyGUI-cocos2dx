@@ -1,7 +1,9 @@
 #include "HitTest.h"
 #include "GComponent.h"
+#include "utils/ByteBuffer.h"
 
-USING_NS_FGUI;
+USING_NS_CC;
+NS_FGUI_BEGIN
 
 PixelHitTestData::PixelHitTestData() :
     pixels(nullptr),
@@ -16,15 +18,15 @@ PixelHitTestData::~PixelHitTestData()
     CC_SAFE_DELETE(pixels);
 }
 
-void PixelHitTestData::load(ByteArray & ba)
+void PixelHitTestData::load(ByteBuffer* buffer)
 {
-    ba.readInt();
-    pixelWidth = ba.readInt();
-    scale = 1.0f / ba.readByte();
-    pixelsLength = ba.readInt();
+    buffer->Skip(4);
+    pixelWidth = buffer->ReadInt();
+    scale = 1.0f / buffer->ReadByte();
+    pixelsLength = buffer->ReadInt();
     pixels = new unsigned char[pixelsLength];
     for (size_t i = 0; i < pixelsLength; i++)
-        pixels[i] = ba.readByte();
+        pixels[i] = buffer->ReadByte();
 }
 
 PixelHitTest::PixelHitTest(PixelHitTestData * data, int offsetX, int offsetY) :
@@ -52,3 +54,5 @@ bool PixelHitTest::hitTest(GComponent * obj, const cocos2d::Vec2 & localPoint)
     else
         return false;
 }
+
+NS_FGUI_END

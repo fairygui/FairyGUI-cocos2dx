@@ -1,7 +1,10 @@
 #include "GButton.h"
-#include "utils/ToolSet.h"
 #include "GLabel.h"
 #include "GTextField.h"
+#include "UIConfig.h"
+#include "GRoot.h"
+#include "PackageItem.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -68,46 +71,34 @@ void GButton::setSelectedIcon(const std::string & value)
 
 cocos2d::Color3B GButton::getTitleColor() const
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        return ((GTextField*)_titleObject)->getColor();
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        return ((GLabel*)_titleObject)->getTitleColor();
-    else if (dynamic_cast<GButton*>(_titleObject))
-        return ((GButton*)_titleObject)->getTitleColor();
+    GTextField* tf = getTextField();
+    if (tf)
+        return tf->getColor();
     else
         return Color3B::BLACK;
 }
 
 void GButton::setTitleColor(const cocos2d::Color3B & value)
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        ((GTextField*)_titleObject)->setColor(value);
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        ((GLabel*)_titleObject)->setTitleColor(value);
-    else if (dynamic_cast<GButton*>(_titleObject))
-        ((GButton*)_titleObject)->setTitleColor(value);
+    GTextField* tf = getTextField();
+    if (tf)
+        tf->setColor(value);
 }
 
 int GButton::getTitleFontSize() const
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        return ((GTextField*)_titleObject)->getFontSize();
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        return ((GLabel*)_titleObject)->getTitleFontSize();
-    else if (dynamic_cast<GButton*>(_titleObject))
-        return ((GButton*)_titleObject)->getTitleFontSize();
+    GTextField* tf = getTextField();
+    if (tf)
+        return tf->getFontSize();
     else
         return 0;
 }
 
 void GButton::setTitleFontSize(int value)
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        ((GTextField*)_titleObject)->setFontSize(value);
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        ((GLabel*)_titleObject)->setTitleFontSize(value);
-    else if (dynamic_cast<GButton*>(_titleObject))
-        ((GButton*)_titleObject)->setTitleFontSize(value);
+    GTextField* tf = getTextField();
+    if (tf)
+        tf->setFontSize(value);
 }
 
 void GButton::setSelected(bool value)
@@ -215,35 +206,29 @@ void GButton::setCurrentState()
     }
 }
 
-void GButton::constructFromXML(TXMLElement * xml)
+GTextField * GButton::getTextField() const
 {
-    GComponent::constructFromXML(xml);
+    if (dynamic_cast<GTextField*>(_titleObject))
+        return dynamic_cast<GTextField*>(_titleObject);
+    else if (dynamic_cast<GLabel*>(_titleObject))
+        return dynamic_cast<GLabel*>(_titleObject)->getTextField();
+    else if (dynamic_cast<GButton*>(_titleObject))
+        return dynamic_cast<GButton*>(_titleObject)->getTextField();
+    else
+        return nullptr;
+}
 
-    xml = xml->FirstChildElement("Button");
-    if (xml)
-    {
-        const char*p;
-        p = xml->Attribute("mode");
-        if (p)
-            _mode = ToolSet::parseButtonMode(p);
+void GButton::constructExtension(ByteBuffer* buffer)
+{
+    buffer->Seek(0, 6);
 
-        p = xml->Attribute("sound");
-        if (p)
-            _sound = p;
-
-        p = xml->Attribute("volume");
-        if (p)
-            _soundVolumeScale = atof(p) / 100.0f;
-
-        p = xml->Attribute("downEffect");
-        if (p)
-        {
-            _downEffect = strcmp(p, "dark") == 0 ? 1 : (strcmp(p, "scale") == 0 ? 2 : 0);
-            _downEffectValue = xml->FloatAttribute("downEffectValue");
-            if (_downEffect == 2)
-                setPivot(0.5f, 0.5f);
-        }
-    }
+    _mode = (ButtonMode)buffer->ReadByte();
+    buffer->ReadS(_sound);
+    _soundVolumeScale = buffer->ReadFloat();
+    _downEffect = buffer->ReadByte();
+    _downEffectValue = buffer->ReadFloat();
+    if (_downEffect == 2)
+        setPivot(0.5f, 0.5f, isPivotAsAnchor());
 
     _buttonController = getController("button");
     _titleObject = getChild("title");
@@ -264,57 +249,41 @@ void GButton::constructFromXML(TXMLElement * xml)
     addEventListener(UIEventType::Exit, CC_CALLBACK_1(GButton::onExit, this));
 }
 
-void GButton::setup_AfterAdd(TXMLElement * xml)
+void GButton::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_AfterAdd(xml);
+    GComponent::setup_afterAdd(buffer, beginPos);
 
-    xml = xml->FirstChildElement("Button");
-    if (!xml)
+    if (!buffer->Seek(beginPos, 6))
         return;
 
-    const char*p;
+    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+        return;
 
-    p = xml->Attribute("title");
-    if (p)
-        setTitle(p);
+    const std::string* str;
 
-    p = xml->Attribute("icon");
-    if (p)
-        setIcon(p);
+    if ((str = buffer->ReadSP()))
+        setTitle(*str);
+    if ((str = buffer->ReadSP()))
+        setSelectedTitle(*str);
+    if ((str = buffer->ReadSP()))
+        setIcon(*str);
+    if ((str = buffer->ReadSP()))
+        setSelectedIcon(*str);
+    if (buffer->ReadBool())
+        setTitleColor((Color3B)buffer->ReadColor());
+    int iv = buffer->ReadInt();
+    if (iv != 0)
+        setTitleFontSize(iv);
+    iv = buffer->ReadShort();
+    if (iv >= 0)
+        _relatedController = _parent->getControllerAt(iv);
+    _relatedPageId = buffer->ReadS();
 
-    p = xml->Attribute("selectedTitle");
-    if (p)
-        setSelectedTitle(p);
+    buffer->ReadS(_sound);
+    if (buffer->ReadBool())
+        _soundVolumeScale = buffer->ReadFloat();
 
-    p = xml->Attribute("selectedIcon");
-    if (p)
-        setSelectedIcon(p);
-
-    p = xml->Attribute("titleColor");
-    if (p)
-        setTitleColor((Color3B)ToolSet::convertFromHtmlColor(p));
-
-    p = xml->Attribute("titleFontSize");
-    if (p)
-        setTitleFontSize(atoi(p));
-
-    p = xml->Attribute("controller");
-    if (p)
-        _relatedController = getParent()->getController(p);
-
-    p = xml->Attribute("page");
-    if (p)
-        _relatedPageId = p;
-
-    setSelected(xml->BoolAttribute("checked"));
-
-    p = xml->Attribute("sound");
-    if (p)
-        _sound = p;
-
-    p = xml->Attribute("volume");
-    if (p)
-        _soundVolumeScale = atof(p) / 100.0f;
+    setSelected(buffer->ReadBool());
 }
 
 void GButton::handleControllerChanged(GController* c)

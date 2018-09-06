@@ -13,17 +13,15 @@ public:
     }
     void setRefreshStatus(int value);
 protected:
-    virtual void constructFromXML(TXMLElement*);
+    virtual void onConstruct();
 private:
     void onSizeChanged(EventContext*);
 
     GController* _c1;
 };
 
-void ScrollPaneHeader::constructFromXML(TXMLElement* xml)
+void ScrollPaneHeader::onConstruct()
 {
-    GComponent::constructFromXML(xml);
-
     _c1 = getController("c1");
 
     addEventListener(UIEventType::SizeChange, CC_CALLBACK_1(ScrollPaneHeader::onSizeChanged, this));

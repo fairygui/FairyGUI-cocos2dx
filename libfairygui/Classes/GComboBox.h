@@ -8,6 +8,8 @@
 
 NS_FGUI_BEGIN
 
+class GTextField;
+
 class GComboBox : public GComponent
 {
 public:
@@ -21,6 +23,12 @@ public:
 
     virtual const std::string& getText() const override { return getTitle(); }
     virtual void setText(const std::string& value) override { setTitle(value); }
+
+    const cocos2d::Color3B& getTitleColor() const;
+    void setTitleColor(const cocos2d::Color3B& value);
+
+    int getTitleFontSize() const;
+    void setTitleFontSize(int value);
 
     virtual const std::string& getIcon() const override;
     virtual void setIcon(const std::string& value) override;
@@ -43,9 +51,10 @@ public:
     int visibleItemCount;
     PopupDirection popupDirection;
 
+    GTextField* getTextField() const;
 protected:
-    virtual void constructFromXML(TXMLElement* xml) override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void constructExtension(ByteBuffer* buffer) override;
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
     virtual void handleControllerChanged(GController* c) override;
     virtual void handleGrayedChanged() override;
 

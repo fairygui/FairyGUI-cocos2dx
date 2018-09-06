@@ -1,20 +1,21 @@
 #include "GearXY.h"
 #include "GObject.h"
-#include "utils/ToolSet.h"
 #include "UIPackage.h"
+#include "utils/ByteBuffer.h"
+#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearXY::GearXY(GObject * owner) : GearBase(owner),_tweener(nullptr)
+GearXY::GearXY(GObject * owner) : GearBase(owner)
 {
 
 }
 
 GearXY::~GearXY()
 {
-    if (_tweener != nullptr)
-        _tweener->kill();
+    if (_tweenConfig && _tweenConfig->_tweener)
+        _tweenConfig->_tweener->kill();
 }
 
 void GearXY::init()
@@ -23,18 +24,16 @@ void GearXY::init()
     _storage.clear();
 }
 
-void GearXY::addStatus(const std::string&  pageId, const std::string& value)
+void GearXY::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
-    if (value == "-" || value.length() == 0)
-        return;
-
-    Vec2 v2;
-    ToolSet::splitString(value, ',', v2);
+    Vec2 gv;
+    gv.x = buffer->ReadInt();
+    gv.y = buffer->ReadInt();
 
     if (pageId.size() == 0)
-        _default = v2;
+        _default = gv;
     else
-        _storage[pageId] = v2;
+        _storage[pageId] = gv;
 }
 
 void GearXY::apply()
@@ -46,14 +45,14 @@ void GearXY::apply()
     else
         gv = _default;
 
-    if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
+    if (_tweenConfig && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_tweener != nullptr)
+        if (_tweenConfig->_tweener != nullptr)
         {
-            if (_tweener->endValue.x != gv.x || _tweener->endValue.y != gv.y)
+            if (_tweenConfig->_tweener->endValue.x != gv.x || _tweenConfig->_tweener->endValue.y != gv.y)
             {
-                _tweener->kill(true);
-                _tweener = nullptr;
+                _tweenConfig->_tweener->kill(true);
+                _tweenConfig->_tweener = nullptr;
             }
             else
                 return;
@@ -62,11 +61,11 @@ void GearXY::apply()
         if (_owner->getX() != gv.x || _owner->getY() != gv.y)
         {
             if (_owner->checkGearController(0, _controller))
-                _displayLockToken = _owner->addDisplayLock();
+                _tweenConfig->_displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::to(_owner->getPosition(), gv, tweenTime)
-                ->setDelay(delay)
-                ->setEase(easeType)
+            _tweenConfig->_tweener = GTween::to(_owner->getPosition(), gv, _tweenConfig->duration)
+                ->setDelay(_tweenConfig->delay)
+                ->setEase(_tweenConfig->easeType)
                 ->setTargetAny(this)
                 ->onUpdate(CC_CALLBACK_1(GearXY::onTweenUpdate, this))
                 ->onComplete(CC_CALLBACK_0(GearXY::onTweenComplete, this));
@@ -83,18 +82,18 @@ void GearXY::apply()
 void GearXY::onTweenUpdate(GTweener* tweener)
 {
     _owner->_gearLocked = true;
-    _owner->setPosition(_tweener->value.x, _tweener->value.y);
+    _owner->setPosition(_tweenConfig->_tweener->value.x, _tweenConfig->_tweener->value.y);
     _owner->_gearLocked = false;
 }
 
 void GearXY::onTweenComplete()
 {
-    if (_displayLockToken != 0)
+    if (_tweenConfig->_displayLockToken != 0)
     {
-        _owner->releaseDisplayLock(_displayLockToken);
-        _displayLockToken = 0;
+        _owner->releaseDisplayLock(_tweenConfig->_displayLockToken);
+        _tweenConfig->_displayLockToken = 0;
     }
-    _tweener = nullptr;
+    _tweenConfig->_tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

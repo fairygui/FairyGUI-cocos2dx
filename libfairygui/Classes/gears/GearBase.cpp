@@ -2,23 +2,30 @@
 #include "GearDisplay.h"
 #include "GComponent.h"
 #include "utils/ToolSet.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 bool GearBase::disableAllTweenEffect = false;
 
-GearBase::GearBase(GObject * owner) :
-    tweenTime(0.3f),
-    tween(false),
+GearTweenConfig::GearTweenConfig() :
+    tween(true),
+    easeType(EaseType::QuadOut),
+    duration(0.3f),
     delay(0),
-    easeType(EaseType::QuadOut)
+    _tweener(nullptr),
+    _displayLockToken(0)
 {
-    _owner = owner;
+}
+
+GearBase::GearBase(GObject * owner) :_owner(owner), _tweenConfig(nullptr)
+{
 }
 
 GearBase::~GearBase()
 {
+    CC_SAFE_DELETE(_tweenConfig);
 }
 
 void GearBase::setController(GController * value)
@@ -31,11 +38,19 @@ void GearBase::setController(GController * value)
     }
 }
 
+GearTweenConfig * GearBase::getTweenConfig()
+{
+    if (!_tweenConfig)
+        _tweenConfig = new GearTweenConfig();
+
+    return _tweenConfig;
+}
+
 void GearBase::init()
 {
 }
 
-void GearBase::addStatus(const std::string&  pageId, const std::string& value)
+void GearBase::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
 }
 
@@ -51,66 +66,40 @@ void GearBase::updateFromRelations(float dx, float dy)
 {
 }
 
-void GearBase::setup(TXMLElement * xml)
+void GearBase::setup(ByteBuffer* buffer)
 {
-    const char* p;
-    p = xml->Attribute("controller");
-    if (p)
-    {
-        _controller = _owner->getParent()->getController(std::string(p));
-        if (_controller == nullptr)
-            return;
-    }
-
+    _controller = _owner->getParent()->getControllerAt(buffer->ReadShort());
     init();
 
-    tween = xml->BoolAttribute("tween");
-
-    p = xml->Attribute("ease");
-    if (p)
-        easeType = ToolSet::parseEaseType(p);
-
-    p = xml->Attribute("duration");
-    if (p)
-        tweenTime = atof(p);
-    p = xml->Attribute("delay");
-    if (p)
-        delay = atof(p);
-
-    std::vector<std::string> pages;
-    p = xml->Attribute("pages");
-    if (p)
-        ToolSet::splitString(p, ',', pages);
-
-    if (dynamic_cast<GearDisplay*>(this))
+    GearDisplay* gear = dynamic_cast<GearDisplay*>(this);
+    if (gear)
     {
-        ((GearDisplay*)this)->pages = pages;
+        int cnt = buffer->ReadShort();
+        for (int i = 0; i < cnt; i++)
+            gear->pages.push_back(buffer->ReadS());
     }
     else
     {
-        if (!pages.empty())
+        int cnt = buffer->ReadShort();
+        for (int i = 0; i < cnt; i++)
         {
-            std::vector<std::string> values;
-            p = xml->Attribute("values");
-            if (p)
-                ToolSet::splitString(p, '|', values);
+            const std::string& page = buffer->ReadS();
+            if (page.empty())
+                continue;
 
-            int cnt1 = (int)pages.size();
-            int cnt2 = (int)values.size();
-            std::string str;
-            for (int i = 0; i < cnt1; i++)
-            {
-                if (i < cnt2)
-                    str = values[i];
-                else
-                    str = STD_STRING_EMPTY;
-                addStatus(pages[i], str);
-            }
+            addStatus(page, buffer);
         }
 
-        p = xml->Attribute("default");
-        if (p)
-            addStatus(STD_STRING_EMPTY, p);
+        if (buffer->ReadBool())
+            addStatus(STD_STRING_EMPTY, buffer);
+    }
+
+    if (buffer->ReadBool())
+    {
+        _tweenConfig = new GearTweenConfig();
+        _tweenConfig->easeType = (EaseType)buffer->ReadByte();
+        _tweenConfig->duration = buffer->ReadFloat();
+        _tweenConfig->delay = buffer->ReadFloat();
     }
 }
 

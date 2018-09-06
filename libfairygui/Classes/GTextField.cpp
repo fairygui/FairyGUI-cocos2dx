@@ -1,5 +1,5 @@
 #include "GTextField.h"
-#include "utils/ToolSet.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -7,7 +7,7 @@ USING_NS_CC;
 GTextField::GTextField()
     :_templateVars(nullptr),
     _ubbEnabled(false),
-    _autoSize(TextAutoSize::BOTH)
+    _autoSize(AutoSizeType::BOTH)
 {
 }
 
@@ -89,101 +89,59 @@ void GTextField::updateSize()
 {
 }
 
-void GTextField::setup_BeforeAdd(TXMLElement * xml)
+void GTextField::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_BeforeAdd(xml);
+    GObject::setup_beforeAdd(buffer, beginPos);
+
+    buffer->Seek(beginPos, 5);
 
     TextFormat* tf = getTextFormat();
-    const char*p;
-    p = xml->Attribute("font");
-    if (p)
-        tf->face = p;
 
-    p = xml->Attribute("fontSize");
-    if (p)
-        tf->fontSize = atoi(p);
-
-    p = xml->Attribute("color");
-    if (p)
-        tf->color = (Color3B)ToolSet::convertFromHtmlColor(p);
-
-    p = xml->Attribute("align");
-    if (p)
-        tf->align = ToolSet::parseAlign(p);
-
-    p = xml->Attribute("vAlign");
-    if (p)
-        tf->verticalAlign = ToolSet::parseVerticalAlign(p);
-
-    p = xml->Attribute("leading");
-    if (p)
-        tf->lineSpacing = atoi(p);
-
-    p = xml->Attribute("letterSpacing");
-    if (p)
-        tf->letterSpacing = atoi(p);
-
-    p = xml->Attribute("ubb");
-    if (p)
-        _ubbEnabled = strcmp(p, "true") == 0;
-
-    p = xml->Attribute("autoSize");
-    if (p)
-        setAutoSize(ToolSet::parseTextAutoSize(p));
-
-    p = xml->Attribute("underline");
-    if (p)
-        tf->underline = strcmp(p, "true") == 0;
-
-    p = xml->Attribute("italic");
-    if (p)
-        tf->italics = strcmp(p, "true") == 0;
-
-    p = xml->Attribute("bold");
-    if (p)
-        tf->bold = strcmp(p, "true") == 0;
-
-    p = xml->Attribute("singleLine");
-    if (p)
-        setSingleLine(strcmp(p, "true") == 0);
-
-    p = xml->Attribute("strokeColor");
-    if (p)
+    tf->face = buffer->ReadS();
+    tf->fontSize = buffer->ReadShort();
+    tf->color = (Color3B)buffer->ReadColor();
+    tf->align = (TextHAlignment)buffer->ReadByte();
+    tf->verticalAlign = (TextVAlignment)buffer->ReadByte();
+    tf->lineSpacing = buffer->ReadShort();
+    tf->letterSpacing = buffer->ReadShort();
+    _ubbEnabled = buffer->ReadBool();
+    setAutoSize((AutoSizeType)buffer->ReadByte());
+    tf->underline = buffer->ReadBool();
+    tf->italics = buffer->ReadBool();
+    tf->bold = buffer->ReadBool();
+    if (buffer->ReadBool())
+        setSingleLine(true);
+    if (buffer->ReadBool())
     {
-        tf->outlineColor = (Color3B)ToolSet::convertFromHtmlColor(p);
-        p = xml->Attribute("strokeSize");
-        tf->outlineSize = p ? atoi(p) : 1;
+        tf->outlineColor = (Color3B)buffer->ReadColor();
+        tf->outlineSize = buffer->ReadFloat();
         tf->enableEffect(TextFormat::OUTLINE);
     }
 
-    p = xml->Attribute("shadowColor");
-    if (p)
+    if (buffer->ReadBool())
     {
-        tf->shadowColor = (Color3B)ToolSet::convertFromHtmlColor(p);
-
-        Vec2 offset;
-        p = xml->Attribute("shadowOffset");
-        if (p)
-            ToolSet::splitString(p, ',', offset);
-        offset.y = -offset.y;
-        tf->shadowOffset = offset;
+        tf->shadowColor = (Color3B)buffer->ReadColor();
+        float f1 = buffer->ReadFloat();
+        float f2 = buffer->ReadFloat();
+        tf->shadowOffset = Vec2(f1, -f2);
         tf->enableEffect(TextFormat::SHADOW);
     }
 
-    if (xml->BoolAttribute("vars") && _templateVars == nullptr)
+    if (buffer->ReadBool())
         _templateVars = new cocos2d::ValueMap();
 }
 
-void GTextField::setup_AfterAdd(TXMLElement * xml)
+void GTextField::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_AfterAdd(xml);
+    GObject::setup_afterAdd(buffer, beginPos);
 
     applyTextFormat();
 
-    const char* p;
-    p = xml->Attribute("text");
-    if (p && strlen(p) > 0)
-        setText(p);
+    buffer->Seek(beginPos, 6);
+
+    const std::string& str = buffer->ReadS();
+    if (!str.empty())
+        setText(str);
 }
 
 std::string GTextField::parseTemplate(const char* text)
@@ -285,28 +243,28 @@ void GBasicTextField::applyTextFormat()
         updateSize();
 }
 
-void GBasicTextField::setAutoSize(TextAutoSize value)
+void GBasicTextField::setAutoSize(AutoSizeType value)
 {
     _autoSize = value;
     switch (value)
     {
-    case TextAutoSize::NONE:
+    case AutoSizeType::NONE:
         _label->setOverflow(Label::Overflow::CLAMP);
         break;
-    case TextAutoSize::BOTH:
+    case AutoSizeType::BOTH:
         _label->setOverflow(Label::Overflow::NONE);
         break;
-    case TextAutoSize::HEIGHT:
+    case AutoSizeType::HEIGHT:
         _label->setOverflow(Label::Overflow::RESIZE_HEIGHT);
         break;
-    case TextAutoSize::SHRINK:
+    case AutoSizeType::SHRINK:
         _label->setOverflow(Label::Overflow::SHRINK);
         break;
     }
 
-    if (_autoSize == TextAutoSize::BOTH)
+    if (_autoSize == AutoSizeType::BOTH)
         _label->setDimensions(0, 0);
-    else if (_autoSize == TextAutoSize::HEIGHT)
+    else if (_autoSize == AutoSizeType::HEIGHT)
         _label->setDimensions(_size.width, 0);
     else
         _label->setDimensions(_size.width, _size.height);
@@ -338,9 +296,9 @@ void GBasicTextField::updateSize()
     _updatingSize = true;
 
     Size sz = _label->getContentSize();
-    if (_autoSize == TextAutoSize::BOTH)
+    if (_autoSize == AutoSizeType::BOTH)
         setSize(sz.width, sz.height);
-    else if (_autoSize == TextAutoSize::HEIGHT)
+    else if (_autoSize == AutoSizeType::HEIGHT)
         setHeight(sz.height);
 
     _updatingSize = false;
@@ -351,11 +309,11 @@ void GBasicTextField::handleSizeChanged()
     if (_updatingSize)
         return;
 
-    if (_autoSize != TextAutoSize::BOTH)
+    if (_autoSize != AutoSizeType::BOTH)
     {
         _label->setDimensions(_size.width, _size.height);
 
-        if (_autoSize == TextAutoSize::HEIGHT)
+        if (_autoSize == AutoSizeType::HEIGHT)
         {
             if (!_text.empty())
                 setSizeDirectly(_size.width, _label->getContentSize().height);

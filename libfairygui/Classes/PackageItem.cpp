@@ -1,15 +1,16 @@
 #include "PackageItem.h"
 #include "UIPackage.h"
 #include "display/BitmapFont.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 
 PackageItem::PackageItem() :
     owner(nullptr),
+    objectType(ObjectType::COMPONENT),
     width(0),
     height(0),
-    decoded(false),
-    exported(false),
+    rawData(nullptr),
     texture(nullptr),
     spriteFrame(nullptr),
     scale9Grid(nullptr),
@@ -18,9 +19,8 @@ PackageItem::PackageItem() :
     animation(nullptr),
     repeatDelay(0),
     swing(false),
-    componentData(nullptr),
-    displayList(nullptr),
     extensionCreator(nullptr),
+    translated(false),
     bitmapFont(nullptr)
 {
 }
@@ -28,15 +28,11 @@ PackageItem::PackageItem() :
 PackageItem::~PackageItem()
 {
     CC_SAFE_DELETE(scale9Grid);
-    if (displayList)
-    {
-        for (auto &it : *displayList)
-            CC_SAFE_DELETE(it);
-        delete displayList;
-    }
-    CC_SAFE_DELETE(componentData);
+
+    CC_SAFE_DELETE(rawData);
     if (bitmapFont) //bitmapfont will be released by fontatlas
         bitmapFont->releaseAtlas();
+    bitmapFont = nullptr;
     CC_SAFE_RELEASE(animation);
     CC_SAFE_RELEASE(texture);
     CC_SAFE_RELEASE(spriteFrame);
@@ -44,19 +40,7 @@ PackageItem::~PackageItem()
 
 void PackageItem::load()
 {
-    owner->loadItem(this);
-}
-
-DisplayListItem::DisplayListItem(PackageItem* pi, const std::string& type)
-    :packageItem(pi),
-    type(type),
-    desc(nullptr),
-    listItemCount(0)
-{
-}
-
-DisplayListItem::~DisplayListItem()
-{
+    owner->getItemAsset(this);
 }
 
 NS_FGUI_END

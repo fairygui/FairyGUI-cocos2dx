@@ -4,8 +4,6 @@
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "event/UIEventDispatcher.h"
-#include "PackageItem.h"
-#include "UIConfig.h"
 #include "Controller.h"
 #include "Relations.h"
 #include "gears/GearBase.h"
@@ -17,17 +15,9 @@ NS_FGUI_BEGIN
 
 class GComponent;
 class GGroup;
-class GButton;
-class GLabel;
-class GComboBox;
-class GProgressBar;
-class GSlider;
-class GList;
+class ByteBuffer;
 class GRoot;
-class GTextFieldDelegate;
-class GRichTextField;
-class GTextInput;
-class WeakPtr;
+class PackageItem;
 
 class GObject : public UIEventDispatcher
 {
@@ -187,8 +177,8 @@ protected:
     virtual void onEnter();
     virtual void onExit();
 
-    virtual void setup_BeforeAdd(TXMLElement* xml);
-    virtual void setup_AfterAdd(TXMLElement* xml);
+    virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos);
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos);
 
     bool init();
 
@@ -253,6 +243,7 @@ private:
     friend class RelationItem;
     friend class UIObjectFactory;
     friend class WeakPtr;
+    friend class UIPackage;
 };
 
 template<typename T>

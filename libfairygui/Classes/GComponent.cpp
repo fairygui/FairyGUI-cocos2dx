@@ -1,8 +1,11 @@
 #include "GComponent.h"
 #include "UIObjectFactory.h"
+#include "GButton.h"
 #include "Relations.h"
 #include "GGroup.h"
-#include "utils/ToolSet.h"
+#include "UIPackage.h"
+#include "TranslationHelper.h"
+#include "utils/Bytebuffer.h"
 #include "display/FUIContainer.h"
 
 NS_FGUI_BEGIN
@@ -957,12 +960,10 @@ void GComponent::setupOverflow(OverflowType overflow)
     _container->setPosition2(_margin.left, _margin.top);
 }
 
-void GComponent::setupScroll(const Margin& scrollBarMargin,
-    ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
-    const std::string& vtScrollBarRes, const std::string& hzScrollBarRes,
-    const std::string& headerRes, const std::string& footerRes)
+void GComponent::setupScroll(ByteBuffer* buffer)
 {
-    _scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+    _scrollPane = new ScrollPane(this);
+    _scrollPane->setup(buffer);
 }
 
 void GComponent::handleSizeChanged()
@@ -1044,176 +1045,196 @@ void GComponent::constructFromResource()
 
 void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int poolIndex)
 {
-    TXMLElement* xml = _packageItem->componentData->RootElement();
+    if (!_packageItem->translated)
+    {
+        _packageItem->translated = true;
+        TranslationHelper::translateComponent(_packageItem);
+    }
+
+    ByteBuffer* buffer = _packageItem->rawData;
+    buffer->Seek(0, 0);
 
     _underConstruct = true;
 
-    Vec2 v2;
-    Vec4 v4;
-    const char *p;
-
-    p = xml->Attribute("size");
-    ToolSet::splitString(p, ',', v2, true);
-    initSize = sourceSize = v2;
+    sourceSize.width = buffer->ReadInt();
+    sourceSize.height = buffer->ReadInt();
+    initSize = sourceSize;
 
     setSize(sourceSize.width, sourceSize.height);
 
-    p = xml->Attribute("restrictSize");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v4, true);
-        minSize.width = v4.x;
-        minSize.height = v4.z;
-        maxSize.width = v4.y;
-        maxSize.height = v4.w;
+        minSize.width = buffer->ReadInt();
+        maxSize.width = buffer->ReadInt();
+        minSize.height = buffer->ReadInt();
+        maxSize.height = buffer->ReadInt();
     }
 
-    p = xml->Attribute("pivot");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v2);
-        setPivot(v2.x, v2.y, xml->BoolAttribute("anchor"));
+        float f1 = buffer->ReadFloat();
+        float f2 = buffer->ReadFloat();
+        setPivot(f1, f2, buffer->ReadBool());
     }
 
-    p = xml->Attribute("opaque");
-    if (p)
-        _opaque = strcmp(p, "true") == 0;
-    else
-        _opaque = true;
-
-    p = xml->Attribute("hitTest");
-    if (p)
+    if (buffer->ReadBool())
     {
-        std::vector<string> arr;
-        ToolSet::splitString(p, ',', arr);
-        PixelHitTestData* hitTestData = _packageItem->owner->getPixelHitTestData(arr[0]);
-        if (hitTestData != nullptr)
-            setHitArea(new PixelHitTest(hitTestData, atoi(arr[1].c_str()), atoi(arr[2].c_str())));
+        _margin.top = buffer->ReadInt();
+        _margin.bottom = buffer->ReadInt();
+        _margin.left = buffer->ReadInt();
+        _margin.right = buffer->ReadInt();
     }
 
-    OverflowType overflow;
-    p = xml->Attribute("overflow");
-    if (p)
-        overflow = ToolSet::parseOverflowType(p);
-    else
-        overflow = OverflowType::VISIBLE;
-
-    p = xml->Attribute("margin");
-    if (p)
-    {
-        ToolSet::splitString(p, ',', v4);
-        _margin.setMargin(v4.z, v4.x, v4.w, v4.y);
-    }
-
+    OverflowType overflow = (OverflowType)buffer->ReadByte();
     if (overflow == OverflowType::SCROLL)
     {
-        ScrollType scroll;
-        p = xml->Attribute("scroll");
-        if (p)
-            scroll = ToolSet::parseScrollType(p);
-        else
-            scroll = ScrollType::VERTICAL;
-
-        ScrollBarDisplayType scrollBarDisplay;
-        p = xml->Attribute("scrollBar");
-        if (p)
-            scrollBarDisplay = ToolSet::parseScrollBarDisplayType(p);
-        else
-            scrollBarDisplay = ScrollBarDisplayType::DEFAULT;
-
-        int scrollBarFlags = xml->IntAttribute("scrollBarFlags");
-
-        Margin scrollBarMargin;
-        p = xml->Attribute("scrollBarMargin");
-        if (p)
-        {
-            ToolSet::splitString(p, ',', v4);
-            scrollBarMargin.setMargin(v4.z, v4.x, v4.w, v4.y);
-        }
-
-        string  vtScrollBarRes;
-        string hzScrollBarRes;
-        p = xml->Attribute("scrollBarRes");
-        if (p)
-            ToolSet::splitString(p, ',', vtScrollBarRes, hzScrollBarRes);
-
-        string headerRes;
-        string footerRes;
-        p = xml->Attribute("ptrRes");
-        if (p)
-            ToolSet::splitString(p, ',', headerRes, footerRes);
-
-        setupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags,
-            vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+        int savedPos = buffer->position;
+        buffer->Seek(0, 7);
+        setupScroll(buffer);
+        buffer->position = savedPos;
     }
     else
         setupOverflow(overflow);
 
+    if (buffer->ReadBool()) //clipsoft
+        buffer->Skip(8);
+
     _buildingDisplayList = true;
 
-    TXMLElement* exml = xml->FirstChildElement("controller");
-    while (exml)
+    buffer->Seek(0, 1);
+
+    int controllerCount = buffer->ReadShort();
+    for (int i = 0; i < controllerCount; i++)
     {
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
+
         GController* controller = new GController();
         _controllers.pushBack(controller);
         controller->setParent(this);
-        controller->setup(exml);
+        controller->setup(buffer);
         controller->release();
 
-        exml = exml->NextSiblingElement("controller");
+        buffer->position = nextPos;
     }
+
+    buffer->Seek(0, 2);
 
     GObject* child;
-    vector<DisplayListItem*>& displayList = *_packageItem->displayList;
-    size_t childCount = displayList.size();
-    for (size_t i = 0; i < childCount; i++)
+    int childCount = buffer->ReadShort();
+    for (int i = 0; i < childCount; i++)
     {
-        DisplayListItem& di = *displayList[i];
-        if (objectPool)
+        int dataLen = buffer->ReadShort();
+        int curPos = buffer->position;
+
+        if (objectPool != nullptr)
             child = (*objectPool)[poolIndex + i];
-        else if (di.packageItem)
-        {
-            di.packageItem->load();
-            child = UIObjectFactory::newObject(di.packageItem);
-            child->constructFromResource();
-        }
         else
-            child = UIObjectFactory::newObject(di.type);
+        {
+            buffer->Seek(curPos, 0);
+
+            ObjectType type = (ObjectType)buffer->ReadByte();
+            const string& src = buffer->ReadS();
+            const string& pkgId = buffer->ReadS();
+
+            PackageItem* pi = nullptr;
+            if (!src.empty())
+            {
+                UIPackage* pkg;
+                if (!pkgId.empty())
+                    pkg = UIPackage::getById(pkgId);
+                else
+                    pkg = _packageItem->owner;
+
+                pi = pkg != nullptr ? pkg->getItem(src) : nullptr;
+            }
+
+            if (pi != nullptr)
+            {
+                child = UIObjectFactory::newObject(pi);
+                child->_packageItem = pi;
+                child->constructFromResource();
+            }
+            else
+                child = UIObjectFactory::newObject(type);
+        }
 
         child->_underConstruct = true;
-        child->setup_BeforeAdd(di.desc);
+        child->setup_beforeAdd(buffer, curPos);
         child->_parent = this;
         _children.pushBack(child);
+
+        buffer->position = curPos + dataLen;
     }
 
-    _relations->setup(xml);
+    buffer->Seek(0, 3);
+    _relations->setup(buffer, true);
 
-    for (size_t i = 0; i < childCount; i++)
-        _children.at(i)->_relations->setup(displayList[i]->desc);
+    buffer->Seek(0, 2);
+    buffer->Skip(2);
 
-    for (size_t i = 0; i < childCount; i++)
+    for (int i = 0; i < childCount; i++)
     {
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
+
+        buffer->Seek(buffer->position, 3);
+        _children.at(i)->relations()->setup(buffer, false);
+
+        buffer->position = nextPos;
+    }
+
+    buffer->Seek(0, 2);
+    buffer->Skip(2);
+
+    for (int i = 0; i < childCount; i++)
+    {
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
+
         child = _children.at(i);
-        child->setup_AfterAdd(displayList[i]->desc);
+        child->setup_afterAdd(buffer, buffer->position);
         child->_underConstruct = false;
+
+        buffer->position = nextPos;
     }
 
-    p = xml->Attribute("mask");
-    if (p)
+    buffer->Seek(0, 4);
+
+    buffer->Skip(2); //customData
+    _opaque = buffer->ReadBool();
+    int maskId = buffer->ReadShort();
+    if (maskId != -1)
     {
-        bool inverted = xml->BoolAttribute("reversedMask");
-        setMask(getChildById(p)->displayObject(), inverted);
+        bool inverted = buffer->ReadBool();
+        setMask(getChildAt(maskId)->displayObject(), inverted);
+    }
+    const string& hitTestId = buffer->ReadS();
+    if (!hitTestId.empty())
+    {
+        PackageItem* pi = _packageItem->owner->getItem(hitTestId);
+        if (pi != nullptr && pi->pixelHitTestData != nullptr)
+        {
+            int i1 = buffer->ReadInt();
+            int i2 = buffer->ReadInt();
+            setHitArea(new PixelHitTest(pi->pixelHitTestData, i1, i2));
+        }
     }
 
-    exml = xml->FirstChildElement("transition");
-    while (exml)
+    buffer->Seek(0, 5);
+
+    int transitionCount = buffer->ReadShort();
+    for (int i = 0; i < transitionCount; i++)
     {
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
+
         Transition* trans = new Transition(this);
+        trans->setup(buffer);
         _transitions.pushBack(trans);
-        trans->setup(exml);
         trans->release();
 
-        exml = exml->NextSiblingElement("transition");
+        buffer->position = nextPos;
     }
 
     applyAllControllers();
@@ -1224,38 +1245,37 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     buildNativeDisplayList();
     setBoundsChangedFlag();
 
-    constructFromXML(xml);
+    if (_packageItem->objectType != ObjectType::COMPONENT)
+        constructExtension(buffer);
+
+    onConstruct();
 }
 
-void GComponent::constructFromXML(TXMLElement * xml)
+void GComponent::constructExtension(ByteBuffer* buffer)
 {
 }
 
-void GComponent::setup_AfterAdd(TXMLElement * xml)
+void GComponent::onConstruct()
 {
-    GObject::setup_AfterAdd(xml);
+}
 
-    const char *p;
+void GComponent::setup_afterAdd(ByteBuffer* buffer, int beginPos)
+{
+    GObject::setup_afterAdd(buffer, beginPos);
 
-    if (_scrollPane != nullptr && _scrollPane->isPageMode())
+    buffer->Seek(beginPos, 4);
+
+    int pageController = buffer->ReadShort();
+    if (pageController != -1 && _scrollPane != nullptr && _scrollPane->isPageMode())
+        _scrollPane->setPageController(_parent->getControllerAt(pageController));
+
+    int cnt = buffer->ReadShort();
+    for (int i = 0; i < cnt; i++)
     {
-        p = xml->Attribute("pageController");
-        if (p)
-            _scrollPane->setPageController(_parent->getController(p));
-    }
-
-    p = xml->Attribute("controller");
-    if (p)
-    {
-        std::vector<std::string> arr;
-        ToolSet::splitString(p, ',', arr);
-        size_t cnt = arr.size();
-        for (size_t i = 0; i < cnt; i += 2)
-        {
-            GController* cc = getController(arr[i]);
-            if (cc != nullptr)
-                cc->setSelectedPageId(arr[i + 1]);
-        }
+        GController* cc = getController(buffer->ReadS());
+        const string& pageId = buffer->ReadS();
+        if (cc)
+            cc->setSelectedPageId(pageId);
     }
 }
 

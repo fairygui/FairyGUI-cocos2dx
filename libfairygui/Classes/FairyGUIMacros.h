@@ -30,9 +30,5 @@ cocos2d::Director::getInstance()->getScheduler()->unschedule(CC_SCHEDULE_SELECTO
 #define UIRoot GRoot::getInstance()
 
 #include "FieldTypes.h"
-#include "tinyxml2/tinyxml2.h"
-
-typedef tinyxml2::XMLElement TXMLElement;
-typedef tinyxml2::XMLDocument TXMLDocument;
 
 #endif

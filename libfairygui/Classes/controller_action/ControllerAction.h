@@ -7,17 +7,18 @@
 NS_FGUI_BEGIN
 
 class GController;
+class ByteBuffer;
 
 class ControllerAction
 {
 public:
-    static ControllerAction* createAction(const char* types);
+    static ControllerAction* createAction(int types);
 
     ControllerAction();
     virtual ~ControllerAction();
 
     void run(GController* controller, const std::string& prevPage, const std::string& curPage);
-    virtual void setup(TXMLElement * xml);
+    virtual void setup(ByteBuffer * buffer);
 
     std::vector<std::string> fromPage;
     std::vector<std::string> toPage;

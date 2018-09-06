@@ -1,19 +1,20 @@
 #include "GearSize.h"
 #include "GObject.h"
-#include "utils/ToolSet.h"
 #include "UIPackage.h"
+#include "utils/ByteBuffer.h"
+#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearSize::GearSize(GObject * owner) :GearBase(owner), _tweener(nullptr)
+GearSize::GearSize(GObject * owner) :GearBase(owner)
 {
 }
 
 GearSize::~GearSize()
 {
-    if (_tweener != nullptr)
-        _tweener->kill();
+    if (_tweenConfig && _tweenConfig->_tweener)
+        _tweenConfig->_tweener->kill();
 }
 
 void GearSize::init()
@@ -23,18 +24,18 @@ void GearSize::init()
     _storage.clear();
 }
 
-void GearSize::addStatus(const std::string&  pageId, const std::string& value)
+void GearSize::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
-    if (value == "-" || value.length() == 0)
-        return;
-
-    Vec4 v4;
-    ToolSet::splitString(value, ',', v4);
+    Vec4 gv;
+    gv.x = buffer->ReadInt();
+    gv.y = buffer->ReadInt();
+    gv.z = buffer->ReadFloat();
+    gv.w = buffer->ReadFloat();
 
     if (pageId.size() == 0)
-        _default = v4;
+        _default = gv;
     else
-        _storage[pageId] = v4;
+        _storage[pageId] = gv;
 }
 
 void GearSize::apply()
@@ -46,14 +47,14 @@ void GearSize::apply()
     else
         gv = _default;
 
-    if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
+    if (_tweenConfig && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
-        if (_tweener != nullptr)
+        if (_tweenConfig->_tweener != nullptr)
         {
-            if (_tweener->endValue.getVec4() != gv)
+            if (_tweenConfig->_tweener->endValue.getVec4() != gv)
             {
-                _tweener->kill(true);
-                _tweener = nullptr;
+                _tweenConfig->_tweener->kill(true);
+                _tweenConfig->_tweener = nullptr;
             }
             else
                 return;
@@ -64,11 +65,11 @@ void GearSize::apply()
         if (a || b)
         {
             if (_owner->checkGearController(0, _controller))
-                _displayLockToken = _owner->addDisplayLock();
+                _tweenConfig->_displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::to(Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()), gv, tweenTime)
-                ->setDelay(delay)
-                ->setEase(easeType)
+            _tweenConfig->_tweener = GTween::to(Vec4(_owner->getWidth(), _owner->getHeight(), _owner->getScaleX(), _owner->getScaleY()), gv, _tweenConfig->duration)
+                ->setDelay(_tweenConfig->delay)
+                ->setEase(_tweenConfig->easeType)
                 ->setTargetAny(this)
                 ->setUserData(Value((a ? 1 : 0) + (b ? 2 : 0)))
                 ->onUpdate(CC_CALLBACK_1(GearSize::onTweenUpdate, this))
@@ -97,12 +98,12 @@ void GearSize::onTweenUpdate(GTweener* tweener)
 
 void GearSize::onTweenComplete()
 {
-    if (_displayLockToken != 0)
+    if (_tweenConfig->_displayLockToken != 0)
     {
-        _owner->releaseDisplayLock(_displayLockToken);
-        _displayLockToken = 0;
+        _owner->releaseDisplayLock(_tweenConfig->_displayLockToken);
+        _tweenConfig->_displayLockToken = 0;
     }
-    _tweener = nullptr;
+    _tweenConfig->_tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

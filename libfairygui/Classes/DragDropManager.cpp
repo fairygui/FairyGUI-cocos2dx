@@ -10,7 +10,7 @@ DragDropManager* DragDropManager::_inst = nullptr;
 DragDropManager::DragDropManager() :
     _agent(nullptr)
 {
-    _agent = (GLoader*)UIObjectFactory::newObject("loader");
+    _agent = (GLoader*)UIObjectFactory::newObject(ObjectType::LOADER);
     _agent->retain();
     _agent->setTouchable(false);
     _agent->setDraggable(true);

@@ -1,5 +1,7 @@
 #include "Window1.h"
 
+USING_NS_CC;
+
 void Window1::onInit()
 {
     setContentPane(UIPackage::createObject("Basics", "WindowA")->as<GComponent>());

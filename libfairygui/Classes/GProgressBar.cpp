@@ -1,5 +1,6 @@
 #include "GProgressBar.h"
-#include "utils/ToolSet.h"
+#include "PackageItem.h"
+#include "utils/ByteBuffer.h"
 #include "tween/GTween.h"
 
 NS_FGUI_BEGIN
@@ -168,16 +169,12 @@ void GProgressBar::handleSizeChanged()
         update(_value);
 }
 
-void GProgressBar::constructFromXML(TXMLElement * xml)
+void GProgressBar::constructExtension(ByteBuffer* buffer)
 {
-    xml = xml->FirstChildElement("ProgressBar");
-    CCASSERT(xml, "type mismatch");
+    buffer->Seek(0, 6);
 
-    const char *p;
-    p = xml->Attribute("titleType");
-    if (p)
-        _titleType = ToolSet::parseProgressTitleType(p);
-    _reverse = xml->BoolAttribute("reverse");
+    _titleType = (ProgressTitleType)buffer->ReadByte();
+    _reverse = buffer->ReadBool();
 
     _titleObject = getChild("title");
     _barObjectH = getChild("bar");
@@ -197,20 +194,25 @@ void GProgressBar::constructFromXML(TXMLElement * xml)
     }
 }
 
-void GProgressBar::setup_AfterAdd(TXMLElement * xml)
+void GProgressBar::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_AfterAdd(xml);
+    GComponent::setup_afterAdd(buffer, beginPos);
 
-    xml = xml->FirstChildElement("ProgressBar");
-    if (xml != nullptr)
+    if (!buffer->Seek(beginPos, 6))
     {
-        int tmp;
-        if (xml->QueryIntAttribute("value", &tmp) == 0)
-            _value = tmp;
-
-        if (xml->QueryIntAttribute("max", &tmp) == 0)
-            _max = tmp;
+        update(_value);
+        return;
     }
+
+    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+    {
+        update(_value);
+        return;
+    }
+
+    _value = buffer->ReadInt();
+    _max = buffer->ReadInt();
+
     update(_value);
 }
 

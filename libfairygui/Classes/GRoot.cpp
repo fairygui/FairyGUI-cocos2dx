@@ -1,6 +1,7 @@
 #include "GRoot.h"
 #include "UIPackage.h"
 #include "AudioEngine.h"
+#include "UIConfig.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;

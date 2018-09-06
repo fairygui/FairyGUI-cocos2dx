@@ -246,9 +246,6 @@
     <ClInclude Include="..\Classes\TranslationHelper.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\AsyncCreationHelper.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\utils\ByteBuffer.h">
       <Filter>src\utils</Filter>
     </ClInclude>
@@ -456,9 +453,6 @@
       <Filter>src\tween</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\TranslationHelper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\AsyncCreationHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\utils\ByteBuffer.cpp">

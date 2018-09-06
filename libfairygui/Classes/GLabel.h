@@ -7,6 +7,8 @@
 
 NS_FGUI_BEGIN
 
+class GTextField;
+
 class GLabel : public GComponent
 {
 public:
@@ -30,9 +32,11 @@ public:
     int getTitleFontSize() const;
     void setTitleFontSize(int value);
 
+    GTextField* getTextField() const;
+
 protected:
-    virtual void constructFromXML(TXMLElement* xml) override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void constructExtension(ByteBuffer* buffer) override;
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
 
 private:
     GObject* _titleObject;

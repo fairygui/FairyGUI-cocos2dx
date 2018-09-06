@@ -41,85 +41,70 @@ void UIObjectFactory::setPackageItemExtension(const string& url, GComponentCreat
 
 GObject * UIObjectFactory::newObject(PackageItem * pi)
 {
-    GObject *ret = nullptr;
-    switch (pi->type)
-    {
-    case PackageItemType::IMAGE:
-        ret = GImage::create();
-        break;
-
-    case PackageItemType::MOVIECLIP:
-        ret = GMovieClip::create();
-        break;
-
-    case PackageItemType::COMPONENT:
-    {
-        if (pi->extensionCreator != nullptr)
-            ret = pi->extensionCreator();
-        else
-        {
-            TXMLDocument* xml = pi->componentData;
-            const char *p = xml->RootElement()->Attribute("extention");
-            if (p)
-            {
-                std::string extention = p;
-                if (extention == "Button")
-                    ret = GButton::create();
-                else if (extention == "Label")
-                    ret = GLabel::create();
-                else if (extention == "ProgressBar")
-                    ret = GProgressBar::create();
-                else if (extention == "Slider")
-                    ret = GSlider::create();
-                else if (extention == "ScrollBar")
-                    ret = GScrollBar::create();
-                else if (extention == "ComboBox")
-                    ret = GComboBox::create();
-                else
-                    ret = GComponent::create();
-            }
-            else
-                ret = GComponent::create();
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    if (ret)
-        ret->_packageItem = pi;
-
-    return ret;
+    if (pi->extensionCreator != nullptr)
+        return pi->extensionCreator();
+    else
+        return newObject(pi->objectType);
 }
 
-GObject * UIObjectFactory::newObject(const string & type)
+GObject * UIObjectFactory::newObject(ObjectType type)
 {
-    if (type == "image")
+    switch (type)
+    {
+    case ObjectType::IMAGE:
         return GImage::create();
-    else if (type == "movieclip")
+
+    case ObjectType::MOVIECLIP:
         return GMovieClip::create();
-    else if (type == "component")
+
+    case ObjectType::COMPONENT:
         return GComponent::create();
-    else if (type == "text")
+
+    case ObjectType::TEXT:
         return GBasicTextField::create();
-    else if (type == "richtext")
+
+    case ObjectType::RICHTEXT:
         return GRichTextField::create();
-    else if (type == "inputtext")
+
+    case ObjectType::INPUTTEXT:
         return GTextInput::create();
-    else if (type == "group")
+
+    case ObjectType::GROUP:
         return GGroup::create();
-    else if (type == "list")
+
+    case ObjectType::LIST:
         return GList::create();
-    else if (type == "graph")
+
+    case ObjectType::GRAPH:
         return GGraph::create();
-    else if (type == "loader")
+
+    case ObjectType::LOADER:
         if (_loaderCreator != nullptr)
             return _loaderCreator();
         else
             return GLoader::create();
-    else
+
+    case ObjectType::BUTTON:
+        return GButton::create();
+
+    case ObjectType::LABEL:
+        return GLabel::create();
+
+    case ObjectType::PROGRESSBAR:
+        return GProgressBar::create();
+
+    case ObjectType::SLIDER:
+        return GSlider::create();
+
+    case ObjectType::SCROLLBAR:
+        return GScrollBar::create();
+
+    case ObjectType::COMBOBOX:
+        return GComboBox::create();
+
+    default:
         return nullptr;
+    }
 }
 
 void UIObjectFactory::setLoaderExtension(GLoaderCreator creator)

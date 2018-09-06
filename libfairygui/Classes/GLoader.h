@@ -61,7 +61,7 @@ protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
     virtual void handleGrayedChanged() override;
-    virtual void setup_BeforeAdd(TXMLElement* xml) override;
+    virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
 
     virtual void loadExternal();
     virtual void freeExternal(cocos2d::SpriteFrame* spriteFrame);

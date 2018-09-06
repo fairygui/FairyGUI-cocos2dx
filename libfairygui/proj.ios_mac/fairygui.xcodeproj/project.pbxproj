@@ -57,7 +57,6 @@
 		445402E01FB3E9E400869375 /* UIConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A01FB3E9E400869375 /* UIConfig.cpp */; };
 		445402E11FB3E9E400869375 /* UIObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A21FB3E9E400869375 /* UIObjectFactory.cpp */; };
 		445402E21FB3E9E400869375 /* UIPackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A41FB3E9E400869375 /* UIPackage.cpp */; };
-		445402E31FB3E9E400869375 /* ByteArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A71FB3E9E400869375 /* ByteArray.cpp */; };
 		445402E41FB3E9E400869375 /* ToolSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AA1FB3E9E400869375 /* ToolSet.cpp */; };
 		445402E51FB3E9E400869375 /* UBBParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AC1FB3E9E400869375 /* UBBParser.cpp */; };
 		445402E61FB3E9E400869375 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AE1FB3E9E400869375 /* Window.cpp */; };
@@ -114,7 +113,6 @@
 		445403A61FB4098900869375 /* UIConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A01FB3E9E400869375 /* UIConfig.cpp */; };
 		445403A71FB4098900869375 /* UIObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A21FB3E9E400869375 /* UIObjectFactory.cpp */; };
 		445403A81FB4098900869375 /* UIPackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A41FB3E9E400869375 /* UIPackage.cpp */; };
-		445403A91FB4098900869375 /* ByteArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402A71FB3E9E400869375 /* ByteArray.cpp */; };
 		445403AA1FB4098900869375 /* ToolSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AA1FB3E9E400869375 /* ToolSet.cpp */; };
 		445403AB1FB4098900869375 /* UBBParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AC1FB3E9E400869375 /* UBBParser.cpp */; };
 		445403AC1FB4098900869375 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445402AE1FB3E9E400869375 /* Window.cpp */; };
@@ -154,6 +152,12 @@
 		449699A321416A9700B6412E /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496999121416A9700B6412E /* TweenValue.cpp */; };
 		449699A421416A9700B6412E /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496999121416A9700B6412E /* TweenValue.cpp */; };
 		449699A521416A9700B6412E /* TweenValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496999221416A9700B6412E /* TweenValue.h */; };
+		449699AB2141749C00B6412E /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699A92141749C00B6412E /* ByteBuffer.cpp */; };
+		449699AC2141749C00B6412E /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699A92141749C00B6412E /* ByteBuffer.cpp */; };
+		449699AD2141749C00B6412E /* ByteBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 449699AA2141749C00B6412E /* ByteBuffer.h */; };
+		449699B02141785900B6412E /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699AE2141785900B6412E /* TranslationHelper.cpp */; };
+		449699B12141785900B6412E /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699AE2141785900B6412E /* TranslationHelper.cpp */; };
+		449699B22141785900B6412E /* TranslationHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 449699AF2141785900B6412E /* TranslationHelper.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -274,9 +278,6 @@
 		445402A31FB3E9E400869375 /* UIObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIObjectFactory.h; sourceTree = "<group>"; };
 		445402A41FB3E9E400869375 /* UIPackage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIPackage.cpp; sourceTree = "<group>"; };
 		445402A51FB3E9E400869375 /* UIPackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIPackage.h; sourceTree = "<group>"; };
-		445402A71FB3E9E400869375 /* ByteArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ByteArray.cpp; sourceTree = "<group>"; };
-		445402A81FB3E9E400869375 /* ByteArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ByteArray.h; sourceTree = "<group>"; };
-		445402A91FB3E9E400869375 /* SwitchHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwitchHelper.h; sourceTree = "<group>"; };
 		445402AA1FB3E9E400869375 /* ToolSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ToolSet.cpp; sourceTree = "<group>"; };
 		445402AB1FB3E9E400869375 /* ToolSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ToolSet.h; sourceTree = "<group>"; };
 		445402AC1FB3E9E400869375 /* UBBParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UBBParser.cpp; sourceTree = "<group>"; };
@@ -318,6 +319,10 @@
 		4496999021416A9700B6412E /* TweenPropType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenPropType.h; sourceTree = "<group>"; };
 		4496999121416A9700B6412E /* TweenValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenValue.cpp; sourceTree = "<group>"; };
 		4496999221416A9700B6412E /* TweenValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenValue.h; sourceTree = "<group>"; };
+		449699A92141749C00B6412E /* ByteBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ByteBuffer.cpp; sourceTree = "<group>"; };
+		449699AA2141749C00B6412E /* ByteBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ByteBuffer.h; sourceTree = "<group>"; };
+		449699AE2141785900B6412E /* TranslationHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TranslationHelper.cpp; sourceTree = "<group>"; };
+		449699AF2141785900B6412E /* TranslationHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslationHelper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -376,6 +381,8 @@
 				4454025A1FB3E9E400869375 /* GButton.h */,
 				4454025B1FB3E9E400869375 /* GComboBox.cpp */,
 				4454025C1FB3E9E400869375 /* GComboBox.h */,
+				449699AE2141785900B6412E /* TranslationHelper.cpp */,
+				449699AF2141785900B6412E /* TranslationHelper.h */,
 				4454025D1FB3E9E400869375 /* GComponent.cpp */,
 				4454025E1FB3E9E400869375 /* GComponent.h */,
 				4454025F1FB3E9E400869375 /* gears */,
@@ -508,10 +515,9 @@
 			children = (
 				44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */,
 				44905A4B1FC2D5E600C33C88 /* WeakPtr.h */,
-				445402A71FB3E9E400869375 /* ByteArray.cpp */,
-				445402A81FB3E9E400869375 /* ByteArray.h */,
-				445402A91FB3E9E400869375 /* SwitchHelper.h */,
 				445402AA1FB3E9E400869375 /* ToolSet.cpp */,
+				449699A92141749C00B6412E /* ByteBuffer.cpp */,
+				449699AA2141749C00B6412E /* ByteBuffer.h */,
 				445402AB1FB3E9E400869375 /* ToolSet.h */,
 				445402AC1FB3E9E400869375 /* UBBParser.cpp */,
 				445402AD1FB3E9E400869375 /* UBBParser.h */,
@@ -591,7 +597,9 @@
 			files = (
 				4496999521416A9700B6412E /* EaseManager.h in Headers */,
 				4496999C21416A9700B6412E /* GTweener.h in Headers */,
+				449699AD2141749C00B6412E /* ByteBuffer.h in Headers */,
 				4496999F21416A9700B6412E /* TweenManager.h in Headers */,
+				449699B22141785900B6412E /* TranslationHelper.h in Headers */,
 				4496999621416A9700B6412E /* EaseType.h in Headers */,
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
 				44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */,
@@ -723,8 +731,8 @@
 				445402C91FB3E9E400869375 /* GGraph.cpp in Sources */,
 				449699A321416A9700B6412E /* TweenValue.cpp in Sources */,
 				44905A561FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
-				445402E31FB3E9E400869375 /* ByteArray.cpp in Sources */,
 				445402D31FB3E9E400869375 /* GRichTextField.cpp in Sources */,
+				449699B02141785900B6412E /* TranslationHelper.cpp in Sources */,
 				445402CB1FB3E9E400869375 /* GImage.cpp in Sources */,
 				445402C31FB3E9E400869375 /* GearDisplay.cpp in Sources */,
 				445402E51FB3E9E400869375 /* UBBParser.cpp in Sources */,
@@ -732,6 +740,7 @@
 				445402B91FB3E9E400869375 /* HitTest.cpp in Sources */,
 				445402C41FB3E9E400869375 /* GearIcon.cpp in Sources */,
 				449699A021416A9700B6412E /* TweenPropType.cpp in Sources */,
+				449699AB2141749C00B6412E /* ByteBuffer.cpp in Sources */,
 				445402BD1FB3E9E400869375 /* GButton.cpp in Sources */,
 				445402D91FB3E9E400869375 /* Margin.cpp in Sources */,
 				445402C61FB3E9E400869375 /* GearSize.cpp in Sources */,
@@ -772,6 +781,7 @@
 				445403841FB4098900869375 /* GComboBox.cpp in Sources */,
 				445403851FB4098900869375 /* GComponent.cpp in Sources */,
 				445403861FB4098900869375 /* GearAnimation.cpp in Sources */,
+				449699B12141785900B6412E /* TranslationHelper.cpp in Sources */,
 				445403871FB4098900869375 /* GearBase.cpp in Sources */,
 				445403881FB4098900869375 /* GearColor.cpp in Sources */,
 				44905A8F1FC574BC00C33C88 /* TreeNode.cpp in Sources */,
@@ -785,6 +795,7 @@
 				445403901FB4098900869375 /* GGroup.cpp in Sources */,
 				44905A4D1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */,
 				445403911FB4098900869375 /* GImage.cpp in Sources */,
+				449699AC2141749C00B6412E /* ByteBuffer.cpp in Sources */,
 				445403921FB4098900869375 /* GLabel.cpp in Sources */,
 				445403931FB4098900869375 /* GList.cpp in Sources */,
 				445403941FB4098900869375 /* GLoader.cpp in Sources */,
@@ -816,7 +827,6 @@
 				44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */,
 				449699A121416A9700B6412E /* TweenPropType.cpp in Sources */,
 				4496999421416A9700B6412E /* EaseManager.cpp in Sources */,
-				445403A91FB4098900869375 /* ByteArray.cpp in Sources */,
 				445403AA1FB4098900869375 /* ToolSet.cpp in Sources */,
 				445403AB1FB4098900869375 /* UBBParser.cpp in Sources */,
 				445403AC1FB4098900869375 /* Window.cpp in Sources */,

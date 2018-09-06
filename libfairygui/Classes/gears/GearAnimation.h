@@ -34,7 +34,7 @@ public:
     void updateState() override;
 
 protected:
-    void addStatus(const std::string&  pageId, const std::string& value) override;
+    void addStatus(const std::string&  pageId, ByteBuffer* buffer) override;
     void init() override;
 
 private:

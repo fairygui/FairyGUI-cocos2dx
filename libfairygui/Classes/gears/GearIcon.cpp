@@ -1,7 +1,6 @@
 #include "GearIcon.h"
 #include "GObject.h"
-#include "utils/ToolSet.h"
-#include "UIPackage.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -21,12 +20,12 @@ void GearIcon::init()
     _storage.clear();
 }
 
-void GearIcon::addStatus(const std::string&  pageId, const std::string& value)
+void GearIcon::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
     if (pageId.length() == 0)
-        _default = value;
+        _default = buffer->ReadS();
     else
-        _storage[pageId] = value;
+        _storage[pageId] = buffer->ReadS();
 }
 
 void GearIcon::apply()

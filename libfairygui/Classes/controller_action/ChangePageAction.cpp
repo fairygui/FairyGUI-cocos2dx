@@ -1,24 +1,18 @@
 #include "ChangePageAction.h"
 #include "Controller.h"
 #include "GComponent.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-void ChangePageAction::setup(TXMLElement * xml)
+void ChangePageAction::setup(ByteBuffer * buffer)
 {
-    ControllerAction::setup(xml);
+    ControllerAction::setup(buffer);
 
-    const char *p;
-    p = xml->Attribute("objectId");
-    if (p)
-        objectId = p;
-    p = xml->Attribute("controller");
-    if (p)
-        controllerName = p;
-    p = xml->Attribute("targetPage");
-    if (p)
-        targetPage = p;
+    objectId = buffer->ReadS();
+    controllerName = buffer->ReadS();
+    targetPage = buffer->ReadS();
 }
 
 void ChangePageAction::enter(GController * controller)

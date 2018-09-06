@@ -1,6 +1,7 @@
 #include "GTextInput.h"
 #include "UIPackage.h"
 #include "ui/UIEditBox/UIEditBox.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -74,30 +75,27 @@ void GTextInput::handleSizeChanged()
     _input->setContentSize(_size);
 }
 
-void GTextInput::setup_BeforeAdd(TXMLElement * xml)
+void GTextInput::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GTextField::setup_BeforeAdd(xml);
+    GTextField::setup_beforeAdd(buffer, beginPos);
 
-    const char *p;
+    buffer->Seek(beginPos, 4);
 
-    p = xml->Attribute("prompt");
-    if (p)
-        setPrompt(p);
+    const std::string* str;
+    if ((str = buffer->ReadSP()))
+        setPrompt(*str);
 
-    if (xml->BoolAttribute("password"))
+    if ((str = buffer->ReadSP()))
+        setRestrict(*str);
+
+    int iv = buffer->ReadInt();
+    if (iv != 0)
+        setMaxLength(iv);
+    iv = buffer->ReadInt();
+    if (iv != 0)
+        setKeyboardType(iv);
+    if (buffer->ReadBool())
         setPassword(true);
-
-    p = xml->Attribute("restrict");
-    if (p)
-        setRestrict(p);
-
-    p = xml->Attribute("maxLength");
-    if (p)
-        setMaxLength(atoi(p));
-
-    p = xml->Attribute("keyboardType");
-    if (p)
-        setKeyboardType(atoi(p));
 }
 
 void GTextInput::setTextFieldText()

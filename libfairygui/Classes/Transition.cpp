@@ -1,12 +1,12 @@
 #include "Transition.h"
 #include "GComponent.h"
-#include "utils/ToolSet.h"
+#include "GRoot.h"
+#include "tween/GTween.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 using namespace std;
-
-const int FRAME_RATE = 24;
 
 const int OPTION_IGNORE_DISPLAY_CONTROLLER = 1;
 const int OPTION_AUTO_STOP_DISABLED = 2;
@@ -1238,86 +1238,71 @@ void Transition::applyValue(TransitionItem* item)
     item->target->_gearLocked = false;
 }
 
-void Transition::setup(TXMLElement * xml)
+void Transition::setup(ByteBuffer* buffer)
 {
-    const char* p;
-    name = xml->Attribute("name");
-    p = xml->Attribute("options");
-    if (p)
-        _options = atoi(p);
-    _autoPlay = xml->BoolAttribute("autoPlay");
-    if (_autoPlay)
-    {
-        p = xml->Attribute("autoPlayRepeat");
-        if (p)
-            _autoPlayTimes = atoi(p);
-        _autoPlayDelay = xml->FloatAttribute("autoPlayDelay");
-    }
+    name = buffer->ReadS();
+    _options = buffer->ReadInt();
+    _autoPlay = buffer->ReadBool();
+    _autoPlayTimes = buffer->ReadInt();
+    _autoPlayDelay = buffer->ReadFloat();
 
-    TXMLElement* cxml = xml->FirstChildElement("item");
-    while (cxml)
+    int cnt = buffer->ReadShort();
+    for (int i = 0; i < cnt; i++)
     {
-        p = cxml->Attribute("type");
+        int dataLen = buffer->ReadShort();
+        int curPos = buffer->position;
 
-        TransitionItem* item = new TransitionItem(ToolSet::parseTransitionActionType(p));
+        buffer->Seek(curPos, 0);
+
+        TransitionItem* item = new TransitionItem((TransitionActionType)buffer->ReadByte());
         _items.push_back(item);
 
-        item->time = (float)cxml->IntAttribute("time") / (float)FRAME_RATE;
-        p = cxml->Attribute("target");
-        if (p)
-            item->targetId = p;
+        item->time = buffer->ReadFloat();
+        int targetId = buffer->ReadShort();
+        if (targetId < 0)
+            item->targetId = STD_STRING_EMPTY;
+        else
+            item->targetId = _owner->getChildAt(targetId)->id;
+        item->label = buffer->ReadS();
 
-        if (cxml->BoolAttribute("tween"))
-            item->tweenConfig = new TweenConfig();
-        p = cxml->Attribute("label");
-        if (p)
-            item->label = p;
-        if (item->tweenConfig != nullptr)
+        if (buffer->ReadBool())
         {
-            item->tweenConfig->duration = (float)cxml->IntAttribute("duration") / FRAME_RATE;
+            buffer->Seek(curPos, 1);
+
+            item->tweenConfig = new TweenConfig();
+            item->tweenConfig->duration = buffer->ReadFloat();
             if (item->time + item->tweenConfig->duration > _totalDuration)
                 _totalDuration = item->time + item->tweenConfig->duration;
+            item->tweenConfig->easeType = (EaseType)buffer->ReadByte();
+            item->tweenConfig->repeat = buffer->ReadInt();
+            item->tweenConfig->yoyo = buffer->ReadBool();
+            item->tweenConfig->endLabel = buffer->ReadS();
 
-            p = cxml->Attribute("ease");
-            if (p)
-                item->tweenConfig->easeType = ToolSet::parseEaseType(p);
+            buffer->Seek(curPos, 2);
 
-            item->tweenConfig->repeat = cxml->IntAttribute("repeat");
-            item->tweenConfig->yoyo = cxml->BoolAttribute("yoyo");
-            p = cxml->Attribute("label2");
-            if (p)
-                item->tweenConfig->endLabel = p;
+            decodeValue(item, buffer, item->tweenConfig->startValue);
 
-            p = cxml->Attribute("endValue");
-            if (p)
-            {
-                decodeValue(item->type, cxml->Attribute("startValue"), item->tweenConfig->startValue);
-                decodeValue(item->type, p, item->tweenConfig->endValue);
-            }
-            else
-            {
-                delete  item->tweenConfig;
-                item->tweenConfig = nullptr;
-                decodeValue(item->type, cxml->Attribute("startValue"), item->value);
-            }
+            buffer->Seek(curPos, 3);
+
+            decodeValue(item, buffer, item->tweenConfig->endValue);
         }
         else
         {
             if (item->time > _totalDuration)
                 _totalDuration = item->time;
-            decodeValue(item->type, cxml->Attribute("value"), item->value);
+
+            buffer->Seek(curPos, 2);
+
+            decodeValue(item, buffer, item->value);
         }
 
-        cxml = cxml->NextSiblingElement("item");
+        buffer->position = curPos + dataLen;
     }
 }
 
-void Transition::decodeValue(TransitionActionType type, const char* pValue, void* value)
+void Transition::decodeValue(TransitionItem* item, ByteBuffer * buffer, void* value)
 {
-    string str;
-    if (pValue)
-        str = pValue;
-    switch (type)
+    switch (item->type)
     {
     case TransitionActionType::XY:
     case TransitionActionType::Size:
@@ -1325,109 +1310,68 @@ void Transition::decodeValue(TransitionActionType type, const char* pValue, void
     case TransitionActionType::Skew:
     {
         TValue* tvalue = (TValue*)value;
-        string s1, s2;
-        ToolSet::splitString(str, ',', s1, s2);
-        if (s1 == "-")
-        {
-            tvalue->b1 = false;
-        }
-        else
-        {
-            tvalue->f1 = atof(s1.c_str());
-            tvalue->b1 = true;
-        }
-        if (s2 == "-")
-        {
-            tvalue->b2 = false;
-        }
-        else
-        {
-            tvalue->f2 = atof(s2.c_str());
-            tvalue->b2 = true;
-        }
+        tvalue->b1 = buffer->ReadBool();
+        tvalue->b2 = buffer->ReadBool();
+        tvalue->f1 = buffer->ReadFloat();
+        tvalue->f2 = buffer->ReadFloat();
         break;
     }
 
     case TransitionActionType::Alpha:
     case TransitionActionType::Rotation:
-        ((TValue*)value)->f1 = atof(str.c_str());
+        ((TValue*)value)->f1 = buffer->ReadFloat();
         break;
 
     case TransitionActionType::Scale:
     {
-        Vec2 v2;
-        ToolSet::splitString(str, ',', v2);
-        ((TValue*)value)->setVec2(v2);
+        ((TValue*)value)->f1 = buffer->ReadFloat();
+        ((TValue*)value)->f2 = buffer->ReadFloat();
         break;
     }
 
     case TransitionActionType::Color:
-        ((TValue*)value)->setColor(ToolSet::convertFromHtmlColor(str.c_str()));
+        ((TValue*)value)->setColor(buffer->ReadColor());
         break;
 
     case TransitionActionType::Animation:
     {
-        TValue_Animation* tvalue = (TValue_Animation*)value;
-        string s1, s2;
-        ToolSet::splitString(str, ',', s1, s2);
-        if (s1 == "-")
-            tvalue->frame = -1;
-        else
-            tvalue->frame = atoi(s1.c_str());
-        tvalue->playing = s2 == "p";
+        ((TValue_Animation*)value)->playing = buffer->ReadBool();
+        ((TValue_Animation*)value)->frame = buffer->ReadInt();
         break;
     }
 
     case TransitionActionType::Visible:
-        ((TValue_Visible*)value)->visible = str == "true";
+        ((TValue_Visible*)value)->visible = buffer->ReadBool();
         break;
 
     case TransitionActionType::Sound:
     {
-        TValue_Sound* tvalue = (TValue_Sound*)value;
-        string s;
-        ToolSet::splitString(str, ',', tvalue->sound, s);
-        if (!s.empty())
-        {
-            int intv = atoi(s.c_str());
-            if (intv == 100 || intv == 0)
-                tvalue->volume = 1;
-            else
-                tvalue->volume = (float)intv / 100;
-        }
-        else
-            tvalue->volume = 1;
+        ((TValue_Sound*)value)->sound = buffer->ReadS();
+        ((TValue_Sound*)value)->volume = buffer->ReadFloat();
         break;
     }
 
     case TransitionActionType::Transition:
     {
-        TValue_Transition* tvalue = (TValue_Transition*)value;
-        string s;
-        ToolSet::splitString(str, ',', tvalue->transName, s);
-        if (!s.empty())
-            tvalue->playTimes = atoi(s.c_str());
-        else
-            tvalue->playTimes = 1;
+        ((TValue_Transition*)value)->transName = buffer->ReadS();
+        ((TValue_Transition*)value)->playTimes = buffer->ReadInt();
         break;
     }
 
     case TransitionActionType::Shake:
     {
-        TValue_Shake * tvalue = (TValue_Shake*)value;
-        Vec2 v2;
-        ToolSet::splitString(str, ',', v2);
-        tvalue->amplitude = v2.x;
-        tvalue->duration = v2.y;
+        ((TValue_Shake*)value)->amplitude = buffer->ReadFloat();
+        ((TValue_Shake*)value)->duration = buffer->ReadFloat();
         break;
     }
 
     case TransitionActionType::ColorFilter:
     {
-        TValue * tvalue = (TValue*)value;
-        Vec4 v4;
-        ToolSet::splitString(str, ',', v4);
-        tvalue->setVec4(v4);
+        TValue* tvalue = (TValue*)value;
+        tvalue->f1 = buffer->ReadFloat();
+        tvalue->f2 = buffer->ReadFloat();
+        tvalue->f3 = buffer->ReadFloat();
+        tvalue->f4 = buffer->ReadFloat();
         break;
     }
     default:

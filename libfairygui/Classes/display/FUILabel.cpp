@@ -110,9 +110,8 @@ void FUILabel::applyTextFormat()
 
 bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 & imageOffset, float fontSize)
 {
-    PackageItem* pi = UIPackage::getItemByURL(bmfontFilePath);
-    BitmapFont* bmFont = nullptr;
-    if (!pi || (bmFont = pi->bitmapFont) == nullptr)
+    BitmapFont* bmFont = (BitmapFont*)UIPackage::getItemAssetByURL(bmfontFilePath, PackageItemType::FONT);
+    if (bmFont == nullptr)
     {
         reset();
         return false;

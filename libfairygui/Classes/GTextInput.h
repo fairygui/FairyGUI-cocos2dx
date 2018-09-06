@@ -33,7 +33,7 @@ public:
 protected:
     virtual void handleInit() override;
     virtual void handleSizeChanged() override;
-    virtual void setup_BeforeAdd(TXMLElement* xml) override;
+    virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
 
     virtual void setTextFieldText() override;
 

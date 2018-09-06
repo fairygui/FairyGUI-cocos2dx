@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "GRoot.h"
 #include "UIPackage.h"
+#include "UIConfig.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;

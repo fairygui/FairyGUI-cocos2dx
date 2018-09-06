@@ -1,5 +1,6 @@
 #include "GMovieClip.h"
-#include "utils/ToolSet.h"
+#include "PackageItem.h"
+#include "utils/ByteBuffer.h"
 #include "display/FUISprite.h"
 
 NS_FGUI_BEGIN
@@ -102,6 +103,8 @@ void GMovieClip::handleGrayedChanged()
 
 void GMovieClip::constructFromResource()
 {
+    _packageItem->load();
+
     sourceSize.width = _packageItem->width;
     sourceSize.height = _packageItem->height;
     initSize = sourceSize;
@@ -112,27 +115,17 @@ void GMovieClip::constructFromResource()
     setSize(sourceSize.width, sourceSize.height);
 }
 
-void GMovieClip::setup_BeforeAdd(TXMLElement * xml)
+void GMovieClip::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_BeforeAdd(xml);
+    GObject::setup_beforeAdd(buffer, beginPos);
 
-    const char *p;
+    buffer->Seek(beginPos, 5);
 
-    p = xml->Attribute("frame");
-    if (p)
-        setFrame(atoi(p));
-
-    p = xml->Attribute("playing");
-    if (p)
-        setPlaying(strcmp(p, "false") != 0);
-
-    p = xml->Attribute("flip");
-    if (p)
-        setFlip(ToolSet::parseFlipType(p));
-
-    p = xml->Attribute("color");
-    if (p)
-        setColor((Color3B)ToolSet::convertFromHtmlColor(p));
+    if (buffer->ReadBool())
+        setColor((Color3B)buffer->ReadColor());
+    setFlip((FlipType)buffer->ReadByte());
+    setFrame(buffer->ReadInt());
+    setPlaying(buffer->ReadBool());
 }
 
 ActionMovieClip::ActionMovieClip() :

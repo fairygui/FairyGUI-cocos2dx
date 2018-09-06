@@ -1,6 +1,7 @@
 #include "GImage.h"
+#include "PackageItem.h"
 #include "display/FUISprite.h"
-#include "utils/ToolSet.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -63,6 +64,8 @@ void GImage::setColor(const cocos2d::Color3B & value)
 
 void GImage::constructFromResource()
 {
+    _packageItem->load();
+
     sourceSize.width = _packageItem->width;
     sourceSize.height = _packageItem->height;
     initSize = sourceSize;
@@ -74,19 +77,18 @@ void GImage::constructFromResource()
     setSize(sourceSize.width, sourceSize.height);
 }
 
-void GImage::setup_BeforeAdd(TXMLElement * xml)
+void GImage::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_BeforeAdd(xml);
+    GObject::setup_beforeAdd(buffer, beginPos);
 
-    const char *p;
+    buffer->Seek(beginPos, 5);
 
-    p = xml->Attribute("flip");
-    if (p)
-        setFlip(ToolSet::parseFlipType(p));
-
-    p = xml->Attribute("color");
-    if (p)
-        setColor((Color3B)ToolSet::convertFromHtmlColor(p));
+    if (buffer->ReadBool())
+        setColor((Color3B)buffer->ReadColor());
+    setFlip((FlipType)buffer->ReadByte());
+    int fillMethod = buffer->ReadByte();
+    if (fillMethod != 0)
+        buffer->Skip(6);
 }
 
 NS_FGUI_END

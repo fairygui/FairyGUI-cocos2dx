@@ -10,25 +10,7 @@ class GObject;
 class GComponent;
 class TransitionItem;
 class GTweener;
-
-enum class TransitionActionType
-{
-    XY,
-    Size,
-    Scale,
-    Pivot,
-    Alpha,
-    Rotation,
-    Color,
-    Animation,
-    Visible,
-    Sound,
-    Transition,
-    Shake,
-    ColorFilter,
-    Skew,
-    Unknown
-};
+class ByteBuffer;
 
 class Transition : public cocos2d::Ref
 {
@@ -66,7 +48,7 @@ public:
     void onOwnerAddedToStage();
     void onOwnerRemovedFromStage();
 
-    void setup(TXMLElement* xml);
+    void setup(ByteBuffer* buffer);
 
     std::string name;
 
@@ -85,7 +67,7 @@ private:
     void callHook(TransitionItem* item, bool tweenEnd);
     void checkAllComplete();
     void applyValue(TransitionItem* item);
-    void decodeValue(TransitionActionType type, const char* pValue, void* value);
+    void decodeValue(TransitionItem* item, ByteBuffer* buffer, void* value);
 
     GComponent* _owner;
     std::vector<TransitionItem*> _items;

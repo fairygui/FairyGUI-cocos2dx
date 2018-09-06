@@ -1,5 +1,6 @@
 #include "GSlider.h"
-#include "utils/ToolSet.h"
+#include "PackageItem.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -154,16 +155,10 @@ void GSlider::handleSizeChanged()
         update();
 }
 
-void GSlider::constructFromXML(TXMLElement * xml)
+void GSlider::constructExtension(ByteBuffer* buffer)
 {
-    xml = xml->FirstChildElement("Slider");
-    CCASSERT(xml, "type mismatch");
-
-    const char *p;
-    p = xml->Attribute("titleType");
-    if (p)
-        _titleType = ToolSet::parseProgressTitleType(p);
-    _reverse = xml->BoolAttribute("reverse");
+    _titleType = (ProgressTitleType)buffer->ReadByte();
+    _reverse = buffer->ReadBool();
 
     _titleObject = getChild("title");
     _barObjectH = getChild("bar");
@@ -192,20 +187,25 @@ void GSlider::constructFromXML(TXMLElement * xml)
     addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GSlider::onTouchBegin, this));
 }
 
-void GSlider::setup_AfterAdd(TXMLElement * xml)
+void GSlider::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_AfterAdd(xml);
+    GComponent::setup_afterAdd(buffer, beginPos);
 
-    xml = xml->FirstChildElement("Slider");
-    if (xml != nullptr)
+    if (!buffer->Seek(beginPos, 6))
     {
-        int tmp;
-        if (xml->QueryIntAttribute("value", &tmp) == 0)
-            _value = tmp;
-
-        if (xml->QueryIntAttribute("max", &tmp) == 0)
-            _max = tmp;
+        update();
+        return;
     }
+
+    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+    {
+        update();
+        return;
+    }
+
+    _value = buffer->ReadInt();
+    _max = buffer->ReadInt();
+
     update();
 }
 

@@ -9,6 +9,22 @@ NS_FGUI_BEGIN
 
 class GObject;
 class GController;
+class GTweener;
+class ByteBuffer;
+
+class GearTweenConfig
+{
+public:
+    GearTweenConfig();
+
+    bool tween;
+    EaseType easeType;
+    float duration;
+    float delay;
+
+    uint32_t _displayLockToken;
+    GTweener* _tweener;
+};
 
 class GearBase
 {
@@ -19,25 +35,23 @@ public:
     GController* getController() const { return _controller; }
     void setController(GController* value);
 
+    GearTweenConfig* getTweenConfig();
+
     virtual void updateFromRelations(float dx, float dy);
     virtual void apply();
     virtual void updateState();
 
-    void setup(TXMLElement * xml);
+    void setup(ByteBuffer* buffer);
 
     static bool disableAllTweenEffect;
-    bool tween;
-    EaseType easeType;
-    float tweenTime;
-    float delay;
 
 protected:
-    virtual void addStatus(const std::string&  pageId, const std::string& value);
+    virtual void addStatus(const std::string&  pageId, ByteBuffer* buffer);
     virtual void init();
 
     GObject* _owner;
     GController* _controller;
-    uint32_t _displayLockToken;
+    GearTweenConfig* _tweenConfig;
 };
 
 NS_FGUI_END

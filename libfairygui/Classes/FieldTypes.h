@@ -13,7 +13,30 @@ enum class PackageItemType
     COMPONENT,
     ATLAS,
     FONT,
-    MISC
+    SWF,
+    MISC,
+    UNKNOWN
+};
+
+enum class ObjectType
+{
+    IMAGE,
+    MOVIECLIP,
+    SWF,
+    GRAPH,
+    LOADER,
+    GROUP,
+    TEXT,
+    RICHTEXT,
+    INPUTTEXT,
+    COMPONENT,
+    LIST,
+    LABEL,
+    BUTTON,
+    COMBOBOX,
+    PROGRESSBAR,
+    SLIDER,
+    SCROLLBAR
 };
 
 enum class ButtonMode
@@ -101,7 +124,7 @@ enum class PopupDirection
     DOWN
 };
 
-enum class TextAutoSize
+enum class AutoSizeType
 {
     NONE,
     BOTH,
@@ -115,6 +138,25 @@ enum class FlipType
     HORIZONTAL,
     VERTICAL,
     BOTH
+};
+
+enum class TransitionActionType
+{
+    XY,
+    Size,
+    Scale,
+    Pivot,
+    Alpha,
+    Rotation,
+    Color,
+    Animation,
+    Visible,
+    Sound,
+    Transition,
+    Shake,
+    ColorFilter,
+    Skew,
+    Unknown
 };
 
 NS_FGUI_END

@@ -1,5 +1,7 @@
 #include "BagWindow.h"
 
+USING_NS_CC;
+
 void BagWindow::onInit()
 {
     setContentPane(UIPackage::createObject("Bag", "BagWin")->as<GComponent>());

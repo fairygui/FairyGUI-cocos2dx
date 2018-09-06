@@ -1,5 +1,9 @@
 #include "GComboBox.h"
+#include "UIConfig.h"
+#include "GRoot.h"
+#include "PackageItem.h"
 #include "utils/ToolSet.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -35,6 +39,38 @@ void GComboBox::setTitle(const std::string & value)
     if (_titleObject != nullptr)
         _titleObject->setText(value);
     updateGear(6);
+}
+
+const cocos2d::Color3B& GComboBox::getTitleColor() const
+{
+    GTextField* tf = getTextField();
+    if (tf)
+        return tf->getColor();
+    else
+        return Color3B::BLACK;
+}
+
+void GComboBox::setTitleColor(const cocos2d::Color3B & value)
+{
+    GTextField* tf = getTextField();
+    if (tf)
+        tf->setColor(value);
+}
+
+int GComboBox::getTitleFontSize() const
+{
+    GTextField* tf = getTextField();
+    if (tf)
+        return tf->getFontSize();
+    else
+        return 0;
+}
+
+void GComboBox::setTitleFontSize(int value)
+{
+    GTextField* tf = getTextField();
+    if (tf)
+        tf->setFontSize(value);
 }
 
 const std::string& GComboBox::getIcon() const
@@ -198,21 +234,30 @@ void GComboBox::handleGrayedChanged()
         GComponent::handleGrayedChanged();
 }
 
-void GComboBox::constructFromXML(TXMLElement * xml)
+GTextField * GComboBox::getTextField() const
 {
-    GComponent::constructFromXML(xml);
+    if (dynamic_cast<GTextField*>(_titleObject))
+        return dynamic_cast<GTextField*>(_titleObject);
+    else if (dynamic_cast<GLabel*>(_titleObject))
+        return dynamic_cast<GLabel*>(_titleObject)->getTextField();
+    else if (dynamic_cast<GButton*>(_titleObject))
+        return dynamic_cast<GButton*>(_titleObject)->getTextField();
+    else
+        return nullptr;
+}
+
+void GComboBox::constructExtension(ByteBuffer* buffer)
+{
+    buffer->Seek(0, 6);
 
     _buttonController = getController("button");
     _titleObject = getChild("title");
     _iconObject = getChild("icon");
 
-    xml = xml->FirstChildElement("ComboBox");
-
-    const char* p;
-    p = xml->Attribute("dropdown");
-    if (p)
+    const std::string& dropdown = buffer->ReadS();
+    if (!dropdown.empty())
     {
-        _dropdown = dynamic_cast<GComponent*>(UIPackage::createObjectFromURL(p));
+        _dropdown = dynamic_cast<GComponent*>(UIPackage::createObjectFromURL(dropdown));
         CCASSERT(_dropdown != nullptr, "FairyGUI: should be a component.");
 
         _dropdown->retain();
@@ -237,60 +282,43 @@ void GComboBox::constructFromXML(TXMLElement * xml)
     addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GComboBox::onTouchEnd, this));
 }
 
-void GComboBox::setup_AfterAdd(TXMLElement * xml)
+void GComboBox::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_AfterAdd(xml);
+    GComponent::setup_afterAdd(buffer, beginPos);
 
-    xml = xml->FirstChildElement("ComboBox");
-    if (!xml)
+    if (!buffer->Seek(beginPos, 6))
         return;
 
-    const char *p;
+    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+        return;
 
-    int vc = xml->IntAttribute("visibleItemCount");
-    if (vc != 0)
-        visibleItemCount = vc;
-    p = xml->Attribute("direction");
-    if (p)
-        popupDirection = ToolSet::parsePopupDirection(p);
-
-    TXMLElement* cxml = xml->FirstChildElement("item");
+    const std::string* str;
     bool hasIcon = false;
-    while (cxml)
+    int itemCount = buffer->ReadShort();
+    for (int i = 0; i < itemCount; i++)
     {
-        p = cxml->Attribute("title");
-        if (p)
-            _items.push_back(p);
-        else
-            _items.push_back(STD_STRING_EMPTY);
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
 
-        p = cxml->Attribute("value");
-        if (p)
-            _values.push_back(p);
-        else
-            _values.push_back(STD_STRING_EMPTY);
-
-        p = cxml->Attribute("icon");
-        if (p)
+        _items.push_back(buffer->ReadS());
+        _values.push_back(buffer->ReadS());
+        if ((str = buffer->ReadSP()))
         {
             if (!hasIcon)
             {
                 for (int i = 0; i < (int)_items.size() - 1; i++)
                     _icons.push_back(STD_STRING_EMPTY);
             }
-            _icons.push_back(p);
+            _icons.push_back(*str);
         }
-        else if (hasIcon)
-            _icons.push_back(STD_STRING_EMPTY);
 
-        cxml = cxml->NextSiblingElement("item");
+        buffer->position = nextPos;
     }
 
-    p = xml->Attribute("title");
-    if (p && strlen(p) > 0)
+    if ((str = buffer->ReadSP()))
     {
-        setTitle(p);
-        _selectedIndex = ToolSet::findInStringArray(_items, p);
+        setTitle(*str);
+        _selectedIndex = ToolSet::findInStringArray(_items, *str);
     }
     else if (!_items.empty())
     {
@@ -300,13 +328,19 @@ void GComboBox::setup_AfterAdd(TXMLElement * xml)
     else
         _selectedIndex = -1;
 
-    p = xml->Attribute("icon");
-    if (p && strlen(p) > 0)
-        this->setIcon(p);
+    if ((str = buffer->ReadSP()))
+        setIcon(*str);
 
-    p = xml->Attribute("selectionController");
-    if (p)
-        _selectionController = _parent->getController(p);
+    if (buffer->ReadBool())
+        setTitleColor((Color3B)buffer->ReadColor());
+    int iv = buffer->ReadInt();
+    if (iv > 0)
+        visibleItemCount = iv;
+    popupDirection = (PopupDirection)buffer->ReadByte();
+
+    iv = buffer->ReadShort();
+    if (iv >= 0)
+        _selectionController = _parent->getControllerAt(iv);
 }
 
 void GComboBox::onClickItem(EventContext* context)

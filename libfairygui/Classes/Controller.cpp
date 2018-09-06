@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include "GComponent.h"
 #include "utils/ToolSet.h"
+#include "utils/Bytebuffer.h"
 #include "controller_action/ControllerAction.h"
 
 NS_FGUI_BEGIN
@@ -133,37 +134,41 @@ void GController::runActions()
         it->run(this, getPreviousPageId(), getSelectedPageId());
 }
 
-void GController::setup(TXMLElement * xml)
+void GController::setup(ByteBuffer* buffer)
 {
-    const char* p;
+    int beginPos = buffer->position;
+    buffer->Seek(beginPos, 0);
 
-    p = xml->Attribute("name");
-    if (p)
-        name = p;
+    name = buffer->ReadS();
+    autoRadioGroupDepth = buffer->ReadBool();
 
-    autoRadioGroupDepth = xml->BoolAttribute("autoRadioGroupDepth");
+    buffer->Seek(beginPos, 1);
 
-    p = xml->Attribute("pages");
-    if (p)
+    int cnt = buffer->ReadShort();
+    _pageIds.resize(cnt);
+    _pageNames.resize(cnt);
+    for (int i = 0; i < cnt; i++)
     {
-        std::vector<std::string> elems;
-        ToolSet::splitString(p, ',', elems);
-        int cnt = (int)elems.size();
-        for (int i = 0; i < cnt; i += 2)
-        {
-            _pageIds.push_back(elems[i]);
-            _pageNames.push_back(elems[i + 1]);
-        }
+        _pageIds[i].assign(buffer->ReadS());
+        _pageNames[i].assign(buffer->ReadS());
     }
 
-    TXMLElement* cxml = xml->FirstChildElement("action");
-    while (cxml)
-    {
-        ControllerAction* action = ControllerAction::createAction(cxml->Attribute("type"));
-        action->setup(cxml);
-        _actions.push_back(action);
+    buffer->Seek(beginPos, 2);
 
-        cxml = cxml->NextSiblingElement("action");
+    cnt = buffer->ReadShort();
+    if (cnt > 0)
+    {
+        for (int i = 0; i < cnt; i++)
+        {
+            int nextPos = buffer->ReadShort();
+            nextPos += buffer->position;
+
+            ControllerAction* action = ControllerAction::createAction(buffer->ReadByte());
+            action->setup(buffer);
+            _actions.push_back(action);
+
+            buffer->position = nextPos;
+        }
     }
 
     if (_parent != nullptr && _pageIds.size() > 0)

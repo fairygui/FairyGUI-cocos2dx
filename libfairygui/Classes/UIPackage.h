@@ -8,10 +8,8 @@
 
 NS_FGUI_BEGIN
 
-USING_NS_CC;
-
 struct AtlasSprite;
-class PixelHitTestData;
+class ByteBuffer;
 
 class UIPackage
 {
@@ -29,33 +27,28 @@ public:
     static std::string getItemURL(const std::string& pkgName, const std::string& resName);
     static PackageItem* getItemByURL(const std::string& url);
     static std::string normalizeURL(const std::string& url);
-    static Texture2D* getEmptyTexture() { return _emptyTexture; }
-    static void setStringsSource(const char *xmlString, size_t nBytes);
+    static void* getItemAsset(const std::string& pkgName, const std::string& resName, PackageItemType type = PackageItemType::UNKNOWN);
+    static void* getItemAssetByURL(const std::string& url, PackageItemType type = PackageItemType::UNKNOWN);
+    static cocos2d::Texture2D* getEmptyTexture() { return _emptyTexture; }
 
     const std::string& getId() const { return _id; }
     const std::string& getName() const { return _name; }
 
     PackageItem* getItem(const std::string& itemId);
     PackageItem* getItemByName(const std::string& itemName);
-    void loadItem(const std::string& resName);
-    void loadItem(PackageItem* item);
-
-    PixelHitTestData* getPixelHitTestData(const std::string& itemId);
+    void* getItemAsset(PackageItem* item);
 
     static int _constructing;
     static const std::string URL_PREFIX;
 
 private:
-    void create(const std::string& assetPath);
-    void decodeDesc(cocos2d::Data& data);
-    void loadPackage();
-    cocos2d::SpriteFrame* createSpriteTexture(AtlasSprite* sprite);
+    bool loadPackage(ByteBuffer* buffer, const std::string& assetPath);
     void loadAtlas(PackageItem* item);
+    AtlasSprite* getSprite(const std::string& spriteId);
+    cocos2d::SpriteFrame* createSpriteTexture(AtlasSprite* sprite);
+    void loadImage(PackageItem* item);
     void loadMovieClip(PackageItem* item);
     void loadFont(PackageItem* item);
-    void loadComponent(PackageItem* item);
-    void loadComponentChildren(PackageItem* item);
-    void translateComponent(PackageItem* item);
 
     GObject* createObject(const std::string& resName);
     GObject* createObject(PackageItem* item);
@@ -69,17 +62,14 @@ private:
     std::unordered_map<std::string, PackageItem*> _itemsById;
     std::unordered_map<std::string, PackageItem*> _itemsByName;
     std::unordered_map<std::string, AtlasSprite*> _sprites;
-    std::unordered_map<std::string, cocos2d::Data*> _descPack;
-    std::unordered_map<std::string, PixelHitTestData*> _hitTestDatas;
-    std::string _assetNamePrefix;
     std::string _customId;
-    bool _loadingPackage;
+    std::vector<std::string> stringTable;
 
     static std::unordered_map<std::string, UIPackage*> _packageInstById;
     static std::unordered_map<std::string, UIPackage*> _packageInstByName;
     static std::vector<UIPackage*> _packageList;
-    static std::unordered_map<std::string, ValueMap> _stringsSource;
-    static Texture2D* _emptyTexture;
+
+    static cocos2d::Texture2D* _emptyTexture;
 };
 
 NS_FGUI_END

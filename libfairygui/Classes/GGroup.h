@@ -31,8 +31,8 @@ public:
     int _updating;
 
 protected:
-    virtual void setup_BeforeAdd(TXMLElement* xml) override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
     virtual void handleAlphaChanged() override;
     virtual void handleVisibleChanged() override;
 

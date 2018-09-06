@@ -3,6 +3,8 @@
 #include "UIPackage.h"
 #include "GList.h"
 #include "GScrollBar.h"
+#include "UIConfig.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -25,15 +27,7 @@ static inline float sp_EaseFunc(float t, float d)
     return t * t * t + 1;//cubicOut
 }
 
-ScrollPane::ScrollPane(GComponent* owner,
-    ScrollType scrollType,
-    const Margin& scrollBarMargin,
-    ScrollBarDisplayType scrollBarDisplay,
-    int flags,
-    const std::string& vtScrollBarRes,
-    const std::string& hzScrollBarRes,
-    const std::string& headerRes,
-    const std::string& footerRes) :
+ScrollPane::ScrollPane(GComponent* owner) :
     _vtScrollBar(nullptr),
     _hzScrollBar(nullptr),
     _header(nullptr),
@@ -53,6 +47,15 @@ ScrollPane::ScrollPane(GComponent* owner,
 {
     _owner = owner;
 
+    _scrollStep = UIConfig::defaultScrollStep;
+    _mouseWheelStep = _scrollStep * 2;
+    _decelerationRate = UIConfig::defaultScrollDecelerationRate;
+    _touchEffect = UIConfig::defaultScrollTouchEffect;
+    _bouncebackEffect = UIConfig::defaultScrollBounceEffect;
+    _scrollBarVisible = true;
+    _mouseWheelEnabled = true;
+    _pageSize = Vec2::ONE;
+
     _maskContainer = FUIContainer::create();
     _maskContainer->setCascadeOpacityEnabled(true);
     _owner->displayObject()->addChild(_maskContainer);
@@ -62,11 +65,58 @@ ScrollPane::ScrollPane(GComponent* owner,
     _container->removeFromParent();
     _maskContainer->addChild(_container, 1);
 
-    _scrollBarMargin = scrollBarMargin;
-    _scrollType = scrollType;
-    _scrollStep = UIConfig::defaultScrollStep;
-    _mouseWheelStep = _scrollStep * 2;
-    _decelerationRate = UIConfig::defaultScrollDecelerationRate;
+    _owner->addEventListener(UIEventType::MouseWheel, CC_CALLBACK_1(ScrollPane::onMouseWheel, this));
+    _owner->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(ScrollPane::onTouchBegin, this));
+    _owner->addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(ScrollPane::onTouchMove, this));
+    _owner->addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(ScrollPane::onTouchEnd, this));
+}
+
+ScrollPane::~ScrollPane()
+{
+    CALL_PER_FRAME_CANCEL(ScrollPane, tweenUpdate);
+    CALL_LATER_CANCEL(ScrollPane, refresh);
+    CALL_LATER_CANCEL(ScrollPane, onShowScrollBar);
+
+    if (_hzScrollBar)
+    {
+        _hzScrollBar->_parent = nullptr;
+        _hzScrollBar->release();
+    }
+    if (_vtScrollBar)
+    {
+        _vtScrollBar->_parent = nullptr;
+        _vtScrollBar->release();
+    }
+    if (_header)
+    {
+        _header->_parent = nullptr;
+        _header->release();
+    }
+    if (_footer)
+    {
+        _footer->_parent = nullptr;
+        _footer->release();
+    }
+}
+
+void ScrollPane::setup(ByteBuffer * buffer)
+{
+    _scrollType = (ScrollType)buffer->ReadByte();
+    ScrollBarDisplayType scrollBarDisplay = (ScrollBarDisplayType)buffer->ReadByte();
+    int flags = buffer->ReadInt();
+
+    if (buffer->ReadBool())
+    {
+        _scrollBarMargin.top = buffer->ReadInt();
+        _scrollBarMargin.bottom = buffer->ReadInt();
+        _scrollBarMargin.left = buffer->ReadInt();
+        _scrollBarMargin.right = buffer->ReadInt();
+    }
+
+    const std::string& vtScrollBarRes = buffer->ReadS();
+    const std::string& hzScrollBarRes = buffer->ReadS();
+    const std::string& headerRes = buffer->ReadS();
+    const std::string& footerRes = buffer->ReadS();
 
     _displayOnLeft = (flags & 1) != 0;
     _snapToItem = (flags & 2) != 0;
@@ -76,20 +126,12 @@ ScrollPane::ScrollPane(GComponent* owner,
         _touchEffect = true;
     else if ((flags & 32) != 0)
         _touchEffect = false;
-    else
-        _touchEffect = UIConfig::defaultScrollTouchEffect;
     if ((flags & 64) != 0)
         _bouncebackEffect = true;
     else if ((flags & 128) != 0)
         _bouncebackEffect = false;
-    else
-        _bouncebackEffect = UIConfig::defaultScrollBounceEffect;
     _inertiaDisabled = (flags & 256) != 0;
     _maskContainer->setClippingEnabled((flags & 512) == 0);
-
-    _scrollBarVisible = true;
-    _mouseWheelEnabled = true;
-    _pageSize = Vec2::ONE;
 
     if (scrollBarDisplay == ScrollBarDisplayType::DEFAULT)
     {
@@ -180,40 +222,7 @@ ScrollPane::ScrollPane(GComponent* owner,
     if (_header != nullptr || _footer != nullptr)
         _refreshBarAxis = (_scrollType == ScrollType::BOTH || _scrollType == ScrollType::VERTICAL) ? 1 : 0;
 
-    setSize(owner->getWidth(), owner->getHeight());
-
-    _owner->addEventListener(UIEventType::MouseWheel, CC_CALLBACK_1(ScrollPane::onMouseWheel, this));
-    _owner->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(ScrollPane::onTouchBegin, this));
-    _owner->addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(ScrollPane::onTouchMove, this));
-    _owner->addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(ScrollPane::onTouchEnd, this));
-}
-
-ScrollPane::~ScrollPane()
-{
-    CALL_PER_FRAME_CANCEL(ScrollPane, tweenUpdate);
-    CALL_LATER_CANCEL(ScrollPane, refresh);
-    CALL_LATER_CANCEL(ScrollPane, onShowScrollBar);
-
-    if (_hzScrollBar)
-    {
-        _hzScrollBar->_parent = nullptr;
-        _hzScrollBar->release();
-    }
-    if (_vtScrollBar)
-    {
-        _vtScrollBar->_parent = nullptr;
-        _vtScrollBar->release();
-    }
-    if (_header)
-    {
-        _header->_parent = nullptr;
-        _header->release();
-    }
-    if (_footer)
-    {
-        _footer->_parent = nullptr;
-        _footer->release();
-    }
+    setSize(_owner->getWidth(), _owner->getHeight());
 }
 
 void ScrollPane::setScrollStep(float value)
@@ -1245,7 +1254,7 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
             float change = (int)(v * duration * 0.4f);
             pos += change;
         }
-    }
+}
 
     if (duration < TWEEN_TIME_DEFAULT)
         duration = TWEEN_TIME_DEFAULT;

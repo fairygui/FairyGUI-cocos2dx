@@ -29,8 +29,8 @@ public:
 
 protected:
     virtual void handleSizeChanged() override;
-    virtual void constructFromXML(TXMLElement* xml) override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void constructExtension(ByteBuffer* buffer) override;
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
 
     void update();
     void updateWidthPercent(float percent);

@@ -14,20 +14,15 @@ class FUIContainer;
 class FUIInnerContainer;
 class GController;
 class EventContext;
+class ByteBuffer;
 
 class ScrollPane : public cocos2d::Ref
 {
 public:
-    ScrollPane(GComponent* owner,
-        ScrollType scrollType,
-        const Margin& scrollBarMargin,
-        ScrollBarDisplayType scrollBarDisplay,
-        int flags,
-        const std::string& vtScrollBarRes,
-        const std::string& hzScrollBarRes,
-        const std::string& headerRes,
-        const std::string& footerRes);
+    ScrollPane(GComponent* owner);
     virtual ~ScrollPane();
+
+    void setup(ByteBuffer* buffer);
 
     GComponent* getOwner() const { return _owner; }
     GComponent* getHeader() const { return _header; }

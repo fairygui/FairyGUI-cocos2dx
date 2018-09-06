@@ -1,5 +1,7 @@
 #include "GScrollBar.h"
 #include "ScrollPane.h"
+#include "PackageItem.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -60,11 +62,11 @@ float GScrollBar::getMinSize()
         return (_arrowButton1 != nullptr ? _arrowButton1->getWidth() : 0) + (_arrowButton2 != nullptr ? _arrowButton2->getWidth() : 0);
 }
 
-void GScrollBar::constructFromXML(TXMLElement * xml)
+void GScrollBar::constructExtension(ByteBuffer* buffer)
 {
-    xml = xml->FirstChildElement("ScrollBar");
-    if (xml != nullptr)
-        _fixedGripSize = xml->BoolAttribute("fixedGripSize");
+    buffer->Seek(0, 6);
+
+    _fixedGripSize = buffer->ReadBool();
 
     _grip = getChild("grip");
     CCASSERT(_grip != nullptr, "FairyGUI: should define grip");

@@ -8,6 +8,7 @@
 NS_FGUI_BEGIN
 
 class GObject;
+class ByteBuffer;
 
 class Relations
 {
@@ -17,7 +18,6 @@ public:
 
     void add(GObject* target, RelationType relationType);
     void add(GObject* target, RelationType relationType, bool usePercent);
-    void addItems(GObject* target, const char* sidePairs);
     void remove(GObject* target, RelationType relationType);
     bool contains(GObject* target);
     void clearFor(GObject* target);
@@ -25,7 +25,7 @@ public:
     void copyFrom(const Relations& source);
     void onOwnerSizeChanged(float dWidth, float dHeight, bool applyPivot);
     bool isEmpty() const;
-    void setup(TXMLElement* xml);
+    void setup(ByteBuffer* buffer, bool parentToChild);
 
     GObject* handling;
 

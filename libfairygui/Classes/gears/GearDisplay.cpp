@@ -1,13 +1,12 @@
 #include "GearDisplay.h"
 #include "Controller.h"
-#include "utils/ToolSet.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearDisplay::GearDisplay(GObject * owner) :GearBase(owner)
+GearDisplay::GearDisplay(GObject * owner) :GearBase(owner), _displayLockToken(1)
 {
-    _displayLockToken = 1;
 }
 
 GearDisplay::~GearDisplay()
@@ -20,18 +19,23 @@ void GearDisplay::apply()
     if (_displayLockToken == 0)
         _displayLockToken = 1;
 
-    if (pages.size() == 0
-        || ToolSet::findInStringArray(pages, _controller->getSelectedPageId()) != -1)
+    if (pages.size() == 0)
         _visible = 1;
     else
-        _visible = 0;
+    {
+        auto iter = std::find(pages.begin(), pages.end(), _controller->getSelectedPageId());
+        if (iter != pages.end())
+            _visible = 1;
+        else
+            _visible = 0;
+    }
 }
 
 void GearDisplay::updateState()
 {
 }
 
-void GearDisplay::addStatus(const std::string&  pageId, const std::string& value)
+void GearDisplay::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
 }
 

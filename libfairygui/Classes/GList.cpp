@@ -1,7 +1,8 @@
 #include "GList.h"
 #include "GButton.h"
 #include "UIPackage.h"
-#include "utils/ToolSet.h"
+#include "UIConfig.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -2366,182 +2367,113 @@ void GList::updateBounds()
     setBounds(0, 0, cw, ch);
 }
 
-void GList::setup_BeforeAdd(TXMLElement * xml)
+void GList::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_BeforeAdd(xml);
+    GComponent::setup_beforeAdd(buffer, beginPos);
 
-    const char *p;
-    Vec4 v4;
+    buffer->Seek(beginPos, 5);
 
-    p = xml->Attribute("layout");
-    if (p)
-        _layout = ToolSet::parseListLayoutType(p);
+    _layout = (ListLayoutType)buffer->ReadByte();
+    _selectionMode = (ListSelectionMode)buffer->ReadByte();
+    _align = (TextHAlignment)buffer->ReadByte();
+    _verticalAlign = (TextVAlignment)buffer->ReadByte();
+    _lineGap = buffer->ReadShort();
+    _columnGap = buffer->ReadShort();
+    _lineCount = buffer->ReadShort();
+    _columnCount = buffer->ReadShort();
+    _autoResizeItem = buffer->ReadBool();
+    _childrenRenderOrder = (ChildrenRenderOrder)buffer->ReadByte();
+    _apexIndex = buffer->ReadShort();
 
-    p = xml->Attribute("selectionMode");
-    if (p)
-        _selectionMode = ToolSet::parseListSelectionMode(p);
-
-    OverflowType overflow;
-    p = xml->Attribute("overflow");
-    if (p)
-        overflow = ToolSet::parseOverflowType(p);
-    else
-        overflow = OverflowType::VISIBLE;
-
-    p = xml->Attribute("margin");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v4);
-        _margin.setMargin(v4.z, v4.x, v4.w, v4.y);
+        _margin.top = buffer->ReadInt();
+        _margin.bottom = buffer->ReadInt();
+        _margin.left = buffer->ReadInt();
+        _margin.right = buffer->ReadInt();
     }
 
-    p = xml->Attribute("align");
-    if (p)
-        _align = ToolSet::parseAlign(p);
-
-    p = xml->Attribute("vAlign");
-    if (p)
-        _verticalAlign = ToolSet::parseVerticalAlign(p);
-
+    OverflowType overflow = (OverflowType)buffer->ReadByte();
     if (overflow == OverflowType::SCROLL)
     {
-        ScrollType scroll;
-        p = xml->Attribute("scroll");
-        if (p)
-            scroll = ToolSet::parseScrollType(p);
-        else
-            scroll = ScrollType::VERTICAL;
-
-        ScrollBarDisplayType scrollBarDisplay;
-        p = xml->Attribute("scrollBar");
-        if (p)
-            scrollBarDisplay = ToolSet::parseScrollBarDisplayType(p);
-        else
-            scrollBarDisplay = ScrollBarDisplayType::DEFAULT;
-
-        int scrollBarFlags = xml->IntAttribute("scrollBarFlags");
-
-        Margin scrollBarMargin;
-        p = xml->Attribute("scrollBarMargin");
-        if (p)
-        {
-            ToolSet::splitString(p, ',', v4);
-            scrollBarMargin.setMargin(v4.z, v4.x, v4.w, v4.y);
-        }
-
-        string  vtScrollBarRes;
-        string hzScrollBarRes;
-        p = xml->Attribute("scrollBarRes");
-        if (p)
-            ToolSet::splitString(p, ',', vtScrollBarRes, hzScrollBarRes);
-
-        string headerRes;
-        string footerRes;
-        p = xml->Attribute("ptrRes");
-        if (p)
-            ToolSet::splitString(p, ',', headerRes, footerRes);
-
-        setupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags,
-            vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+        int savedPos = buffer->position;
+        buffer->Seek(beginPos, 7);
+        setupScroll(buffer);
+        buffer->position = savedPos;
     }
     else
         setupOverflow(overflow);
 
-    _lineGap = xml->IntAttribute("lineGap");
-    _columnGap = xml->IntAttribute("colGap");
-    int c = xml->IntAttribute("lineItemCount");
-    if (_layout == ListLayoutType::FLOW_HORIZONTAL)
-        _columnCount = c;
-    else if (_layout == ListLayoutType::FLOW_VERTICAL)
-        _lineCount = c;
-    else if (_layout == ListLayoutType::PAGINATION)
+    if (buffer->ReadBool()) //clipSoftness
+        buffer->Skip(8);
+
+    buffer->Seek(beginPos, 8);
+
+    const string* str;
+
+    _defaultItem = buffer->ReadS();
+    int itemCount = buffer->ReadShort();
+    for (int i = 0; i < itemCount; i++)
     {
-        _columnCount = c;
-        _lineCount = xml->IntAttribute("lineItemCount2");
-    }
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
 
-    p = xml->Attribute("defaultItem");
-    if (p)
-        _defaultItem = p;
-
-    p = xml->Attribute("autoItemSize");
-    if (p)
-        _autoResizeItem = strcmp(p, "true") == 0;
-    else if (_layout == ListLayoutType::SINGLE_ROW || _layout == ListLayoutType::SINGLE_COLUMN)
-        _autoResizeItem = true;
-    else
-        _autoResizeItem = false;
-
-    p = xml->Attribute("renderOrder");
-    if (p)
-    {
-        _childrenRenderOrder = ToolSet::parseChildrenRenderOrder(p);
-        if (_childrenRenderOrder == ChildrenRenderOrder::ARCH)
-            _apexIndex = xml->IntAttribute("apex");
-    }
-
-    TXMLElement* ix = xml->FirstChildElement("item");
-    std::string url;
-    while (ix)
-    {
-        p = ix->Attribute("url");
-        if (!p)
+        str = buffer->ReadSP();
+        if (!str || (*str).empty())
         {
-            url = _defaultItem;
-            if (url.length() == 0)
+            str = &_defaultItem;
+            if ((*str).empty())
             {
-                ix = ix->NextSiblingElement("item");
+                buffer->position = nextPos;
                 continue;
             }
         }
 
-        GObject *obj = getFromPool(url);
+        GObject* obj = getFromPool(*str);
         if (obj != nullptr)
         {
             addChild(obj);
-            p = ix->Attribute("title");
-            if (p)
-                obj->setText(p);
-            p = ix->Attribute("icon");
-            if (p)
-                obj->setIcon(p);
-            p = ix->Attribute("name");
-            if (p)
-                obj->name = p;
-            p = ix->Attribute("selectedIcon");
-            if (p && dynamic_cast<GButton*>(obj))
-                dynamic_cast<GButton*>(obj)->setSelectedIcon(p);
-            p = ix->Attribute("selectedTitle");
-            if (p && dynamic_cast<GButton*>(obj))
-                dynamic_cast<GButton*>(obj)->setSelectedTitle(p);
-            p = ix->Attribute("controllers");
-            if (p && dynamic_cast<GComponent*>(obj))
+            GButton* btn = dynamic_cast<GButton*>(obj);
+
+            if ((str = buffer->ReadSP()))
+                obj->setText(*str);
+            if ((str = buffer->ReadSP()) && btn)
+                btn->setSelectedTitle(*str);
+            if ((str = buffer->ReadSP()))
+                obj->setIcon(*str);
+            if ((str = buffer->ReadSP()) && btn)
+                btn->setSelectedIcon(*str);
+            if ((str = buffer->ReadSP()))
+                obj->name = *str;
+            int cnt = buffer->ReadShort();
+            if (cnt > 0)
             {
-                std::vector<std::string> arr;
-                ToolSet::splitString(p, ',', arr);
-                size_t cnt = arr.size();
-                for (size_t i = 0; i < cnt; i += 2)
+                GComponent* gcom = dynamic_cast<GComponent*>(obj);
+                if (gcom)
                 {
-                    GController* cc = dynamic_cast<GComponent*>(obj)->getController(arr[i]);
-                    if (cc != nullptr)
-                        cc->setSelectedPageId(arr[i + 1]);
+                    for (int j = 0; j < cnt; j++)
+                    {
+                        GController* cc = gcom->getController(buffer->ReadS());
+                        const std::string& pageId = buffer->ReadS();
+                        cc->setSelectedPageId(pageId);
+                    }
                 }
             }
         }
 
-        ix = ix->NextSiblingElement("item");
+        buffer->position = nextPos;
     }
 }
 
-void GList::setup_AfterAdd(TXMLElement * xml)
+void GList::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_AfterAdd(xml);
+    GComponent::setup_afterAdd(buffer, beginPos);
 
-    const char *p;
+    buffer->Seek(beginPos, 6);
 
-    p = xml->Attribute("selectionController");
-    if (p)
-        _selectionController = _parent->getController(p);
+    int i = buffer->ReadShort();
+    if (i != -1)
+        _selectionController = _parent->getControllerAt(i);
 }
 
 NS_FGUI_END

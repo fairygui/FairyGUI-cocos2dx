@@ -1,6 +1,6 @@
 #include "GearAnimation.h"
 #include "GObject.h"
-#include "utils/ToolSet.h"
+#include "utils/ByteBuffer.h"
 #include "UIPackage.h"
 
 NS_FGUI_BEGIN
@@ -34,17 +34,11 @@ void GearAnimation::init()
     _storage.clear();
 }
 
-void GearAnimation::addStatus(const std::string&  pageId, const std::string& value)
+void GearAnimation::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
-    if (value == "-" || value.length() == 0)
-        return;
-
-    std::vector<std::string> arr;
-    ToolSet::splitString(value, ',', arr);
-
     GearAnimationValue gv;
-    gv.frame = Value(arr[0]).asInt();
-    gv.playing = arr[1] == "p";
+    gv.playing = buffer->ReadBool();
+    gv.frame = buffer->ReadInt();
     if (pageId.size() == 0)
         _default = gv;
     else

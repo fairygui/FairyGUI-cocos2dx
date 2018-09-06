@@ -5,7 +5,6 @@
 #include <locale>
 #include <algorithm>
 
-#include "utils/SwitchHelper.h"
 #include "utils/ToolSet.h"
 #include "UIPackage.h"
 
@@ -13,6 +12,10 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 
 using namespace std;
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#define strcasecmp _stricmp
+#endif
 
 static const int GUTTER_X = 2;
 static const int GUTTER_Y = 2;
@@ -227,29 +230,22 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
 {
     finishTextBlock();
 
-    switch (hash_(elementName))
+    if (strcasecmp(elementName, "b") == 0)
     {
-    case "b"_hash:
         pushTextFormat();
         _format.bold = true;
-        break;
-    case "i"_hash:
+    }
+    else if (strcasecmp(elementName, "i") == 0)
+    {
         pushTextFormat();
         _format.italics = true;
-        break;
-
-    case "u"_hash:
+    }
+    else if (strcasecmp(elementName, "u") == 0)
+    {
         pushTextFormat();
         _format.underline = true;
-        break;
-
-    case "sub"_hash:
-        break;
-
-    case "sup"_hash:
-        break;
-
-    case "font"_hash:
+    }
+    else if (strcasecmp(elementName, "font") == 0)
     {
         pushTextFormat();
         ValueMap&& tagAttrValueMap = tagAttrMapWithXMLElement(atts);
@@ -261,16 +257,12 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
             _format.color = (Color3B)ToolSet::convertFromHtmlColor(it->second.asString().c_str());
             _format._hasColor = true;
         }
-        break;
     }
-
-    case "br"_hash:
+    else if (strcasecmp(elementName, "br") == 0)
     {
         addNewLine(false);
-        break;
     }
-
-    case "img"_hash:
+    else if (strcasecmp(elementName, "img") == 0)
     {
         std::string src;
         ValueMap&& tagAttrValueMap = tagAttrMapWithXMLElement(atts);
@@ -306,11 +298,8 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
         _richText->_richElements.push_back(element);
         if (!_linkStack.empty())
             element->link = _linkStack.back();
-
-        break;
     }
-
-    case "a"_hash:
+    else if (strcasecmp(elementName, "a") == 0)
     {
         pushTextFormat();
 
@@ -329,28 +318,21 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
             _format.underline = true;
         if (!_format._hasColor)
             _format.color = _richText->_anchorFontColor;
-        break;
     }
-
-    case "p"_hash:
-    case "ui"_hash:
-    case "div"_hash:
-    case "li"_hash:
+    else if (strcasecmp(elementName, "p") == 0 || strcasecmp(elementName, "ui") == 0 || strcasecmp(elementName, "div") == 0
+        || strcasecmp(elementName, "li") == 0)
+    {
         addNewLine(true);
-        break;
-
-    case "html"_hash:
-    case "body"_hash:
+    }
+    else if (strcasecmp(elementName, "html") == 0 || strcasecmp(elementName, "body") == 0)
+    {
         //full html
         _ignoreWhiteSpace = true;
-        break;
-
-    case "head"_hash:
-    case "style"_hash:
-    case "script"_hash:
-    case "form"_hash:
+    }
+    else if (strcasecmp(elementName, "head") == 0 || strcasecmp(elementName, "style") == 0 || strcasecmp(elementName, "script") == 0
+        || strcasecmp(elementName, "form") == 0)
+    {
         _skipText++;
-        break;
     }
 }
 
@@ -358,30 +340,22 @@ void FUIXMLVisitor::endElement(void* /*ctx*/, const char *elementName)
 {
     finishTextBlock();
 
-    switch (hash_(elementName))
+    if (strcasecmp(elementName, "b") == 0 || strcasecmp(elementName, "i") == 0 || strcasecmp(elementName, "u") == 0
+        || strcasecmp(elementName, "font") == 0)
     {
-    case "b"_hash:
-    case "i"_hash:
-    case "u"_hash:
-    case "font"_hash:
         popTextFormat();
-        break;
-
-    case "a"_hash:
+    }
+    else if (strcasecmp(elementName, "a") == 0)
     {
         popTextFormat();
 
         if (!_linkStack.empty())
             _linkStack.pop_back();
-        break;
     }
-
-    case "head"_hash:
-    case "style"_hash:
-    case "script"_hash:
-    case "form"_hash:
+    else if (strcasecmp(elementName, "head") == 0 || strcasecmp(elementName, "style") == 0 || strcasecmp(elementName, "script") == 0
+        || strcasecmp(elementName, "form") == 0)
+    {
         _skipText--;
-        break;
     }
 }
 #pragma warning(default:4307)

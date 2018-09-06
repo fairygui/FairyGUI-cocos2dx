@@ -16,7 +16,7 @@ public:
     void playEffect(float delay);
 
 protected:
-    virtual void constructFromXML(TXMLElement*);
+    virtual void onConstruct() override;
 
     GTextField* _timeText;
     GController* _readController;

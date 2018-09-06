@@ -21,7 +21,7 @@ public:
     float getMinSize();
 
 protected:
-    virtual void constructFromXML(TXMLElement* xml) override;
+    virtual void constructExtension(ByteBuffer* buffer) override;
 
 private:
     void onTouchBegin(EventContext* context);

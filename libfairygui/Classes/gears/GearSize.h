@@ -4,11 +4,11 @@
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
 #include "GearBase.h"
-#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 
 class GObject;
+class GTweener;
 
 class GearSize : public GearBase
 {
@@ -21,7 +21,7 @@ public:
     void updateFromRelations(float dx, float dy) override;
 
 protected:
-    void addStatus(const std::string&  pageId, const std::string& value) override;
+    void addStatus(const std::string&  pageId, ByteBuffer* buffer) override;
     void init() override;
 
 private:
@@ -30,7 +30,6 @@ private:
 
     std::unordered_map<std::string, cocos2d::Vec4> _storage;
     cocos2d::Vec4 _default;
-    GTweener* _tweener;
 };
 
 NS_FGUI_END

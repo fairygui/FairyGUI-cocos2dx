@@ -25,11 +25,12 @@ public:
     std::vector<std::string> pages;
 
 protected:
-    void addStatus(const std::string&  pageId, const std::string& value) override;
+    void addStatus(const std::string&  pageId, ByteBuffer* buffer) override;
     void init() override;
 
 private:
     int _visible;
+    uint32_t _displayLockToken;
 };
 
 NS_FGUI_END

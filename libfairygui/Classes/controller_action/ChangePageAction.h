@@ -8,7 +8,7 @@ NS_FGUI_BEGIN
 class ChangePageAction : public ControllerAction
 {
 public:
-    virtual void setup(TXMLElement * xml) override;
+    virtual void setup(ByteBuffer * buffer) override;
 
     std::string objectId;
     std::string controllerName;

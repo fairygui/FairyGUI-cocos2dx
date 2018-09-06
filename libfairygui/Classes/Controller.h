@@ -9,6 +9,7 @@ NS_FGUI_BEGIN
 
 class GComponent;
 class ControllerAction;
+class ByteBuffer;
 
 class GController : public UIEventDispatcher
 {
@@ -40,7 +41,7 @@ public:
     void setOppositePageId(const std::string& value);
     void runActions();
 
-    void setup(TXMLElement* xml);
+    void setup(ByteBuffer* buffer);
 
     std::string name;
     bool changing;

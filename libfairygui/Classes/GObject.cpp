@@ -2,6 +2,8 @@
 #include "GGroup.h"
 #include "GList.h"
 #include "GRoot.h"
+#include "UIPackage.h"
+#include "UIConfig.h"
 #include "gears/GearXY.h"
 #include "gears/GearSize.h"
 #include "gears/GearColor.h"
@@ -9,8 +11,8 @@
 #include "gears/GearLook.h"
 #include "gears/GearText.h"
 #include "gears/GearIcon.h"
-#include "utils/ToolSet.h"
 #include "utils/WeakPtr.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -281,12 +283,12 @@ void GObject::setScale(float xv, float yv)
 
 void GObject::setSkewX(float value)
 {
-    _displayObject->setSkewX(value);
+    _displayObject->setRotationSkewX(value);
 }
 
 void GObject::setSkewY(float value)
 {
-    _displayObject->setSkewY(value);
+    _displayObject->setRotationSkewY(value);
 }
 
 void GObject::setRotation(float value)
@@ -773,112 +775,100 @@ void GObject::handleControllerChanged(GController * c)
     checkGearDisplay();
 }
 
-void GObject::setup_BeforeAdd(TXMLElement * xml)
+void GObject::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    const char *p;
-    Vec2 v2;
-    Vec4 v4;
+    buffer->Seek(beginPos, 0);
+    buffer->Skip(5);
 
-    p = xml->Attribute("id");
-    if (p)
-        id = p;
+    id = buffer->ReadS();
+    name = buffer->ReadS();
+    float f1 = buffer->ReadInt();
+    float f2 = buffer->ReadInt();
+    setPosition(f1, f2);
 
-    p = xml->Attribute("name");
-    if (p)
-        name = p;
-
-    p = xml->Attribute("xy");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v2, true);
-        setPosition(v2.x, v2.y);
-    }
-
-    p = xml->Attribute("size");
-    if (p)
-    {
-        ToolSet::splitString(p, ',', v2, true);
-        initSize = v2;
+        initSize.width = buffer->ReadInt();
+        initSize.height = buffer->ReadInt();
         setSize(initSize.width, initSize.height, true);
     }
 
-    p = xml->Attribute("restrictSize");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v4, true);
-        minSize.width = v4.x;
-        minSize.height = v4.z;
-        maxSize.width = v4.y;
-        maxSize.height = v4.w;
+        minSize.width = buffer->ReadInt();
+        maxSize.width = buffer->ReadInt();
+        minSize.height = buffer->ReadInt();
+        maxSize.height = buffer->ReadInt();
     }
 
-    p = xml->Attribute("scale");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v2);
-        setScale(v2.x, v2.y);
+        f1 = buffer->ReadFloat();
+        f2 = buffer->ReadFloat();
+        setScale(f1, f2);
     }
 
-    p = xml->Attribute("skew");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v2);
-        setSkewX(v2.x);
-        setSkewY(v2.y);
+        f1 = buffer->ReadFloat();
+        f2 = buffer->ReadFloat();
+        setSkewX(f1);
+        setSkewY(f2);
     }
 
-    p = xml->Attribute("rotation");
-    if (p)
-        setRotation(atof(p));
-
-    p = xml->Attribute("pivot");
-    if (p)
+    if (buffer->ReadBool())
     {
-        ToolSet::splitString(p, ',', v2);
-        setPivot(v2.x, v2.y, xml->BoolAttribute("anchor"));
+        f1 = buffer->ReadFloat();
+        f2 = buffer->ReadFloat();
+        setPivot(f1, f2, buffer->ReadBool());
     }
 
-    p = xml->Attribute("alpha");
-    if (p)
-        setAlpha(atof(p));
+    f1 = buffer->ReadFloat();
+    if (f1 != 1)
+        setAlpha(f1);
 
-    p = xml->Attribute("touchable");
-    if (p)
-        setTouchable(strcmp(p, "true") == 0);
+    f1 = buffer->ReadFloat();
+    if (f1 != 0)
+        setRotation(f1);
 
-    p = xml->Attribute("visible");
-    if (p)
-        setVisible(strcmp(p, "true") == 0);
+    if (!buffer->ReadBool())
+        setVisible(false);
+    if (!buffer->ReadBool())
+        setTouchable(false);
+    if (buffer->ReadBool())
+        setGrayed(true);
+    buffer->ReadByte(); //blendMode
+    buffer->ReadByte(); //filter
 
-    p = xml->Attribute("grayed");
-    if (p)
-        setGrayed(strcmp(p, "true") == 0);
-
-    p = xml->Attribute("tooltips");
-    if (p)
-        setTooltips(p);
-
-    p = xml->Attribute("customData");
-    if (p)
-        _customData = Value(p);
+    const std::string& str = buffer->ReadS();
+    if (!str.empty())
+        _customData = Value(str);
 }
 
-void GObject::setup_AfterAdd(TXMLElement * xml)
+void GObject::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    const char *p;
+    buffer->Seek(beginPos, 1);
 
-    p = xml->Attribute("group");
-    if (p)
-        _group = dynamic_cast<GGroup*>(_parent->getChildById(p));
+    const std::string& str = buffer->ReadS();
+    if (!str.empty())
+        setTooltips(str);
 
-    TXMLElement* exml = xml->FirstChildElement();
-    while (exml)
+    int groupId = buffer->ReadShort();
+    if (groupId >= 0)
+        _group = dynamic_cast<GGroup*>(_parent->getChildAt(groupId));
+
+    buffer->Seek(beginPos, 2);
+
+    int cnt = buffer->ReadShort();
+    for (int i = 0; i < cnt; i++)
     {
-        int gearIndex = ToolSet::parseGearIndex(exml->Name());
-        if (gearIndex != -1)
-            getGear(gearIndex)->setup(exml);
+        int nextPos = buffer->ReadShort();
+        nextPos += buffer->position;
 
-        exml = exml->NextSiblingElement();
+        GearBase* gear = getGear(buffer->ReadByte());
+        gear->setup(buffer);
+
+        buffer->position = nextPos;
     }
 }
 

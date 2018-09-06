@@ -7,10 +7,11 @@
 NS_FGUI_BEGIN
 
 class UIPackage;
-class DisplayListItem;
 class UIObjectFactory;
 class GComponent;
 class BitmapFont;
+class PixelHitTestData;
+class ByteBuffer;
 
 class PackageItem
 {
@@ -24,13 +25,13 @@ public:
     UIPackage* owner;
 
     PackageItemType type;
+    ObjectType objectType;
     std::string id;
     std::string name;
     int width;
     int height;
     std::string file;
-    bool decoded;
-    bool exported;
+    ByteBuffer* rawData;
 
     //atlas
     cocos2d::Texture2D* texture;
@@ -40,6 +41,7 @@ public:
     bool scaleByTile;
     int tileGridIndice;
     cocos2d::SpriteFrame* spriteFrame;
+    PixelHitTestData* pixelHitTestData;
 
     //movieclip
     cocos2d::Animation* animation;
@@ -48,24 +50,11 @@ public:
     bool swing;
 
     //component
-    TXMLDocument* componentData;
-    std::vector<DisplayListItem*>* displayList;
     std::function<GComponent*()> extensionCreator;
+    bool translated;
 
     //font
     BitmapFont* bitmapFont;
-};
-
-class DisplayListItem
-{
-public:
-    PackageItem* packageItem;
-    std::string type;
-    TXMLElement* desc;
-    int listItemCount;
-
-    DisplayListItem(PackageItem* pi, const std::string& type);
-    virtual ~DisplayListItem();
 };
 
 NS_FGUI_END

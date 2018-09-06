@@ -11,10 +11,10 @@ class PlayTransitionAction : public ControllerAction
 {
 public:
     PlayTransitionAction();
-    virtual void setup(TXMLElement * xml) override;
+    virtual void setup(ByteBuffer * buffer) override;
 
     std::string transitionName;
-    int repeat;
+    int playTimes;
     float delay;
     bool stopOnExit;
 

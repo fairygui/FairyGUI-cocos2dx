@@ -20,8 +20,8 @@ public:
     bool isUBBEnabled() const { return _ubbEnabled; }
     virtual void setUBBEnabled(bool value);
 
-    TextAutoSize getAutoSize() const { return _autoSize; }
-    virtual void setAutoSize(TextAutoSize value) {};
+    AutoSizeType getAutoSize() const { return _autoSize; }
+    virtual void setAutoSize(AutoSizeType value) {};
 
     virtual bool isSingleLine() const { return false; }
     virtual void setSingleLine(bool value) {};
@@ -50,14 +50,14 @@ protected:
     virtual void setTextFieldText() = 0;
     virtual void updateSize();
 
-    virtual void setup_BeforeAdd(TXMLElement* xml) override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
 
     std::string parseTemplate(const char* text);
 
     std::string _text;
     bool _ubbEnabled;
-    TextAutoSize _autoSize;
+    AutoSizeType _autoSize;
     cocos2d::ValueMap* _templateVars;
 };
 
@@ -69,7 +69,7 @@ public:
 
     CREATE_FUNC(GBasicTextField);
 
-    virtual void setAutoSize(TextAutoSize value) override;
+    virtual void setAutoSize(AutoSizeType value) override;
 
     virtual bool isSingleLine() const override { return _label->isWrapEnabled(); }
     virtual void setSingleLine(bool value) override;

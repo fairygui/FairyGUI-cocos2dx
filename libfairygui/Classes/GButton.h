@@ -7,6 +7,8 @@
 
 NS_FGUI_BEGIN
 
+class GTextField;
+
 class GButton : public GComponent
 {
 public:
@@ -52,9 +54,11 @@ public:
     bool isChangeStateOnClick() { return _changeStateOnClick; }
     void setChangeStateOnClick(bool value) { _changeStateOnClick = value; }
 
+    GTextField* getTextField() const;
+
 protected:
-    virtual void constructFromXML(TXMLElement* xml) override;
-    virtual void setup_AfterAdd(TXMLElement* xml) override;
+    virtual void constructExtension(ByteBuffer* buffer) override;
+    virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
     virtual void handleControllerChanged(GController* c) override;
 
     void setState(const std::string& value);

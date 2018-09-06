@@ -17,7 +17,7 @@ public:
 
     static void setPackageItemExtension(const std::string& url, GComponentCreator creator);
     static GObject* newObject(PackageItem* pi);
-    static GObject* newObject(const std::string& type);
+    static GObject* newObject(ObjectType type);
 
     static void setLoaderExtension(GLoaderCreator creator);
 

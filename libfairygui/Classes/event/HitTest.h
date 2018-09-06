@@ -3,11 +3,11 @@
 
 #include "FairyGUIMacros.h"
 #include "cocos2d.h"
-#include "utils/ByteArray.h"
 
 NS_FGUI_BEGIN
 
 class GComponent;
+class ByteBuffer;
 
 class IHitTest
 {
@@ -29,7 +29,7 @@ public:
     PixelHitTestData();
     ~PixelHitTestData();
 
-    void load(ByteArray& ba);
+    void load(ByteBuffer* buffer);
 };
 
 class PixelHitTest : public IHitTest

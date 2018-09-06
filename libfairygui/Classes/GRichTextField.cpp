@@ -1,5 +1,6 @@
 #include "GRichTextField.h"
 #include "utils/UBBParser.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -31,21 +32,21 @@ void GRichTextField::applyTextFormat()
         updateSize();
 }
 
-void GRichTextField::setAutoSize(TextAutoSize value)
+void GRichTextField::setAutoSize(AutoSizeType value)
 {
     _autoSize = value;
     switch (value)
     {
-    case TextAutoSize::NONE:
+    case AutoSizeType::NONE:
         _richText->setOverflow(Label::Overflow::CLAMP);
         break;
-    case TextAutoSize::BOTH:
+    case AutoSizeType::BOTH:
         _richText->setOverflow(Label::Overflow::NONE);
         break;
-    case TextAutoSize::HEIGHT:
+    case AutoSizeType::HEIGHT:
         _richText->setOverflow(Label::Overflow::RESIZE_HEIGHT);
         break;
-    case TextAutoSize::SHRINK:
+    case AutoSizeType::SHRINK:
         _richText->setOverflow(Label::Overflow::SHRINK);
         break;
     }
@@ -85,9 +86,9 @@ void GRichTextField::updateSize()
     _updatingSize = true;
 
     Size sz = _richText->getContentSize();
-    if (_autoSize == TextAutoSize::BOTH)
+    if (_autoSize == AutoSizeType::BOTH)
         setSize(sz.width, sz.height);
-    else if (_autoSize == TextAutoSize::HEIGHT)
+    else if (_autoSize == AutoSizeType::HEIGHT)
         setHeight(sz.height);
 
     _updatingSize = false;
@@ -98,11 +99,11 @@ void GRichTextField::handleSizeChanged()
     if (_updatingSize)
         return;
 
-    if (_autoSize != TextAutoSize::BOTH)
+    if (_autoSize != AutoSizeType::BOTH)
     {
         _richText->setDimensions(_size.width, _size.height);
 
-        if (_autoSize == TextAutoSize::HEIGHT)
+        if (_autoSize == AutoSizeType::HEIGHT)
         {
             if (!_text.empty())
                 setSizeDirectly(_size.width, _richText->getContentSize().height);

@@ -1,6 +1,6 @@
 #include "GGroup.h"
 #include "GComponent.h"
-#include "utils/ToolSet.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -432,24 +432,20 @@ void GGroup::handleVisibleChanged()
     }
 }
 
-void GGroup::setup_BeforeAdd(TXMLElement * xml)
+void GGroup::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_BeforeAdd(xml);
+    GObject::setup_beforeAdd(buffer, beginPos);
 
-    const char *p;
+    buffer->Seek(beginPos, 5);
 
-    p = xml->Attribute("layout");
-    if (p)
-    {
-        _layout = ToolSet::parseGroupLayoutType(p);
-        _lineGap = xml->IntAttribute("lineGap");
-        _columnGap = xml->IntAttribute("colGap");
-    }
+    _layout = (GroupLayoutType)buffer->ReadByte();
+    _lineGap = buffer->ReadInt();
+    _columnGap = buffer->ReadInt();
 }
 
-void GGroup::setup_AfterAdd(TXMLElement * xml)
+void GGroup::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GObject::setup_AfterAdd(xml);
+    GObject::setup_afterAdd(buffer, beginPos);
 
     if (!_visible)
         handleVisibleChanged();

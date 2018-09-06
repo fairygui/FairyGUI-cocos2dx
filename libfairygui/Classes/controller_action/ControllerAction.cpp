@@ -2,20 +2,20 @@
 #include "Controller.h"
 #include "ChangePageAction.h"
 #include "PlayTransitionAction.h"
-#include "utils/SwitchHelper.h"
+#include "utils/ByteBuffer.h"
 #include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-ControllerAction * ControllerAction::createAction(const char* type)
+ControllerAction * ControllerAction::createAction(int type)
 {
-    switch (hash_(type))
+    switch (type)
     {
-    case "play_transition"_hash:
+    case 0:
         return new PlayTransitionAction();
 
-    case "change_page"_hash:
+    case 1:
         return new ChangePageAction();
     }
     return nullptr;
@@ -38,15 +38,19 @@ void ControllerAction::run(GController * controller, const std::string & prevPag
         leave(controller);
 }
 
-void ControllerAction::setup(TXMLElement * xml)
+void ControllerAction::setup(ByteBuffer * buffer)
 {
-    const char* p;
-    p = xml->Attribute("fromPage");
-    if (p)
-        ToolSet::splitString(p, ',', fromPage);
-    p = xml->Attribute("toPage");
-    if (p)
-        ToolSet::splitString(p, ',', toPage);
+    int cnt;
+
+    cnt = buffer->ReadShort();
+    fromPage.resize(cnt);
+    for (int i = 0; i < cnt; i++)
+        fromPage[i].assign(buffer->ReadS());
+
+    cnt = buffer->ReadShort();
+    toPage.resize(cnt);
+    for (int i = 0; i < cnt; i++)
+        toPage[i].assign(buffer->ReadS());
 }
 
 NS_FGUI_END

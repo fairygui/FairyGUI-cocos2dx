@@ -1,7 +1,9 @@
 #include "GearColor.h"
 #include "GObject.h"
-#include "utils/ToolSet.h"
+#include "GTextField.h"
 #include "UIPackage.h"
+#include "utils/ByteBuffer.h"
+#include "tween/GTween.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -17,15 +19,15 @@ GearColor::GearColorValue::GearColorValue(const Color3B& color, const Color3B& s
     this->outlineColor = strokeColor;
 }
 
-GearColor::GearColor(GObject * owner) :GearBase(owner), _tweener(nullptr)
+GearColor::GearColor(GObject * owner) :GearBase(owner)
 {
 
 }
 
 GearColor::~GearColor()
 {
-    if (_tweener != nullptr)
-        _tweener->kill();
+    if (_tweenConfig && _tweenConfig->_tweener)
+        _tweenConfig->_tweener->kill();
 }
 
 void GearColor::init()
@@ -37,21 +39,11 @@ void GearColor::init()
     _storage.clear();
 }
 
-void GearColor::addStatus(const std::string&  pageId, const std::string& value)
+void GearColor::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
-    if (value == "-" || value.length() == 0)
-        return;
-
-    std::vector<std::string> arr;
-    ToolSet::splitString(value, ',', arr);
-
     GearColorValue gv;
-    gv.color = (Color3B)ToolSet::convertFromHtmlColor(arr[0].c_str());
-    if (arr.size() == 1)
-        gv.outlineColor = _default.outlineColor;
-    else
-        gv.outlineColor = (Color3B)ToolSet::convertFromHtmlColor(arr[1].c_str());
-
+    gv.color = (Color3B)buffer->ReadColor();
+    gv.outlineColor = (Color3B)buffer->ReadColor();
     if (pageId.size() == 0)
         _default = gv;
     else
@@ -70,7 +62,7 @@ void GearColor::apply()
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
     GTextField* tf = dynamic_cast<GTextField*>(_owner);
 
-    if (tween && UIPackage::_constructing == 0 && !disableAllTweenEffect)
+    if (_tweenConfig && UIPackage::_constructing == 0 && !disableAllTweenEffect)
     {
         if (tf != nullptr && gv.outlineColor != tf->getOutlineColor())
         {
@@ -79,12 +71,12 @@ void GearColor::apply()
             _owner->_gearLocked = false;
         }
 
-        if (_tweener != nullptr)
+        if (_tweenConfig->_tweener != nullptr)
         {
-            if (_tweener->endValue.getColor() != gv.color)
+            if (_tweenConfig->_tweener->endValue.getColor() != gv.color)
             {
-                _tweener->kill(true);
-                _tweener = nullptr;
+                _tweenConfig->_tweener->kill(true);
+                _tweenConfig->_tweener = nullptr;
             }
             else
                 return;
@@ -94,11 +86,11 @@ void GearColor::apply()
         if (gv.color != curColor)
         {
             if (_owner->checkGearController(0, _controller))
-                _displayLockToken = _owner->addDisplayLock();
+                _tweenConfig->_displayLockToken = _owner->addDisplayLock();
 
-            _tweener = GTween::to((Color4B)curColor, (Color4B)gv.color, tweenTime)
-                ->setDelay(delay)
-                ->setEase(easeType)
+            _tweenConfig->_tweener = GTween::to((Color4B)curColor, (Color4B)gv.color, _tweenConfig->duration)
+                ->setDelay(_tweenConfig->delay)
+                ->setEase(_tweenConfig->easeType)
                 ->setTargetAny(this)
                 ->onUpdate(CC_CALLBACK_1(GearColor::onTweenUpdate, this))
                 ->onComplete(CC_CALLBACK_0(GearColor::onTweenComplete, this));
@@ -119,18 +111,18 @@ void GearColor::onTweenUpdate(GTweener* tweener)
     IColorGear *cg = dynamic_cast<IColorGear*>(_owner);
 
     _owner->_gearLocked = true;
-    cg->setColor((Color3B)_tweener->value.getColor());
+    cg->setColor((Color3B)_tweenConfig->_tweener->value.getColor());
     _owner->_gearLocked = false;
 }
 
 void GearColor::onTweenComplete()
 {
-    if (_displayLockToken != 0)
+    if (_tweenConfig->_displayLockToken != 0)
     {
-        _owner->releaseDisplayLock(_displayLockToken);
-        _displayLockToken = 0;
+        _owner->releaseDisplayLock(_tweenConfig->_displayLockToken);
+        _tweenConfig->_displayLockToken = 0;
     }
-    _tweener = nullptr;
+    _tweenConfig->_tweener = nullptr;
     _owner->dispatchEvent(UIEventType::GearStop);
 }
 

@@ -1,7 +1,9 @@
 #include "GLabel.h"
 #include "GButton.h"
 #include "GTextField.h"
-#include "utils/ToolSet.h"
+#include "GTextInput.h"
+#include "PackageItem.h"
+#include "utils/Bytebuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -33,52 +35,50 @@ void GLabel::setIcon(const std::string & value)
 
 cocos2d::Color3B GLabel::getTitleColor() const
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        return ((GTextField*)_titleObject)->getColor();
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        return ((GLabel*)_titleObject)->getTitleColor();
-    else if (dynamic_cast<GButton*>(_titleObject))
-        return ((GButton*)_titleObject)->getTitleColor();
+    GTextField* tf = getTextField();
+    if (tf)
+        return tf->getColor();
     else
         return Color3B::BLACK;
 }
 
 void GLabel::setTitleColor(const cocos2d::Color3B & value)
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        ((GTextField*)_titleObject)->setColor(value);
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        ((GLabel*)_titleObject)->setTitleColor(value);
-    else if (dynamic_cast<GButton*>(_titleObject))
-        ((GButton*)_titleObject)->setTitleColor(value);
+    GTextField* tf = getTextField();
+    if (tf)
+        tf->setColor(value);
 }
 
 int GLabel::getTitleFontSize() const
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        return ((GTextField*)_titleObject)->getFontSize();
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        return ((GLabel*)_titleObject)->getTitleFontSize();
-    else if (dynamic_cast<GButton*>(_titleObject))
-        return ((GButton*)_titleObject)->getTitleFontSize();
+    GTextField* tf = getTextField();
+    if (tf)
+        return tf->getFontSize();
     else
         return 0;
 }
 
 void GLabel::setTitleFontSize(int value)
 {
-    if (dynamic_cast<GTextField*>(_titleObject))
-        ((GTextField*)_titleObject)->setFontSize(value);
-    else if (dynamic_cast<GLabel*>(_titleObject))
-        ((GLabel*)_titleObject)->setTitleFontSize(value);
-    else if (dynamic_cast<GButton*>(_titleObject))
-        ((GButton*)_titleObject)->setTitleFontSize(value);
+    GTextField* tf = getTextField();
+    if (tf)
+        tf->setFontSize(value);
 }
 
-void GLabel::constructFromXML(TXMLElement * xml)
+GTextField * GLabel::getTextField() const
 {
-    GComponent::constructFromXML(xml);
+    if (dynamic_cast<GTextField*>(_titleObject))
+        return dynamic_cast<GTextField*>(_titleObject);
+    else if (dynamic_cast<GLabel*>(_titleObject))
+        return dynamic_cast<GLabel*>(_titleObject)->getTextField();
+    else if (dynamic_cast<GButton*>(_titleObject))
+        return dynamic_cast<GButton*>(_titleObject)->getTextField();
+    else
+        return nullptr;
+}
 
+void GLabel::constructExtension(ByteBuffer* buffer)
+{
     _titleObject = getChild("title");
     _iconObject = getChild("icon");
     if (_titleObject != nullptr)
@@ -87,53 +87,48 @@ void GLabel::constructFromXML(TXMLElement * xml)
         _icon = _iconObject->getIcon();
 }
 
-void GLabel::setup_AfterAdd(TXMLElement * xml)
+void GLabel::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
-    GComponent::setup_AfterAdd(xml);
+    GComponent::setup_afterAdd(buffer, beginPos);
 
-    xml = xml->FirstChildElement("Label");
-    if (!xml)
+    if (!buffer->Seek(beginPos, 6))
         return;
 
-    const char *p;
+    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+        return;
 
-    p = xml->Attribute("title");
-    if (p)
-        this->setTitle(p);
+    const std::string* str;
 
-    p = xml->Attribute("icon");
-    if (p)
-        this->setIcon(p);
+    if ((str = buffer->ReadSP()))
+        setTitle(*str);
+    if ((str = buffer->ReadSP()))
+        setIcon(*str);
+    if (buffer->ReadBool())
+        setTitleColor((Color3B)buffer->ReadColor());
+    int iv = buffer->ReadInt();
+    if (iv != 0)
+        setTitleFontSize(iv);
 
-    p = xml->Attribute("titleColor");
-    if (p)
-        setTitleColor((Color3B)ToolSet::convertFromHtmlColor(p));
-
-    p = xml->Attribute("titleFontSize");
-    if (p)
-        setTitleFontSize(atoi(p));
-
-    GTextInput* input = dynamic_cast<GTextInput*>(_titleObject);
-    if (input)
+    if (buffer->ReadBool())
     {
-        p = xml->Attribute("prompt");
-        if (p)
-            input->setPrompt(p);
-
-        if (xml->BoolAttribute("password"))
-            input->setPassword(true);
-
-        p = xml->Attribute("restrict");
-        if (p)
-            input->setRestrict(p);
-
-        p = xml->Attribute("maxLength");
-        if (p)
-            input->setMaxLength(atoi(p));
-
-        p = xml->Attribute("keyboardType");
-        if (p)
-            input->setKeyboardType(atoi(p));
+        GTextInput* input = dynamic_cast<GTextInput*>(getTextField());
+        if (input)
+        {
+            if ((str = buffer->ReadSP()))
+                input->setPrompt(*str);
+            if ((str = buffer->ReadSP()))
+                input->setRestrict(*str);
+            iv = buffer->ReadInt();
+            if (iv != 0)
+                input->setMaxLength(iv);
+            iv = buffer->ReadInt();
+            if (iv != 0)
+                input->setKeyboardType(iv);
+            if (buffer->ReadBool())
+                input->setPassword(true);
+        }
+        else
+            buffer->Skip(13);
     }
 }
 

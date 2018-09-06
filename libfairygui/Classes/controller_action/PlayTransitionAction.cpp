@@ -1,33 +1,24 @@
 #include "PlayTransitionAction.h"
 #include "Controller.h"
 #include "GComponent.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 PlayTransitionAction::PlayTransitionAction() :
-    repeat(1), delay(0), stopOnExit(false), _currentTransition(nullptr)
+    playTimes(1), delay(0), stopOnExit(false), _currentTransition(nullptr)
 {
 }
 
-void PlayTransitionAction::setup(TXMLElement * xml)
+void PlayTransitionAction::setup(ByteBuffer * buffer)
 {
-    ControllerAction::setup(xml);
+    ControllerAction::setup(buffer);
 
-    const char *p;
-    p = xml->Attribute("transition");
-    if (p)
-        transitionName = p;
-
-    p = xml->Attribute("repeat");
-    if (p)
-        repeat = atoi(p);
-
-    p = xml->Attribute("delay");
-    if (p)
-        delay = atof(p);
-
-    stopOnExit = xml->BoolAttribute("stopOnExit");
+    transitionName = buffer->ReadS();
+    playTimes = buffer->ReadInt();
+    delay = buffer->ReadFloat();
+    stopOnExit = buffer->ReadBool();
 }
 
 void PlayTransitionAction::enter(GController * controller)
@@ -36,9 +27,9 @@ void PlayTransitionAction::enter(GController * controller)
     if (trans != nullptr)
     {
         if (_currentTransition != nullptr && _currentTransition->isPlaying())
-            trans->changePlayTimes(repeat);
+            trans->changePlayTimes(playTimes);
         else
-            trans->play(repeat, delay, nullptr);
+            trans->play(playTimes, delay, nullptr);
         _currentTransition = trans;
     }
 }
