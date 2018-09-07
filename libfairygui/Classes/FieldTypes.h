@@ -156,6 +156,8 @@ enum class TransitionActionType
     Shake,
     ColorFilter,
     Skew,
+    Text,
+    Icon,
     Unknown
 };
 

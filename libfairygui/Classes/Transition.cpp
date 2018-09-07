@@ -51,6 +51,12 @@ public:
     cocos2d::Vec2 offset;
 };
 
+class TValue_Text
+{
+public:
+    std::string text;
+};
+
 class TValue
 {
 public:
@@ -197,6 +203,11 @@ TransitionItem::TransitionItem(TransitionActionType aType) :
 
     case TransitionActionType::Visible:
         value = new TValue_Visible();
+        break;
+
+    case TransitionActionType::Text:
+    case TransitionActionType::Icon:
+        value = new TValue_Text();
         break;
 
     default:
@@ -562,6 +573,11 @@ void Transition::setValue(const std::string & label, const ValueVector& values)
             tvalue->f4 = values[3].asFloat();
             break;
         }
+
+        case TransitionActionType::Text:
+        case TransitionActionType::Icon:
+            ((TValue_Text*)value)->text = values[0].asString();
+            break;
         }
     }
 }
@@ -988,6 +1004,13 @@ void Transition::onTweenStart(GTweener* tweener)
                 if (!startValue->b2)
                     startValue->f2 = item->target->getY();
             }
+            else
+            {
+                if (!startValue->b1)
+                    startValue->f1 = item->target->getX() - _ownerBaseX;
+                if (!startValue->b2)
+                    startValue->f2 = item->target->getY() - _ownerBaseY;
+            }
         }
         else
         {
@@ -1230,8 +1253,15 @@ void Transition::applyValue(TransitionItem* item)
             break;
         }
 
-
     case TransitionActionType::ColorFilter:
+        break;
+
+    case TransitionActionType::Text:
+        item->target->setText(((TValue_Text*)item->value)->text);
+        break;
+
+    case TransitionActionType::Icon:
+        item->target->setIcon(((TValue_Text*)item->value)->text);
         break;
     }
 
@@ -1374,6 +1404,12 @@ void Transition::decodeValue(TransitionItem* item, ByteBuffer * buffer, void* va
         tvalue->f4 = buffer->ReadFloat();
         break;
     }
+
+    case TransitionActionType::Text:
+    case TransitionActionType::Icon:
+        ((TValue_Text*)value)->text = buffer->ReadS();
+        break;
+
     default:
         break;
     }

@@ -19,7 +19,7 @@ void TweenPropTypeUtils::setProps(GObject * target, TweenPropType propType, cons
         break;
 
     case TweenPropType::Y:
-        g->setY(value.y);
+        g->setY(value.x);
         break;
 
     case TweenPropType::Position:
@@ -31,7 +31,7 @@ void TweenPropTypeUtils::setProps(GObject * target, TweenPropType propType, cons
         break;
 
     case TweenPropType::Height:
-        g->setHeight(value.y);
+        g->setHeight(value.x);
         break;
 
     case TweenPropType::Size:
@@ -43,7 +43,7 @@ void TweenPropTypeUtils::setProps(GObject * target, TweenPropType propType, cons
         break;
 
     case TweenPropType::ScaleY:
-        g->setScaleY(value.y);
+        g->setScaleY(value.x);
         break;
 
     case TweenPropType::Scale:
@@ -77,7 +77,7 @@ void TweenPropTypeUtils::setProps(cocos2d::Node * target, TweenPropType propType
         break;
 
     case TweenPropType::Y:
-        g->setY(value.y);
+        g->setY(value.x);
         break;
 
     case TweenPropType::Position:
@@ -89,7 +89,7 @@ void TweenPropTypeUtils::setProps(cocos2d::Node * target, TweenPropType propType
         break;
 
     case TweenPropType::Height:
-        g->setHeight(value.y);
+        g->setHeight(value.x);
         break;
 
     case TweenPropType::Size:
@@ -101,7 +101,7 @@ void TweenPropTypeUtils::setProps(cocos2d::Node * target, TweenPropType propType
         break;
 
     case TweenPropType::ScaleY:
-        g->setScaleY(value.y);
+        g->setScaleY(value.x);
         break;
 
     case TweenPropType::Scale:
