@@ -48,6 +48,14 @@ void GGraph::drawEllipse(float aWidth, float aHeight, int lineSize, const cocos2
     updateShape();
 }
 
+static void drawVertRect(cocos2d::DrawNode* shape, float x, float y, float width, float height, const cocos2d::Color4F &color)
+{
+    float mx = x + width;
+    float my = y + height;
+    shape->drawTriangle(Vec2(x, y), Vec2(mx, y), Vec2(x, my), color);
+    shape->drawTriangle(Vec2(mx, y), Vec2(mx, my), Vec2(x, my), color);
+}
+
 void GGraph::updateShape()
 {
     _shape->clear();
@@ -55,16 +63,18 @@ void GGraph::updateShape()
     {
         if (_lineSize > 0)
         {
-            _shape->setLineWidth(_lineSize);
+            float wl = _size.width - _lineSize;
+            float hl = _size.height - _lineSize;
+            drawVertRect(_shape, 0, 0, wl, _lineSize, _lineColor);
+            drawVertRect(_shape, wl, 0, _lineSize, hl, _lineColor);
+            drawVertRect(_shape, _lineSize, hl, wl, _lineSize, _lineColor);
+            drawVertRect(_shape, 0, _lineSize, _lineSize, hl, _lineColor);
 
-            float tmp = floor(_lineSize*0.5f);
-            float tmp2 = ceil(_lineSize*0.5f);
-            _shape->drawLine(Vec2(1, tmp), Vec2(_size.width, tmp), _lineColor);
-            _shape->drawLine(Vec2(_size.width - tmp, 0), Vec2(_size.width - tmp, _size.height), _lineColor);
-            _shape->drawLine(Vec2(_size.width - 1, _size.height - tmp2), Vec2(0, _size.height - tmp2), _lineColor);
-            _shape->drawLine(Vec2(tmp2, _size.height - 1), Vec2(tmp2, 0), _lineColor);
+            drawVertRect(_shape, _lineSize, _lineSize, _size.width - _lineSize * 2, _size.height - _lineSize * 2, _fillColor);
         }
-        _shape->drawSolidRect(Vec2(_lineSize, _lineSize), Vec2(_size.width - _lineSize, _size.height - _lineSize), _fillColor);
+        else
+            drawVertRect(_shape, 0, 0, _size.width, _size.height, _fillColor);
+
         _touchDisabled = false;
     }
     else if (_type == 2)
