@@ -170,7 +170,7 @@ void GList::returnToPool(GObject * obj)
 
 GObject * GList::addItemFromPool(const std::string & url)
 {
-    GObject* obj = getFromPool();
+    GObject* obj = getFromPool(url);
 
     return addChild(obj);
 }
