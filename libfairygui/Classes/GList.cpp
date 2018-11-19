@@ -1472,8 +1472,8 @@ void GList::handleScroll1(bool forceUpdate)
     _firstIndex = newFirstIndex;
     int curIndex = newFirstIndex;
     bool forward = oldFirstIndex > newFirstIndex;
-    int oldCount = numChildren();
-    int lastIndex = oldFirstIndex + oldCount - 1;
+    int childCount = numChildren();
+    int lastIndex = oldFirstIndex + childCount - 1;
     int reuseIndex = forward ? lastIndex : oldFirstIndex;
     float curX = 0, curY = pos;
     bool needRender;
@@ -1596,7 +1596,7 @@ void GList::handleScroll1(bool forceUpdate)
         curIndex++;
     }
 
-    for (int i = 0; i < oldCount; i++)
+    for (int i = 0; i < childCount; i++)
     {
         ItemInfo& ii = _virtualItems[oldFirstIndex + i];
         if (ii.updateFlag != _itemInfoVer && ii.obj != nullptr)
@@ -1606,6 +1606,14 @@ void GList::handleScroll1(bool forceUpdate)
             removeChildToPool(ii.obj);
             ii.obj = nullptr;
         }
+    }
+
+    childCount = (int)_children.size();
+    for (int i = 0; i < childCount; i++)
+    {
+        GObject* obj = _virtualItems[newFirstIndex + i].obj;
+        if (_children.at(i) != obj)
+            setChildIndex(obj, i);
     }
 
     if (deltaSize != 0 || firstItemDeltaSize != 0)
@@ -1634,8 +1642,8 @@ void GList::handleScroll2(bool forceUpdate)
     _firstIndex = newFirstIndex;
     int curIndex = newFirstIndex;
     bool forward = oldFirstIndex > newFirstIndex;
-    int oldCount = numChildren();
-    int lastIndex = oldFirstIndex + oldCount - 1;
+    int childCount = numChildren();
+    int lastIndex = oldFirstIndex + childCount - 1;
     int reuseIndex = forward ? lastIndex : oldFirstIndex;
     float curX = pos, curY = 0;
     bool needRender;
@@ -1758,7 +1766,7 @@ void GList::handleScroll2(bool forceUpdate)
         curIndex++;
     }
 
-    for (int i = 0; i < oldCount; i++)
+    for (int i = 0; i < childCount; i++)
     {
         ItemInfo& ii = _virtualItems[oldFirstIndex + i];
         if (ii.updateFlag != _itemInfoVer && ii.obj != nullptr)
@@ -1768,6 +1776,14 @@ void GList::handleScroll2(bool forceUpdate)
             removeChildToPool(ii.obj);
             ii.obj = nullptr;
         }
+    }
+
+    childCount = (int)_children.size();
+    for (int i = 0; i < childCount; i++)
+    {
+        GObject* obj = _virtualItems[newFirstIndex + i].obj;
+        if (_children.at(i) != obj)
+            setChildIndex(obj, i);
     }
 
     if (deltaSize != 0 || firstItemDeltaSize != 0)
