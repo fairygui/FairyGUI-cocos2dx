@@ -889,14 +889,14 @@ void GList::scrollToView(int index, bool ani, bool setFirst)
         if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
         {
             float pos = 0;
-            for (int i = 0; i < index; i += _curLineItemCount)
+            for (int i = _curLineItemCount - 1; i < index; i += _curLineItemCount)
                 pos += _virtualItems[i].size.y + _lineGap;
             rect.setRect(0, pos, _itemSize.x, ii.size.y);
         }
         else if (_layout == ListLayoutType::SINGLE_ROW || _layout == ListLayoutType::FLOW_VERTICAL)
         {
             float pos = 0;
-            for (int i = 0; i < index; i += _curLineItemCount)
+            for (int i = _curLineItemCount - 1; i < index; i += _curLineItemCount)
                 pos += _virtualItems[i].size.x + _columnGap;
             rect.setRect(pos, 0, ii.size.x, _itemSize.y);
         }
