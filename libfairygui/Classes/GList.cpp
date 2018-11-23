@@ -39,7 +39,6 @@ GList::GList() :
     _firstIndex(-1),
     _virtualListChanged(false),
     _eventLocked(false),
-    _enterCounter(0),
     _itemInfoVer(0)
 {
     _trackBounds = true;
@@ -1435,15 +1434,34 @@ void GList::handleScroll(bool forceUpdate)
     if (_eventLocked)
         return;
 
-    _enterCounter = 0;
     if (_layout == ListLayoutType::SINGLE_COLUMN || _layout == ListLayoutType::FLOW_HORIZONTAL)
     {
-        handleScroll1(forceUpdate);
+        int enterCounter = 0;
+        while (handleScroll1(forceUpdate))
+        {
+            enterCounter++;
+            forceUpdate = false;
+            if (enterCounter > 20)
+            {
+                CCLOG("FairyGUI: list will never be filled as the item renderer function always returns a different size.");
+                break;
+            }
+        }
         handleArchOrder1();
     }
     else if (_layout == ListLayoutType::SINGLE_ROW || _layout == ListLayoutType::FLOW_VERTICAL)
     {
-        handleScroll2(forceUpdate);
+        int enterCounter = 0;
+        while (handleScroll2(forceUpdate))
+        {
+            enterCounter++;
+            forceUpdate = false;
+            if (enterCounter > 20)
+            {
+                CCLOG("FairyGUI: list will never be filled as the item renderer function always returns a different size.");
+                break;
+            }
+        }
         handleArchOrder2();
     }
     else
@@ -1454,19 +1472,15 @@ void GList::handleScroll(bool forceUpdate)
     _boundsChanged = false;
 }
 
-void GList::handleScroll1(bool forceUpdate)
+bool GList::handleScroll1(bool forceUpdate)
 {
-    _enterCounter++;
-    if (_enterCounter > 3)
-        return;
-
     float pos = _scrollPane->getScrollingPosY();
     float max = pos + _scrollPane->getViewSize().height;
     bool end = max == _scrollPane->getContentSize().height;
 
     int newFirstIndex = getIndexOnPos1(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
-        return;
+        return false;
 
     int oldFirstIndex = _firstIndex;
     _firstIndex = newFirstIndex;
@@ -1621,22 +1635,20 @@ void GList::handleScroll1(bool forceUpdate)
 
     if (curIndex > 0 && numChildren() > 0
         && _container->getPositionY2() < 0 && getChildAt(0)->getY() > -_container->getPositionY2())
-        handleScroll1(false);
+        return true;
+    else
+        return false;
 }
 
-void GList::handleScroll2(bool forceUpdate)
+bool GList::handleScroll2(bool forceUpdate)
 {
-    _enterCounter++;
-    if (_enterCounter > 3)
-        return;
-
     float pos = _scrollPane->getScrollingPosX();
     float max = pos + _scrollPane->getViewSize().width;
     bool end = pos == _scrollPane->getContentSize().width;
 
     int newFirstIndex = getIndexOnPos2(pos, forceUpdate);
     if (newFirstIndex == _firstIndex && !forceUpdate)
-        return;
+        return false;
 
     int oldFirstIndex = _firstIndex;
     _firstIndex = newFirstIndex;
@@ -1791,7 +1803,9 @@ void GList::handleScroll2(bool forceUpdate)
 
     if (curIndex > 0 && numChildren() > 0 && _container->getPositionX() < 0
         && getChildAt(0)->getX() > -_container->getPositionX())
-        handleScroll2(false);
+        return true;
+    else
+        return false;
 }
 
 void GList::handleScroll3(bool forceUpdate)

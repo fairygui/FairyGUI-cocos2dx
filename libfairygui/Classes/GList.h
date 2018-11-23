@@ -131,8 +131,8 @@ private:
     int getIndexOnPos3(float& pos, bool forceUpdate);
 
     void handleScroll(bool forceUpdate);
-    void handleScroll1(bool forceUpdate);
-    void handleScroll2(bool forceUpdate);
+    bool handleScroll1(bool forceUpdate);
+    bool handleScroll2(bool forceUpdate);
     void handleScroll3(bool forceUpdate);
 
     void handleArchOrder1();
@@ -168,7 +168,6 @@ private:
     int _virtualListChanged; //1-content changed, 2-size changed
     bool _eventLocked;
     uint32_t _itemInfoVer;
-    uint32_t _enterCounter;
 
     struct ItemInfo
     {
