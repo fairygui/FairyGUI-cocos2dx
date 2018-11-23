@@ -382,8 +382,30 @@ void GLoader::updateLayout()
     }
     else
     {
-        _content->setContentSize(_contentSourceSize);
-        _content->setScale(sx, sy);
+        if (_contentItem != nullptr)
+        {
+            if (_contentItem->scale9Grid)
+            {
+                _content->setScale(1, 1);
+                _content->setContentSize(_contentSize);
+            }
+            else if (_contentItem->scaleByTile)
+            {
+                _content->setScale(1, 1);
+                _content->setContentSize(_contentSourceSize);
+                _content->setTextureRect(Rect(Vec2::ZERO, _contentSize));
+            }
+            else
+            {
+                _content->setContentSize(_contentSourceSize);
+                _content->setScale(sx, sy);
+            }
+        }
+        else
+        {
+            _content->setContentSize(_contentSourceSize);
+            _content->setScale(sx, sy);
+        }
         _content->setAnchorPoint(Vec2::ZERO);
     }
 
