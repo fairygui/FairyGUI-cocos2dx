@@ -76,7 +76,7 @@ void FUILabel::applyTextFormat()
     }
 
     if (_currentLabelType != LabelType::BMFONT || _bmFontCanTint)
-        setColor(_textFormat->color);
+        setTextColor((Color4B)_textFormat->color);
 
     if (_textFormat->underline)
         enableUnderline();
