@@ -37,11 +37,11 @@ Classes/RelationItem.cpp \
 Classes/Relations.cpp \
 Classes/ScrollPane.cpp \
 Classes/Transition.cpp \
+Classes/TranslationHelper.cpp \
 Classes/UIConfig.cpp \
 Classes/UIObjectFactory.cpp \
 Classes/UIPackage.cpp \
 Classes/Window.cpp \
-Classes/display/Actions.cpp \
 Classes/display/BitmapFont.cpp \
 Classes/display/FUIContainer.cpp \
 Classes/display/FUILabel.cpp \
@@ -63,7 +63,7 @@ Classes/gears/GearLook.cpp \
 Classes/gears/GearSize.cpp \
 Classes/gears/GearText.cpp \
 Classes/gears/GearXY.cpp \
-Classes/utils/ByteArray.cpp \
+Classes/utils/ByteBuffer.cpp \
 Classes/utils/ToolSet.cpp \
 Classes/utils/UBBParser.cpp \
 Classes/utils/WeakPtr.cpp \
@@ -71,7 +71,15 @@ Classes/controller_action/ControllerAction.cpp \
 Classes/controller_action/ChangePageAction.cpp \
 Classes/controller_action/PlayTransitionAction.cpp \
 Classes/treeview/TreeView.cpp \
-Classes/treeview/TreeNode.cpp
+Classes/treeview/TreeNode.cpp \
+Classes/tween/EaseManager.cpp \
+Classes/tween/GTween.cpp \
+Classes/tween/GTweener.cpp \
+Classes/tween/TweenManager.cpp \
+Classes/tween/TweenPropType.cpp \
+Classes/tween/TweenValue.cpp
+
+LOCAL_CPP_FEATURES := rtti exceptions
 
 LOCAL_STATIC_LIBRARIES := cocos2dx_static
 
