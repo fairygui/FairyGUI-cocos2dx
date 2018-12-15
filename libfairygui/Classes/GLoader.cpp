@@ -498,6 +498,9 @@ void GLoader::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 
 GObject* GLoader::hitTest(const Vec2 &worldPoint, const Camera* camera)
 {
+    if (!_touchable || !_displayObject->isVisible() || !_displayObject->getParent())
+        return nullptr;
+
     if (_content2 != nullptr)
     {
         GObject* obj = _content2->hitTest(worldPoint, camera);
@@ -505,7 +508,13 @@ GObject* GLoader::hitTest(const Vec2 &worldPoint, const Camera* camera)
             return obj;
     }
 
-    return GObject::hitTest(worldPoint, camera);
+    Rect rect;
+    rect.size = _size;
+    //if (isScreenPointInRect(worldPoint, camera, _displayObject->getWorldToNodeTransform(), rect, nullptr))
+    if (rect.containsPoint(_displayObject->convertToNodeSpace(worldPoint)))
+        return this;
+    else
+        return nullptr;
 }
 
 NS_FGUI_END
