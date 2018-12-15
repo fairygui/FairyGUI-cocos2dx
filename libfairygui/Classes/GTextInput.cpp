@@ -3,6 +3,8 @@
 #include "GRoot.h"
 #include "ui/UIEditBox/UIEditBox.h"
 #include "utils/Bytebuffer.h"
+#include "utils/UBBParser.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -24,7 +26,7 @@ void GTextInput::handleInit()
     _displayObject = _input;
 
     this->addEventListener(UIEventType::TouchBegin, [this](EventContext*) {
-        _input->openKeyboard(); 
+        _input->openKeyboard();
     });
 }
 
@@ -45,7 +47,17 @@ void GTextInput::applyTextFormat()
 
 void GTextInput::setPrompt(const std::string & value)
 {
-    _input->setPlaceHolder(value.c_str());
+    if (value.empty())
+        _input->setPlaceHolder(value.c_str());
+    else
+    {
+        UBBParser* parser = UBBParser::getInstance();
+        _input->setPlaceHolder(parser->parse(value.c_str(), true).c_str());
+        if (!parser->lastColor.empty())
+            _input->setPlaceholderFontColor(ToolSet::convertFromHtmlColor(parser->lastColor.c_str()));
+        if (!parser->lastFontSize.empty())
+            _input->setPlaceholderFontSize(Value(parser->lastFontSize).asInt());
+    }
 }
 
 void GTextInput::setPassword(bool value)

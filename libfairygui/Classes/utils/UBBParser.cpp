@@ -37,10 +37,12 @@ UBBParser::~UBBParser()
 
 }
 
-std::string UBBParser::parse(const char * text)
+std::string UBBParser::parse(const char * text, bool remove)
 {
     _pString = text;
     _readPos = 0;
+    lastColor.clear();
+    lastFontSize.clear();
 
     ssize_t pos;
     bool end;
@@ -104,7 +106,8 @@ std::string UBBParser::parse(const char * text)
         if (it != _handlers.end())
         {
             it->second(tag, end, attr, repl);
-            out.append(repl);
+            if (!remove)
+                out.append(repl);
         }
         else
             out.append(_pString, _readPos);
@@ -165,8 +168,10 @@ void UBBParser::onTag_Simple(const std::string & tagName, bool end, const std::s
 
 void UBBParser::onTag_COLOR(const std::string & tagName, bool end, const std::string & attr, std::string& replacement)
 {
-    if (!end)
+    if (!end) {
         replacement = "<font color=\"" + attr + "\">";
+        lastColor = attr;
+    }
     else
         replacement = "</font>";
 }
@@ -181,8 +186,10 @@ void UBBParser::onTag_FONT(const std::string & tagName, bool end, const std::str
 
 void UBBParser::onTag_SIZE(const std::string & tagName, bool end, const std::string & attr, std::string& replacement)
 {
-    if (!end)
+    if (!end) {
         replacement = "<font size=\"" + attr + "\">";
+        lastFontSize = attr;
+    }
     else
         replacement = "</font>";
 }

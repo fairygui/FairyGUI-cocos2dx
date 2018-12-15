@@ -16,10 +16,12 @@ public:
 
     static UBBParser* getInstance();
 
-    std::string parse(const char *text);
+    std::string parse(const char *text, bool remove = false);
 
     int defaultImgWidth;
     int defaultImgHeight;
+    std::string lastColor;
+    std::string lastFontSize;
 
 protected:
     virtual void onTag_URL(const std::string& tagName, bool end, const std::string& attr, std::string& replacement);
