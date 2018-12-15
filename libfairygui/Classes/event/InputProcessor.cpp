@@ -150,7 +150,7 @@ void InputProcessor::handleRollOver(TouchInfo* touch, GObject* target)
     while (element != nullptr)
     {
         rollOutChain.push_back(WeakPtr(element));
-        element = element->getParent();
+        element = element->findParent();
     }
 
     element = target;
@@ -164,7 +164,7 @@ void InputProcessor::handleRollOver(TouchInfo* touch, GObject* target)
         }
         rollOverChain.push_back(WeakPtr(element));
 
-        element = element->getParent();
+        element = element->findParent();
     }
 
     touch->lastRollOver = target;
@@ -212,6 +212,38 @@ void InputProcessor::cancelClick(int touchId)
         ti->clickCancelled = true;
 }
 
+void InputProcessor::simulateClick(GObject* target, int touchId)
+{
+    _activeProcessor = this;
+
+    Vec2 pt = target->localToGlobal(Vec2::ZERO);
+    _recentInput._pos.x = pt.x;
+    _recentInput._pos.y = pt.y;
+    _recentInput._target = target;
+    _recentInput._clickCount = 1;
+    _recentInput._button = EventMouse::MouseButton::BUTTON_LEFT;
+    _recentInput._touch = nullptr;
+    _recentInput._touchId = touchId;
+
+    if (_captureCallback)
+        _captureCallback(UIEventType::TouchBegin);
+
+    WeakPtr wptr(target);
+    target->bubbleEvent(UIEventType::TouchBegin);
+
+    target = wptr.ptr();
+    if (target)
+    {
+        target->bubbleEvent(UIEventType::TouchEnd);
+
+        target = wptr.ptr();
+        if (target)
+            target->bubbleEvent(UIEventType::Click);
+    }
+
+    _activeProcessor = nullptr;
+}
+
 void InputProcessor::setBegin(TouchInfo* touch, GObject* target)
 {
     touch->began = true;
@@ -223,7 +255,7 @@ void InputProcessor::setBegin(TouchInfo* touch, GObject* target)
     while (obj != nullptr)
     {
         touch->downTargets.push_back(WeakPtr(obj));
-        obj = obj->getParent();
+        obj = obj->findParent();
     }
 }
 
@@ -267,7 +299,7 @@ GObject* InputProcessor::clickTest(TouchInfo* touch, GObject* target)
             break;
         }
 
-        obj = obj->getParent();
+        obj = obj->findParent();
     }
 
     return obj;

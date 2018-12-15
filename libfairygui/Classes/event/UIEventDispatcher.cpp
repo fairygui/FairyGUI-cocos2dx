@@ -267,7 +267,7 @@ void UIEventDispatcher::doDispatch(int eventType, EventContext* context)
 void UIEventDispatcher::doBubble(int eventType, EventContext* context)
 {
     //parent maybe disposed in callbacks
-    WeakPtr wptr(((GObject*)this)->getParent());
+    WeakPtr wptr(((GObject*)this)->findParent());
 
     if (!_callbacks.empty())
     {

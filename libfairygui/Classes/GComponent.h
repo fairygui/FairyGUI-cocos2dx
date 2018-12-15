@@ -134,8 +134,6 @@ private:
     int getInsertPosForSortingChild(GObject * target);
     int moveChild(GObject* child, int oldIndex, int index);
 
-    void addAdoptiveChild(GObject* child);
-
     CALL_LATER_FUNC(GComponent, doUpdateBounds);
     CALL_LATER_FUNC(GComponent, buildNativeDisplayList);
 

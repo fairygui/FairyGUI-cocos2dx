@@ -1,6 +1,7 @@
 #include "FUIContainer.h"
 #include "base/CCStencilStateManager.h"
 #include "utils/ToolSet.h"
+#include "GComponent.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -39,7 +40,8 @@ StencilClippingSupport::StencilClippingSupport() :
 
 FUIContainer::FUIContainer() :
     _rectClippingSupport(nullptr),
-    _stencilClippingSupport(nullptr)
+    _stencilClippingSupport(nullptr),
+    gOwner(nullptr)
 {
 }
 

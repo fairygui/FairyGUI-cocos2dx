@@ -8,12 +8,10 @@
 
 NS_FGUI_BEGIN
 
-class GTextInput;
-
-class FUIInput : public cocos2d::ui::EditBox, cocos2d::ui::EditBoxDelegate
+class FUIInput : public cocos2d::ui::EditBox
 {
 public:
-    static FUIInput* create(GTextInput* owner);
+    static FUIInput* create();
 
     FUIInput();
     virtual ~FUIInput();
@@ -33,13 +31,13 @@ public:
     int keyboardType() const { return _keyboardType;  }
     void setKeyboardType(int value);
 
-    GTextInput* getOwner() const { return _owner; }
+    void openKeyboard();
 
 private:
-    void init(GTextInput* owner);
-    void editBoxReturn(cocos2d::ui::EditBox* editBox);
+    void continueInit();
 
-    GTextInput* _owner;
+    void _touchDownAction(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchEventType controlEvent);
+
     TextFormat* _textFormat;
     bool _password;
     int _keyboardType;

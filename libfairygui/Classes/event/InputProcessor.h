@@ -28,6 +28,7 @@ public:
     void removeTouchMonitor(GObject* target);
 
     void cancelClick(int touchId);
+    void simulateClick(GObject* target, int touchId = -1);
 
     void setCaptureCallback(CaptureEventCallback value) { _captureCallback = value; }
 
@@ -36,7 +37,7 @@ private:
     void onTouchMoved(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchEnded(cocos2d::Touch * touch, cocos2d::Event *);
     void onTouchCancelled(cocos2d::Touch * touch, cocos2d::Event *);
-    
+
     void onMouseDown(cocos2d::EventMouse* event);
     void onMouseUp(cocos2d::EventMouse* event);
     void onMouseMove(cocos2d::EventMouse* event);

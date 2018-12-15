@@ -5,7 +5,7 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-FUIInput * FUIInput::create(GTextInput* owner)
+FUIInput * FUIInput::create()
 {
     FUIInput* pRet = new (std::nothrow) FUIInput();
 
@@ -13,7 +13,7 @@ FUIInput * FUIInput::create(GTextInput* owner)
         (ui::Scale9Sprite*)ui::Scale9Sprite::createWithTexture(UIPackage::getEmptyTexture())))
     {
         pRet->autorelease();
-        pRet->init(owner);
+        pRet->continueInit();
     }
     else
     {
@@ -23,7 +23,7 @@ FUIInput * FUIInput::create(GTextInput* owner)
     return pRet;
 }
 
-FUIInput::FUIInput():
+FUIInput::FUIInput() :
     _textFormat(new TextFormat()),
     _password(false),
     _keyboardType(0)
@@ -76,19 +76,23 @@ void FUIInput::setKeyboardType(int value)
         //setInputMode((ui::EditBox::InputMode)value);
 }
 
-void FUIInput::init(GTextInput* owner)
+void FUIInput::openKeyboard()
 {
-    _owner = owner;
-    setDelegate(this);
-
-    applyTextFormat();
+    touchDownAction(this, cocos2d::ui::Widget::TouchEventType::ENDED);
 }
 
-void FUIInput::editBoxReturn(cocos2d::ui::EditBox * editBox)
+void FUIInput::continueInit()
 {
-    //found that this will trigger even when focus is lost
-    //if (isSingleLine())
-       // _owner->dispatchEvent(UIEventType::Submit);
+    applyTextFormat();
+
+    //disable default behavior
+    this->setTouchEnabled(false);
+    this->addTouchEventListener(CC_CALLBACK_2(FUIInput::_touchDownAction, this));
+}
+
+void FUIInput::_touchDownAction(cocos2d::Ref *sender, cocos2d::ui::Widget::TouchEventType controlEvent)
+{
+    //do nothing
 }
 
 NS_FGUI_END

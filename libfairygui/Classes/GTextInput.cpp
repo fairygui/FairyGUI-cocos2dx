@@ -1,5 +1,6 @@
 #include "GTextInput.h"
 #include "UIPackage.h"
+#include "GRoot.h"
 #include "ui/UIEditBox/UIEditBox.h"
 #include "utils/Bytebuffer.h"
 
@@ -16,18 +17,15 @@ GTextInput::~GTextInput()
 
 void GTextInput::handleInit()
 {
-    _input = FUIInput::create(this);
+    _input = FUIInput::create();
     _input->retain();
+    _input->setDelegate(this);
 
     _displayObject = _input;
-}
 
-const std::string & GTextInput::getText() const
-{
-    std::string* tmp = const_cast<std::string*>(&_text);
-    tmp->clear();
-    tmp->append(_input->getText());
-    return _text;
+    this->addEventListener(UIEventType::TouchBegin, [this](EventContext*) {
+        _input->openKeyboard(); 
+    });
 }
 
 bool GTextInput::isSingleLine() const
@@ -44,7 +42,6 @@ void GTextInput::applyTextFormat()
 {
     _input->applyTextFormat();
 }
-
 
 void GTextInput::setPrompt(const std::string & value)
 {
@@ -104,6 +101,19 @@ void GTextInput::setTextFieldText()
         _input->setText(parseTemplate(_text.c_str()));
     else
         _input->setText(_text);
+}
+
+void GTextInput::editBoxReturn(cocos2d::ui::EditBox * editBox)
+{
+    //found that this will trigger even when focus is lost
+    //if (isSingleLine())
+    // dispatchEvent(UIEventType::Submit);
+}
+
+void GTextInput::editBoxTextChanged(cocos2d::ui::EditBox* editBox, const std::string& text)
+{
+    _text.clear();
+    _text.append(_input->getText());
 }
 
 NS_FGUI_END

@@ -78,25 +78,13 @@ ScrollPane::~ScrollPane()
     CALL_LATER_CANCEL(ScrollPane, onShowScrollBar);
 
     if (_hzScrollBar)
-    {
-        _hzScrollBar->_parent = nullptr;
         _hzScrollBar->release();
-    }
     if (_vtScrollBar)
-    {
-        _vtScrollBar->_parent = nullptr;
         _vtScrollBar->release();
-    }
     if (_header)
-    {
-        _header->_parent = nullptr;
         _header->release();
-    }
     if (_footer)
-    {
-        _footer->_parent = nullptr;
         _footer->release();
-    }
 }
 
 void ScrollPane::setup(ByteBuffer * buffer)
@@ -156,7 +144,8 @@ void ScrollPane::setup(ByteBuffer * buffer)
                 {
                     _vtScrollBar->retain();
                     _vtScrollBar->setScrollPane(this, true);
-                    _owner->addAdoptiveChild(_vtScrollBar);
+                    _vtScrollBar->_alignToBL = true;
+                    _owner->displayObject()->addChild(_vtScrollBar->displayObject());
                 }
             }
         }
@@ -172,7 +161,8 @@ void ScrollPane::setup(ByteBuffer * buffer)
                 {
                     _hzScrollBar->retain();
                     _hzScrollBar->setScrollPane(this, false);
-                    _owner->addAdoptiveChild(_hzScrollBar);
+                    _hzScrollBar->_alignToBL = true;
+                    _owner->displayObject()->addChild(_hzScrollBar->displayObject());
                 }
             }
         }
@@ -202,7 +192,8 @@ void ScrollPane::setup(ByteBuffer * buffer)
         {
             _header->retain();
             _header->setVisible(false);
-            _owner->addAdoptiveChild(_header);
+            _header->_alignToBL = true;
+            _owner->displayObject()->addChild(_header->displayObject());
         }
     }
 
@@ -215,7 +206,8 @@ void ScrollPane::setup(ByteBuffer * buffer)
         {
             _footer->retain();
             _footer->setVisible(false);
-            _owner->addAdoptiveChild(_footer);
+            _footer->_alignToBL = true;
+            _owner->displayObject()->addChild(_footer->displayObject());
         }
     }
 

@@ -133,6 +133,7 @@ public:
     void releaseDisplayLock(uint32_t token);
 
     GComponent* getParent() const { return _parent; }
+    GObject* findParent() const;
     cocos2d::Node* displayObject() const { return _displayObject; }
     GRoot* getRoot() const;
     bool onStage() const;
@@ -157,6 +158,7 @@ public:
     //internal use
     bool _underConstruct;
     bool _gearLocked;
+    bool _alignToBL;
 
 protected:
     GComponent* _parent;
@@ -231,7 +233,6 @@ private:
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
     bool _dragTesting;
-    bool _isAdoptiveChild;
 
     uint64_t _uid;
     size_t _weakPtrRef;

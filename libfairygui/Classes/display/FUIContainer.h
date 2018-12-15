@@ -6,6 +6,8 @@
 
 NS_FGUI_BEGIN
 
+class GObject;
+
 class RectClippingSupport
 {
 public:
@@ -65,6 +67,7 @@ public:
 
     virtual void setContentSize(const cocos2d::Size& contentSize) override;
 
+    GObject* gOwner;
 private:
     void onBeforeVisitScissor();
     void onAfterVisitScissor();

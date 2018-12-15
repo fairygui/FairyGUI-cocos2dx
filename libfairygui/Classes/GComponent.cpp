@@ -46,8 +46,11 @@ GComponent::~GComponent()
 
 void GComponent::handleInit()
 {
-    _displayObject = FUIContainer::create();
-    _displayObject->retain();
+    FUIContainer* c = FUIContainer::create();
+    c->retain();
+    c->gOwner = this;
+
+    _displayObject = c;
 
     _container = FUIInnerContainer::create();
     _container->retain();
@@ -341,13 +344,6 @@ bool GComponent::isAncestorOf(const GObject * obj) const
     return false;
 }
 
-void GComponent::addAdoptiveChild(GObject * child)
-{
-    child->_parent = this;
-    child->_isAdoptiveChild = true;
-    _displayObject->addChild(child->_displayObject);
-}
-
 bool GComponent::isChildInView(GObject * child)
 {
     if (_scrollPane != nullptr)
@@ -512,7 +508,7 @@ void GComponent::setMask(cocos2d::Node * value, bool inverted)
 {
     if (_maskOwner)
     {
-        _maskOwner->_isAdoptiveChild = false;
+        _maskOwner->_alignToBL = false;
         childStateChanged(_maskOwner);
         _maskOwner->handlePositionChanged();
         _maskOwner->release();
@@ -528,7 +524,7 @@ void GComponent::setMask(cocos2d::Node * value, bool inverted)
                 _maskOwner = child;
                 if (value->getParent())
                     value->getParent()->removeChild(value, false);
-                _maskOwner->_isAdoptiveChild = true;
+                _maskOwner->_alignToBL = true;
                 _maskOwner->handlePositionChanged();
                 _maskOwner->retain();
                 break;

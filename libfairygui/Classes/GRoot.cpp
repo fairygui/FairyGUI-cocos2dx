@@ -334,7 +334,7 @@ void GRoot::checkPopups()
                 handled = true;
                 break;
             }
-            mc = mc->getParent();
+            mc = mc->findParent();
         }
 
         if (!handled)

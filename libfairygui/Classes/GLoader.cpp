@@ -39,8 +39,11 @@ void GLoader::handleInit()
     _content->setAnchorPoint(Vec2::ZERO);
     _content->setCascadeOpacityEnabled(true);
 
-    _displayObject = Node::create();
-    _displayObject->retain();
+    FUIContainer* c = FUIContainer::create();
+    c->retain();
+    c->gOwner = this;
+
+    _displayObject = c;
     _displayObject->addChild(_content);
 }
 
@@ -491,6 +494,18 @@ void GLoader::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 
     if (_url.length() > 0)
         loadContent();
+}
+
+GObject* GLoader::hitTest(const Vec2 &worldPoint, const Camera* camera)
+{
+    if (_content2 != nullptr)
+    {
+        GObject* obj = _content2->hitTest(worldPoint, camera);
+        if (obj != nullptr)
+            return obj;
+    }
+
+    return GObject::hitTest(worldPoint, camera);
 }
 
 NS_FGUI_END
