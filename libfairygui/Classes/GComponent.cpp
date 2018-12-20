@@ -687,9 +687,9 @@ void GComponent::childStateChanged(GObject* child)
             }
             else if (_childrenRenderOrder == ChildrenRenderOrder::DESCENT)
             {
-                ssize_t index = cnt - 1 - _children.getIndex(child);
-                _container->addChild(child->_displayObject, (int)index);
-                for (ssize_t i = index - 1; i >= 0; i--)
+                ssize_t index = _children.getIndex(child);
+                _container->addChild(child->_displayObject, (int)(cnt - 1 - index));
+                for (ssize_t i = index + 1; i < cnt; i++)
                 {
                     child = _children.at(i);
                     if (child->_displayObject->getParent() != nullptr)
