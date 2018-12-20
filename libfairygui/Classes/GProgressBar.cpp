@@ -1,5 +1,7 @@
 #include "GProgressBar.h"
 #include "PackageItem.h"
+#include "GImage.h"
+#include "GLoader.h"
 #include "utils/ByteBuffer.h"
 #include "tween/GTween.h"
 
@@ -110,32 +112,38 @@ void GProgressBar::update(double newValue)
     {
         if (_barObjectH != nullptr)
         {
-            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectH).fillAmount = percent;
-            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectH).fillAmount = percent;
-            else*/
-            _barObjectH->setWidth(round(fullWidth * percent));
+            GImage* image = dynamic_cast<GImage*>(_barObjectH);
+            GLoader* loader = dynamic_cast<GLoader*>(_barObjectH);
+            if (image && image->getFillMethod() != FillMethod::None)
+                image->setFillAmount(percent);
+            else if (loader && loader->getFillMethod() != FillMethod::None)
+                loader->setFillAmount(percent);
+            else
+                _barObjectH->setWidth(round(fullWidth * percent));
         }
         if (_barObjectV != nullptr)
         {
-            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectV).fillAmount = percent;
-            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectV).fillAmount = percent;
-            else*/
-            _barObjectV->setHeight(round(fullHeight * percent));
+            GImage* image = dynamic_cast<GImage*>(_barObjectV);
+            GLoader* loader = dynamic_cast<GLoader*>(_barObjectV);
+            if (image && image->getFillMethod() != FillMethod::None)
+                image->setFillAmount(percent);
+            else if (loader && loader->getFillMethod() != FillMethod::None)
+                loader->setFillAmount(percent);
+            else
+                _barObjectV->setHeight(round(fullHeight * percent));
         }
     }
     else
     {
         if (_barObjectH != nullptr)
         {
-            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectH).fillAmount = 1 - percent;
-            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectH).fillAmount = 1 - percent;
-            else*/
+            GImage* image = dynamic_cast<GImage*>(_barObjectH);
+            GLoader* loader = dynamic_cast<GLoader*>(_barObjectH);
+            if (image && image->getFillMethod() != FillMethod::None)
+                image->setFillAmount(1 - percent);
+            else if (loader && loader->getFillMethod() != FillMethod::None)
+                loader->setFillAmount(1 - percent);
+            else
             {
                 _barObjectH->setWidth(round(fullWidth * percent));
                 _barObjectH->setX(_barStartX + (fullWidth - _barObjectH->getWidth()));
@@ -143,11 +151,13 @@ void GProgressBar::update(double newValue)
         }
         if (_barObjectV != nullptr)
         {
-            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectV).fillAmount = 1 - percent;
-            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectV).fillAmount = 1 - percent;
-            else*/
+            GImage* image = dynamic_cast<GImage*>(_barObjectV);
+            GLoader* loader = dynamic_cast<GLoader*>(_barObjectV);
+            if (image && image->getFillMethod() != FillMethod::None)
+                image->setFillAmount(1 - percent);
+            else if (loader && loader->getFillMethod() != FillMethod::None)
+                loader->setFillAmount(1 - percent);
+            else
             {
                 _barObjectV->setHeight(round(fullHeight * percent));
                 _barObjectV->setY(_barStartY + (fullHeight - _barObjectV->getHeight()));

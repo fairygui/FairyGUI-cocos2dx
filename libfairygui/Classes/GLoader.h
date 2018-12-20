@@ -9,6 +9,7 @@ NS_FGUI_BEGIN
 
 class GComponent;
 class ActionMovieClip;
+class FUISprite;
 
 class GLoader : public GObject, public IColorGear, public IAnimationGear
 {
@@ -41,7 +42,7 @@ public:
 
     const cocos2d::Size& getContentSize() { return _contentSize; }
 
-    cocos2d::Color3B getColor() const override { return _content->getColor(); }
+    cocos2d::Color3B getColor() const override;
     void setColor(const cocos2d::Color3B& value) override;
 
     bool isPlaying() const override { return _playing; }
@@ -54,6 +55,18 @@ public:
     void setTimeScale(float value) override;
 
     void advance(float time) override;
+
+    FillMethod getFillMethod() const;
+    void setFillMethod(FillMethod value);
+
+    FillOrigin getFillOrigin() const;
+    void setFillOrigin(FillOrigin value);
+
+    bool isFillClockwise() const;
+    void setFillClockwise(bool value);
+
+    float getFillAmount() const;
+    void setFillAmount(float value);
 
     GComponent* getComponent() const { return _content2; }
 
@@ -91,7 +104,7 @@ private:
     bool _playing;
     int _frame;
 
-    cocos2d::Sprite* _content;
+    FUISprite* _content;
     GComponent* _content2;
     ActionMovieClip* _playAction;
 };

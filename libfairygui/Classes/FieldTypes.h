@@ -161,6 +161,24 @@ enum class TransitionActionType
     Unknown
 };
 
+enum class FillMethod
+{
+    None,
+    Horizontal,
+    Vertical,
+    Radial90,
+    Radial180,
+    Radial360,
+};
+
+enum class FillOrigin
+{
+    Top,
+    Bottom,
+    Left,
+    Right
+};
+
 NS_FGUI_END
 
 #endif

@@ -102,6 +102,11 @@ void GLoader::setShrinkOnly(bool value)
     }
 }
 
+cocos2d::Color3B GLoader::getColor() const
+{
+    return _content->getColor();
+}
+
 void GLoader::setColor(const cocos2d::Color3B & value)
 {
     _content->setColor(value);
@@ -157,6 +162,46 @@ void GLoader::advance(float time)
 {
     if (_playAction)
         _playAction->advance(time);
+}
+
+FillMethod GLoader::getFillMethod() const
+{
+    return _content->getFillMethod();
+}
+
+void GLoader::setFillMethod(FillMethod value)
+{
+    _content->setFillMethod(value);
+}
+
+FillOrigin GLoader::getFillOrigin() const
+{
+    return _content->getFillOrigin();
+}
+
+void GLoader::setFillOrigin(FillOrigin value)
+{
+    _content->setFillOrigin(value);
+}
+
+bool GLoader::isFillClockwise() const
+{
+    return _content->isFillClockwise();
+}
+
+void GLoader::setFillClockwise(bool value)
+{
+    _content->setFillClockwise(value);
+}
+
+float GLoader::getFillAmount() const
+{
+    return _content->getFillAmount();
+}
+
+void GLoader::setFillAmount(float value)
+{
+    _content->setFillAmount(value);
 }
 
 void GLoader::loadContent()
@@ -490,7 +535,12 @@ void GLoader::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
         setColor((Color3B)buffer->ReadColor());
     int fillMethod = buffer->ReadByte();
     if (fillMethod != 0)
-        buffer->Skip(6);
+    {
+        _content->setFillMethod((FillMethod)fillMethod);
+        _content->setFillOrigin((FillOrigin)buffer->ReadByte());
+        _content->setFillClockwise(buffer->ReadBool());
+        _content->setFillAmount(buffer->ReadFloat());
+    }
 
     if (_url.length() > 0)
         loadContent();

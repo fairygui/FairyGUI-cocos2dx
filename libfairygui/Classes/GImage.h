@@ -8,6 +8,8 @@
 
 NS_FGUI_BEGIN
 
+class FUISprite;
+
 class GImage : public GObject, public IColorGear
 {
 public:
@@ -19,8 +21,20 @@ public:
     FlipType getFlip() const;
     void setFlip(FlipType value);
 
-    cocos2d::Color3B getColor() const override { return _content->getColor(); }
+    cocos2d::Color3B getColor() const override;
     void setColor(const cocos2d::Color3B& value) override;
+
+    FillMethod getFillMethod() const;
+    void setFillMethod(FillMethod value);
+
+    FillOrigin getFillOrigin() const;
+    void setFillOrigin(FillOrigin value);
+
+    bool isFillClockwise() const;
+    void setFillClockwise(bool value);
+
+    float getFillAmount() const;
+    void setFillAmount(float value);
 
     virtual void constructFromResource() override;
 
@@ -31,7 +45,7 @@ protected:
     virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
 
 private:
-    cocos2d::Sprite* _content;
+    FUISprite* _content;
 };
 
 NS_FGUI_END
