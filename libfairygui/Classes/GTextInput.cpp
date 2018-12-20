@@ -25,7 +25,7 @@ void GTextInput::handleInit()
 
     _displayObject = _input;
 
-    this->addEventListener(UIEventType::TouchBegin, [this](EventContext*) {
+    this->addEventListener(UIEventType::TouchEnd, [this](EventContext*) {
         _input->openKeyboard();
     });
 }
