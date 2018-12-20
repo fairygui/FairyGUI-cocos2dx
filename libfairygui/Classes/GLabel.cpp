@@ -17,19 +17,33 @@ GLabel::~GLabel()
 {
 }
 
-void GLabel::setTitle(const std::string & value)
+const std::string& GLabel::getText() const
 {
-    _title = value;
     if (_titleObject != nullptr)
-        _titleObject->setText(_title);
+        return _titleObject->getText();
+    else
+        return STD_STRING_EMPTY;
+}
+
+void GLabel::setText(const std::string & value)
+{
+    if (_titleObject != nullptr)
+        _titleObject->setText(value);
     updateGear(6);
+}
+
+const std::string& GLabel::getIcon() const
+{
+    if (_iconObject != nullptr)
+        return _iconObject->getIcon();
+    else
+        return STD_STRING_EMPTY;
 }
 
 void GLabel::setIcon(const std::string & value)
 {
-    _icon = value;
     if (_iconObject != nullptr)
-        _iconObject->setIcon(_icon);
+        _iconObject->setIcon(value);
     updateGear(7);
 }
 
@@ -81,10 +95,6 @@ void GLabel::constructExtension(ByteBuffer* buffer)
 {
     _titleObject = getChild("title");
     _iconObject = getChild("icon");
-    if (_titleObject != nullptr)
-        _title = _titleObject->getText();
-    if (_iconObject != nullptr)
-        _icon = _iconObject->getIcon();
 }
 
 void GLabel::setup_afterAdd(ByteBuffer* buffer, int beginPos)

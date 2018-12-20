@@ -17,13 +17,13 @@ public:
 
     CREATE_FUNC(GLabel);
 
-    const std::string& getTitle() { return _title; }
-    void setTitle(const std::string& value);
+    const std::string& getTitle() { return getText(); }
+    void setTitle(const std::string& value) { setText(value); };
 
-    virtual const std::string& getText() const override { return _title; }
-    virtual void setText(const std::string& value) override { setTitle(value); }
+    virtual const std::string& getText() const override;
+    virtual void setText(const std::string& value) override;
 
-    virtual const std::string& getIcon() const override { return _icon; }
+    virtual const std::string& getIcon() const override;
     virtual void setIcon(const std::string& value) override;
 
     cocos2d::Color3B getTitleColor() const;
@@ -41,8 +41,6 @@ protected:
 private:
     GObject* _titleObject;
     GObject* _iconObject;
-    std::string _title;
-    std::string _icon;
 };
 
 NS_FGUI_END
