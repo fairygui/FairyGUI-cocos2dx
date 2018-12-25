@@ -59,7 +59,7 @@ void TweenPropTypeUtils::setProps(GObject * target, TweenPropType propType, cons
         break;
 
     case TweenPropType::Progress:
-        g->as<GProgressBar>()->setValue(value.d);
+        g->as<GProgressBar>()->update(value.d);
         break;
     }
 }

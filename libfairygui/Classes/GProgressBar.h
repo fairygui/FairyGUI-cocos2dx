@@ -49,6 +49,8 @@ private:
     float _barMaxHeightDelta;
     float _barStartX;
     float _barStartY;
+
+    friend class TweenPropTypeUtils;
 };
 
 NS_FGUI_END

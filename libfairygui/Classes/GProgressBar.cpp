@@ -66,12 +66,19 @@ void GProgressBar::setValue(double value)
 
 void GProgressBar::tweenValue(double value, float duration)
 {
-    double oldValule = _value;
-    _value = value;
-
+    double oldValule;
     if (_tweening)
-        GTween::kill(this, TweenPropType::Progress, false);
+    {
+        GTweener* twener = GTween::getTween(this, TweenPropType::Progress);
+        oldValule = twener->value.d;
+        twener->kill(false);
+    }
+    else
+        oldValule = _value;
+
+    _value = value;
     _tweening = true;
+
     GTween::toDouble(oldValule, _value, duration)
         ->setEase(EaseType::Linear)
         ->setTarget(this, TweenPropType::Progress)
