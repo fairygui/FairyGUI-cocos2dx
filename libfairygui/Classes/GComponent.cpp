@@ -689,11 +689,11 @@ void GComponent::childStateChanged(GObject* child)
             {
                 ssize_t index = _children.getIndex(child);
                 _container->addChild(child->_displayObject, (int)(cnt - 1 - index));
-                for (ssize_t i = index + 1; i < cnt; i++)
+                for (ssize_t i = 0; i < index; i++)
                 {
                     child = _children.at(i);
                     if (child->_displayObject->getParent() != nullptr)
-                        child->_displayObject->setLocalZOrder((int)(cnt - i - 1));
+                        child->_displayObject->setLocalZOrder((int)(cnt - 1 - i));
                 }
             }
             else
