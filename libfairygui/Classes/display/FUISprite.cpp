@@ -188,6 +188,8 @@ Vec2 FUISprite::vertexFromAlphaPoint(Vec2 alpha)
 
 void FUISprite::updateColor(void)
 {
+    CCSprite::updateColor();
+
     if (_vertexData)
     {
         Color4B sc = getQuad().tl.colors;
