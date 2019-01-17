@@ -309,6 +309,7 @@ bool UIPackage::loadPackage(ByteBuffer* buffer, const string& assetPath)
     buffer->ReadBool(); //compressed
     _id = buffer->ReadString();
     _name = buffer->ReadString();
+    _assetPath = assetPath;
     buffer->Skip(20);
     int indexTablePos = buffer->position;
     int cnt;
