@@ -10,7 +10,7 @@ NS_FGUI_BEGIN
 class GObject;
 class InputProcessor;
 
-class EventContext
+class EventContext : public cocos2d::Ref
 {
 public:
     EventContext();
