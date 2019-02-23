@@ -23,6 +23,7 @@ public:
 
     cocos2d::Touch* touch;
     cocos2d::Vec2 pos;
+    cocos2d::Vec2 lastTouchLocation;
     int touchId;
     int clickCount;
     int mouseWheelDelta;
@@ -321,6 +322,7 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
 
     TouchInfo* ti = getTouch(touch->getID());
     ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+	ti->lastTouchLocation = pt;
     ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
     setBegin(ti, target);
@@ -351,8 +353,12 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
         target = _owner;
 
     TouchInfo* ti = getTouch(touch->getID());
+	if(ti->lastTouchLocation == pt) {
+		return;
+	}
     ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
     ti->button = EventMouse::MouseButton::BUTTON_LEFT;
+    ti->lastTouchLocation = pt;
     ti->touch = touch;
 
     updateRecentInput(ti, target);
@@ -397,6 +403,7 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
 
     TouchInfo* ti = getTouch(touch->getID());
     ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->lastTouchLocation = pt;
     ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
     setEnd(ti, target);
