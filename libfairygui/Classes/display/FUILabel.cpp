@@ -106,7 +106,7 @@ void FUILabel::applyTextFormat()
 
     if (_textFormat->hasEffect(TextFormat::SHADOW))
         enableShadow((Color4B)_textFormat->shadowColor, _textFormat->shadowOffset);
-    else
+    else if(!_textFormat->bold)
         disableEffect(LabelEffect::SHADOW);
 }
 
