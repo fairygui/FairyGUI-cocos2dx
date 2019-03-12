@@ -27,8 +27,6 @@ GearLook::GearLook(GObject * owner) :GearBase(owner)
 
 GearLook::~GearLook()
 {
-    if (_tweenConfig && _tweenConfig->_tweener)
-        _tweenConfig->_tweener->kill();
 }
 
 void GearLook::init()

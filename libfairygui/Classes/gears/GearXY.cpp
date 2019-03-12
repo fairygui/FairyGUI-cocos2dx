@@ -14,8 +14,6 @@ GearXY::GearXY(GObject * owner) : GearBase(owner)
 
 GearXY::~GearXY()
 {
-    if (_tweenConfig && _tweenConfig->_tweener)
-        _tweenConfig->_tweener->kill();
 }
 
 void GearXY::init()

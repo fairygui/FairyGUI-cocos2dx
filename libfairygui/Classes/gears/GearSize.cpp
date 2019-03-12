@@ -13,8 +13,6 @@ GearSize::GearSize(GObject * owner) :GearBase(owner)
 
 GearSize::~GearSize()
 {
-    if (_tweenConfig && _tweenConfig->_tweener)
-        _tweenConfig->_tweener->kill();
 }
 
 void GearSize::init()

@@ -26,8 +26,6 @@ GearColor::GearColor(GObject * owner) :GearBase(owner)
 
 GearColor::~GearColor()
 {
-    if (_tweenConfig && _tweenConfig->_tweener)
-        _tweenConfig->_tweener->kill();
 }
 
 void GearColor::init()

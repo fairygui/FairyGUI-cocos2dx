@@ -25,6 +25,8 @@ GearBase::GearBase(GObject * owner) :_owner(owner), _tweenConfig(nullptr)
 
 GearBase::~GearBase()
 {
+    if (_tweenConfig && _tweenConfig->_tweener)
+        _tweenConfig->_tweener->kill();
     CC_SAFE_DELETE(_tweenConfig);
 }
 
