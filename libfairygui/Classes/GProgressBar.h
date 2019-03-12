@@ -38,7 +38,6 @@ private:
     double _value;
     ProgressTitleType _titleType;
     bool _reverse;
-    bool _tweening;
 
     GObject* _titleObject;
     GObject* _barObjectH;
