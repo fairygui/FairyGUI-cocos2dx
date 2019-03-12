@@ -180,6 +180,7 @@ GTweener * GTweener::_to(float start, float end, float duration)
     _valueSize = 1;
     startValue.x = start;
     endValue.x = end;
+    value.x = start;
     _duration = duration;
     return this;
 }
@@ -189,6 +190,7 @@ GTweener * GTweener::_to(const cocos2d::Vec2 & start, const cocos2d::Vec2 & end,
     _valueSize = 2;
     startValue.setVec2(start);
     endValue.setVec2(end);
+    value.setVec2(start);
     _duration = duration;
     return this;
 }
@@ -198,6 +200,7 @@ GTweener * GTweener::_to(const cocos2d::Vec3 & start, const cocos2d::Vec3 & end,
     _valueSize = 3;
     startValue.setVec3(start);
     endValue.setVec3(end);
+    value.setVec3(start);
     _duration = duration;
     return this;
 }
@@ -207,6 +210,7 @@ GTweener * GTweener::_to(const cocos2d::Vec4 & start, const cocos2d::Vec4 & end,
     _valueSize = 4;
     startValue.setVec4(start);
     endValue.setVec4(end);
+    value.setVec4(start);
     _duration = duration;
     return this;
 }
@@ -216,6 +220,7 @@ GTweener * GTweener::_to(const cocos2d::Color4B & start, const cocos2d::Color4B 
     _valueSize = 4;
     startValue.setColor(start);
     endValue.setColor(end);
+    value.setColor(start);
     _duration = duration;
     return this;
 }
@@ -225,6 +230,7 @@ GTweener * GTweener::_to(double start, double end, float duration)
     _valueSize = 5;
     startValue.d = start;
     endValue.d = end;
+    value.d = start;
     _duration = duration;
     return this;
 }

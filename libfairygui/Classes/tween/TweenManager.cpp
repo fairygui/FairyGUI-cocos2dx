@@ -113,7 +113,6 @@ void TweenManager::update(float dt)
 {
     int cnt = _totalActiveTweens;
     int freePosStart = -1;
-    int freePosCount = 0;
     for (int i = 0; i < cnt; i++)
     {
         GTweener* tweener = _activeTweens[i];
@@ -121,7 +120,6 @@ void TweenManager::update(float dt)
         {
             if (freePosStart == -1)
                 freePosStart = i;
-            freePosCount++;
         }
         else if (tweener->_killed)
         {
@@ -131,11 +129,12 @@ void TweenManager::update(float dt)
 
             if (freePosStart == -1)
                 freePosStart = i;
-            freePosCount++;
         }
         else
         {
-            if (!tweener->_paused)
+            if (tweener->_refTarget != nullptr && tweener->_refTarget->getReferenceCount() == 1)
+                tweener->_killed = true;
+            else if (!tweener->_paused)
                 tweener->_update(dt);
 
             if (freePosStart != -1)
