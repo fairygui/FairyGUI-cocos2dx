@@ -783,7 +783,7 @@ void ScrollPane::handleSizeChanged()
     }
 
     _maskContainer->setContentSize(_viewSize);
-    _maskContainer->setClippingRegion(Rect(-_owner->_alignOffset, _viewSize));
+    _maskContainer->setClippingRegion(Rect(Vec2(-_owner->_alignOffset.x, _owner->_alignOffset.y), _viewSize));
 
     if (_vtScrollBar)
         _vtScrollBar->handlePositionChanged();
@@ -1246,7 +1246,7 @@ float ScrollPane::updateTargetAndDuration(float pos, int axis)
             float change = (int)(v * duration * 0.4f);
             pos += change;
         }
-}
+    }
 
     if (duration < TWEEN_TIME_DEFAULT)
         duration = TWEEN_TIME_DEFAULT;
