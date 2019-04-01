@@ -727,6 +727,7 @@ void UIPackage::loadFont(PackageItem * item)
 
                 if (fontSize == 0)
                     fontSize = bh;
+                lineHeight = MAX(fontSize, lineHeight);
             }
         }
 
