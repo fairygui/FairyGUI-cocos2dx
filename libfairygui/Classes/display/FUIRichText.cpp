@@ -22,8 +22,7 @@ static const int GUTTER_Y = 2;
 
 static int getPrevWord(const std::string& text, int idx)
 {
-    // start from idx-1
-    for (int i = idx - 1; i >= 0; --i)
+    for (int i = idx + 1; i <= (int)text.size() - 1; ++i)
     {
         if (!std::isalnum(text[i], std::locale()))
             return i;
@@ -627,7 +626,7 @@ int FUIRichText::findSplitPositionForWord(cocos2d::Label* label, const std::stri
         return 0;
     }
 
-    for (int idx = (int)text.size() - 1; idx >= 0; )
+    for (int idx = 0; idx <= (int)text.size() - 1; )
     {
         int newidx = getPrevWord(text, idx);
         if (newidx >= 0)
@@ -635,7 +634,7 @@ int FUIRichText::findSplitPositionForWord(cocos2d::Label* label, const std::stri
             idx = newidx;
             auto leftStr = getSubStringOfUTF8String(text, 0, idx);
             label->setString(leftStr);
-            if (label->getContentSize().width <= originalLeftSpaceWidth)
+            if (label->getContentSize().width >= originalLeftSpaceWidth)
                 return idx;
         }
         else
