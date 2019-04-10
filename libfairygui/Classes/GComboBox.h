@@ -24,7 +24,7 @@ public:
     virtual const std::string& getText() const override { return getTitle(); }
     virtual void setText(const std::string& value) override { setTitle(value); }
 
-    const cocos2d::Color3B& getTitleColor() const;
+    const cocos2d::Color3B getTitleColor() const;
     void setTitleColor(const cocos2d::Color3B& value);
 
     int getTitleFontSize() const;

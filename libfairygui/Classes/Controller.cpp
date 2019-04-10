@@ -1,7 +1,7 @@
 #include "Controller.h"
 #include "GComponent.h"
 #include "utils/ToolSet.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 #include "controller_action/ControllerAction.h"
 
 NS_FGUI_BEGIN

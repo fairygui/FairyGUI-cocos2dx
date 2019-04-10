@@ -28,33 +28,49 @@ float EaseManager::evaluate(EaseType easeType, float time, float duration, float
     case EaseType::SineInOut:
         return -0.5f * ((float)cos(M_PI * time / duration) - 1);
     case EaseType::QuadIn:
-        return (time /= duration) * time;
+        time /= duration;
+        return time * time;
     case EaseType::QuadOut:
-        return -(time /= duration) * (time - 2);
+        time /= duration;
+        return -time * (time - 2);
     case EaseType::QuadInOut:
-        if ((time /= duration * 0.5f) < 1) return 0.5f * time * time;
-        return -0.5f * ((--time) * (time - 2) - 1);
+        time /= duration * 0.5f;
+        if (time < 1) return 0.5f * time * time;
+        --time;
+        return -0.5f * (time * (time - 2) - 1);
     case EaseType::CubicIn:
-        return (time /= duration) * time * time;
+        time /= duration;
+        return time * time * time;
     case EaseType::CubicOut:
-        return ((time = time / duration - 1) * time * time + 1);
+        time = time / duration - 1;
+        return time * time * time + 1;
     case EaseType::CubicInOut:
-        if ((time /= duration * 0.5f) < 1) return 0.5f * time * time * time;
-        return 0.5f * ((time -= 2) * time * time + 2);
+        time /= duration * 0.5f;
+        if (time < 1) return 0.5f * time * time * time;
+        time -= 2;
+        return 0.5f * (time * time * time + 2);
     case EaseType::QuartIn:
-        return (time /= duration) * time * time * time;
+        time /= duration;
+        return time * time * time * time;
     case EaseType::QuartOut:
-        return -((time = time / duration - 1) * time * time * time - 1);
+        time = time / duration - 1;
+        return -(time * time * time * time - 1);
     case EaseType::QuartInOut:
-        if ((time /= duration * 0.5f) < 1) return 0.5f * time * time * time * time;
-        return -0.5f * ((time -= 2) * time * time * time - 2);
+        time /= duration * 0.5f;
+        if (time < 1) return 0.5f * time * time * time * time;
+        time -= 2;
+        return -0.5f * (time * time * time * time - 2);
     case EaseType::QuintIn:
-        return (time /= duration) * time * time * time * time;
+        time /= duration;
+        return time * time * time * time * time;
     case EaseType::QuintOut:
-        return ((time = time / duration - 1) * time * time * time * time + 1);
+        time = time / duration - 1;
+        return (time * time * time * time * time + 1);
     case EaseType::QuintInOut:
-        if ((time /= duration * 0.5f) < 1) return 0.5f * time * time * time * time * time;
-        return 0.5f * ((time -= 2) * time * time * time * time + 2);
+        time /= duration * 0.5f;
+        if (time < 1) return 0.5f * time * time * time * time * time;
+        time -= 2;
+        return 0.5f * (time * time * time * time * time + 2);
     case EaseType::ExpoIn:
         return (time == 0) ? 0 : (float)pow(2, 10 * (time / duration - 1));
     case EaseType::ExpoOut:
@@ -66,12 +82,16 @@ float EaseManager::evaluate(EaseType easeType, float time, float duration, float
         if ((time /= duration * 0.5f) < 1) return 0.5f * (float)pow(2, 10 * (time - 1));
         return 0.5f * (-(float)pow(2, -10 * --time) + 2);
     case EaseType::CircIn:
-        return -((float)sqrt(1 - (time /= duration) * time) - 1);
+        time /= duration;
+        return -((float)sqrt(1 - time * time) - 1);
     case EaseType::CircOut:
-        return (float)sqrt(1 - (time = time / duration - 1) * time);
+        time = time / duration - 1;
+        return (float)sqrt(1 - time * time);
     case EaseType::CircInOut:
-        if ((time /= duration * 0.5f) < 1) return -0.5f * ((float)sqrt(1 - time * time) - 1);
-        return 0.5f * ((float)sqrt(1 - (time -= 2) * time) + 1);
+        time /= duration * 0.5f;
+        if (time < 1) return -0.5f * ((float)sqrt(1 - time * time) - 1);
+        time -= 2;
+        return 0.5f * ((float)sqrt(1 - time * time) + 1);
     case EaseType::ElasticIn:
         float s0;
         if (time == 0) return 0;
@@ -83,7 +103,8 @@ float EaseManager::evaluate(EaseType easeType, float time, float duration, float
             s0 = period / 4;
         }
         else s0 = period / _TwoPi * (float)asin(1 / overshootOrAmplitude);
-        return -(overshootOrAmplitude * (float)pow(2, 10 * (time -= 1)) * (float)sin((time * duration - s0) * _TwoPi / period));
+        time -= 1;
+        return -(overshootOrAmplitude * (float)pow(2, 10 * time) * (float)sin((time * duration - s0) * _TwoPi / period));
     case EaseType::ElasticOut:
         float s1;
         if (time == 0) return 0;
@@ -107,15 +128,26 @@ float EaseManager::evaluate(EaseType easeType, float time, float duration, float
             s = period / 4;
         }
         else s = period / _TwoPi * (float)asin(1 / overshootOrAmplitude);
-        if (time < 1) return -0.5f * (overshootOrAmplitude * (float)pow(2, 10 * (time -= 1)) * (float)sin((time * duration - s) * _TwoPi / period));
-        return overshootOrAmplitude * (float)pow(2, -10 * (time -= 1)) * (float)sin((time * duration - s) * _TwoPi / period) * 0.5f + 1;
+        if (time < 1)
+        {
+            time -= 1;
+            return -0.5f * (overshootOrAmplitude * (float)pow(2, 10 * time) * (float)sin((time * duration - s) * _TwoPi / period));
+        }
+            
+        time -= 1;
+        return overshootOrAmplitude * (float)pow(2, -10 * time) * (float)sin((time * duration - s) * _TwoPi / period) * 0.5f + 1;
     case EaseType::BackIn:
-        return (time /= duration) * time * ((overshootOrAmplitude + 1) * time - overshootOrAmplitude);
+        time /= duration;
+        return time * time * ((overshootOrAmplitude + 1) * time - overshootOrAmplitude);
     case EaseType::BackOut:
-        return ((time = time / duration - 1) * time * ((overshootOrAmplitude + 1) * time + overshootOrAmplitude) + 1);
+        time = time / duration - 1;
+        return (time * time * ((overshootOrAmplitude + 1) * time + overshootOrAmplitude) + 1);
     case EaseType::BackInOut:
-        if ((time /= duration * 0.5f) < 1) return 0.5f * (time * time * (((overshootOrAmplitude *= (1.525f)) + 1) * time - overshootOrAmplitude));
-        return 0.5f * ((time -= 2) * time * (((overshootOrAmplitude *= (1.525f)) + 1) * time + overshootOrAmplitude) + 2);
+        time /= duration * 0.5f;
+        overshootOrAmplitude *= (1.525f);
+        if (time < 1) return 0.5f * (time * time * ((overshootOrAmplitude + 1) * time - overshootOrAmplitude));
+        time -= 2;
+        return 0.5f * (time * time * ((overshootOrAmplitude + 1) * time + overshootOrAmplitude) + 2);
     case EaseType::BounceIn:
         return Bounce::easeIn(time, duration);
     case EaseType::BounceOut:
@@ -124,7 +156,8 @@ float EaseManager::evaluate(EaseType easeType, float time, float duration, float
         return Bounce::easeInOut(time, duration);
 
     default:
-        return -(time /= duration) * (time - 2);
+        time /= duration;
+        return -time * (time - 2);
     }
 }
 
@@ -135,19 +168,23 @@ float Bounce::easeIn(float time, float duration)
 
 float Bounce::easeOut(float time, float duration)
 {
-    if ((time /= duration) < (1 / 2.75f))
+    time /= duration;
+    if (time < (1 / 2.75f))
     {
         return (7.5625f * time * time);
     }
     if (time < (2 / 2.75f))
     {
-        return (7.5625f * (time -= (1.5f / 2.75f)) * time + 0.75f);
+        time -= (1.5f / 2.75f);
+        return (7.5625f * time * time + 0.75f);
     }
     if (time < (2.5f / 2.75f))
     {
-        return (7.5625f * (time -= (2.25f / 2.75f)) * time + 0.9375f);
+        time -= (2.25f / 2.75f);
+        return (7.5625f * time * time + 0.9375f);
     }
-    return (7.5625f * (time -= (2.625f / 2.75f)) * time + 0.984375f);
+    time -= (2.625f / 2.75f);
+    return (7.5625f * time * time + 0.984375f);
 }
 
 float Bounce::easeInOut(float time, float duration)

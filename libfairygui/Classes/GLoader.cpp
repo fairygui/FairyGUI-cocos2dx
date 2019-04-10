@@ -2,7 +2,7 @@
 #include "UIPackage.h"
 #include "GComponent.h"
 #include "GMovieClip.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 #include "display/FUISprite.h"
 
 NS_FGUI_BEGIN

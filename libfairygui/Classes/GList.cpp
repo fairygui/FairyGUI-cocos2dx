@@ -2,7 +2,7 @@
 #include "GButton.h"
 #include "UIPackage.h"
 #include "UIConfig.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -1867,6 +1867,7 @@ void GList::handleScroll3(bool forceUpdate)
 
         if (ii.obj == nullptr)
         {
+            reuseIndex = reuseIndex < 0 ? 0 : reuseIndex;
             while (reuseIndex < virtualItemCount)
             {
                 ItemInfo& ii2 = _virtualItems[reuseIndex];

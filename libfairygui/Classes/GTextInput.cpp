@@ -2,7 +2,7 @@
 #include "UIPackage.h"
 #include "GRoot.h"
 #include "ui/UIEditBox/UIEditBox.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 #include "utils/UBBParser.h"
 #include "utils/ToolSet.h"
 

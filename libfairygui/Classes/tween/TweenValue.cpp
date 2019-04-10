@@ -69,7 +69,7 @@ float TweenValue::operator[](int index) const
     case 3:
         return w;
     default:
-        throw "Index out of bounds: " + index;
+        throw "Index out of bounds: " + std::to_string(index);
     }
 }
 
@@ -86,7 +86,7 @@ float & TweenValue::operator[](int index)
     case 3:
         return w;
     default:
-        throw "Index out of bounds: " + index;
+        throw "Index out of bounds: " + std::to_string(index);
     }
 }
 

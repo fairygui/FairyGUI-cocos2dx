@@ -1,7 +1,7 @@
 #include "GImage.h"
 #include "PackageItem.h"
 #include "display/FUISprite.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;

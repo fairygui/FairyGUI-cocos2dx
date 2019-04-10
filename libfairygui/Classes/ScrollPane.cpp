@@ -783,7 +783,7 @@ void ScrollPane::handleSizeChanged()
     }
 
     _maskContainer->setContentSize(_viewSize);
-    _maskContainer->setClippingRegion(Rect(-_owner->_alignOffset, _viewSize));
+    _maskContainer->setClippingRegion(Rect(Vec2(-_owner->_alignOffset.x, _owner->_alignOffset.y), _viewSize));
 
     if (_vtScrollBar)
         _vtScrollBar->handlePositionChanged();

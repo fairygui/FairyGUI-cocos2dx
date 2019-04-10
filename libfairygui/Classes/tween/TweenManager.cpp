@@ -162,7 +162,7 @@ void TweenManager::update(float dt)
 void TweenManager::clean()
 {
     for (auto it = _tweenerPool.begin(); it != _tweenerPool.end(); it++)
-        delete *it;
+        (*it)->release();
     _tweenerPool.clear();
 }
 

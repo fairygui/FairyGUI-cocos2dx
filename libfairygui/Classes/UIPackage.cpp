@@ -1,6 +1,6 @@
 #include "UIPackage.h"
 #include "UIObjectFactory.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 #include "utils/ToolSet.h"
 
 #include "display/BitmapFont.h"
@@ -36,7 +36,7 @@ UIPackage::UIPackage()
 UIPackage::~UIPackage()
 {
     for (auto &it : _items)
-        delete it;
+        it->release();
     for (auto &it : _sprites)
         delete it.second;
 }
@@ -117,7 +117,7 @@ void UIPackage::removePackage(const string& packageIdOrName)
         _packageInstById.erase(pkg->_assetPath);
         _packageInstByName.erase(pkg->getName());
 
-        delete pkg;
+        pkg->release();
     }
     else
         CCLOGERROR("FairyGUI: invalid package name or id: %s", packageIdOrName.c_str());
@@ -126,7 +126,7 @@ void UIPackage::removePackage(const string& packageIdOrName)
 void UIPackage::removeAllPackages()
 {
     for (auto &it : _packageList)
-        delete it;
+        it->release();
 
     _packageInstById.clear();
     _packageInstByName.clear();
@@ -400,6 +400,8 @@ bool UIPackage::loadPackage(ByteBuffer* buffer, const string& assetPath)
             pi->file = assetNamePrefix + pi->file;
             break;
         }
+        default:
+            break;
         }
         _items.push_back(pi);
         _itemsById[pi->id] = pi;

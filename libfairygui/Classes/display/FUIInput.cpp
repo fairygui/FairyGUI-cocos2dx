@@ -78,7 +78,7 @@ void FUIInput::setKeyboardType(int value)
 
 void FUIInput::openKeyboard()
 {
-    touchDownAction(this, cocos2d::ui::Widget::TouchEventType::ENDED);
+    EditBox::openKeyboard();
 }
 
 void FUIInput::continueInit()
