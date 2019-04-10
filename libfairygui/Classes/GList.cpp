@@ -2,7 +2,7 @@
 #include "GButton.h"
 #include "UIPackage.h"
 #include "UIConfig.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;

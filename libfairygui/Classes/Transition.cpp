@@ -2,7 +2,7 @@
 #include "GComponent.h"
 #include "GRoot.h"
 #include "tween/GTween.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -578,6 +578,8 @@ void Transition::setValue(const std::string & label, const ValueVector& values)
         case TransitionActionType::Icon:
             ((TValue_Text*)value)->text = values[0].asString();
             break;
+        default:
+            break;
         }
     }
 }
@@ -822,6 +824,8 @@ void Transition::playItem(TransitionItem* item)
             case TransitionActionType::ColorFilter:
                 item->tweener = GTween::to(startValue->getVec4(), endValue->getVec4(), item->tweenConfig->duration);
                 break;
+            default:
+                break;
             }
 
             item->tweener->setDelay(time)
@@ -1060,6 +1064,8 @@ void Transition::onTweenUpdate(GTweener* tweener)
     case TransitionActionType::Shake:
         ((TValue_Shake*)item->value)->offset = tweener->deltaValue.getVec2();
         break;
+    default:
+        break;
     }
     applyValue(item);
 }
@@ -1262,6 +1268,8 @@ void Transition::applyValue(TransitionItem* item)
 
     case TransitionActionType::Icon:
         item->target->setIcon(((TValue_Text*)item->value)->text);
+        break;
+    default:
         break;
     }
 

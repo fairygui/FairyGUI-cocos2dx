@@ -61,7 +61,7 @@ void RelationItem::internalAdd(RelationType relationType, bool usePercent)
     RelationDef info;
     info.percent = usePercent;
     info.type = relationType;
-    info.axis = (relationType <= RelationType::Right_Right || relationType == RelationType::Width || relationType >= RelationType::LeftExt_Left && relationType <= RelationType::RightExt_Right) ? 0 : 1;
+    info.axis = (relationType <= RelationType::Right_Right || relationType == RelationType::Width || (relationType >= RelationType::LeftExt_Left && relationType <= RelationType::RightExt_Right)) ? 0 : 1;
     _defs.push_back(info);
 
     if (usePercent || relationType == RelationType::Left_Center || relationType == RelationType::Center_Center || relationType == RelationType::Right_Center
@@ -514,6 +514,8 @@ void RelationItem::applyOnSizeChanged(GObject* target, const RelationDef& info)
                 _owner->setYMin(tmp);
             }
         }
+        break;
+    default:
         break;
     }
 }

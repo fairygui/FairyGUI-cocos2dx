@@ -1,6 +1,6 @@
 #include "UIPackage.h"
 #include "UIObjectFactory.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 #include "utils/ToolSet.h"
 
 #include "display/BitmapFont.h"
