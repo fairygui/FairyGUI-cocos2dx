@@ -9,7 +9,7 @@
 
 NS_FGUI_BEGIN
 
-class GTweener
+class GTweener : public cocos2d::Ref
 {
 public:
     typedef std::function<void(GTweener* tweener)> GTweenCallback;
