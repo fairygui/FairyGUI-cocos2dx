@@ -1867,6 +1867,7 @@ void GList::handleScroll3(bool forceUpdate)
 
         if (ii.obj == nullptr)
         {
+            reuseIndex = reuseIndex < 0 ? 0 : reuseIndex;
             while (reuseIndex < virtualItemCount)
             {
                 ItemInfo& ii2 = _virtualItems[reuseIndex];
