@@ -11,7 +11,7 @@ NS_FGUI_BEGIN
 struct AtlasSprite;
 class ByteBuffer;
 
-class UIPackage
+class UIPackage : public cocos2d::Ref
 {
 public:
     UIPackage();

@@ -5,7 +5,7 @@
 #include "GGroup.h"
 #include "UIPackage.h"
 #include "TranslationHelper.h"
-#include "utils/Bytebuffer.h"
+#include "utils/ByteBuffer.h"
 #include "display/FUIContainer.h"
 
 NS_FGUI_BEGIN

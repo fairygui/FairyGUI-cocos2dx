@@ -188,7 +188,7 @@ Vec2 FUISprite::vertexFromAlphaPoint(Vec2 alpha)
 
 void FUISprite::updateColor(void)
 {
-    CCSprite::updateColor();
+    Sprite::updateColor();
 
     if (_vertexData)
     {

@@ -13,7 +13,7 @@ class BitmapFont;
 class PixelHitTestData;
 class ByteBuffer;
 
-class PackageItem
+class PackageItem : public cocos2d::Ref
 {
 public:
     PackageItem();

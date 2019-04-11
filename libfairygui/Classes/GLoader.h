@@ -75,7 +75,7 @@ protected:
     virtual void handleSizeChanged() override;
     virtual void handleGrayedChanged() override;
     virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
-    virtual GObject* hitTest(const cocos2d::Vec2 & worldPoint, const cocos2d::Camera * camera);
+    virtual GObject* hitTest(const cocos2d::Vec2 & worldPoint, const cocos2d::Camera * camera) override;
 
     virtual void loadExternal();
     virtual void freeExternal(cocos2d::SpriteFrame* spriteFrame);
