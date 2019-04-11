@@ -492,17 +492,14 @@ void* UIPackage::getItemAsset(PackageItem * item)
 void UIPackage::loadAtlas(PackageItem * item)
 {
     Image* image = new Image();
-    Image::setPNGPremultipliedAlphaEnabled(false);
     if (!image->initWithImageFile(item->file))
     {
         item->texture = _emptyTexture;
         _emptyTexture->retain();
         delete image;
-        Image::setPNGPremultipliedAlphaEnabled(true);
         CCLOGWARN("FairyGUI: texture '%s' not found in %s", item->file.c_str(), _name.c_str());
         return;
     }
-    Image::setPNGPremultipliedAlphaEnabled(true);
 
     Texture2D* tex = new Texture2D();
     tex->initWithImage(image);
