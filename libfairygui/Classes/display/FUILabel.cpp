@@ -6,10 +6,18 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
+static Color3B toGrayed(const Color3B& source)
+{
+    Color3B c = source;
+    c.r = c.g = c.b = c.r*0.299f + c.g*0.587f + c.b*0.114f;
+    return c;
+}
+
 FUILabel::FUILabel() :
     _fontSize(-1),
     _bmFontCanTint(false),
-    _textFormat(new TextFormat())
+    _textFormat(new TextFormat()),
+    _grayed(false)
 {
 }
 
@@ -76,9 +84,9 @@ void FUILabel::applyTextFormat()
     }
 
     if (_currentLabelType != LabelType::BMFONT)
-        setTextColor((Color4B)_textFormat->color);
+        setTextColor((Color4B)(_grayed ? toGrayed(_textFormat->color) : _textFormat->color));
     else if (_bmFontCanTint)
-        setColor(_textFormat->color);
+        setColor(_grayed ? toGrayed(_textFormat->color) : _textFormat->color);
 
     if (_textFormat->underline)
         enableUnderline();
@@ -100,13 +108,13 @@ void FUILabel::applyTextFormat()
     setVerticalAlignment(_textFormat->verticalAlign);
 
     if (_textFormat->hasEffect(TextFormat::OUTLINE))
-        enableOutline((Color4B)_textFormat->outlineColor, _textFormat->outlineSize);
+        enableOutline((Color4B)(_grayed ? toGrayed(_textFormat->outlineColor) : _textFormat->outlineColor), _textFormat->outlineSize);
     else
         disableEffect(LabelEffect::OUTLINE);
 
     if (_textFormat->hasEffect(TextFormat::SHADOW))
-        enableShadow((Color4B)_textFormat->shadowColor, _textFormat->shadowOffset);
-    else if(!_textFormat->bold)
+        enableShadow((Color4B)(_grayed ? toGrayed(_textFormat->shadowColor) : _textFormat->shadowColor), _textFormat->shadowOffset);
+    else if (!_textFormat->bold)
         disableEffect(LabelEffect::SHADOW);
 }
 
@@ -140,16 +148,21 @@ bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 
 
 void FUILabel::setGrayed(bool value)
 {
-    if (_fontAtlas == nullptr)
-        return;
+    if (_grayed != value)
+    {
+        _grayed = value;
 
-    GLProgramState *glState = nullptr;
-    if (value)
-        glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, _fontAtlas->getTexture(0));
-    else
-        glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, _fontAtlas->getTexture(0));
+        if (_currentLabelType != LabelType::BMFONT)
+            setTextColor((Color4B)(_grayed ? toGrayed(_textFormat->color) : _textFormat->color));
+        else if (_bmFontCanTint)
+            setColor(_grayed ? toGrayed(_textFormat->color) : _textFormat->color);
 
-    setGLProgramState(glState);
+        if (_textFormat->hasEffect(TextFormat::OUTLINE))
+            enableOutline((Color4B)(_grayed ? toGrayed(_textFormat->outlineColor) : _textFormat->outlineColor), _textFormat->outlineSize);
+
+        if (_textFormat->hasEffect(TextFormat::SHADOW))
+            enableShadow((Color4B)(_grayed ? toGrayed(_textFormat->shadowColor) : _textFormat->shadowColor), _textFormat->shadowOffset);
+    }
 }
 
 void FUILabel::updateBMFontScale()

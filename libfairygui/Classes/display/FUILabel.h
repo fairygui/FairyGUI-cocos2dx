@@ -37,6 +37,7 @@ private:
     std::string _fontName;
     int _fontSize;
     bool _bmFontCanTint;
+    bool _grayed;
 };
 
 NS_FGUI_END
