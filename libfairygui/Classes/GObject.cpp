@@ -733,8 +733,13 @@ void GObject::handlePositionChanged()
             pt.x += _size.width * _pivot.x;
             pt.y -= _size.height * _pivot.y;
         }
-        if (_alignToBL && _displayObject->getParent())
-            pt.y += _displayObject->getParent()->getContentSize().height;
+        if (_alignToBL)
+        {
+            if (_displayObject->getParent())
+                pt.y += _displayObject->getParent()->getContentSize().height;
+            else if (_parent != nullptr)
+                pt.y += _parent->_displayObject->getContentSize().height;
+        }
         if (_pixelSnapping)
         {
             pt.x = (int)pt.x;
