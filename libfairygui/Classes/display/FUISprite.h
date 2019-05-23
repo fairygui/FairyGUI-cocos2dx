@@ -53,6 +53,8 @@ private:
     int _vertexDataCount;
     cocos2d::V2F_C4B_T2F *_vertexData;
     cocos2d::GLProgramState *_fillGlProgramState;
+    
+    static cocos2d::Texture2D* _empty;
 };
 
 NS_FGUI_END

@@ -7,6 +7,8 @@ USING_NS_CC;
 //  kProgressTextureCoords holds points {0,1} {0,0} {1,0} {1,1} we can represent it as bits
 const char kProgressTextureCoords = 0x4b;
 
+Texture2D* FUISprite::_empty = nullptr;
+
 FUISprite::FUISprite() :
     _fillMethod(FillMethod::None),
     _fillOrigin(FillOrigin::Left),
@@ -29,6 +31,8 @@ void FUISprite::clearContent()
     setTexture(nullptr);
     CC_SAFE_RELEASE_NULL(_spriteFrame);
     setCenterRectNormalized(Rect(0, 0, 1, 1));
+
+    _empty = _texture;
 }
 
 void FUISprite::setScale9Grid(Rect * value)
@@ -433,6 +437,9 @@ void FUISprite::onDraw(const Mat4 &transform, uint32_t /*flags*/)
 
 void FUISprite::draw(cocos2d::Renderer * renderer, const cocos2d::Mat4 & transform, uint32_t flags)
 {
+    if (_texture == _empty)
+        return;
+
     if (_fillMethod == FillMethod::None)
         Sprite::draw(renderer, transform, flags);
     else
