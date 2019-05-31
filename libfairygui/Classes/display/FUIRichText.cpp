@@ -403,6 +403,7 @@ int FUIXMLVisitor::attributeInt(const ValueMap& valueMap, const std::string& key
 
 FUIRichText::FUIRichText() :
     _formatTextDirty(true),
+    _textChanged(false),
     _leftSpaceWidth(0.0f),
     _textRectWidth(0.0f),
     _numLines(0),
@@ -437,21 +438,13 @@ void FUIRichText::setDimensions(float width, float height)
 void FUIRichText::setText(const std::string & value)
 {
     _formatTextDirty = true;
-    _richElements.clear();
-    _numLines = 0;
-
-    if (value.empty())
-        return;
-
-    string xmlText = "<dummy>" + value + "</dummy>";
-    FUIXMLVisitor visitor(this);
-    SAXParser parser;
-    parser.setDelegator(&visitor);
-    parser.parseIntrusive(&xmlText.front(), xmlText.length());
+    _textChanged = true;
+    _text = value;
 }
 
 void FUIRichText::applyTextFormat()
 {
+    _textChanged = true;
     _formatTextDirty = true;
 }
 
@@ -515,6 +508,22 @@ void FUIRichText::formatText()
 {
     if (!_formatTextDirty)
         return;
+
+    if (_textChanged)
+    {
+        _textChanged = false;
+        _richElements.clear();
+        _numLines = 0;
+
+        if (!_text.empty())
+        {
+            string xmlText = "<dummy>" + _text + "</dummy>";
+            FUIXMLVisitor visitor(this);
+            SAXParser parser;
+            parser.setDelegator(&visitor);
+            parser.parseIntrusive(&xmlText.front(), xmlText.length());
+        }
+    }
 
     removeAllChildrenWithCleanup(true);
     _elementRenders.clear();

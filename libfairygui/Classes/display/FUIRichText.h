@@ -27,7 +27,7 @@ public:
     TextFormat* getTextFormat() const { return _defaultTextFormat; }
     void applyTextFormat();
 
-    cocos2d::Label::Overflow getOverflow()const { return _overflow;  }
+    cocos2d::Label::Overflow getOverflow()const { return _overflow; }
     void setOverflow(cocos2d::Label::Overflow overflow);
 
     bool isAnchorTextUnderline() { return _anchorTextUnderline; }
@@ -40,7 +40,7 @@ public:
     virtual void visit(cocos2d::Renderer *renderer, const cocos2d::Mat4 &parentTransform, uint32_t parentFlags) override;
 
     virtual const cocos2d::Size& getContentSize() const override;
-    
+
 protected:
     virtual bool init() override;
     void formatText();
@@ -55,6 +55,7 @@ protected:
     std::vector<std::vector<Node*>> _elementRenders;
     cocos2d::Vector<GLoader*> _imageLoaders;
     bool _formatTextDirty;
+    bool _textChanged;
     cocos2d::Size _dimensions;
     float _leftSpaceWidth;
     float _textRectWidth;
@@ -63,6 +64,7 @@ protected:
     TextFormat* _defaultTextFormat;
     bool _anchorTextUnderline;
     cocos2d::Color3B _anchorFontColor;
+    std::string _text;
 
     friend class FUIXMLVisitor;
 };
