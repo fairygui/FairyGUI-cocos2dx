@@ -746,6 +746,10 @@ void FUIRichText::formarRenderers()
     else if (_overflow == Label::Overflow::RESIZE_HEIGHT)
         _dimensions.height = _contentSize.height;
     float delta = _contentSize.height - oldDimensionsHeight;
+    if (_defaultTextFormat->verticalAlign == TextVAlignment::CENTER)
+        delta -= floor((_dimensions.height - textHeight) * 0.5f);
+    else if (_defaultTextFormat->verticalAlign == TextVAlignment::BOTTOM)
+        delta -= _dimensions.height - textHeight;
     if (delta != 0)
     {
         Vec2 offset(0, delta);
