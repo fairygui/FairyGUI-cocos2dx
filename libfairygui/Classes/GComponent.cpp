@@ -767,17 +767,28 @@ void GComponent::buildNativeDisplayList()
 
     case ChildrenRenderOrder::ARCH:
     {
-        for (int i = 0; i < _apexIndex; i++)
+        int ai = MIN(_apexIndex, cnt);
+        for (int i = 0; i < ai; i++)
         {
             GObject* child = _children.at(i);
             if (child->_displayObject != nullptr && child != _maskOwner && child->internalVisible())
-                _container->addChild(child->_displayObject, i);
+            {
+                if (child->_displayObject->getParent() == nullptr)
+                    _container->addChild(child->_displayObject, i);
+                else
+                    child->_displayObject->setLocalZOrder((int)i);
+            }
         }
-        for (int i = cnt - 1; i >= _apexIndex; i--)
+        for (int i = cnt - 1; i >= ai; i--)
         {
             GObject* child = _children.at(i);
             if (child->_displayObject != nullptr && child != _maskOwner && child->internalVisible())
-                _container->addChild(child->_displayObject, _apexIndex + cnt - 1 - i);
+            {
+                if (child->_displayObject->getParent() == nullptr)
+                    _container->addChild(child->_displayObject, ai + cnt - 1 - i);
+                else
+                    child->_displayObject->setLocalZOrder(ai + cnt - 1 - i);
+            }
         }
     }
     break;
@@ -915,14 +926,63 @@ GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
             return target;
     }
 
-    for (auto it = _children.rbegin(); it != _children.rend(); ++it)
-    {
-        if (!(*it)->_displayObject || *it == _maskOwner)
-            continue;
+    int cnt = (int)_children.size();
 
-        target = (*it)->hitTest(worldPoint, camera);
-        if (target)
-            return target;
+    switch (_childrenRenderOrder)
+    {
+    case ChildrenRenderOrder::ASCENT:
+    {
+        for (int i = cnt - 1; i >= 0; i--)
+        {
+            GObject* child = _children.at(i);
+            if (!child->_displayObject || child == _maskOwner)
+                continue;
+
+            target = child->hitTest(worldPoint, camera);
+            if (target)
+                return target;
+        }
+    }
+    break;
+    case ChildrenRenderOrder::DESCENT:
+    {
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _children.at(i);
+            if (!child->_displayObject || child == _maskOwner)
+                continue;
+
+            target = child->hitTest(worldPoint, camera);
+            if (target)
+                return target;
+        }
+    }
+    break;
+
+    case ChildrenRenderOrder::ARCH:
+    {
+        int ai = MIN(_apexIndex, cnt);
+        for (int i = ai; i < cnt; i++)
+        {
+            GObject* child = _children.at(i);
+            if (!child->_displayObject || child == _maskOwner)
+                continue;
+
+            target = child->hitTest(worldPoint, camera);
+            if (target)
+                return target;
+        }
+        for (int i = ai - 1; i >= 0; i--)
+        {
+            GObject* child = _children.at(i);
+            if (!child->_displayObject || child == _maskOwner)
+                continue;
+
+            target = child->hitTest(worldPoint, camera);
+            if (target)
+                return target;
+        }
+    }
     }
 
     if (_opaque)
