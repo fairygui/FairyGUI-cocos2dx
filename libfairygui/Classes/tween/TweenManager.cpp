@@ -10,12 +10,23 @@ int TweenManager::_totalActiveTweens = 0;
 int TweenManager::_arrayLength = 0;
 bool TweenManager::_inited = false;
 
+static std::string UPDATE_KEY = "__TweenEngine__update__";
+
 class TweenEngine
 {
 public:
     void update(float dt)
     {
         TweenManager::update(dt);
+    }
+    
+    static void activate(TweenEngine *engine)
+    {
+        auto scheduler = cocos2d::Director::getInstance()->getScheduler();
+        if (!scheduler->isScheduled(UPDATE_KEY, engine)) {
+            scheduler->schedule([](float dt){}, engine, FLT_MAX, false, UPDATE_KEY);
+            cocos2d::Director::getInstance()->getScheduler()->scheduleUpdate(engine, INT_MIN + 10, false);
+        }
     }
 };
 static TweenEngine tweenEngine;
@@ -24,6 +35,8 @@ GTweener* TweenManager::createTween()
 {
     if (!_inited)
         init();
+    
+    TweenEngine::activate(&tweenEngine);
 
     GTweener* tweener;
     int cnt = (int)_tweenerPool.size();
@@ -172,8 +185,6 @@ void TweenManager::init()
 
     _arrayLength = 30;
     _activeTweens = new GTweener*[_arrayLength];
-
-    cocos2d::Director::getInstance()->getScheduler()->scheduleUpdate(&tweenEngine, INT_MIN + 10, false);
 }
 
 NS_FGUI_END
