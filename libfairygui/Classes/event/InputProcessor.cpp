@@ -312,6 +312,9 @@ bool InputProcessor::isTouchOnUI()
 
 bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
 {
+    if (!(_owner->isTouchable() && _owner->isVisible())) {
+        return false;
+    }
     auto camera = Camera::getVisitingCamera();
     Vec2 pt = touch->getLocation();
     GObject* target = _owner->hitTest(pt, camera);
