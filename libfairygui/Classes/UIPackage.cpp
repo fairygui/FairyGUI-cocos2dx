@@ -489,20 +489,26 @@ void* UIPackage::getItemAsset(PackageItem * item)
     }
 }
 
+class ImageUtil : public cocos2d::Image {
+public:
+    static bool getPNGPremultipliedAlphaEnabled() { return PNG_PREMULTIPLIED_ALPHA_ENABLED; };
+};
+
 void UIPackage::loadAtlas(PackageItem * item)
 {
     Image* image = new Image();
+    bool last = ImageUtil::getPNGPremultipliedAlphaEnabled();
     Image::setPNGPremultipliedAlphaEnabled(false);
     if (!image->initWithImageFile(item->file))
     {
         item->texture = _emptyTexture;
         _emptyTexture->retain();
         delete image;
-        Image::setPNGPremultipliedAlphaEnabled(true);
+        Image::setPNGPremultipliedAlphaEnabled(last);
         CCLOGWARN("FairyGUI: texture '%s' not found in %s", item->file.c_str(), _name.c_str());
         return;
     }
-    Image::setPNGPremultipliedAlphaEnabled(true);
+    Image::setPNGPremultipliedAlphaEnabled(last);
 
     Texture2D* tex = new Texture2D();
     tex->initWithImage(image);
