@@ -497,15 +497,29 @@ void GRoot::handlePositionChanged()
 void GRoot::onEnter()
 {
     GComponent::onEnter();
-    _inst = this;
+    // _inst = this;
 }
 
 void GRoot::onExit()
 {
     GComponent::onExit();
-    if (_inst == this)
-        _inst = nullptr;
+    // if (_inst == this)
+    //    _inst = nullptr;
 }
+
+class MonitorNode : public cocos2d::Node {
+public:
+    CREATE_FUNC(MonitorNode);
+    
+    MonitorNode():onVisit(nullptr) {}
+    
+    virtual void visit(cocos2d::Renderer *renderer, const cocos2d::Mat4& parentTransform, uint32_t parentFlags)
+    {
+        onVisit();
+    }
+    
+    std::function<void ()> onVisit;
+};
 
 bool GRoot::initWithScene(cocos2d::Scene * scene, int zOrder)
 {
@@ -521,6 +535,13 @@ bool GRoot::initWithScene(cocos2d::Scene * scene, int zOrder)
     onWindowSizeChanged();
 
     scene->addChild(_displayObject, zOrder);
+    
+    auto monitor = MonitorNode::create();
+    monitor->onVisit = [this]() {
+        GRoot::_inst = this;
+    };
+    _displayObject->addChild(monitor);
+    _inst = this;
 
     return true;
 }
