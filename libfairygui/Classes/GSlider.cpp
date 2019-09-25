@@ -79,7 +79,7 @@ void GSlider::updateWidthPercent(float percent)
             break;
 
         case ProgressTitleType::VALUE:
-            oss << _value;
+            oss << round(_value);
             break;
 
         case ProgressTitleType::MAX:
