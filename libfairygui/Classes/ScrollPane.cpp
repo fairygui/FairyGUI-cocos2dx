@@ -1730,8 +1730,10 @@ void ScrollPane::onTouchEnd(EventContext * context)
             alignPosition(endPos, true);
 
         _tweenChange = endPos - _tweenStart;
-        if (_tweenChange.x == 0 && _tweenChange.y == 0)
+        if (_tweenChange.x == 0 && _tweenChange.y == 0) {
+			_owner->dispatchEvent(UIEventType::ScrollEnd);
             return;
+        }
 
         if (_pageMode || _snapToItem)
         {
