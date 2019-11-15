@@ -52,61 +52,61 @@ void TranslationHelper::translateComponent(PackageItem * item)
 
     ByteBuffer* buffer = item->rawData;
 
-    buffer->Seek(0, 2);
+    buffer->seek(0, 2);
 
-    int childCount = buffer->ReadShort();
+    int childCount = buffer->readShort();
     for (int i = 0; i < childCount; i++)
     {
-        int dataLen = buffer->ReadShort();
-        int curPos = buffer->position;
+        int dataLen = buffer->readShort();
+        int curPos = buffer->getPos();
 
-        buffer->Seek(curPos, 0);
+        buffer->seek(curPos, 0);
 
-        ObjectType type = (ObjectType)buffer->ReadByte();
-        buffer->Skip(4);
-        const string& elementId = buffer->ReadS();
+        ObjectType type = (ObjectType)buffer->readByte();
+        buffer->skip(4);
+        const string& elementId = buffer->readS();
 
         if (type == ObjectType::COMPONENT)
         {
-            if (buffer->Seek(curPos, 6))
-                type = (ObjectType)buffer->ReadByte();
+            if (buffer->seek(curPos, 6))
+                type = (ObjectType)buffer->readByte();
         }
 
-        buffer->Seek(curPos, 1);
+        buffer->seek(curPos, 1);
 
         auto it = strings.find(elementId + "-tips");
         if (it != strings.end())
-            buffer->WriteS(it->second);
+            buffer->writeS(it->second);
 
-        buffer->Seek(curPos, 2);
+        buffer->seek(curPos, 2);
 
-        int gearCnt = buffer->ReadShort();
+        int gearCnt = buffer->readShort();
         for (int j = 0; j < gearCnt; j++)
         {
-            int nextPos = buffer->ReadShort();
-            nextPos += buffer->position;
+            int nextPos = buffer->readShort();
+            nextPos += buffer->getPos();
 
-            if (buffer->ReadByte() == 6) //gearText
+            if (buffer->readByte() == 6) //gearText
             {
-                buffer->Skip(2);//controller
-                int valueCnt = buffer->ReadShort();
+                buffer->skip(2);//controller
+                int valueCnt = buffer->readShort();
                 for (int k = 0; k < valueCnt; k++)
                 {
-                    const string& page = buffer->ReadS();
+                    const string& page = buffer->readS();
                     if (!page.empty())
                     {
                         if ((it = strings.find(elementId + "-texts_" + Value(k).asString())) != strings.end())
-                            buffer->WriteS(it->second);
+                            buffer->writeS(it->second);
                         else
-                            buffer->Skip(2);
+                            buffer->skip(2);
                     }
                 }
 
-                if (buffer->ReadBool() && (it = strings.find(elementId + "-texts_def")) != strings.end())
-                    buffer->WriteS(it->second);
+                if (buffer->readBool() && (it = strings.find(elementId + "-texts_def")) != strings.end())
+                    buffer->writeS(it->second);
             }
 
-            buffer->position = nextPos;
+            buffer->setPos(nextPos);
         }
 
         switch (type)
@@ -117,90 +117,90 @@ void TranslationHelper::translateComponent(PackageItem * item)
         {
             if ((it = strings.find(elementId)) != strings.end())
             {
-                buffer->Seek(curPos, 6);
-                buffer->WriteS(it->second);
+                buffer->seek(curPos, 6);
+                buffer->writeS(it->second);
             }
             if ((it = strings.find(elementId + "-prompt")) != strings.end())
             {
-                buffer->Seek(curPos, 4);
-                buffer->WriteS(it->second);
+                buffer->seek(curPos, 4);
+                buffer->writeS(it->second);
             }
             break;
         }
 
         case ObjectType::LIST:
         {
-            buffer->Seek(curPos, 8);
-            buffer->Skip(2);
-            int itemCount = buffer->ReadShort();
+            buffer->seek(curPos, 8);
+            buffer->skip(2);
+            int itemCount = buffer->readShort();
             for (int j = 0; j < itemCount; j++)
             {
-                int nextPos = buffer->ReadShort();
-                nextPos += buffer->position;
+                int nextPos = buffer->readShort();
+                nextPos += buffer->getPos();
 
-                buffer->Skip(2); //url
+                buffer->skip(2); //url
                 if ((it = strings.find(elementId + "-" + Value(j).asString())) != strings.end())
-                    buffer->WriteS(it->second);
+                    buffer->writeS(it->second);
                 else
-                    buffer->Skip(2);
+                    buffer->skip(2);
                 if ((it = strings.find(elementId + "-" + Value(j).asString() + "-0")) != strings.end())
-                    buffer->WriteS(it->second);
-                buffer->position = nextPos;
+                    buffer->writeS(it->second);
+                buffer->setPos(nextPos);
             }
             break;
         }
 
         case ObjectType::LABEL:
         {
-            if (buffer->Seek(curPos, 6) && (ObjectType)buffer->ReadByte() == type)
+            if (buffer->seek(curPos, 6) && (ObjectType)buffer->readByte() == type)
             {
                 if ((it = strings.find(elementId)) != strings.end())
-                    buffer->WriteS(it->second);
+                    buffer->writeS(it->second);
                 else
-                    buffer->Skip(2);
+                    buffer->skip(2);
 
-                buffer->Skip(2);
-                if (buffer->ReadBool())
-                    buffer->Skip(4);
-                buffer->Skip(4);
-                if (buffer->ReadBool() && (it = strings.find(elementId + "-prompt")) != strings.end())
-                    buffer->WriteS(it->second);
+                buffer->skip(2);
+                if (buffer->readBool())
+                    buffer->skip(4);
+                buffer->skip(4);
+                if (buffer->readBool() && (it = strings.find(elementId + "-prompt")) != strings.end())
+                    buffer->writeS(it->second);
             }
             break;
         }
 
         case ObjectType::BUTTON:
         {
-            if (buffer->Seek(curPos, 6) && (ObjectType)buffer->ReadByte() == type)
+            if (buffer->seek(curPos, 6) && (ObjectType)buffer->readByte() == type)
             {
                 if ((it = strings.find(elementId)) != strings.end())
-                    buffer->WriteS(it->second);
+                    buffer->writeS(it->second);
                 else
-                    buffer->Skip(2);
+                    buffer->skip(2);
                 if ((it = strings.find(elementId + "-0")) != strings.end())
-                    buffer->WriteS(it->second);
+                    buffer->writeS(it->second);
             }
             break;
         }
 
         case ObjectType::COMBOBOX:
         {
-            if (buffer->Seek(curPos, 6) && (ObjectType)buffer->ReadByte() == type)
+            if (buffer->seek(curPos, 6) && (ObjectType)buffer->readByte() == type)
             {
-                int itemCount = buffer->ReadShort();
+                int itemCount = buffer->readShort();
                 for (int j = 0; j < itemCount; j++)
                 {
-                    int nextPos = buffer->ReadShort();
-                    nextPos += buffer->position;
+                    int nextPos = buffer->readShort();
+                    nextPos += buffer->getPos();
 
                     if ((it = strings.find(elementId + "-" + Value(j).asString())) != strings.end())
-                        buffer->WriteS(it->second);
+                        buffer->writeS(it->second);
 
-                    buffer->position = nextPos;
+                    buffer->setPos(nextPos);
                 }
 
                 if ((it = strings.find(elementId)) != strings.end())
-                    buffer->WriteS(it->second);
+                    buffer->writeS(it->second);
             }
 
             break;
@@ -209,7 +209,7 @@ void TranslationHelper::translateComponent(PackageItem * item)
             break;
         }
 
-        buffer->position = curPos + dataLen;
+        buffer->setPos(curPos + dataLen);
     }
 }
 

@@ -23,9 +23,9 @@ void GearIcon::init()
 void GearIcon::addStatus(const std::string&  pageId, ByteBuffer* buffer)
 {
     if (pageId.length() == 0)
-        _default = buffer->ReadS();
+        _default = buffer->readS();
     else
-        _storage[pageId] = buffer->ReadS();
+        _storage[pageId] = buffer->readS();
 }
 
 void GearIcon::apply()

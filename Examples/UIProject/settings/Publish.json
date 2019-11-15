@@ -1,4 +1,10 @@
 {
+	"atlasSetting":{
+		"allowRotation":true,
+		"paging":true,
+		"sizeOption":"pot",
+		"trimImage":true
+	},
 	"binaryFormat":true,
 	"codeGeneration":{
 		"classNamePrefix":"",
@@ -10,7 +16,6 @@
 		"packageName":""
 	},
 	"compressDesc":true,
-	"fileExtension":"",
 	"packageCount":2,
 	"path":"../Resources/UI"
 }

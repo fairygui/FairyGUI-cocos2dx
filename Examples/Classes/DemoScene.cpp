@@ -35,8 +35,7 @@ void DemoScene::onClose(EventContext* context)
 {
     if (!dynamic_cast<MenuScene*>(this))
     {
-        TransitionFlipX* scene = TransitionFlipX::create(1, MenuScene::create());
-        Director::getInstance()->replaceScene(scene);
+        Director::getInstance()->replaceScene(MenuScene::create());
     }
     else
     {

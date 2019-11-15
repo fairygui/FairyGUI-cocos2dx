@@ -1,14 +1,13 @@
 #include "GearAnimation.h"
 #include "GObject.h"
-#include "utils/ByteBuffer.h"
 #include "UIPackage.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearAnimation::GearAnimationValue::GearAnimationValue() :frame(0), playing(false)
+GearAnimation::GearAnimationValue::GearAnimationValue() : frame(0), playing(false)
 {
-
 }
 
 GearAnimation::GearAnimationValue::GearAnimationValue(bool playing, int frame)
@@ -17,9 +16,8 @@ GearAnimation::GearAnimationValue::GearAnimationValue(bool playing, int frame)
     this->frame = frame;
 }
 
-GearAnimation::GearAnimation(GObject * owner) :GearBase(owner)
+GearAnimation::GearAnimation(GObject* owner) : GearBase(owner)
 {
-
 }
 
 GearAnimation::~GearAnimation()
@@ -28,17 +26,15 @@ GearAnimation::~GearAnimation()
 
 void GearAnimation::init()
 {
-    IAnimationGear *ag = dynamic_cast<IAnimationGear*>(_owner);
-
-    _default = GearAnimationValue(ag->isPlaying(), ag->getFrame());
+    _default = GearAnimationValue(_owner->getProp(ObjectPropID::Playing).asBool(), _owner->getProp(ObjectPropID::Frame).asInt());
     _storage.clear();
 }
 
-void GearAnimation::addStatus(const std::string&  pageId, ByteBuffer* buffer)
+void GearAnimation::addStatus(const std::string& pageId, ByteBuffer* buffer)
 {
     GearAnimationValue gv;
-    gv.playing = buffer->ReadBool();
-    gv.frame = buffer->ReadInt();
+    gv.playing = buffer->readBool();
+    gv.frame = buffer->readInt();
     if (pageId.size() == 0)
         _default = gv;
     else
@@ -56,19 +52,16 @@ void GearAnimation::apply()
     else
         gv = _default;
 
-    IAnimationGear *ag = dynamic_cast<IAnimationGear*>(_owner);
-
-    ag->setPlaying(gv.playing);
-    ag->setFrame(gv.frame);
+    _owner->setProp(ObjectPropID::Playing, Value(gv.playing));
+    _owner->setProp(ObjectPropID::Frame, Value(gv.frame));
 
     _owner->_gearLocked = false;
 }
 
 void GearAnimation::updateState()
 {
-    IAnimationGear *ag = dynamic_cast<IAnimationGear*>(_owner);
-
-    _storage[_controller->getSelectedPageId()] = GearAnimationValue(ag->isPlaying(), ag->getFrame());
+    _storage[_controller->getSelectedPageId()] = GearAnimationValue(
+        _owner->getProp(ObjectPropID::Playing).asBool(), _owner->getProp(ObjectPropID::Frame).asInt());
 }
 
 NS_FGUI_END

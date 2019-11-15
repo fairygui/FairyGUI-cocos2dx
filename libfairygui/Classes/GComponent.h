@@ -1,14 +1,14 @@
 #ifndef __GCOMPONENT_H__
 #define __GCOMPONENT_H__
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GObject.h"
-#include "Transition.h"
 #include "Margin.h"
 #include "ScrollPane.h"
-#include "event/HitTest.h"
+#include "Transition.h"
+#include "cocos2d.h"
 #include "display/FUIContainer.h"
+#include "event/HitTest.h"
 
 NS_FGUI_BEGIN
 
@@ -23,15 +23,16 @@ public:
     GObject* addChild(GObject* child);
     virtual GObject* addChildAt(GObject* child, int index);
 
-    void removeChild(GObject * child);
+    void removeChild(GObject* child);
     virtual void removeChildAt(int index);
     void removeChildren() { removeChildren(0, -1); }
     void removeChildren(int beginIndex, int endIndex);
 
-    GObject * getChildAt(int index) const;
-    GObject * getChild(const std::string& name) const;
-    GObject * getChildInGroup(const GGroup * group, const std::string& name) const;
-    GObject * getChildById(const std::string& id) const;
+    GObject* getChildAt(int index) const;
+    GObject* getChild(const std::string& name) const;
+    GObject* getChildByPath(const std::string& path) const;
+    GObject* getChildInGroup(const GGroup* group, const std::string& name) const;
+    GObject* getChildById(const std::string& id) const;
     const cocos2d::Vector<GObject*>& getChildren() const { return _children; }
 
     int getChildIndex(const GObject* child) const;
@@ -85,12 +86,12 @@ public:
     void setBoundsChangedFlag();
     void ensureBoundsCorrect();
 
-    virtual GObject* hitTest(const cocos2d::Vec2 & worldPoint, const cocos2d::Camera * camera) override;
+    virtual GObject* hitTest(const cocos2d::Vec2& worldPoint, const cocos2d::Camera* camera) override;
     virtual cocos2d::Vec2 getSnappingPosition(const cocos2d::Vec2& pt);
 
     //internal use
     void childSortingOrderChanged(GObject* child, int oldValue, int newValue);
-    void childStateChanged(GObject * child);
+    void childStateChanged(GObject* child);
     void adjustRadioGroupDepth(GObject* obj, GController* c);
 
     virtual void constructFromResource() override;
@@ -131,7 +132,7 @@ protected:
     IHitTest* _hitArea;
 
 private:
-    int getInsertPosForSortingChild(GObject * target);
+    int getInsertPosForSortingChild(GObject* target);
     int moveChild(GObject* child, int oldIndex, int index);
 
     CALL_LATER_FUNC(GComponent, doUpdateBounds);

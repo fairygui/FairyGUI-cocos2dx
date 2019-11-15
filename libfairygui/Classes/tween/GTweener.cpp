@@ -1,82 +1,82 @@
 #include "GTweener.h"
 #include "EaseManager.h"
 #include "GObject.h"
+#include "GPath.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GTweener::GTweener() :
-    _target(nullptr),
-    _refTarget(nullptr),
-    _userData(nullptr),
-    _onStart(nullptr),
-    _onUpdate(nullptr),
-    _onComplete(nullptr),
-    _onComplete0(nullptr)
+GTweener::GTweener() : _target(nullptr),
+                       _refTarget(nullptr),
+                       _userData(nullptr),
+                       _onStart(nullptr),
+                       _onUpdate(nullptr),
+                       _onComplete(nullptr),
+                       _onComplete0(nullptr),
+                       _path(nullptr)
 {
 }
 
 GTweener::~GTweener()
 {
-
 }
 
-GTweener * GTweener::setDelay(float value)
+GTweener* GTweener::setDelay(float value)
 {
     _delay = value;
     return this;
 }
 
-GTweener * GTweener::setDuration(float value)
+GTweener* GTweener::setDuration(float value)
 {
     _duration = value;
     return this;
 }
 
-GTweener * GTweener::setBreakpoint(float value)
+GTweener* GTweener::setBreakpoint(float value)
 {
     _breakpoint = value;
     return this;
 }
 
-GTweener * GTweener::setEase(EaseType value)
+GTweener* GTweener::setEase(EaseType value)
 {
     _easeType = value;
     return this;
 }
 
-GTweener * GTweener::setEasePeriod(float value)
+GTweener* GTweener::setEasePeriod(float value)
 {
     _easePeriod = value;
     return this;
 }
 
-GTweener * GTweener::setEaseOvershootOrAmplitude(float value)
+GTweener* GTweener::setEaseOvershootOrAmplitude(float value)
 {
     _easeOvershootOrAmplitude = value;
     return this;
 }
 
-GTweener * GTweener::setRepeat(int repeat, bool yoyo)
+GTweener* GTweener::setRepeat(int repeat, bool yoyo)
 {
     _repeat = repeat;
     _yoyo = yoyo;
     return this;
 }
 
-GTweener * GTweener::setTimeScale(float value)
+GTweener* GTweener::setTimeScale(float value)
 {
     _timeScale = value;
     return this;
 }
 
-GTweener * GTweener::setSnapping(bool value)
+GTweener* GTweener::setSnapping(bool value)
 {
     _snapping = value;
     return this;
 }
 
-GTweener * GTweener::setTargetAny(void * value)
+GTweener* GTweener::setTargetAny(void* value)
 {
     CC_SAFE_RELEASE(_refTarget);
     _refTarget = nullptr;
@@ -84,12 +84,12 @@ GTweener * GTweener::setTargetAny(void * value)
     return this;
 }
 
-GTweener * GTweener::setTarget(cocos2d::Ref* value)
+GTweener* GTweener::setTarget(cocos2d::Ref* value)
 {
     return setTarget(value, TweenPropType::None);
 }
 
-GTweener * GTweener::setTarget(cocos2d::Ref * target, TweenPropType propType)
+GTweener* GTweener::setTarget(cocos2d::Ref* target, TweenPropType propType)
 {
     CC_SAFE_RELEASE(_refTarget);
     _target = _refTarget = target;
@@ -98,37 +98,43 @@ GTweener * GTweener::setTarget(cocos2d::Ref * target, TweenPropType propType)
     return this;
 }
 
-GTweener * GTweener::setUserData(const Value& value)
+GTweener* GTweener::setUserData(const Value& value)
 {
     _userData = value;
     return this;
 }
 
-GTweener * GTweener::onUpdate(GTweenCallback callback)
+GTweener* GTweener::setPath(GPath* path)
+{
+    _path = path;
+    return this;
+}
+
+GTweener* GTweener::onUpdate(GTweenCallback callback)
 {
     _onUpdate = callback;
     return this;
 }
 
-GTweener * GTweener::onStart(GTweenCallback callback)
+GTweener* GTweener::onStart(GTweenCallback callback)
 {
     _onStart = callback;
     return this;
 }
 
-GTweener * GTweener::onComplete(GTweenCallback0 callback)
+GTweener* GTweener::onComplete(GTweenCallback0 callback)
 {
     _onComplete0 = callback;
     return this;
 }
 
-GTweener * GTweener::onComplete1(GTweenCallback callback)
+GTweener* GTweener::onComplete1(GTweenCallback callback)
 {
     _onComplete = callback;
     return this;
 }
 
-GTweener * GTweener::setPaused(bool paused)
+GTweener* GTweener::setPaused(bool paused)
 {
     _paused = paused;
     return this;
@@ -175,7 +181,7 @@ void GTweener::kill(bool complete)
     _killed = true;
 }
 
-GTweener * GTweener::_to(float start, float end, float duration)
+GTweener* GTweener::_to(float start, float end, float duration)
 {
     _valueSize = 1;
     startValue.x = start;
@@ -185,7 +191,7 @@ GTweener * GTweener::_to(float start, float end, float duration)
     return this;
 }
 
-GTweener * GTweener::_to(const cocos2d::Vec2 & start, const cocos2d::Vec2 & end, float duration)
+GTweener* GTweener::_to(const cocos2d::Vec2& start, const cocos2d::Vec2& end, float duration)
 {
     _valueSize = 2;
     startValue.setVec2(start);
@@ -195,7 +201,7 @@ GTweener * GTweener::_to(const cocos2d::Vec2 & start, const cocos2d::Vec2 & end,
     return this;
 }
 
-GTweener * GTweener::_to(const cocos2d::Vec3 & start, const cocos2d::Vec3 & end, float duration)
+GTweener* GTweener::_to(const cocos2d::Vec3& start, const cocos2d::Vec3& end, float duration)
 {
     _valueSize = 3;
     startValue.setVec3(start);
@@ -205,7 +211,7 @@ GTweener * GTweener::_to(const cocos2d::Vec3 & start, const cocos2d::Vec3 & end,
     return this;
 }
 
-GTweener * GTweener::_to(const cocos2d::Vec4 & start, const cocos2d::Vec4 & end, float duration)
+GTweener* GTweener::_to(const cocos2d::Vec4& start, const cocos2d::Vec4& end, float duration)
 {
     _valueSize = 4;
     startValue.setVec4(start);
@@ -215,7 +221,7 @@ GTweener * GTweener::_to(const cocos2d::Vec4 & start, const cocos2d::Vec4 & end,
     return this;
 }
 
-GTweener * GTweener::_to(const cocos2d::Color4B & start, const cocos2d::Color4B & end, float duration)
+GTweener* GTweener::_to(const cocos2d::Color4B& start, const cocos2d::Color4B& end, float duration)
 {
     _valueSize = 4;
     startValue.setColor(start);
@@ -225,7 +231,7 @@ GTweener * GTweener::_to(const cocos2d::Color4B & start, const cocos2d::Color4B 
     return this;
 }
 
-GTweener * GTweener::_to(double start, double end, float duration)
+GTweener* GTweener::_to(double start, double end, float duration)
 {
     _valueSize = 5;
     startValue.d = start;
@@ -235,7 +241,7 @@ GTweener * GTweener::_to(double start, double end, float duration)
     return this;
 }
 
-GTweener * GTweener::_shake(const cocos2d::Vec2 & start, float amplitude, float duration)
+GTweener* GTweener::_shake(const cocos2d::Vec2& start, float amplitude, float duration)
 {
     _valueSize = 6;
     startValue.setVec2(start);
@@ -276,6 +282,7 @@ void GTweener::_reset()
     _target = nullptr;
     _refTarget = nullptr;
     _userData = nullptr;
+    _path = nullptr;
     _onStart = _onUpdate = _onComplete = nullptr;
     _onComplete0 = nullptr;
 }
@@ -360,7 +367,7 @@ void GTweener::update()
     }
 
     _normalizedTime = EaseManager::evaluate(_easeType, reversed ? (_duration - tt) : tt, _duration,
-        _easeOvershootOrAmplitude, _easePeriod);
+                                            _easeOvershootOrAmplitude, _easePeriod);
 
     value.setZero();
     deltaValue.setZero();
@@ -372,14 +379,15 @@ void GTweener::update()
             d = round(d);
         deltaValue.d = d - value.d;
         value.d = d;
+        value.x = (float)d;
     }
     else if (_valueSize == 6)
     {
         if (_ended == 0)
         {
-            float r = startValue.w*(1 - _normalizedTime);
-            float rx = (rand_0_1() * 2 - 1)*r;
-            float ry = (rand_0_1() * 2 - 1)*r;
+            float r = startValue.w * (1 - _normalizedTime);
+            float rx = (rand_0_1() * 2 - 1) * r;
+            float ry = (rand_0_1() * 2 - 1) * r;
             rx = rx > 0 ? ceil(rx) : floor(rx);
             ry = ry > 0 ? ceil(ry) : floor(ry);
 
@@ -390,6 +398,18 @@ void GTweener::update()
         }
         else
             value.setVec3(startValue.getVec3());
+    }
+    else if (_path != nullptr)
+    {
+        Vec3 vec3 = _path->getPointAt(_normalizedTime);
+        if (_snapping)
+        {
+            vec3.x = round(vec3.x);
+            vec3.y = round(vec3.y);
+            vec3.z = round(vec3.z);
+        }
+        deltaValue.setVec3(vec3 - value.getVec3());
+        value.setVec3(vec3);
     }
     else
     {
@@ -403,6 +423,7 @@ void GTweener::update()
             deltaValue[i] = f - value[i];
             value[i] = f;
         }
+        value.d = value.x;
     }
 
     if (_refTarget != nullptr && _propType != TweenPropType::None)

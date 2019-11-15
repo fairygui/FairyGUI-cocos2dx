@@ -15,10 +15,10 @@ void PlayTransitionAction::setup(ByteBuffer * buffer)
 {
     ControllerAction::setup(buffer);
 
-    transitionName = buffer->ReadS();
-    playTimes = buffer->ReadInt();
-    delay = buffer->ReadFloat();
-    stopOnExit = buffer->ReadBool();
+    transitionName = buffer->readS();
+    playTimes = buffer->readInt();
+    delay = buffer->readFloat();
+    stopOnExit = buffer->readBool();
 }
 
 void PlayTransitionAction::enter(GController * controller)

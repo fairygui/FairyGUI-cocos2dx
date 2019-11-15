@@ -2,12 +2,12 @@
 #include "PackageItem.h"
 #include "display/FUISprite.h"
 #include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GImage::GImage() :
-    _content(nullptr)
+GImage::GImage() : _content(nullptr)
 {
     _touchDisabled = true;
 }
@@ -42,14 +42,6 @@ void GImage::setFlip(FlipType value)
     _content->setFlippedY(value == FlipType::VERTICAL || value == FlipType::BOTH);
 }
 
-void GImage::handleSizeChanged()
-{
-    if (_packageItem->scaleByTile)
-        _content->setTextureRect(Rect(Vec2::ZERO, _size));
-    else
-        _content->setContentSize(_size);
-}
-
 void GImage::handleGrayedChanged()
 {
     GObject::handleGrayedChanged();
@@ -62,7 +54,7 @@ cocos2d::Color3B GImage::getColor() const
     return _content->getColor();
 }
 
-void GImage::setColor(const cocos2d::Color3B & value)
+void GImage::setColor(const cocos2d::Color3B& value)
 {
     _content->setColor(value);
 }
@@ -107,17 +99,45 @@ void GImage::setFillAmount(float value)
     _content->setFillAmount(value);
 }
 
+cocos2d::Value GImage::getProp(ObjectPropID propId)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        return Value(ToolSet::colorToInt(getColor()));
+    default:
+        return GObject::getProp(propId);
+    }
+}
+
+void GImage::setProp(ObjectPropID propId, const cocos2d::Value& value)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        setColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    default:
+        GObject::setProp(propId, value);
+        break;
+    }
+}
+
 void GImage::constructFromResource()
 {
-    _packageItem->load();
-
-    sourceSize.width = _packageItem->width;
-    sourceSize.height = _packageItem->height;
+    PackageItem* contentItem = _packageItem->getBranch();
+    sourceSize.width = contentItem->width;
+    sourceSize.height = contentItem->height;
     initSize = sourceSize;
 
-    _content->setSpriteFrame(_packageItem->spriteFrame);
-    if (_packageItem->scale9Grid)
-        ((FUISprite*)_content)->setScale9Grid(_packageItem->scale9Grid);
+    contentItem = contentItem->getHighResolution();
+    contentItem->load();
+
+    _content->setSpriteFrame(contentItem->spriteFrame);
+    if (contentItem->scale9Grid)
+        ((FUISprite*)_content)->setScale9Grid(contentItem->scale9Grid);
+    else if (contentItem->scaleByTile)
+        ((FUISprite*)_content)->setScaleByTile(true);
 
     setSize(sourceSize.width, sourceSize.height);
 }
@@ -126,18 +146,18 @@ void GImage::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
     GObject::setup_beforeAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 5);
+    buffer->seek(beginPos, 5);
 
-    if (buffer->ReadBool())
-        setColor((Color3B)buffer->ReadColor());
-    setFlip((FlipType)buffer->ReadByte());
-    int fillMethod = buffer->ReadByte();
+    if (buffer->readBool())
+        setColor((Color3B)buffer->readColor());
+    setFlip((FlipType)buffer->readByte());
+    int fillMethod = buffer->readByte();
     if (fillMethod != 0)
     {
         _content->setFillMethod((FillMethod)fillMethod);
-        _content->setFillOrigin((FillOrigin)buffer->ReadByte());
-        _content->setFillClockwise(buffer->ReadBool());
-        _content->setFillAmount(buffer->ReadFloat());
+        _content->setFillOrigin((FillOrigin)buffer->readByte());
+        _content->setFillClockwise(buffer->readBool());
+        _content->setFillAmount(buffer->readFloat());
     }
 }
 

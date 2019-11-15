@@ -4,7 +4,7 @@ NS_FGUI_BEGIN
 USING_NS_CC;
 using namespace std;
 
-Color4B ToolSet::convertFromHtmlColor(const char* str)
+Color4B ToolSet::hexToColor(const char* str)
 {
     ssize_t len = strlen(str);
     if (len < 7 || str[0] != '#')
@@ -16,17 +16,27 @@ Color4B ToolSet::convertFromHtmlColor(const char* str)
     if (len == 9)
     {
         return Color4B(strtol(strncpy(temp, str + 3, 2), NULL, 16),
-            strtol(strncpy(temp, str + 5, 2), NULL, 16),
-            strtol(strncpy(temp, str + 7, 2), NULL, 16),
-            strtol(strncpy(temp, str + 1, 2), NULL, 16));
+                       strtol(strncpy(temp, str + 5, 2), NULL, 16),
+                       strtol(strncpy(temp, str + 7, 2), NULL, 16),
+                       strtol(strncpy(temp, str + 1, 2), NULL, 16));
     }
     else
     {
         return Color4B(strtol(strncpy(temp, str + 1, 2), NULL, 16),
-            strtol(strncpy(temp, str + 3, 2), NULL, 16),
-            strtol(strncpy(temp, str + 5, 2), NULL, 16),
-            255);
+                       strtol(strncpy(temp, str + 3, 2), NULL, 16),
+                       strtol(strncpy(temp, str + 5, 2), NULL, 16),
+                       255);
     }
+}
+
+cocos2d::Color3B ToolSet::intToColor(unsigned int rgb)
+{
+    return Color3B((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
+}
+
+unsigned int ToolSet::colorToInt(const cocos2d::Color3B& color)
+{
+    return (color.r << 16) + (color.g << 8) + color.b;
 }
 
 Rect ToolSet::intersection(const Rect& rect1, const Rect& rect2)
@@ -54,11 +64,11 @@ int ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::s
     return -1;
 }
 
-FastSplitter::FastSplitter() :data(nullptr), dataLength(-1), delimiter('\0')
+FastSplitter::FastSplitter() : data(nullptr), dataLength(-1), delimiter('\0')
 {
 }
 
-void FastSplitter::start(const char * data, ssize_t dataLength, char delimiter)
+void FastSplitter::start(const char* data, ssize_t dataLength, char delimiter)
 {
     this->data = data;
     this->dataLength = dataLength;
@@ -89,7 +99,7 @@ bool FastSplitter::next()
     return true;
 }
 
-const char * FastSplitter::getText()
+const char* FastSplitter::getText()
 {
     if (textLength > 0)
         return data;

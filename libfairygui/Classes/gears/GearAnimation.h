@@ -7,21 +7,6 @@
 
 NS_FGUI_BEGIN
 
-class IAnimationGear
-{
-public:
-    virtual bool isPlaying() const = 0;
-    virtual void setPlaying(bool value) = 0;
-
-    virtual int getFrame() const = 0;
-    virtual void setFrame(int value) = 0;
-
-    virtual float getTimeScale() const = 0;
-    virtual void setTimeScale(float value) = 0;
-
-    virtual void advance(float time) = 0;
-};
-
 class GObject;
 
 class GearAnimation : public GearBase

@@ -2,8 +2,10 @@
 	"buttonClickSound":"",
 	"colorScheme":["Custom color #FF0000"],
 	"font":"宋体",
+	"fontScheme":["默认字体"],
 	"fontSize":12,
 	"fontSizeScheme":["Custom font size 30"],
+	"pivot":"default",
 	"scrollBars":{
 		"defaultDisplay":"visible",
 		"horizontal":"ui://9leh0eyfi3s65i",

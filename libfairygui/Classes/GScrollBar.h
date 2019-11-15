@@ -1,9 +1,9 @@
 #ifndef __GSCROLLBAR_H__
 #define __GSCROLLBAR_H__
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GComponent.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -20,6 +20,8 @@ public:
     void setScrollPerc(float value);
     float getMinSize();
 
+    bool _gripDragging;
+
 protected:
     virtual void constructExtension(ByteBuffer* buffer) override;
 
@@ -27,6 +29,7 @@ private:
     void onTouchBegin(EventContext* context);
     void onGripTouchBegin(EventContext* context);
     void onGripTouchMove(EventContext* context);
+    void onGripTouchEnd(EventContext* context);
     void onArrowButton1Click(EventContext* context);
     void onArrowButton2Click(EventContext* context);
 

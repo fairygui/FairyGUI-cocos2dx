@@ -2,14 +2,12 @@
 
 USING_NS_CC;
 
-TreeViewScene::TreeViewScene() :_treeView(nullptr)
+TreeViewScene::TreeViewScene() : _tree1(nullptr)
 {
-
 }
 
 TreeViewScene::~TreeViewScene()
 {
-    CC_SAFE_RELEASE(_treeView);
 }
 
 void TreeViewScene::continueInit()
@@ -19,60 +17,56 @@ void TreeViewScene::continueInit()
     _view = UIPackage::createObject("TreeView", "Main")->as<GComponent>();
     _groot->addChild(_view);
 
-    _treeView = TreeView::create(_view->getChild("tree")->as<GList>());
-    _treeView->retain();
+    _tree1 = _view->getChild("tree")->as<GTree>();
+    _tree1->addEventListener(UIEventType::ClickItem, CC_CALLBACK_1(TreeViewScene::onClickNode, this));
 
-    _treeView->addEventListener(UIEventType::ClickItem, CC_CALLBACK_1(TreeViewScene::onClickNode, this));
-    _treeView->treeNodeRender = CC_CALLBACK_1(TreeViewScene::renderTreeNode, this);
+    _tree2 = _view->getChild("tree2")->as<GTree>();
+    _tree2->addEventListener(UIEventType::ClickItem, CC_CALLBACK_1(TreeViewScene::onClickNode, this));
+    _tree2->treeNodeRender = CC_CALLBACK_2(TreeViewScene::renderTreeNode, this);
 
-    TreeNode* topNode = TreeNode::create(true);
+    GTreeNode* topNode = GTreeNode::create(true);
     topNode->setData(Value("I'm a top node"));
-    _treeView->getRootNode()->addChild(topNode);
+    _tree2->getRootNode()->addChild(topNode);
     for (int i = 0; i < 5; i++)
     {
-        TreeNode* node = TreeNode::create();
+        GTreeNode* node = GTreeNode::create();
         node->setData(Value("Hello " + Value(i).asString()));
         topNode->addChild(node);
     }
 
-    TreeNode* aFolderNode = TreeNode::create(true);
+    GTreeNode* aFolderNode = GTreeNode::create(true);
     aFolderNode->setData(Value("A folder node"));
     topNode->addChild(aFolderNode);
     for (int i = 0; i < 5; i++)
     {
-        TreeNode* node = TreeNode::create();
+        GTreeNode* node = GTreeNode::create();
         node->setData(Value("Good " + Value(i).asString()));
         aFolderNode->addChild(node);
     }
 
     for (int i = 0; i < 3; i++)
     {
-        TreeNode* node = TreeNode::create();
+        GTreeNode* node = GTreeNode::create();
         node->setData(Value("World " + Value(i).asString()));
         topNode->addChild(node);
     }
 
-    TreeNode* anotherTopNode = TreeNode::create();
-    anotherTopNode->setData(Value(ValueVector({ Value("I'm a top node too"), Value("ui://TreeView/heart") })));
-    _treeView->getRootNode()->addChild(anotherTopNode);
+    GTreeNode* anotherTopNode = GTreeNode::create();
+    anotherTopNode->setData(Value(ValueVector({Value("I'm a top node too"), Value("ui://TreeView/heart")})));
+    _tree2->getRootNode()->addChild(anotherTopNode);
 }
 
-void TreeViewScene::onClickNode(EventContext * context)
+void TreeViewScene::onClickNode(EventContext* context)
 {
-    TreeNode* node = (TreeNode*)context->getData();
-    if (node->isFolder() && context->getInput()->isDoubleClick())
-        node->setExpaned(!node->isExpanded());
+    GTreeNode* node = ((GObject*)context->getData())->treeNode();
+    CCLOG("click node %s", node->getText().c_str());
 }
 
-void TreeViewScene::renderTreeNode(TreeNode * node)
+void TreeViewScene::renderTreeNode(GTreeNode* node, GComponent* obj)
 {
     GObject* btn = node->getCell();
     if (node->isFolder())
     {
-        if (node->isExpanded())
-            btn->setIcon("ui://TreeView/folder_opened");
-        else
-            btn->setIcon("ui://TreeView/folder_closed");
         btn->setText(node->getData().asString());
     }
     else if (node->getData().getType() == Value::Type::VECTOR)

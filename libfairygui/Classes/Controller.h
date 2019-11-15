@@ -21,15 +21,15 @@ public:
     void setParent(GComponent* value) { _parent = value; }
 
     int getSelectedIndex() const { return _selectedIndex; }
-    void setSelectedIndex(int value);
+    void setSelectedIndex(int value, bool triggerEvent = true);
 
     const std::string& getSelectedPage() const;
-    void setSelectedPage(const std::string& value);
+    void setSelectedPage(const std::string& value, bool triggerEvent = true);
 
     const std::string& getSelectedPageId() const;
-    void setSelectedPageId(const std::string& value);
+    void setSelectedPageId(const std::string& value, bool triggerEvent = true);
 
-    int getPrevisousIndex() const  { return _previousIndex; }
+    int getPrevisousIndex() const { return _previousIndex; }
     const std::string& getPreviousPage() const;
     const std::string& getPreviousPageId() const;
 

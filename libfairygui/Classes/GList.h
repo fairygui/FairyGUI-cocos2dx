@@ -1,10 +1,10 @@
 #ifndef __GLIST_H__
 #define __GLIST_H__
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "GComponent.h"
 #include "GObjectPool.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -52,21 +52,21 @@ public:
     GObjectPool* getItemPool() const { return _pool; }
     GObject* getFromPool() { return getFromPool(cocos2d::STD_STRING_EMPTY); }
     GObject* getFromPool(const std::string& url);
-    void returnToPool(GObject *obj);
+    void returnToPool(GObject* obj);
     GObject* addItemFromPool() { return addItemFromPool(cocos2d::STD_STRING_EMPTY); }
     GObject* addItemFromPool(const std::string& url);
 
     GObject* addChildAt(GObject* child, int index) override;
     void removeChildAt(int index) override;
     void removeChildToPoolAt(int index);
-    void removeChildToPool(GObject *child);
+    void removeChildToPool(GObject* child);
     void removeChildrenToPool();
     void removeChildrenToPool(int beginIndex, int endIndex);
 
     int getSelectedIndex() const;
     void setSelectedIndex(int value);
 
-    void getSelection(std::vector<int>& result);
+    void getSelection(std::vector<int>& result) const;
     void addSelection(int index, bool scrollItToView);
     void removeSelection(int index);
     void clearSelection();
@@ -110,9 +110,13 @@ protected:
     virtual void setup_beforeAdd(ByteBuffer* buffer, int beginPos) override;
     virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;
 
+    virtual void dispatchItemEvent(GObject* item, EventContext* context);
+    virtual void readItems(ByteBuffer* buffer);
+    virtual void setupItem(ByteBuffer* buffer, GObject* obj);
+
 private:
-    void clearSelectionExcept(GObject *g);
-    void setSelectionOnEvent(GObject *item, InputEvent* evt);
+    void clearSelectionExcept(GObject* g);
+    void setSelectionOnEvent(GObject* item, InputEvent* evt);
 
     void onItemTouchBegin(EventContext* context);
     void onClickItem(EventContext* context);
@@ -124,7 +128,7 @@ private:
     void setVirtualListChangedFlag(bool layoutChanged);
     CALL_LATER_FUNC(GList, doRefreshVirtualList);
 
-    void onScroll(EventContext *context);
+    void onScroll(EventContext* context);
 
     int getIndexOnPos1(float& pos, bool forceUpdate);
     int getIndexOnPos2(float& pos, bool forceUpdate);
@@ -161,8 +165,8 @@ private:
     bool _loop;
     int _numItems;
     int _realNumItems;
-    int _firstIndex; //the top left index
-    int _curLineItemCount; //item count in one line
+    int _firstIndex;        //the top left index
+    int _curLineItemCount;  //item count in one line
     int _curLineItemCount2; //item count in vertical direction,only pagination layout
     cocos2d::Vec2 _itemSize;
     int _virtualListChanged; //1-content changed, 2-size changed

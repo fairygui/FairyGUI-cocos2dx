@@ -1,27 +1,28 @@
 #include "GLoader.h"
-#include "UIPackage.h"
 #include "GComponent.h"
 #include "GMovieClip.h"
-#include "utils/ByteBuffer.h"
+#include "UIPackage.h"
 #include "display/FUISprite.h"
+#include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GLoader::GLoader() :
-    _autoSize(false),
-    _align(TextHAlignment::LEFT),
-    _verticalAlign(TextVAlignment::TOP),
-    _fill(LoaderFillType::NONE),
-    _shrinkOnly(false),
-    _updatingLayout(false),
-    _contentItem(nullptr),
-    _contentStatus(0),
-    _content(nullptr),
-    _content2(nullptr),
-    _playAction(nullptr),
-    _playing(true),
-    _frame(0)
+GLoader::GLoader()
+    : _autoSize(false),
+      _align(TextHAlignment::LEFT),
+      _verticalAlign(TextVAlignment::TOP),
+      _fill(LoaderFillType::NONE),
+      _shrinkOnly(false),
+      _updatingLayout(false),
+      _contentItem(nullptr),
+      _contentStatus(0),
+      _content(nullptr),
+      _content2(nullptr),
+      _playAction(nullptr),
+      _playing(true),
+      _frame(0)
 {
 }
 
@@ -47,7 +48,7 @@ void GLoader::handleInit()
     _displayObject->addChild(_content);
 }
 
-void GLoader::setURL(const std::string & value)
+void GLoader::setURL(const std::string& value)
 {
     if (_url.compare(value) == 0)
         return;
@@ -107,7 +108,7 @@ cocos2d::Color3B GLoader::getColor() const
     return _content->getColor();
 }
 
-void GLoader::setColor(const cocos2d::Color3B & value)
+void GLoader::setColor(const cocos2d::Color3B& value)
 {
     _content->setColor(value);
 }
@@ -142,26 +143,6 @@ void GLoader::setFrame(int value)
             _playAction->setFrame(value);
         updateGear(5);
     }
-}
-
-float GLoader::getTimeScale() const
-{
-    if (_playAction)
-        return _playAction->getTimeScale();
-    else
-        return 1;
-}
-
-void GLoader::setTimeScale(float value)
-{
-    if (_playAction)
-        _playAction->setTimeScale(value);
-}
-
-void GLoader::advance(float time)
-{
-    if (_playAction)
-        _playAction->advance(time);
 }
 
 FillMethod GLoader::getFillMethod() const
@@ -226,9 +207,11 @@ void GLoader::loadFromPackage()
 
     if (_contentItem != nullptr)
     {
-        _contentItem->load();
+        _contentItem = _contentItem->getBranch();
         _contentSourceSize.width = _contentItem->width;
         _contentSourceSize.height = _contentItem->height;
+        _contentItem = _contentItem->getHighResolution();
+        _contentItem->load();
 
         if (_contentItem->type == PackageItemType::IMAGE)
         {
@@ -515,38 +498,85 @@ void GLoader::handleGrayedChanged()
         _content2->setGrayed(_finalGrayed);
 }
 
+cocos2d::Value GLoader::getProp(ObjectPropID propId)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        return Value(ToolSet::colorToInt(getColor()));
+    case ObjectPropID::Playing:
+        return Value(isPlaying());
+    case ObjectPropID::Frame:
+        return Value(getFrame());
+    case ObjectPropID::TimeScale:
+        if (_playAction)
+            return Value(_playAction->getTimeScale());
+        else
+            return Value(1);
+    default:
+        return GObject::getProp(propId);
+    }
+}
+
+void GLoader::setProp(ObjectPropID propId, const cocos2d::Value& value)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        setColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    case ObjectPropID::Playing:
+        setPlaying(value.asBool());
+        break;
+    case ObjectPropID::Frame:
+        setFrame(value.asInt());
+        break;
+    case ObjectPropID::TimeScale:
+        if (_playAction)
+            _playAction->setTimeScale(value.asFloat());
+        break;
+    case ObjectPropID::DeltaTime:
+        if (_playAction)
+            _playAction->advance(value.asFloat());
+        break;
+    default:
+        GObject::setProp(propId, value);
+        break;
+    }
+}
+
 void GLoader::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
     GObject::setup_beforeAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 5);
+    buffer->seek(beginPos, 5);
 
-    _url = buffer->ReadS();
-    _align = (TextHAlignment)buffer->ReadByte();
-    _verticalAlign = (TextVAlignment)buffer->ReadByte();
-    _fill = (LoaderFillType)buffer->ReadByte();
-    _shrinkOnly = buffer->ReadBool();
-    _autoSize = buffer->ReadBool();
-    buffer->ReadBool();//_showErrorSign
-    _playing = buffer->ReadBool();
-    _frame = buffer->ReadInt();
+    _url = buffer->readS();
+    _align = (TextHAlignment)buffer->readByte();
+    _verticalAlign = (TextVAlignment)buffer->readByte();
+    _fill = (LoaderFillType)buffer->readByte();
+    _shrinkOnly = buffer->readBool();
+    _autoSize = buffer->readBool();
+    buffer->readBool(); //_showErrorSign
+    _playing = buffer->readBool();
+    _frame = buffer->readInt();
 
-    if (buffer->ReadBool())
-        setColor((Color3B)buffer->ReadColor());
-    int fillMethod = buffer->ReadByte();
+    if (buffer->readBool())
+        setColor((Color3B)buffer->readColor());
+    int fillMethod = buffer->readByte();
     if (fillMethod != 0)
     {
         _content->setFillMethod((FillMethod)fillMethod);
-        _content->setFillOrigin((FillOrigin)buffer->ReadByte());
-        _content->setFillClockwise(buffer->ReadBool());
-        _content->setFillAmount(buffer->ReadFloat());
+        _content->setFillOrigin((FillOrigin)buffer->readByte());
+        _content->setFillClockwise(buffer->readBool());
+        _content->setFillAmount(buffer->readFloat());
     }
 
     if (_url.length() > 0)
         loadContent();
 }
 
-GObject* GLoader::hitTest(const Vec2 &worldPoint, const Camera* camera)
+GObject* GLoader::hitTest(const Vec2& worldPoint, const Camera* camera)
 {
     if (!_touchable || !_displayObject->isVisible() || !_displayObject->getParent())
         return nullptr;

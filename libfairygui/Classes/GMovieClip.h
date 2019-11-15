@@ -9,7 +9,7 @@ NS_FGUI_BEGIN
 
 class ActionMovieClip;
 
-class GMovieClip : public GObject, public IColorGear, public IAnimationGear
+class GMovieClip : public GObject
 {
 public:
     GMovieClip();
@@ -17,27 +17,30 @@ public:
 
     CREATE_FUNC(GMovieClip);
 
-    bool isPlaying() const override { return _playing; }
-    void setPlaying(bool value) override;
+    bool isPlaying() const { return _playing; }
+    void setPlaying(bool value);
 
-    int getFrame() const override;
-    void setFrame(int value) override;
+    int getFrame() const;
+    void setFrame(int value);
 
-    float getTimeScale() const override;
-    void setTimeScale(float value) override;
+    float getTimeScale() const;
+    void setTimeScale(float value);
 
-    void advance(float time) override;
+    void advance(float time);
 
     FlipType getFlip() const;
     void setFlip(FlipType value);
 
-    cocos2d::Color3B getColor() const override { return _content->getColor(); }
-    void setColor(const cocos2d::Color3B& value) override;
+    cocos2d::Color3B getColor() const { return _content->getColor(); }
+    void setColor(const cocos2d::Color3B& value);
 
-    //from start to end(-1 means ending)£¬repeat times(0 means infinite loop)£¬when all is over, stopping at endAt(-1 means same value of end)
+    //from start to end(-1 means ending) repeat times(0 means infinite loop) when all is over, stopping at endAt(-1 means same value of end)
     void setPlaySettings(int start = 0, int end = -1, int times = 0, int endAt = -1, std::function<void()> completeCallback = nullptr);
 
     virtual void constructFromResource() override;
+
+    virtual cocos2d::Value getProp(ObjectPropID propId) override;
+    virtual void setProp(ObjectPropID propId, const cocos2d::Value& value) override;
 
 protected:
     virtual void handleInit() override;

@@ -1,26 +1,27 @@
 #include "GProgressBar.h"
-#include "PackageItem.h"
 #include "GImage.h"
 #include "GLoader.h"
-#include "utils/ByteBuffer.h"
+#include "PackageItem.h"
 #include "tween/GTween.h"
+#include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GProgressBar::GProgressBar() :
-    _max(100),
-    _value(0),
-    _titleType(ProgressTitleType::PERCENT),
-    _titleObject(nullptr),
-    _barObjectH(nullptr),
-    _barObjectV(nullptr),
-    _barMaxWidth(0),
-    _barMaxHeight(0),
-    _barMaxWidthDelta(0),
-    _barMaxHeightDelta(0),
-    _barStartX(0),
-    _barStartY(0)
+GProgressBar::GProgressBar()
+    : _min(0),
+      _max(100),
+      _value(0),
+      _titleType(ProgressTitleType::PERCENT),
+      _titleObject(nullptr),
+      _barObjectH(nullptr),
+      _barObjectV(nullptr),
+      _barMaxWidth(0),
+      _barMaxHeight(0),
+      _barMaxWidthDelta(0),
+      _barMaxHeightDelta(0),
+      _barStartX(0),
+      _barStartY(0)
 {
 }
 
@@ -33,6 +34,15 @@ void GProgressBar::setTitleType(ProgressTitleType value)
     if (_titleType != value)
     {
         _titleType = value;
+        update(_value);
+    }
+}
+
+void GProgressBar::setMin(double value)
+{
+    if (_min != value)
+    {
+        _min = value;
         update(_value);
     }
 }
@@ -78,7 +88,11 @@ void GProgressBar::tweenValue(double value, float duration)
 
 void GProgressBar::update(double newValue)
 {
-    float percent = _max != 0 ? MIN(newValue / _max, 1) : 0;
+    float percent;
+    if (_max == _min)
+        percent = 0;
+    else
+        percent = clampf((newValue - _min) / (_max - _min), 0, 1);
 
     if (_titleObject != nullptr)
     {
@@ -86,19 +100,19 @@ void GProgressBar::update(double newValue)
         switch (_titleType)
         {
         case ProgressTitleType::PERCENT:
-            oss << round(percent * 100) << "%";
+            oss << floor(percent * 100) << "%";
             break;
 
         case ProgressTitleType::VALUE_MAX:
-            oss << round(newValue) << "/" << round(_max);
+            oss << floor(newValue) << "/" << floor(_max);
             break;
 
         case ProgressTitleType::VALUE:
-            oss << newValue;
+            oss << floor(newValue);
             break;
 
         case ProgressTitleType::MAX:
-            oss << _max;
+            oss << floor(_max);
             break;
         }
         _titleObject->setText(oss.str());
@@ -110,24 +124,12 @@ void GProgressBar::update(double newValue)
     {
         if (_barObjectH != nullptr)
         {
-            GImage* image = dynamic_cast<GImage*>(_barObjectH);
-            GLoader* loader = dynamic_cast<GLoader*>(_barObjectH);
-            if (image && image->getFillMethod() != FillMethod::None)
-                image->setFillAmount(percent);
-            else if (loader && loader->getFillMethod() != FillMethod::None)
-                loader->setFillAmount(percent);
-            else
+            if (!setFillAmount(_barObjectH, percent))
                 _barObjectH->setWidth(round(fullWidth * percent));
         }
         if (_barObjectV != nullptr)
         {
-            GImage* image = dynamic_cast<GImage*>(_barObjectV);
-            GLoader* loader = dynamic_cast<GLoader*>(_barObjectV);
-            if (image && image->getFillMethod() != FillMethod::None)
-                image->setFillAmount(percent);
-            else if (loader && loader->getFillMethod() != FillMethod::None)
-                loader->setFillAmount(percent);
-            else
+            if (!setFillAmount(_barObjectV, percent))
                 _barObjectV->setHeight(round(fullHeight * percent));
         }
     }
@@ -135,13 +137,7 @@ void GProgressBar::update(double newValue)
     {
         if (_barObjectH != nullptr)
         {
-            GImage* image = dynamic_cast<GImage*>(_barObjectH);
-            GLoader* loader = dynamic_cast<GLoader*>(_barObjectH);
-            if (image && image->getFillMethod() != FillMethod::None)
-                image->setFillAmount(1 - percent);
-            else if (loader && loader->getFillMethod() != FillMethod::None)
-                loader->setFillAmount(1 - percent);
-            else
+            if (!setFillAmount(_barObjectH, 1 - percent))
             {
                 _barObjectH->setWidth(round(fullWidth * percent));
                 _barObjectH->setX(_barStartX + (fullWidth - _barObjectH->getWidth()));
@@ -149,19 +145,28 @@ void GProgressBar::update(double newValue)
         }
         if (_barObjectV != nullptr)
         {
-            GImage* image = dynamic_cast<GImage*>(_barObjectV);
-            GLoader* loader = dynamic_cast<GLoader*>(_barObjectV);
-            if (image && image->getFillMethod() != FillMethod::None)
-                image->setFillAmount(1 - percent);
-            else if (loader && loader->getFillMethod() != FillMethod::None)
-                loader->setFillAmount(1 - percent);
-            else
+            if (!setFillAmount(_barObjectV, 1 - percent))
             {
                 _barObjectV->setHeight(round(fullHeight * percent));
                 _barObjectV->setY(_barStartY + (fullHeight - _barObjectV->getHeight()));
             }
         }
     }
+}
+
+bool GProgressBar::setFillAmount(GObject* bar, float amount)
+{
+    GImage* image = nullptr;
+    GLoader* loader = nullptr;
+
+    if ((image = dynamic_cast<GImage*>(bar)) != nullptr && image->getFillMethod() != FillMethod::None)
+        image->setFillAmount(amount);
+    else if ((loader = dynamic_cast<GLoader*>(bar)) != nullptr && loader->getFillMethod() != FillMethod::None)
+        loader->setFillAmount(amount);
+    else
+        return false;
+
+    return true;
 }
 
 void GProgressBar::handleSizeChanged()
@@ -179,10 +184,10 @@ void GProgressBar::handleSizeChanged()
 
 void GProgressBar::constructExtension(ByteBuffer* buffer)
 {
-    buffer->Seek(0, 6);
+    buffer->seek(0, 6);
 
-    _titleType = (ProgressTitleType)buffer->ReadByte();
-    _reverse = buffer->ReadBool();
+    _titleType = (ProgressTitleType)buffer->readByte();
+    _reverse = buffer->readBool();
 
     _titleObject = getChild("title");
     _barObjectH = getChild("bar");
@@ -206,20 +211,22 @@ void GProgressBar::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
     GComponent::setup_afterAdd(buffer, beginPos);
 
-    if (!buffer->Seek(beginPos, 6))
+    if (!buffer->seek(beginPos, 6))
     {
         update(_value);
         return;
     }
 
-    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+    if ((ObjectType)buffer->readByte() != _packageItem->objectType)
     {
         update(_value);
         return;
     }
 
-    _value = buffer->ReadInt();
-    _max = buffer->ReadInt();
+    _value = buffer->readInt();
+    _max = buffer->readInt();
+    if (buffer->version >= 2)
+        _min = buffer->readInt();
 
     update(_value);
 }

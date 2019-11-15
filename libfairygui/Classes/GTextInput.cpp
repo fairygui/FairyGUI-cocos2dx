@@ -54,7 +54,7 @@ void GTextInput::setPrompt(const std::string & value)
         UBBParser* parser = UBBParser::getInstance();
         _input->setPlaceHolder(parser->parse(value.c_str(), true).c_str());
         if (!parser->lastColor.empty())
-            _input->setPlaceholderFontColor(ToolSet::convertFromHtmlColor(parser->lastColor.c_str()));
+            _input->setPlaceholderFontColor(ToolSet::hexToColor(parser->lastColor.c_str()));
         if (!parser->lastFontSize.empty())
             _input->setPlaceholderFontSize(Value(parser->lastFontSize).asInt());
     }
@@ -88,22 +88,22 @@ void GTextInput::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
     GTextField::setup_beforeAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 4);
+    buffer->seek(beginPos, 4);
 
     const std::string* str;
-    if ((str = buffer->ReadSP()))
+    if ((str = buffer->readSP()))
         setPrompt(*str);
 
-    if ((str = buffer->ReadSP()))
+    if ((str = buffer->readSP()))
         setRestrict(*str);
 
-    int iv = buffer->ReadInt();
+    int iv = buffer->readInt();
     if (iv != 0)
         setMaxLength(iv);
-    iv = buffer->ReadInt();
+    iv = buffer->readInt();
     if (iv != 0)
         setKeyboardType(iv);
-    if (buffer->ReadBool())
+    if (buffer->readBool())
         setPassword(true);
 }
 

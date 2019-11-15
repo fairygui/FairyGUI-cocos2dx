@@ -1,9 +1,10 @@
 #include "ScrollPane.h"
-#include "event/InputProcessor.h"
-#include "UIPackage.h"
 #include "GList.h"
 #include "GScrollBar.h"
 #include "UIConfig.h"
+#include "UIPackage.h"
+#include "event/InputProcessor.h"
+#include "tween/GTween.h"
 #include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
@@ -12,38 +13,53 @@ USING_NS_CC;
 ScrollPane* ScrollPane::_draggingPane = nullptr;
 int ScrollPane::_gestureFlag = 0;
 
-static const float TWEEN_TIME_GO = 0.5f; //tween time for SetPos(ani)
+static const float TWEEN_TIME_GO = 0.5f;      //tween time for SetPos(ani)
 static const float TWEEN_TIME_DEFAULT = 0.3f; //min tween time for inertial scroll
-static const float PULL_RATIO = 0.5f; //pull down/up ratio
+static const float PULL_RATIO = 0.5f;         //pull down/up ratio
 
 static inline float sp_getField(const Vec2& pt, int axis) { return axis == 0 ? pt.x : pt.y; }
 static inline float sp_getField(const cocos2d::Size& sz, int axis) { return axis == 0 ? sz.width : sz.height; }
-static void sp_setField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x = value; else pt.y = value; }
-static void sp_incField(Vec2& pt, int axis, float value) { if (axis == 0) pt.x += value; else pt.y += value; }
+static void sp_setField(Vec2& pt, int axis, float value)
+{
+    if (axis == 0)
+        pt.x = value;
+    else
+        pt.y = value;
+}
+static void sp_incField(Vec2& pt, int axis, float value)
+{
+    if (axis == 0)
+        pt.x += value;
+    else
+        pt.y += value;
+}
 
 static inline float sp_EaseFunc(float t, float d)
 {
     t = t / d - 1;
-    return t * t * t + 1;//cubicOut
+    return t * t * t + 1; //cubicOut
 }
 
-ScrollPane::ScrollPane(GComponent* owner) :
-    _vtScrollBar(nullptr),
-    _hzScrollBar(nullptr),
-    _header(nullptr),
-    _footer(nullptr),
-    _pageController(nullptr),
-    _needRefresh(false),
-    _refreshBarAxis(0),
-    _aniFlag(0),
-    _loop(0),
-    _headerLockedSize(0),
-    _footerLockedSize(0),
-    _vScrollNone(false),
-    _hScrollNone(false),
-    _tweening(0),
-    _xPos(0),
-    _yPos(0)
+ScrollPane::ScrollPane(GComponent* owner)
+    : _vtScrollBar(nullptr),
+      _hzScrollBar(nullptr),
+      _header(nullptr),
+      _footer(nullptr),
+      _pageController(nullptr),
+      _needRefresh(false),
+      _refreshBarAxis(0),
+      _aniFlag(0),
+      _loop(0),
+      _headerLockedSize(0),
+      _footerLockedSize(0),
+      _vScrollNone(false),
+      _hScrollNone(false),
+      _tweening(0),
+      _xPos(0),
+      _yPos(0),
+      _floating(false),
+      _mouseWheelEnabled(true),
+      _hover(false)
 {
     _owner = owner;
 
@@ -52,8 +68,6 @@ ScrollPane::ScrollPane(GComponent* owner) :
     _decelerationRate = UIConfig::defaultScrollDecelerationRate;
     _touchEffect = UIConfig::defaultScrollTouchEffect;
     _bouncebackEffect = UIConfig::defaultScrollBounceEffect;
-    _scrollBarVisible = true;
-    _mouseWheelEnabled = true;
     _pageSize = Vec2::ONE;
 
     _maskContainer = FUIContainer::create();
@@ -75,7 +89,6 @@ ScrollPane::~ScrollPane()
 {
     CALL_PER_FRAME_CANCEL(ScrollPane, tweenUpdate);
     CALL_LATER_CANCEL(ScrollPane, refresh);
-    CALL_LATER_CANCEL(ScrollPane, onShowScrollBar);
 
     if (_hzScrollBar)
         _hzScrollBar->release();
@@ -87,24 +100,24 @@ ScrollPane::~ScrollPane()
         _footer->release();
 }
 
-void ScrollPane::setup(ByteBuffer * buffer)
+void ScrollPane::setup(ByteBuffer* buffer)
 {
-    _scrollType = (ScrollType)buffer->ReadByte();
-    ScrollBarDisplayType scrollBarDisplay = (ScrollBarDisplayType)buffer->ReadByte();
-    int flags = buffer->ReadInt();
+    _scrollType = (ScrollType)buffer->readByte();
+    ScrollBarDisplayType scrollBarDisplay = (ScrollBarDisplayType)buffer->readByte();
+    int flags = buffer->readInt();
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
-        _scrollBarMargin.top = buffer->ReadInt();
-        _scrollBarMargin.bottom = buffer->ReadInt();
-        _scrollBarMargin.left = buffer->ReadInt();
-        _scrollBarMargin.right = buffer->ReadInt();
+        _scrollBarMargin.top = buffer->readInt();
+        _scrollBarMargin.bottom = buffer->readInt();
+        _scrollBarMargin.left = buffer->readInt();
+        _scrollBarMargin.right = buffer->readInt();
     }
 
-    const std::string& vtScrollBarRes = buffer->ReadS();
-    const std::string& hzScrollBarRes = buffer->ReadS();
-    const std::string& headerRes = buffer->ReadS();
-    const std::string& footerRes = buffer->ReadS();
+    const std::string& vtScrollBarRes = buffer->readS();
+    const std::string& hzScrollBarRes = buffer->readS();
+    const std::string& headerRes = buffer->readS();
+    const std::string& footerRes = buffer->readS();
 
     _displayOnLeft = (flags & 1) != 0;
     _snapToItem = (flags & 2) != 0;
@@ -120,6 +133,7 @@ void ScrollPane::setup(ByteBuffer * buffer)
         _bouncebackEffect = false;
     _inertiaDisabled = (flags & 256) != 0;
     _maskContainer->setClippingEnabled((flags & 512) == 0);
+    _floating = (flags & 1024) != 0;
 
     if (scrollBarDisplay == ScrollBarDisplayType::DEFAULT)
     {
@@ -174,7 +188,6 @@ void ScrollPane::setup(ByteBuffer * buffer)
                 _vtScrollBar->setVisible(false);
             if (_hzScrollBar != nullptr)
                 _hzScrollBar->setVisible(false);
-            _scrollBarVisible = false;
 
             _owner->addEventListener(UIEventType::RollOver, CC_CALLBACK_1(ScrollPane::onRollOver, this));
             _owner->addEventListener(UIEventType::RollOut, CC_CALLBACK_1(ScrollPane::onRollOut, this));
@@ -329,7 +342,7 @@ void ScrollPane::scrollBottom(bool ani)
     setPercY(1, ani);
 }
 
-void ScrollPane::scrollToView(GObject * obj, bool ani, bool setFirst)
+void ScrollPane::scrollToView(GObject* obj, bool ani, bool setFirst)
 {
     _owner->ensureBoundsCorrect();
     if (_needRefresh)
@@ -341,7 +354,7 @@ void ScrollPane::scrollToView(GObject * obj, bool ani, bool setFirst)
     scrollToView(rect, ani, setFirst);
 }
 
-void ScrollPane::scrollToView(const cocos2d::Rect & rect, bool ani, bool setFirst)
+void ScrollPane::scrollToView(const cocos2d::Rect& rect, bool ani, bool setFirst)
 {
     _owner->ensureBoundsCorrect();
     if (_needRefresh)
@@ -391,7 +404,7 @@ void ScrollPane::scrollToView(const cocos2d::Rect & rect, bool ani, bool setFirs
         refresh();
 }
 
-bool ScrollPane::isChildInView(GObject * obj) const
+bool ScrollPane::isChildInView(GObject* obj) const
 {
     if (_overlapSize.height > 0)
     {
@@ -426,6 +439,8 @@ void ScrollPane::setPageX(int value, bool ani)
     if (!_pageMode)
         return;
 
+    _owner->ensureBoundsCorrect();
+
     if (_overlapSize.width > 0)
         setPosX(value * _pageSize.width, ani);
 }
@@ -444,6 +459,11 @@ int ScrollPane::getPageY() const
 
 void ScrollPane::setPageY(int value, bool ani)
 {
+    if (!_pageMode)
+        return;
+
+    _owner->ensureBoundsCorrect();
+
     if (_overlapSize.height > 0)
         setPosY(value * _pageSize.height, ani);
 }
@@ -461,7 +481,7 @@ float ScrollPane::getScrollingPosY() const
 void ScrollPane::setViewWidth(float value)
 {
     value = value + _owner->_margin.left + _owner->_margin.right;
-    if (_vtScrollBar != nullptr)
+    if (_vtScrollBar != nullptr && !_floating)
         value += _vtScrollBar->getWidth();
     _owner->setWidth(value);
 }
@@ -469,7 +489,7 @@ void ScrollPane::setViewWidth(float value)
 void ScrollPane::setViewHeight(float value)
 {
     value = value + _owner->_margin.top + _owner->_margin.bottom;
-    if (_hzScrollBar != nullptr)
+    if (_hzScrollBar != nullptr && !_floating)
         value += _hzScrollBar->getHeight();
     _owner->setHeight(value);
 }
@@ -482,15 +502,13 @@ void ScrollPane::lockHeader(int size)
     Vec2 cpos = _container->getPosition2();
 
     _headerLockedSize = size;
-    if (!_owner->isDispatchingEvent(UIEventType::PullDownRelease)
-        && sp_getField(cpos, _refreshBarAxis) >= 0)
+    if (!_owner->isDispatchingEvent(UIEventType::PullDownRelease) && sp_getField(cpos, _refreshBarAxis) >= 0)
     {
         _tweenStart = cpos;
         _tweenChange.setZero();
         sp_setField(_tweenChange, _refreshBarAxis, _headerLockedSize - sp_getField(_tweenStart, _refreshBarAxis));
         _tweenDuration.set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
-        _tweenTime.setZero();
-        _tweening = 2;
+        startTween(2);
 
         CALL_PER_FRAME(ScrollPane, tweenUpdate);
     }
@@ -504,8 +522,7 @@ void ScrollPane::lockFooter(int size)
     Vec2 cpos = _container->getPosition2();
 
     _footerLockedSize = size;
-    if (!_owner->isDispatchingEvent(UIEventType::PullUpRelease)
-        && sp_getField(cpos, _refreshBarAxis) >= 0)
+    if (!_owner->isDispatchingEvent(UIEventType::PullUpRelease) && sp_getField(cpos, _refreshBarAxis) >= 0)
     {
         _tweenStart = cpos;
         _tweenChange.setZero();
@@ -516,8 +533,7 @@ void ScrollPane::lockFooter(int size)
             max += _footerLockedSize;
         sp_setField(_tweenChange, _refreshBarAxis, -max - sp_getField(_tweenStart, _refreshBarAxis));
         _tweenDuration.set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
-        _tweenTime.setZero();
-        _tweening = 2;
+        startTween(2);
 
         CALL_PER_FRAME(ScrollPane, tweenUpdate);
     }
@@ -529,10 +545,10 @@ void ScrollPane::cancelDragging()
         _draggingPane = nullptr;
 
     _gestureFlag = 0;
-    _isMouseMoved = false;
+    _dragged = false;
 }
 
-void ScrollPane::handleControllerChanged(GController * c)
+void ScrollPane::handleControllerChanged(GController* c)
 {
     if (_pageController == c)
     {
@@ -565,7 +581,7 @@ void ScrollPane::updatePageController()
 void ScrollPane::adjustMaskContainer()
 {
     float mx, my;
-    if (_displayOnLeft && _vtScrollBar != nullptr)
+    if (_displayOnLeft && _vtScrollBar != nullptr && !_floating)
         mx = floor(_owner->_margin.left + _vtScrollBar->getWidth());
     else
         mx = floor(_owner->_margin.left);
@@ -614,9 +630,9 @@ void ScrollPane::setSize(float wv, float hv)
 
     _viewSize.width = wv;
     _viewSize.height = hv;
-    if (_hzScrollBar != nullptr && !_hScrollNone)
+    if (_hzScrollBar != nullptr && !_floating)
         _viewSize.height -= _hzScrollBar->getHeight();
-    if (_vtScrollBar != nullptr && !_vScrollNone)
+    if (_vtScrollBar != nullptr && !_floating)
         _viewSize.width -= _vtScrollBar->getWidth();
     _viewSize.width -= (_owner->_margin.left + _owner->_margin.right);
     _viewSize.height -= (_owner->_margin.top + _owner->_margin.bottom);
@@ -677,7 +693,7 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
             _yPos = -_container->getPositionY2();
         }
     }
-    else if (_isMouseMoved)
+    else if (_dragged)
     {
         if (deltaPosX != 0)
         {
@@ -715,75 +731,34 @@ void ScrollPane::handleSizeChanged()
 {
     if (_displayInDemand)
     {
-        if (_vtScrollBar != nullptr)
-        {
-            if (_contentSize.height <= _viewSize.height)
-            {
-                if (!_vScrollNone)
-                {
-                    _vScrollNone = true;
-                    _viewSize.width += _vtScrollBar->getWidth();
-                }
-            }
-            else
-            {
-                if (_vScrollNone)
-                {
-                    _vScrollNone = false;
-                    _viewSize.width -= _vtScrollBar->getWidth();
-                }
-            }
-        }
-        if (_hzScrollBar != nullptr)
-        {
-            if (_contentSize.width <= _viewSize.width)
-            {
-                if (!_hScrollNone)
-                {
-                    _hScrollNone = true;
-                    _viewSize.height += _hzScrollBar->getHeight();
-                }
-            }
-            else
-            {
-                if (_hScrollNone)
-                {
-                    _hScrollNone = false;
-                    _viewSize.height -= _hzScrollBar->getHeight();
-                }
-            }
-        }
+        _vScrollNone = _contentSize.height <= _viewSize.height;
+        _hScrollNone = _contentSize.width <= _viewSize.width;
     }
 
     if (_vtScrollBar != nullptr)
     {
-        if (_viewSize.height < _vtScrollBar->getMinSize())
-            _vtScrollBar->setVisible(false);
+        if (_contentSize.height == 0)
+            _vtScrollBar->setDisplayPerc(0);
         else
-        {
-            _vtScrollBar->setVisible(_scrollBarVisible && !_vScrollNone);
-            if (_contentSize.height == 0)
-                _vtScrollBar->setDisplayPerc(0);
-            else
-                _vtScrollBar->setDisplayPerc(MIN(1, _viewSize.height / _contentSize.height));
-        }
+            _vtScrollBar->setDisplayPerc(MIN(1, _viewSize.height / _contentSize.height));
     }
     if (_hzScrollBar != nullptr)
     {
-        if (_viewSize.width < _hzScrollBar->getMinSize())
-            _hzScrollBar->setVisible(false);
+        if (_contentSize.width == 0)
+            _hzScrollBar->setDisplayPerc(0);
         else
-        {
-            _hzScrollBar->setVisible(_scrollBarVisible && !_hScrollNone);
-            if (_contentSize.width == 0)
-                _hzScrollBar->setDisplayPerc(0);
-            else
-                _hzScrollBar->setDisplayPerc(MIN(1, _viewSize.width / _contentSize.width));
-        }
+            _hzScrollBar->setDisplayPerc(MIN(1, _viewSize.width / _contentSize.width));
     }
 
+    updateScrollBarVisible();
+
     _maskContainer->setContentSize(_viewSize);
-    _maskContainer->setClippingRegion(Rect(Vec2(-_owner->_alignOffset.x, _owner->_alignOffset.y), _viewSize));
+    Rect maskRect(Vec2(-_owner->_alignOffset.x, _owner->_alignOffset.y), _viewSize);
+    if (_vScrollNone && _vtScrollBar != nullptr)
+        maskRect.size.width += _vtScrollBar->getWidth();
+    if (_hScrollNone && _hzScrollBar != nullptr)
+        maskRect.size.height += _hzScrollBar->getHeight();
+    _maskContainer->setClippingRegion(maskRect);
 
     if (_vtScrollBar)
         _vtScrollBar->handlePositionChanged();
@@ -803,7 +778,6 @@ void ScrollPane::handleSizeChanged()
     else
         _overlapSize.height = 0;
 
-
     _xPos = clampf(_xPos, 0, _overlapSize.width);
     _yPos = clampf(_yPos, 0, _overlapSize.height);
     float max = sp_getField(_overlapSize, _refreshBarAxis);
@@ -813,10 +787,10 @@ void ScrollPane::handleSizeChanged()
         max += _footerLockedSize;
     if (_refreshBarAxis == 0)
         _container->setPosition2(clampf(_container->getPositionX(), -max, _headerLockedSize),
-            clampf(_container->getPositionY2(), -_overlapSize.height, 0));
+                                 clampf(_container->getPositionY2(), -_overlapSize.height, 0));
     else
         _container->setPosition2(clampf(_container->getPositionX(), -_overlapSize.width, 0),
-            clampf(_container->getPositionY2(), -max, _headerLockedSize));
+                                 clampf(_container->getPositionY2(), -max, _headerLockedSize));
 
     if (_header != nullptr)
     {
@@ -834,15 +808,14 @@ void ScrollPane::handleSizeChanged()
             _footer->setWidth(_viewSize.width);
     }
 
-    syncScrollBar(true);
-    checkRefreshBar();
+    updateScrollBarPos();
     if (_pageMode)
         updatePageController();
 }
 
-GObject* ScrollPane::hitTest(const cocos2d::Vec2 & pt, const cocos2d::Camera * camera)
+GObject* ScrollPane::hitTest(const cocos2d::Vec2& pt, const cocos2d::Camera* camera)
 {
-    GObject *target = nullptr;
+    GObject* target = nullptr;
     if (_vtScrollBar)
     {
         target = _vtScrollBar->hitTest(pt, camera);
@@ -914,13 +887,13 @@ void ScrollPane::refresh()
         refresh2();
     }
 
-    syncScrollBar();
+    updateScrollBarPos();
     _aniFlag = 0;
 }
 
 void ScrollPane::refresh2()
 {
-    if (_aniFlag == 1 && !_isMouseMoved)
+    if (_aniFlag == 1 && !_dragged)
     {
         Vec2 pos;
 
@@ -943,12 +916,10 @@ void ScrollPane::refresh2()
 
         if (pos.x != _container->getPositionX() || pos.y != _container->getPositionY2())
         {
-            _tweening = 1;
-            _tweenTime.setZero();
             _tweenDuration.set(TWEEN_TIME_GO, TWEEN_TIME_GO);
             _tweenStart = _container->getPosition2();
             _tweenChange = pos - _tweenStart;
-            CALL_PER_FRAME(ScrollPane, tweenUpdate);
+            startTween(1);
         }
         else if (_tweening != 0)
             killTween();
@@ -967,41 +938,61 @@ void ScrollPane::refresh2()
         updatePageController();
 }
 
-void ScrollPane::syncScrollBar(bool end)
+void ScrollPane::updateScrollBarPos()
+{
+    if (_vtScrollBar != nullptr)
+        _vtScrollBar->setScrollPerc(_overlapSize.height == 0 ? 0 : clampf(-_container->getPositionY2(), 0, _overlapSize.height) / _overlapSize.height);
+
+    if (_hzScrollBar != nullptr)
+        _hzScrollBar->setScrollPerc(_overlapSize.width == 0 ? 0 : clampf(-_container->getPositionX(), 0, _overlapSize.width) / _overlapSize.width);
+
+    checkRefreshBar();
+}
+
+void ScrollPane::updateScrollBarVisible()
 {
     if (_vtScrollBar != nullptr)
     {
-        _vtScrollBar->setScrollPerc(_overlapSize.height == 0 ? 0 : clampf(-_container->getPositionY2(), 0, _overlapSize.height) / _overlapSize.height);
-        if (_scrollBarDisplayAuto)
-            showScrollBar(!end);
+        if (_viewSize.height <= _vtScrollBar->getMinSize() || _vScrollNone)
+            _vtScrollBar->setVisible(false);
+        else
+            updateScrollBarVisible2(_vtScrollBar);
     }
+
     if (_hzScrollBar != nullptr)
     {
-        _hzScrollBar->setScrollPerc(_overlapSize.width == 0 ? 0 : clampf(-_container->getPositionX(), 0, _overlapSize.width) / _overlapSize.width);
-        if (_scrollBarDisplayAuto)
-            showScrollBar(!end);
+        if (_viewSize.width <= _hzScrollBar->getMinSize() || _hScrollNone)
+            _hzScrollBar->setVisible(false);
+        else
+            updateScrollBarVisible2(_hzScrollBar);
     }
 }
 
-void ScrollPane::showScrollBar(bool show)
+void ScrollPane::updateScrollBarVisible2(GScrollBar* bar)
 {
-    _scrollBarVisible = (bool)show && _viewSize.width > 0 && _viewSize.height > 0;
+    if (_scrollBarDisplayAuto)
+        GTween::kill(bar, TweenPropType::Alpha, false);
 
-    if (show)
+    if (_scrollBarDisplayAuto && !_hover && _tweening == 0 && !_dragged && !bar->_gripDragging)
     {
-        onShowScrollBar();
-        CALL_LATER_CANCEL(ScrollPane, onShowScrollBar);
+        if (bar->isVisible())
+            GTween::to(1, 0, 0.5f)
+                ->setDelay(0.5f)
+                ->onComplete1(CC_CALLBACK_1(ScrollPane::onBarTweenComplete, this))
+                ->setTarget(bar, TweenPropType::Alpha);
     }
     else
-        CALL_LATER(ScrollPane, onShowScrollBar, 0.5f);
+    {
+        bar->setAlpha(1);
+        bar->setVisible(true);
+    }
 }
 
-void ScrollPane::onShowScrollBar()
+void ScrollPane::onBarTweenComplete(GTweener* tweener)
 {
-    if (_vtScrollBar != nullptr)
-        _vtScrollBar->setVisible(_scrollBarVisible && !_vScrollNone);
-    if (_hzScrollBar != nullptr)
-        _hzScrollBar->setVisible(_scrollBarVisible && !_hScrollNone);
+    GObject* bar = (GObject*)tweener->getTarget();
+    bar->setAlpha(1);
+    bar->setVisible(false);
 }
 
 float ScrollPane::getLoopPartSize(float division, int axis)
@@ -1045,7 +1036,7 @@ bool ScrollPane::loopCheckingCurrent()
     return changed;
 }
 
-void ScrollPane::loopCheckingTarget(cocos2d::Vec2 & endPos)
+void ScrollPane::loopCheckingTarget(cocos2d::Vec2& endPos)
 {
     if (_loop == 1)
         loopCheckingTarget(endPos, 0);
@@ -1054,7 +1045,7 @@ void ScrollPane::loopCheckingTarget(cocos2d::Vec2 & endPos)
         loopCheckingTarget(endPos, 1);
 }
 
-void ScrollPane::loopCheckingTarget(cocos2d::Vec2 & endPos, int axis)
+void ScrollPane::loopCheckingTarget(cocos2d::Vec2& endPos, int axis)
 {
     if (sp_getField(endPos, axis) > 0)
     {
@@ -1078,7 +1069,7 @@ void ScrollPane::loopCheckingTarget(cocos2d::Vec2 & endPos, int axis)
     }
 }
 
-void ScrollPane::loopCheckingNewPos(float & value, int axis)
+void ScrollPane::loopCheckingNewPos(float& value, int axis)
 {
     float overlapSize = sp_getField(_overlapSize, axis);
     if (overlapSize == 0)
@@ -1118,7 +1109,7 @@ void ScrollPane::loopCheckingNewPos(float & value, int axis)
     }
 }
 
-void ScrollPane::alignPosition(Vec2 & pos, bool inertialScrolling)
+void ScrollPane::alignPosition(Vec2& pos, bool inertialScrolling)
 {
     if (_pageMode)
     {
@@ -1193,7 +1184,7 @@ float ScrollPane::alignByPage(float pos, int axis, bool inertialScrolling)
     return pos;
 }
 
-cocos2d::Vec2 ScrollPane::updateTargetAndDuration(const cocos2d::Vec2 & orignPos)
+cocos2d::Vec2 ScrollPane::updateTargetAndDuration(const cocos2d::Vec2& orignPos)
 {
     Vec2 ret(0, 0);
     ret.x = updateTargetAndDuration(orignPos.x, 0);
@@ -1268,6 +1259,14 @@ void ScrollPane::fixDuration(int axis, float oldChange)
     sp_setField(_tweenDuration, axis, newDuration);
 }
 
+void ScrollPane::startTween(int type)
+{
+    _tweenTime.setZero();
+    _tweening = type;
+    CALL_PER_FRAME(ScrollPane, tweenUpdate);
+    updateScrollBarVisible();
+}
+
 void ScrollPane::killTween()
 {
     if (_tweening == 1)
@@ -1316,9 +1315,7 @@ void ScrollPane::checkRefreshBar()
             if (max > 0)
                 sp_setField(vec, _refreshBarAxis, pos + sp_getField(_contentSize, _refreshBarAxis));
             else
-                sp_setField(vec, _refreshBarAxis, MAX(MIN(pos + sp_getField(_viewSize, _refreshBarAxis),
-                    sp_getField(_viewSize, _refreshBarAxis) - _footerLockedSize),
-                    sp_getField(_viewSize, _refreshBarAxis) - sp_getField(_contentSize, _refreshBarAxis)));
+                sp_setField(vec, _refreshBarAxis, MAX(MIN(pos + sp_getField(_viewSize, _refreshBarAxis), sp_getField(_viewSize, _refreshBarAxis) - _footerLockedSize), sp_getField(_viewSize, _refreshBarAxis) - sp_getField(_contentSize, _refreshBarAxis)));
             _footer->setPosition(vec.x, vec.y);
 
             vec = _footer->getSize();
@@ -1358,15 +1355,15 @@ void ScrollPane::tweenUpdate(float dt)
 
         loopCheckingCurrent();
 
-        syncScrollBar(true);
-        checkRefreshBar();
+        updateScrollBarPos();
+        updateScrollBarVisible();
+
         _owner->dispatchEvent(UIEventType::Scroll);
         _owner->dispatchEvent(UIEventType::ScrollEnd);
     }
     else
     {
-        syncScrollBar(false);
-        checkRefreshBar();
+        updateScrollBarPos();
         _owner->dispatchEvent(UIEventType::Scroll);
     }
 }
@@ -1404,16 +1401,14 @@ float ScrollPane::runTween(int axis, float dt)
 
         if (_tweening == 2 && _bouncebackEffect)
         {
-            if ((newValue > 20 + threshold1 && sp_getField(_tweenChange, axis) > 0)
-                || (newValue > threshold1 && sp_getField(_tweenChange, axis) == 0))
+            if ((newValue > 20 + threshold1 && sp_getField(_tweenChange, axis) > 0) || (newValue > threshold1 && sp_getField(_tweenChange, axis) == 0))
             {
                 sp_setField(_tweenTime, axis, 0);
                 sp_setField(_tweenDuration, axis, TWEEN_TIME_DEFAULT);
                 sp_setField(_tweenChange, axis, -newValue + threshold1);
                 sp_setField(_tweenStart, axis, newValue);
             }
-            else if ((newValue < threshold2 - 20 && sp_getField(_tweenChange, axis) < 0)
-                || (newValue < threshold2 && sp_getField(_tweenChange, axis) == 0))
+            else if ((newValue < threshold2 - 20 && sp_getField(_tweenChange, axis) < 0) || (newValue < threshold2 && sp_getField(_tweenChange, axis) == 0))
             {
                 sp_setField(_tweenTime, axis, 0);
                 sp_setField(_tweenDuration, axis, TWEEN_TIME_DEFAULT);
@@ -1441,7 +1436,7 @@ float ScrollPane::runTween(int axis, float dt)
     return newValue;
 }
 
-void ScrollPane::onTouchBegin(EventContext * context)
+void ScrollPane::onTouchBegin(EventContext* context)
 {
     if (!_touchEffect)
         return;
@@ -1455,10 +1450,10 @@ void ScrollPane::onTouchBegin(EventContext * context)
         killTween();
         evt->getProcessor()->cancelClick(evt->getTouchId());
 
-        _isMouseMoved = true;
+        _dragged = true;
     }
     else
-        _isMouseMoved = false;
+        _dragged = false;
 
     _containerPos = _container->getPosition2();
     _beginTouchPos = _lastTouchPos = pt;
@@ -1469,7 +1464,7 @@ void ScrollPane::onTouchBegin(EventContext * context)
     _lastMoveTime = clock();
 }
 
-void ScrollPane::onTouchMove(EventContext * context)
+void ScrollPane::onTouchMove(EventContext* context)
 {
     if (!_touchEffect)
         return;
@@ -1636,29 +1631,29 @@ void ScrollPane::onTouchMove(EventContext * context)
 
     _draggingPane = this;
     _isHoldAreaDone = true;
-    _isMouseMoved = true;
+    _dragged = true;
 
-    syncScrollBar();
-    checkRefreshBar();
+    updateScrollBarPos();
+    updateScrollBarVisible();
     if (_pageMode)
         updatePageController();
     _owner->dispatchEvent(UIEventType::Scroll);
 }
 
-void ScrollPane::onTouchEnd(EventContext * context)
+void ScrollPane::onTouchEnd(EventContext* context)
 {
     if (_draggingPane == this)
         _draggingPane = nullptr;
 
     _gestureFlag = 0;
 
-    if (!_isMouseMoved || !_touchEffect)
+    if (!_dragged || !_touchEffect)
     {
-        _isMouseMoved = false;
+        _dragged = false;
         return;
     }
 
-    _isMouseMoved = false;
+    _dragged = false;
     _tweenStart = _container->getPosition2();
 
     Vec2 endPos = _tweenStart;
@@ -1731,7 +1726,10 @@ void ScrollPane::onTouchEnd(EventContext * context)
 
         _tweenChange = endPos - _tweenStart;
         if (_tweenChange.x == 0 && _tweenChange.y == 0)
+        {
+            updateScrollBarVisible();
             return;
+        }
 
         if (_pageMode || _snapToItem)
         {
@@ -1740,12 +1738,10 @@ void ScrollPane::onTouchEnd(EventContext * context)
         }
     }
 
-    _tweening = 2;
-    _tweenTime.setZero();
-    CALL_PER_FRAME(ScrollPane, tweenUpdate);
+    startTween(2);
 }
 
-void ScrollPane::onMouseWheel(EventContext * context)
+void ScrollPane::onMouseWheel(EventContext* context)
 {
     if (!_mouseWheelEnabled)
         return;
@@ -1769,14 +1765,16 @@ void ScrollPane::onMouseWheel(EventContext * context)
     }
 }
 
-void ScrollPane::onRollOver(EventContext * context)
+void ScrollPane::onRollOver(EventContext* context)
 {
-    showScrollBar(true);
+    _hover = true;
+    updateScrollBarVisible();
 }
 
-void ScrollPane::onRollOut(EventContext * context)
+void ScrollPane::onRollOut(EventContext* context)
 {
-    showScrollBar(false);
+    _hover = false;
+    updateScrollBarVisible();
 }
 
 NS_FGUI_END

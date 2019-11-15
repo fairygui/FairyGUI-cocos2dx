@@ -5,9 +5,8 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearText::GearText(GObject * owner) :GearBase(owner)
+GearText::GearText(GObject* owner) : GearBase(owner)
 {
-
 }
 
 GearText::~GearText()
@@ -20,12 +19,12 @@ void GearText::init()
     _storage.clear();
 }
 
-void GearText::addStatus(const std::string&  pageId, ByteBuffer* buffer)
+void GearText::addStatus(const std::string& pageId, ByteBuffer* buffer)
 {
     if (pageId.length() == 0)
-        _default = buffer->ReadS();
+        _default = buffer->readS();
     else
-        _storage[pageId] = buffer->ReadS();
+        _storage[pageId] = buffer->readS();
 }
 
 void GearText::apply()

@@ -30,6 +30,7 @@ private:
     GComponent* _g3;
     GComponent* _g4;
     GComponent* _g5;
+    GComponent* _g6;
 
     int _startValue;
     int _endValue;

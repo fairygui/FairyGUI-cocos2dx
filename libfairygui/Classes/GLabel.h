@@ -34,6 +34,9 @@ public:
 
     GTextField* getTextField() const;
 
+    virtual cocos2d::Value getProp(ObjectPropID propId) override;
+    virtual void setProp(ObjectPropID propId, const cocos2d::Value& value) override;
+
 protected:
     virtual void constructExtension(ByteBuffer* buffer) override;
     virtual void setup_afterAdd(ByteBuffer* buffer, int beginPos) override;

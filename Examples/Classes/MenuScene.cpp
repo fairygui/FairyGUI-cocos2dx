@@ -1,18 +1,19 @@
 #include "MenuScene.h"
-#include "BasicsScene.h"
-#include "TransitionDemoScene.h"
-#include "VirtualListScene.h"
-#include "LoopListScene.h"
-#include "HitTestScene.h"
-#include "PullToRefreshScene.h"
-#include "ModalWaitingScene.h"
-#include "JoystickScene.h"
 #include "BagScene.h"
+#include "BasicsScene.h"
 #include "ChatScene.h"
-#include "ListEffectScene.h"
-#include "ScrollPaneScene.h"
-#include "TreeViewScene.h"
 #include "GuideScene.h"
+#include "HitTestScene.h"
+#include "JoystickScene.h"
+#include "ListEffectScene.h"
+#include "LoopListScene.h"
+#include "ModalWaitingScene.h"
+#include "PullToRefreshScene.h"
+#include "ScrollPaneScene.h"
+#include "TransitionDemoScene.h"
+#include "TreeViewScene.h"
+#include "VirtualListScene.h"
+#include "CooldownScene.h"
 
 USING_NS_CC;
 
@@ -22,74 +23,50 @@ void MenuScene::continueInit()
     _view = UIPackage::createObject("MainMenu", "Main")->as<GComponent>();
     _groot->addChild(_view);
 
-    _view->getChild("n1")->addClickListener([this](EventContext*)
-    {
+    _view->getChild("n1")->addClickListener([this](EventContext*) {
         TransitionFade* scene = TransitionFade::create(0.5f, BasicsScene::create());
         Director::getInstance()->replaceScene(scene);
     });
-    _view->getChild("n2")->addClickListener([this](EventContext*)
-    {
-        TransitionProgressRadialCCW* scene  = TransitionProgressRadialCCW::create(1, TransitionDemoScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n2")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(TransitionDemoScene::create());
     });
-    _view->getChild("n4")->addClickListener([this](EventContext*)
-    {
-        TransitionRotoZoom* scene = TransitionRotoZoom::create(1, VirtualListScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n4")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(VirtualListScene::create());
     });
-    _view->getChild("n5")->addClickListener([this](EventContext*)
-    {
-        TransitionPageTurn* scene = TransitionPageTurn::create(1, LoopListScene::create(), false);
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n5")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(LoopListScene::create());
     });
-    _view->getChild("n6")->addClickListener([this](EventContext*)
-    {
-        TransitionSlideInL* scene = TransitionSlideInL::create(1, HitTestScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n6")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(HitTestScene::create());
     });
-    _view->getChild("n7")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitRows* scene = TransitionSplitRows::create(1, PullToRefreshScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n7")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(PullToRefreshScene::create());
     });
-    _view->getChild("n8")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, ModalWaitingScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n8")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(ModalWaitingScene::create());
     });
-    _view->getChild("n9")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, JoystickScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n9")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(JoystickScene::create());
     });
-    _view->getChild("n10")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, BagScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n10")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(BagScene::create());
     });
-    _view->getChild("n11")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, ChatScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n11")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(ChatScene::create());
     });
-    _view->getChild("n12")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, ListEffectScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n12")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(ListEffectScene::create());
     });
-    _view->getChild("n13")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, ScrollPaneScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n13")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(ScrollPaneScene::create());
     });
-    _view->getChild("n14")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, TreeViewScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n14")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(TreeViewScene::create());
     });
-    _view->getChild("n15")->addClickListener([this](EventContext*)
-    {
-        TransitionSplitCols* scene = TransitionSplitCols::create(1, GuideScene::create());
-        Director::getInstance()->replaceScene(scene);
+    _view->getChild("n15")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(GuideScene::create());
+    });
+    _view->getChild("n16")->addClickListener([this](EventContext*) {
+        Director::getInstance()->replaceScene(CooldownScene::create());
     });
 }

@@ -1,22 +1,22 @@
 #include "GComboBox.h"
-#include "UIConfig.h"
 #include "GRoot.h"
 #include "PackageItem.h"
-#include "utils/ToolSet.h"
+#include "UIConfig.h"
 #include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GComboBox::GComboBox() :
-    _dropdown(nullptr),
-    _titleObject(nullptr),
-    _iconObject(nullptr),
-    _list(nullptr),
-    _selectionController(nullptr),
-    _itemsUpdated(true),
-    _selectedIndex(-1),
-    popupDirection(PopupDirection::AUTO)
+GComboBox::GComboBox()
+    : _dropdown(nullptr),
+      _titleObject(nullptr),
+      _iconObject(nullptr),
+      _list(nullptr),
+      _selectionController(nullptr),
+      _itemsUpdated(true),
+      _selectedIndex(-1),
+      popupDirection(PopupDirection::AUTO)
 {
     visibleItemCount = UIConfig::defaultComboBoxVisibleItemCount;
 }
@@ -34,7 +34,7 @@ const std::string& GComboBox::getTitle() const
         return STD_STRING_EMPTY;
 }
 
-void GComboBox::setTitle(const std::string & value)
+void GComboBox::setTitle(const std::string& value)
 {
     if (_titleObject != nullptr)
         _titleObject->setText(value);
@@ -50,7 +50,7 @@ const cocos2d::Color3B GComboBox::getTitleColor() const
         return Color3B::BLACK;
 }
 
-void GComboBox::setTitleColor(const cocos2d::Color3B & value)
+void GComboBox::setTitleColor(const cocos2d::Color3B& value)
 {
     GTextField* tf = getTextField();
     if (tf)
@@ -81,14 +81,14 @@ const std::string& GComboBox::getIcon() const
         return STD_STRING_EMPTY;
 }
 
-void GComboBox::setIcon(const std::string & value)
+void GComboBox::setIcon(const std::string& value)
 {
     if (_iconObject != nullptr)
         _iconObject->setIcon(value);
     updateGear(7);
 }
 
-const std::string & GComboBox::getValue() const
+const std::string& GComboBox::getValue() const
 {
     if (_selectedIndex >= 0 && _selectedIndex < (int)_values.size())
         return _values[_selectedIndex];
@@ -96,7 +96,7 @@ const std::string & GComboBox::getValue() const
         return STD_STRING_EMPTY;
 }
 
-void GComboBox::setValue(const std::string & value)
+void GComboBox::setValue(const std::string& value)
 {
     setSelectedIndex(ToolSet::findInStringArray(_values, value));
 }
@@ -168,8 +168,7 @@ void GComboBox::setCurrentState()
 
 void GComboBox::updateSelectionController()
 {
-    if (_selectionController != nullptr && !_selectionController->changing
-        && _selectedIndex < _selectionController->getPageCount())
+    if (_selectionController != nullptr && !_selectionController->changing && _selectedIndex < _selectionController->getPageCount())
     {
         GController* c = _selectionController;
         _selectionController = nullptr;
@@ -194,6 +193,7 @@ void GComboBox::showDropdown()
     if (_list->getSelectionMode() == ListSelectionMode::SINGLE)
         _list->setSelectedIndex(-1);
     _dropdown->setWidth(_size.width);
+    _list->ensureBoundsCorrect();
 
     UIRoot->togglePopup(_dropdown, this, popupDirection);
     if (_dropdown->getParent() != nullptr)
@@ -234,7 +234,7 @@ void GComboBox::handleGrayedChanged()
         GComponent::handleGrayedChanged();
 }
 
-GTextField * GComboBox::getTextField() const
+GTextField* GComboBox::getTextField() const
 {
     if (dynamic_cast<GTextField*>(_titleObject))
         return dynamic_cast<GTextField*>(_titleObject);
@@ -246,15 +246,59 @@ GTextField * GComboBox::getTextField() const
         return nullptr;
 }
 
+cocos2d::Value GComboBox::getProp(ObjectPropID propId)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        return Value(ToolSet::colorToInt(getTitleColor()));
+    case ObjectPropID::OutlineColor:
+    {
+        GTextField* tf = getTextField();
+        if (tf != nullptr)
+            return Value(ToolSet::colorToInt(tf->getOutlineColor()));
+        else
+            return Value::Null;
+    }
+    case ObjectPropID::FontSize:
+        return Value(getTitleFontSize());
+    default:
+        return GComponent::getProp(propId);
+    }
+}
+
+void GComboBox::setProp(ObjectPropID propId, const cocos2d::Value& value)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        setTitleColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    case ObjectPropID::OutlineColor:
+    {
+        GTextField* tf = getTextField();
+        if (tf != nullptr)
+            tf->setOutlineColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    }
+    case ObjectPropID::FontSize:
+        setTitleFontSize(value.asInt());
+        break;
+    default:
+        GComponent::setProp(propId, value);
+        break;
+    }
+}
+
 void GComboBox::constructExtension(ByteBuffer* buffer)
 {
-    buffer->Seek(0, 6);
+    buffer->seek(0, 6);
 
     _buttonController = getController("button");
     _titleObject = getChild("title");
     _iconObject = getChild("icon");
 
-    const std::string& dropdown = buffer->ReadS();
+    const std::string& dropdown = buffer->readS();
     if (!dropdown.empty())
     {
         _dropdown = dynamic_cast<GComponent*>(UIPackage::createObjectFromURL(dropdown));
@@ -286,23 +330,23 @@ void GComboBox::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
     GComponent::setup_afterAdd(buffer, beginPos);
 
-    if (!buffer->Seek(beginPos, 6))
+    if (!buffer->seek(beginPos, 6))
         return;
 
-    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+    if ((ObjectType)buffer->readByte() != _packageItem->objectType)
         return;
 
     const std::string* str;
     bool hasIcon = false;
-    int itemCount = buffer->ReadShort();
+    int itemCount = buffer->readShort();
     for (int i = 0; i < itemCount; i++)
     {
-        int nextPos = buffer->ReadShort();
-        nextPos += buffer->position;
+        int nextPos = buffer->readShort();
+        nextPos += buffer->getPos();
 
-        _items.push_back(buffer->ReadS());
-        _values.push_back(buffer->ReadS());
-        if ((str = buffer->ReadSP()))
+        _items.push_back(buffer->readS());
+        _values.push_back(buffer->readS());
+        if ((str = buffer->readSP()))
         {
             if (!hasIcon)
             {
@@ -312,10 +356,10 @@ void GComboBox::setup_afterAdd(ByteBuffer* buffer, int beginPos)
             _icons.push_back(*str);
         }
 
-        buffer->position = nextPos;
+        buffer->setPos(nextPos);
     }
 
-    if ((str = buffer->ReadSP()))
+    if ((str = buffer->readSP()))
     {
         setTitle(*str);
         _selectedIndex = ToolSet::findInStringArray(_items, *str);
@@ -328,17 +372,17 @@ void GComboBox::setup_afterAdd(ByteBuffer* buffer, int beginPos)
     else
         _selectedIndex = -1;
 
-    if ((str = buffer->ReadSP()))
+    if ((str = buffer->readSP()))
         setIcon(*str);
 
-    if (buffer->ReadBool())
-        setTitleColor((Color3B)buffer->ReadColor());
-    int iv = buffer->ReadInt();
+    if (buffer->readBool())
+        setTitleColor((Color3B)buffer->readColor());
+    int iv = buffer->readInt();
     if (iv > 0)
         visibleItemCount = iv;
-    popupDirection = (PopupDirection)buffer->ReadByte();
+    popupDirection = (PopupDirection)buffer->readByte();
 
-    iv = buffer->ReadShort();
+    iv = buffer->readShort();
     if (iv >= 0)
         _selectionController = _parent->getControllerAt(iv);
 }

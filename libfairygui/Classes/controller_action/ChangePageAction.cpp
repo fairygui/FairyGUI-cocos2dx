@@ -6,16 +6,16 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-void ChangePageAction::setup(ByteBuffer * buffer)
+void ChangePageAction::setup(ByteBuffer* buffer)
 {
     ControllerAction::setup(buffer);
 
-    objectId = buffer->ReadS();
-    controllerName = buffer->ReadS();
-    targetPage = buffer->ReadS();
+    objectId = buffer->readS();
+    controllerName = buffer->readS();
+    targetPage = buffer->readS();
 }
 
-void ChangePageAction::enter(GController * controller)
+void ChangePageAction::enter(GController* controller)
 {
     if (controllerName.empty())
         return;
@@ -29,11 +29,21 @@ void ChangePageAction::enter(GController * controller)
     {
         GController* cc = gcom->getController(controllerName);
         if (cc != nullptr && cc != controller && !cc->changing)
-            cc->setSelectedPageId(targetPage);
+        {
+            if (targetPage.compare("~1") == 0)
+            {
+                if (controller->getSelectedIndex() < cc->getPageCount())
+                    cc->setSelectedIndex(controller->getSelectedIndex());
+            }
+            else if (targetPage.compare("~2") == 0)
+                cc->setSelectedPage(controller->getSelectedPage());
+            else
+                cc->setSelectedPageId(targetPage);
+        }
     }
 }
 
-void ChangePageAction::leave(GController * controller)
+void ChangePageAction::leave(GController* controller)
 {
 }
 

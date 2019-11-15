@@ -126,10 +126,6 @@
 		44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */; };
 		44905A6B1FC4367600C33C88 /* FUIInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A691FC4367600C33C88 /* FUIInput.cpp */; };
 		44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A691FC4367600C33C88 /* FUIInput.cpp */; };
-		44905A8E1FC574BC00C33C88 /* TreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8A1FC574BC00C33C88 /* TreeNode.cpp */; };
-		44905A8F1FC574BC00C33C88 /* TreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8A1FC574BC00C33C88 /* TreeNode.cpp */; };
-		44905A911FC574BC00C33C88 /* TreeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8C1FC574BC00C33C88 /* TreeView.cpp */; };
-		44905A921FC574BC00C33C88 /* TreeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8C1FC574BC00C33C88 /* TreeView.cpp */; };
 		44905A9A1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
 		44905A9B1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
 		44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A991FC809AA00C33C88 /* TextFormat.h */; };
@@ -158,6 +154,21 @@
 		7D0EA2EC2373F172008942A9 /* TranslationHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2EA2373F172008942A9 /* TranslationHelper.h */; };
 		7D0EA2ED2373F172008942A9 /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */; };
 		7D0EA2EE2373F172008942A9 /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */; };
+		7DCFF2C1237E3EF20031E954 /* GPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C0237E3EF20031E954 /* GPath.cpp */; };
+		7DCFF2C2237E3EF20031E954 /* GPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C0237E3EF20031E954 /* GPath.cpp */; };
+		7DCFF2C7237E3F410031E954 /* GearFontSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */; };
+		7DCFF2C8237E3F410031E954 /* GearFontSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */; };
+		7DCFF2C9237E3F410031E954 /* GearDisplay2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */; };
+		7DCFF2CA237E3F410031E954 /* GearDisplay2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */; };
+		7DCFF2CB237E3F410031E954 /* GearFontSize.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2C5237E3F410031E954 /* GearFontSize.h */; };
+		7DCFF2CC237E3F410031E954 /* GearDisplay2.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2C6237E3F410031E954 /* GearDisplay2.h */; };
+		7DCFF2CE237E3F490031E954 /* GPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2CD237E3F490031E954 /* GPath.h */; };
+		7DCFF2D3237E40370031E954 /* GTreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2CF237E40360031E954 /* GTreeNode.cpp */; };
+		7DCFF2D4237E40370031E954 /* GTreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2CF237E40360031E954 /* GTreeNode.cpp */; };
+		7DCFF2D5237E40370031E954 /* GTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2D0237E40370031E954 /* GTreeNode.h */; };
+		7DCFF2D6237E40370031E954 /* GTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2D1237E40370031E954 /* GTree.h */; };
+		7DCFF2D7237E40370031E954 /* GTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2D2237E40370031E954 /* GTree.cpp */; };
+		7DCFF2D8237E40370031E954 /* GTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2D2237E40370031E954 /* GTree.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -300,10 +311,6 @@
 		44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayTransitionAction.h; sourceTree = "<group>"; };
 		44905A691FC4367600C33C88 /* FUIInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FUIInput.cpp; sourceTree = "<group>"; };
 		44905A6A1FC4367600C33C88 /* FUIInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUIInput.h; sourceTree = "<group>"; };
-		44905A8A1FC574BC00C33C88 /* TreeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TreeNode.cpp; sourceTree = "<group>"; };
-		44905A8B1FC574BC00C33C88 /* TreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeNode.h; sourceTree = "<group>"; };
-		44905A8C1FC574BC00C33C88 /* TreeView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TreeView.cpp; sourceTree = "<group>"; };
-		44905A8D1FC574BC00C33C88 /* TreeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeView.h; sourceTree = "<group>"; };
 		44905A981FC809AA00C33C88 /* TextFormat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextFormat.cpp; sourceTree = "<group>"; };
 		44905A991FC809AA00C33C88 /* TextFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFormat.h; sourceTree = "<group>"; };
 		7D0EA2C22373EC5C008942A9 /* ByteBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ByteBuffer.cpp; sourceTree = "<group>"; };
@@ -323,6 +330,16 @@
 		7D0EA2D62373EFF3008942A9 /* GTween.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTween.cpp; sourceTree = "<group>"; };
 		7D0EA2EA2373F172008942A9 /* TranslationHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslationHelper.h; sourceTree = "<group>"; };
 		7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TranslationHelper.cpp; sourceTree = "<group>"; };
+		7DCFF2C0237E3EF20031E954 /* GPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPath.cpp; sourceTree = "<group>"; };
+		7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GearFontSize.cpp; sourceTree = "<group>"; };
+		7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GearDisplay2.cpp; sourceTree = "<group>"; };
+		7DCFF2C5237E3F410031E954 /* GearFontSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GearFontSize.h; sourceTree = "<group>"; };
+		7DCFF2C6237E3F410031E954 /* GearDisplay2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GearDisplay2.h; sourceTree = "<group>"; };
+		7DCFF2CD237E3F490031E954 /* GPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPath.h; sourceTree = "<group>"; };
+		7DCFF2CF237E40360031E954 /* GTreeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTreeNode.cpp; sourceTree = "<group>"; };
+		7DCFF2D0237E40370031E954 /* GTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTreeNode.h; sourceTree = "<group>"; };
+		7DCFF2D1237E40370031E954 /* GTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTree.h; sourceTree = "<group>"; };
+		7DCFF2D2237E40370031E954 /* GTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTree.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -365,8 +382,6 @@
 		445402381FB3E9E400869375 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				7D0EA2C92373EFF3008942A9 /* tween */,
-				44905A891FC574BC00C33C88 /* treeview */,
 				44905A4F1FC3CCCD00C33C88 /* controller_action */,
 				445402391FB3E9E400869375 /* Controller.cpp */,
 				4454023A1FB3E9E400869375 /* Controller.h */,
@@ -411,13 +426,15 @@
 				4454028A1FB3E9E400869375 /* GScrollBar.cpp */,
 				4454028B1FB3E9E400869375 /* GScrollBar.h */,
 				4454028C1FB3E9E400869375 /* GSlider.cpp */,
-				7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */,
-				7D0EA2EA2373F172008942A9 /* TranslationHelper.h */,
 				4454028D1FB3E9E400869375 /* GSlider.h */,
 				4454028E1FB3E9E400869375 /* GTextField.cpp */,
 				4454028F1FB3E9E400869375 /* GTextField.h */,
 				445402901FB3E9E400869375 /* GTextInput.cpp */,
 				445402911FB3E9E400869375 /* GTextInput.h */,
+				7DCFF2D2237E40370031E954 /* GTree.cpp */,
+				7DCFF2D1237E40370031E954 /* GTree.h */,
+				7DCFF2CF237E40360031E954 /* GTreeNode.cpp */,
+				7DCFF2D0237E40370031E954 /* GTreeNode.h */,
 				445402921FB3E9E400869375 /* Margin.cpp */,
 				445402931FB3E9E400869375 /* Margin.h */,
 				445402941FB3E9E400869375 /* PackageItem.cpp */,
@@ -432,6 +449,9 @@
 				4454029D1FB3E9E400869375 /* ScrollPane.h */,
 				4454029E1FB3E9E400869375 /* Transition.cpp */,
 				4454029F1FB3E9E400869375 /* Transition.h */,
+				7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */,
+				7D0EA2EA2373F172008942A9 /* TranslationHelper.h */,
+				7D0EA2C92373EFF3008942A9 /* tween */,
 				445402A01FB3E9E400869375 /* UIConfig.cpp */,
 				445402A11FB3E9E400869375 /* UIConfig.h */,
 				445402A21FB3E9E400869375 /* UIObjectFactory.cpp */,
@@ -488,6 +508,10 @@
 		4454025F1FB3E9E400869375 /* gears */ = {
 			isa = PBXGroup;
 			children = (
+				7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */,
+				7DCFF2C6237E3F410031E954 /* GearDisplay2.h */,
+				7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */,
+				7DCFF2C5237E3F410031E954 /* GearFontSize.h */,
 				445402601FB3E9E400869375 /* GearAnimation.cpp */,
 				445402611FB3E9E400869375 /* GearAnimation.h */,
 				445402621FB3E9E400869375 /* GearBase.cpp */,
@@ -557,20 +581,11 @@
 			path = controller_action;
 			sourceTree = "<group>";
 		};
-		44905A891FC574BC00C33C88 /* treeview */ = {
-			isa = PBXGroup;
-			children = (
-				44905A8A1FC574BC00C33C88 /* TreeNode.cpp */,
-				44905A8B1FC574BC00C33C88 /* TreeNode.h */,
-				44905A8C1FC574BC00C33C88 /* TreeView.cpp */,
-				44905A8D1FC574BC00C33C88 /* TreeView.h */,
-			);
-			path = treeview;
-			sourceTree = "<group>";
-		};
 		7D0EA2C92373EFF3008942A9 /* tween */ = {
 			isa = PBXGroup;
 			children = (
+				7DCFF2CD237E3F490031E954 /* GPath.h */,
+				7DCFF2C0237E3EF20031E954 /* GPath.cpp */,
 				7D0EA2CA2373EFF3008942A9 /* EaseManager.h */,
 				7D0EA2CB2373EFF3008942A9 /* TweenManager.cpp */,
 				7D0EA2CC2373EFF3008942A9 /* TweenManager.h */,
@@ -596,16 +611,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D0EA2DA2373EFF3008942A9 /* TweenManager.h in Headers */,
+				7DCFF2CB237E3F410031E954 /* GearFontSize.h in Headers */,
 				7D0EA2E02373EFF4008942A9 /* GTweener.h in Headers */,
 				7D0EA2C62373EC5C008942A9 /* ByteBuffer.h in Headers */,
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
 				7D0EA2EC2373F172008942A9 /* TranslationHelper.h in Headers */,
 				7D0EA2DF2373EFF3008942A9 /* GTween.h in Headers */,
+				7DCFF2D6237E40370031E954 /* GTree.h in Headers */,
 				7D0EA2E42373EFF4008942A9 /* TweenPropType.h in Headers */,
 				44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */,
+				7DCFF2CE237E3F490031E954 /* GPath.h in Headers */,
+				7DCFF2CC237E3F410031E954 /* GearDisplay2.h in Headers */,
 				7D0EA2D72373EFF3008942A9 /* EaseManager.h in Headers */,
 				445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */,
 				7D0EA2E72373EFF4008942A9 /* TweenValue.h in Headers */,
+				7DCFF2D5237E40370031E954 /* GTreeNode.h in Headers */,
 				7D0EA2E12373EFF4008942A9 /* EaseType.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -695,15 +715,16 @@
 				445402DE1FB3E9E400869375 /* ScrollPane.cpp in Sources */,
 				7D0EA2DD2373EFF3008942A9 /* GTweener.cpp in Sources */,
 				445402B71FB3E9E400869375 /* DragDropManager.cpp in Sources */,
+				7DCFF2C9237E3F410031E954 /* GearDisplay2.cpp in Sources */,
 				445402D11FB3E9E400869375 /* GObjectPool.cpp in Sources */,
 				7D0EA2E82373EFF4008942A9 /* GTween.cpp in Sources */,
 				445402C01FB3E9E400869375 /* GearAnimation.cpp in Sources */,
 				44905A6B1FC4367600C33C88 /* FUIInput.cpp in Sources */,
 				445402B31FB3E9E400869375 /* FUIContainer.cpp in Sources */,
 				445402D81FB3E9E400869375 /* GTextInput.cpp in Sources */,
-				44905A911FC574BC00C33C88 /* TreeView.cpp in Sources */,
 				445402E11FB3E9E400869375 /* UIObjectFactory.cpp in Sources */,
 				445402E61FB3E9E400869375 /* Window.cpp in Sources */,
+				7DCFF2D7237E40370031E954 /* GTree.cpp in Sources */,
 				44905A591FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */,
 				445402C11FB3E9E400869375 /* GearBase.cpp in Sources */,
 				445402DF1FB3E9E400869375 /* Transition.cpp in Sources */,
@@ -713,7 +734,6 @@
 				445402CC1FB3E9E400869375 /* GLabel.cpp in Sources */,
 				445402DD1FB3E9E400869375 /* Relations.cpp in Sources */,
 				445402B61FB3E9E400869375 /* FUISprite.cpp in Sources */,
-				44905A8E1FC574BC00C33C88 /* TreeNode.cpp in Sources */,
 				445402C51FB3E9E400869375 /* GearLook.cpp in Sources */,
 				445402C21FB3E9E400869375 /* GearColor.cpp in Sources */,
 				445402E41FB3E9E400869375 /* ToolSet.cpp in Sources */,
@@ -727,6 +747,7 @@
 				445402E01FB3E9E400869375 /* UIConfig.cpp in Sources */,
 				445402B81FB3E9E400869375 /* EventContext.cpp in Sources */,
 				445402DB1FB3E9E400869375 /* PopupMenu.cpp in Sources */,
+				7DCFF2C1237E3EF20031E954 /* GPath.cpp in Sources */,
 				445402BE1FB3E9E400869375 /* GComboBox.cpp in Sources */,
 				445402BF1FB3E9E400869375 /* GComponent.cpp in Sources */,
 				445402C91FB3E9E400869375 /* GGraph.cpp in Sources */,
@@ -734,6 +755,7 @@
 				445402D31FB3E9E400869375 /* GRichTextField.cpp in Sources */,
 				445402CB1FB3E9E400869375 /* GImage.cpp in Sources */,
 				7D0EA2ED2373F172008942A9 /* TranslationHelper.cpp in Sources */,
+				7DCFF2D3237E40370031E954 /* GTreeNode.cpp in Sources */,
 				445402C31FB3E9E400869375 /* GearDisplay.cpp in Sources */,
 				7D0EA2C42373EC5C008942A9 /* ByteBuffer.cpp in Sources */,
 				445402E51FB3E9E400869375 /* UBBParser.cpp in Sources */,
@@ -749,6 +771,7 @@
 				445402D51FB3E9E400869375 /* GScrollBar.cpp in Sources */,
 				44905A5C1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
 				445402D21FB3E9E400869375 /* GProgressBar.cpp in Sources */,
+				7DCFF2C7237E3F410031E954 /* GearFontSize.cpp in Sources */,
 				445402DC1FB3E9E400869375 /* RelationItem.cpp in Sources */,
 				445402CD1FB3E9E400869375 /* GList.cpp in Sources */,
 				445402B21FB3E9E400869375 /* BitmapFont.cpp in Sources */,
@@ -765,7 +788,6 @@
 			files = (
 				7D0EA2DE2373EFF3008942A9 /* GTweener.cpp in Sources */,
 				445403761FB4098900869375 /* Controller.cpp in Sources */,
-				44905A921FC574BC00C33C88 /* TreeView.cpp in Sources */,
 				445403781FB4098900869375 /* BitmapFont.cpp in Sources */,
 				445403791FB4098900869375 /* FUIContainer.cpp in Sources */,
 				4454037A1FB4098900869375 /* FUILabel.cpp in Sources */,
@@ -780,12 +802,12 @@
 				445403821FB4098900869375 /* UIEventDispatcher.cpp in Sources */,
 				445403831FB4098900869375 /* GButton.cpp in Sources */,
 				445403841FB4098900869375 /* GComboBox.cpp in Sources */,
+				7DCFF2D8237E40370031E954 /* GTree.cpp in Sources */,
 				445403851FB4098900869375 /* GComponent.cpp in Sources */,
 				445403861FB4098900869375 /* GearAnimation.cpp in Sources */,
 				7D0EA2EE2373F172008942A9 /* TranslationHelper.cpp in Sources */,
 				445403871FB4098900869375 /* GearBase.cpp in Sources */,
 				445403881FB4098900869375 /* GearColor.cpp in Sources */,
-				44905A8F1FC574BC00C33C88 /* TreeNode.cpp in Sources */,
 				7D0EA2E92373EFF4008942A9 /* GTween.cpp in Sources */,
 				445403891FB4098900869375 /* GearDisplay.cpp in Sources */,
 				4454038A1FB4098900869375 /* GearIcon.cpp in Sources */,
@@ -809,6 +831,7 @@
 				4454039A1FB4098900869375 /* GRoot.cpp in Sources */,
 				4454039B1FB4098900869375 /* GScrollBar.cpp in Sources */,
 				44905A5A1FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */,
+				7DCFF2C8237E3F410031E954 /* GearFontSize.cpp in Sources */,
 				44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
 				4454039C1FB4098900869375 /* GSlider.cpp in Sources */,
 				4454039D1FB4098900869375 /* GTextField.cpp in Sources */,
@@ -818,6 +841,7 @@
 				445403A01FB4098900869375 /* PackageItem.cpp in Sources */,
 				445403A11FB4098900869375 /* PopupMenu.cpp in Sources */,
 				445403A21FB4098900869375 /* RelationItem.cpp in Sources */,
+				7DCFF2C2237E3EF20031E954 /* GPath.cpp in Sources */,
 				445403A31FB4098900869375 /* Relations.cpp in Sources */,
 				445403A41FB4098900869375 /* ScrollPane.cpp in Sources */,
 				445403A51FB4098900869375 /* Transition.cpp in Sources */,
@@ -826,9 +850,11 @@
 				445403A71FB4098900869375 /* UIObjectFactory.cpp in Sources */,
 				445403A81FB4098900869375 /* UIPackage.cpp in Sources */,
 				7D0EA2E62373EFF4008942A9 /* TweenPropType.cpp in Sources */,
+				7DCFF2CA237E3F410031E954 /* GearDisplay2.cpp in Sources */,
 				44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */,
 				445403AA1FB4098900869375 /* ToolSet.cpp in Sources */,
 				445403AB1FB4098900869375 /* UBBParser.cpp in Sources */,
+				7DCFF2D4237E40370031E954 /* GTreeNode.cpp in Sources */,
 				445403AC1FB4098900869375 /* Window.cpp in Sources */,
 				44905A571FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
 				445402FF1FB3EFFA00869375 /* libfairygui_MAC.cpp in Sources */,
@@ -842,7 +868,7 @@
 		445402271FB3E8D500869375 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -907,7 +933,7 @@
 		445402281FB3E8D500869375 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";

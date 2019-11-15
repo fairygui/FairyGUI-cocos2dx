@@ -5,29 +5,30 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GSlider::GSlider() :
-    changeOnClick(false),
-    canDrag(false),
-    _max(100),
-    _value(0),
-    _titleType(ProgressTitleType::PERCENT),
-    _titleObject(nullptr),
-    _barObjectH(nullptr),
-    _barObjectV(nullptr),
-    _barMaxWidth(0),
-    _barMaxHeight(0),
-    _barMaxWidthDelta(0),
-    _barMaxHeightDelta(0),
-    _gripObject(nullptr),
-    _clickPercent(0),
-    _barStartX(0),
-    _barStartY(0)
+GSlider::GSlider()
+    : changeOnClick(false),
+      canDrag(false),
+      _min(0),
+      _max(100),
+      _value(0),
+      _titleType(ProgressTitleType::PERCENT),
+      _titleObject(nullptr),
+      _barObjectH(nullptr),
+      _barObjectV(nullptr),
+      _barMaxWidth(0),
+      _barMaxHeight(0),
+      _barMaxWidthDelta(0),
+      _barMaxHeightDelta(0),
+      _gripObject(nullptr),
+      _clickPercent(0),
+      _barStartX(0),
+      _barStartY(0),
+      _wholeNumbers(false)
 {
 }
 
 GSlider::~GSlider()
 {
-
 }
 
 void GSlider::setTitleType(ProgressTitleType value)
@@ -35,6 +36,15 @@ void GSlider::setTitleType(ProgressTitleType value)
     if (_titleType != value)
     {
         _titleType = value;
+        update();
+    }
+}
+
+void GSlider::setMin(double value)
+{
+    if (_min != value)
+    {
+        _min = value;
         update();
     }
 }
@@ -57,25 +67,56 @@ void GSlider::setValue(double value)
     }
 }
 
+void GSlider::setWholeNumbers(bool value)
+{
+    if (_value != value)
+    {
+        _wholeNumbers = value;
+        update();
+    }
+}
+
 void GSlider::update()
 {
     float percent = MIN(_value / _max, 1);
-    updateWidthPercent(percent);
+    updateWithPercent(percent, false);
 }
 
-void GSlider::updateWidthPercent(float percent)
+void GSlider::updateWithPercent(float percent, bool manual)
 {
+    percent = clampf(percent, 0, 1);
+    if (manual)
+    {
+        double newValue = _min + (_max - _min) * percent;
+        if (newValue < _min)
+            newValue = _min;
+        if (newValue > _max)
+            newValue = _max;
+        if (_wholeNumbers)
+        {
+            newValue = round(newValue);
+            percent = clampf((newValue - _min) / (_max - _min), 0, 1);
+        }
+
+        if (newValue != _value)
+        {
+            _value = newValue;
+            if (dispatchEvent(UIEventType::Changed))
+                return;
+        }
+    }
+
     if (_titleObject != nullptr)
     {
         std::ostringstream oss;
         switch (_titleType)
         {
         case ProgressTitleType::PERCENT:
-            oss << round(percent * 100) << "%";
+            oss << floor(percent * 100) << "%";
             break;
 
         case ProgressTitleType::VALUE_MAX:
-            oss << round(_value) << "/" << round(_max);
+            oss << floor(_value) << "/" << floor(_max);
             break;
 
         case ProgressTitleType::VALUE:
@@ -94,53 +135,24 @@ void GSlider::updateWidthPercent(float percent)
     if (!_reverse)
     {
         if (_barObjectH != nullptr)
-        {
-            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectH).fillAmount = percent;
-            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectH).fillAmount = percent;
-            else*/
             _barObjectH->setWidth(round(fullWidth * percent));
-        }
         if (_barObjectV != nullptr)
-        {
-            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectV).fillAmount = percent;
-            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectV).fillAmount = percent;
-            else*/
             _barObjectV->setHeight(round(fullHeight * percent));
-        }
     }
     else
     {
         if (_barObjectH != nullptr)
         {
-            /*if (dynamic_cast<GImage*>(_barObjectH) && ((GImage *)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectH).fillAmount = 1 - percent;
-            else if (dynamic_cast<GLoader*>(_barObjectH) && ((GLoader*)_barObjectH)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectH).fillAmount = 1 - percent;
-            else*/
-            {
-                _barObjectH->setWidth(round(fullWidth * percent));
-                _barObjectH->setX(_barStartX + (fullWidth - _barObjectH->getWidth()));
-            }
+            _barObjectH->setWidth(round(fullWidth * percent));
+            _barObjectH->setX(_barStartX + (fullWidth - _barObjectH->getWidth()));
         }
         if (_barObjectV != nullptr)
         {
-            /*if (dynamic_cast<GImage*>(_barObjectV) && ((GImage *)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GImage *)_barObjectV).fillAmount = 1 - percent;
-            else if (dynamic_cast<GLoader*>(_barObjectV) && ((GLoader*)_barObjectV)->getFillMethod() != FillMethod::None)
-            ((GLoader *)_barObjectV).fillAmount = 1 - percent;
-            else*/
-            {
-                _barObjectV->setHeight(round(fullHeight * percent));
-                _barObjectV->setY(_barStartY + (fullHeight - _barObjectV->getHeight()));
-            }
+            _barObjectV->setHeight(round(fullHeight * percent));
+            _barObjectV->setY(_barStartY + (fullHeight - _barObjectV->getHeight()));
         }
     }
 }
-
 
 void GSlider::handleSizeChanged()
 {
@@ -157,8 +169,13 @@ void GSlider::handleSizeChanged()
 
 void GSlider::constructExtension(ByteBuffer* buffer)
 {
-    _titleType = (ProgressTitleType)buffer->ReadByte();
-    _reverse = buffer->ReadBool();
+    _titleType = (ProgressTitleType)buffer->readByte();
+    _reverse = buffer->readBool();
+    if (buffer->version >= 2)
+    {
+        _wholeNumbers = buffer->readBool();
+        changeOnClick = buffer->readBool();
+    }
 
     _titleObject = getChild("title");
     _barObjectH = getChild("bar");
@@ -191,25 +208,27 @@ void GSlider::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
     GComponent::setup_afterAdd(buffer, beginPos);
 
-    if (!buffer->Seek(beginPos, 6))
+    if (!buffer->seek(beginPos, 6))
     {
         update();
         return;
     }
 
-    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+    if ((ObjectType)buffer->readByte() != _packageItem->objectType)
     {
         update();
         return;
     }
 
-    _value = buffer->ReadInt();
-    _max = buffer->ReadInt();
+    _value = buffer->readInt();
+    _max = buffer->readInt();
+    if (buffer->version >= 2)
+        _min = buffer->readInt();
 
     update();
 }
 
-void GSlider::onTouchBegin(EventContext * context)
+void GSlider::onTouchBegin(EventContext* context)
 {
     if (!changeOnClick)
         return;
@@ -219,30 +238,20 @@ void GSlider::onTouchBegin(EventContext * context)
         return;
 
     Vec2 pt = _gripObject->globalToLocal(evt->getPosition());
-    float percent = (float)(_value / _max);
+    float percent = clampf((_value - _min) / (_max - _min), 0, 1);
     float delta = 0;
     if (_barObjectH != nullptr)
-        delta = (pt.x - _gripObject->getWidth() / 2) / _barMaxWidth;
+        delta = pt.x / _barMaxWidth;
     if (_barObjectV != nullptr)
-        delta = (pt.y - _gripObject->getHeight() / 2) / _barMaxHeight;
+        delta = pt.y / _barMaxHeight;
     if (_reverse)
         percent -= delta;
     else
         percent += delta;
-    if (percent > 1)
-        percent = 1;
-    else if (percent < 0)
-        percent = 0;
-    double newValue = percent * _max;
-    if (newValue != _value)
-    {
-        _value = newValue;
-        dispatchEvent(UIEventType::Changed);
-    }
-    updateWidthPercent(percent);
+    updateWithPercent(percent, true);
 }
 
-void GSlider::onGripTouchBegin(EventContext * context)
+void GSlider::onGripTouchBegin(EventContext* context)
 {
     if (context->getInput()->getButton() != EventMouse::MouseButton::BUTTON_LEFT)
         return;
@@ -252,10 +261,10 @@ void GSlider::onGripTouchBegin(EventContext * context)
     context->captureTouch();
 
     _clickPos = globalToLocal(context->getInput()->getPosition());
-    _clickPercent = (float)(_value / _max);
+    _clickPercent = clampf((_value - _min) / (_max - _min), 0, 1);
 }
 
-void GSlider::onGripTouchMove(EventContext * context)
+void GSlider::onGripTouchMove(EventContext* context)
 {
     if (!canDrag)
         return;
@@ -275,18 +284,7 @@ void GSlider::onGripTouchMove(EventContext * context)
         percent = _clickPercent + deltaX / _barMaxWidth;
     else
         percent = _clickPercent + deltaY / _barMaxHeight;
-    if (percent > 1)
-        percent = 1;
-    else if (percent < 0)
-        percent = 0;
-
-    double newValue = percent * _max;
-    if (newValue != _value)
-    {
-        _value = newValue;
-        dispatchEvent(UIEventType::Changed);
-    }
-    updateWidthPercent(percent);
+    updateWithPercent(percent, true);
 }
 
 NS_FGUI_END

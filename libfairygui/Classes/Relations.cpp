@@ -116,11 +116,11 @@ bool Relations::isEmpty() const
 
 void Relations::setup(ByteBuffer * buffer, bool parentToChild)
 {
-    int cnt = buffer->ReadByte();
+    int cnt = buffer->readByte();
     GObject* target;
     for (int i = 0; i < cnt; i++)
     {
-        int targetIndex = buffer->ReadShort();
+        int targetIndex = buffer->readShort();
         if (targetIndex == -1)
             target = _owner->getParent();
         else if (parentToChild)
@@ -132,11 +132,11 @@ void Relations::setup(ByteBuffer * buffer, bool parentToChild)
         newItem->setTarget(target);
         _items.push_back(newItem);
 
-        int cnt2 = buffer->ReadByte();
+        int cnt2 = buffer->readByte();
         for (int j = 0; j < cnt2; j++)
         {
-            RelationType rt = (RelationType)buffer->ReadByte();
-            bool usePercent = buffer->ReadBool();
+            RelationType rt = (RelationType)buffer->readByte();
+            bool usePercent = buffer->readBool();
             newItem->internalAdd(rt, usePercent);
         }
     }

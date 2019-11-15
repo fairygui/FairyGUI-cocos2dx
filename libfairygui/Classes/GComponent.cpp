@@ -1,37 +1,37 @@
 #include "GComponent.h"
-#include "UIObjectFactory.h"
 #include "GButton.h"
-#include "Relations.h"
 #include "GGroup.h"
-#include "UIPackage.h"
+#include "Relations.h"
 #include "TranslationHelper.h"
-#include "utils/ByteBuffer.h"
+#include "UIObjectFactory.h"
+#include "UIPackage.h"
 #include "display/FUIContainer.h"
+#include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 using namespace std;
 
-GComponent::GComponent() :
-    _container(nullptr),
-    _scrollPane(nullptr),
-    _childrenRenderOrder(ChildrenRenderOrder::ASCENT),
-    _apexIndex(0),
-    _boundsChanged(false),
-    _trackBounds(false),
-    _opaque(false),
-    _sortingChildCount(0),
-    _applyingController(nullptr),
-    _buildingDisplayList(false),
-    _maskOwner(nullptr),
-    _hitArea(nullptr)
+GComponent::GComponent() : _container(nullptr),
+                           _scrollPane(nullptr),
+                           _childrenRenderOrder(ChildrenRenderOrder::ASCENT),
+                           _apexIndex(0),
+                           _boundsChanged(false),
+                           _trackBounds(false),
+                           _opaque(false),
+                           _sortingChildCount(0),
+                           _applyingController(nullptr),
+                           _buildingDisplayList(false),
+                           _maskOwner(nullptr),
+                           _hitArea(nullptr)
 {
 }
 
 GComponent::~GComponent()
 {
-    for (auto &child : _children)
+    for (auto& child : _children)
         child->_parent = nullptr;
     _children.clear();
     _controllers.clear();
@@ -99,8 +99,6 @@ GObject* GComponent::addChildAt(GObject* child, int index)
 
         childStateChanged(child);
         setBoundsChangedFlag();
-        if (child->_group != nullptr)
-            child->_group->setBoundsChangedFlag(true);
     }
     return child;
 }
@@ -132,6 +130,8 @@ void GComponent::removeChild(GObject* child)
 
 void GComponent::removeChildAt(int index)
 {
+    CCASSERT(index >= 0 && index < _children.size(), "Invalid child index");
+
     GObject* child = _children.at(index);
 
     child->_parent = nullptr;
@@ -162,6 +162,8 @@ void GComponent::removeChildren(int beginIndex, int endIndex)
 
 GObject* GComponent::getChildAt(int index) const
 {
+    CCASSERT(index >= 0 && index < _children.size(), "Invalid child index");
+
     return _children.at(index);
 }
 
@@ -174,6 +176,37 @@ GObject* GComponent::getChild(const std::string& name) const
     }
 
     return nullptr;
+}
+
+GObject* GComponent::getChildByPath(const std::string& path) const
+{
+    const GComponent* gcom = this;
+    GObject* obj = nullptr;
+
+    FastSplitter fs;
+    fs.start(path.data(), path.length(), '.');
+    std::string str;
+    while (fs.next())
+    {
+        if (gcom == nullptr)
+        {
+            gcom = dynamic_cast<GComponent*>(obj);
+            if (gcom == nullptr)
+            {
+                obj = nullptr;
+                break;
+            }
+        }
+
+        str.append(fs.getText(), fs.getTextLength());
+        obj = gcom->getChild(std::string(fs.getText(), fs.getTextLength()));
+        if (!obj)
+            break;
+
+        gcom = nullptr;
+    }
+
+    return obj;
 }
 
 GObject* GComponent::getChildInGroup(const GGroup* group, const std::string& name) const
@@ -328,7 +361,7 @@ int GComponent::numChildren() const
     return (int)_children.size();
 }
 
-bool GComponent::isAncestorOf(const GObject * obj) const
+bool GComponent::isAncestorOf(const GObject* obj) const
 {
     if (obj == nullptr)
         return false;
@@ -344,7 +377,7 @@ bool GComponent::isAncestorOf(const GObject * obj) const
     return false;
 }
 
-bool GComponent::isChildInView(GObject * child)
+bool GComponent::isChildInView(GObject* child)
 {
     if (_scrollPane != nullptr)
     {
@@ -352,8 +385,7 @@ bool GComponent::isChildInView(GObject * child)
     }
     else if (((FUIContainer*)_displayObject)->isClippingEnabled())
     {
-        return child->_position.x + child->_size.width >= 0 && child->_position.x <= _size.width
-            && child->_position.y + child->_size.height >= 0 && child->_position.y <= _size.height;
+        return child->_position.x + child->_size.width >= 0 && child->_position.x <= _size.width && child->_position.y + child->_size.height >= 0 && child->_position.y <= _size.height;
     }
     else
         return true;
@@ -362,7 +394,7 @@ bool GComponent::isChildInView(GObject * child)
 int GComponent::getFirstChildInView()
 {
     int i = 0;
-    for (auto &child : _children)
+    for (auto& child : _children)
     {
 
         if (isChildInView(child))
@@ -390,8 +422,10 @@ void GComponent::addController(GController* c)
     _controllers.pushBack(c);
 }
 
-GController * GComponent::getControllerAt(int index) const
+GController* GComponent::getControllerAt(int index) const
 {
+    CCASSERT(index >= 0 && index < _controllers.size(), "Invalid controller index");
+
     return _controllers.at(index);
 }
 
@@ -407,7 +441,7 @@ void GComponent::removeController(GController* c)
     _controllers.erase(index);
 }
 
-void GComponent::applyController(GController * c)
+void GComponent::applyController(GController* c)
 {
     _applyingController = c;
 
@@ -425,7 +459,7 @@ void GComponent::applyAllControllers()
         applyController(c);
 }
 
-Transition * GComponent::getTransition(const std::string & name) const
+Transition* GComponent::getTransition(const std::string& name) const
 {
     for (const auto& c : _transitions)
     {
@@ -436,8 +470,10 @@ Transition * GComponent::getTransition(const std::string & name) const
     return nullptr;
 }
 
-Transition * GComponent::getTransitionAt(int index) const
+Transition* GComponent::getTransitionAt(int index) const
 {
+    CCASSERT(index >= 0 && index < _transitions.size(), "Invalid transition index");
+
     return _transitions.at(index);
 }
 
@@ -454,8 +490,7 @@ void GComponent::adjustRadioGroupDepth(GObject* obj, GController* c)
         {
             myIndex = i;
         }
-        else if (dynamic_cast<GButton*>(child)
-            && ((GButton *)child)->getRelatedController() == c)
+        else if (dynamic_cast<GButton*>(child) && ((GButton*)child)->getRelatedController() == c)
         {
             if (i > maxIndex)
                 maxIndex = i;
@@ -474,7 +509,7 @@ void GComponent::setOpaque(bool value)
     _opaque = value;
 }
 
-void GComponent::setMargin(const Margin & value)
+void GComponent::setMargin(const Margin& value)
 {
     _margin = value;
 }
@@ -504,7 +539,7 @@ cocos2d::Node* GComponent::getMask() const
     return ((FUIContainer*)_displayObject)->getStencil();
 }
 
-void GComponent::setMask(cocos2d::Node * value, bool inverted)
+void GComponent::setMask(cocos2d::Node* value, bool inverted)
 {
     if (_maskOwner)
     {
@@ -517,7 +552,7 @@ void GComponent::setMask(cocos2d::Node * value, bool inverted)
 
     if (value)
     {
-        for (auto &child : _children)
+        for (auto& child : _children)
         {
             if (child->_displayObject == value)
             {
@@ -540,7 +575,7 @@ void GComponent::setMask(cocos2d::Node * value, bool inverted)
     }
 }
 
-void GComponent::setHitArea(IHitTest * value)
+void GComponent::setHitArea(IHitTest* value)
 {
     if (_hitArea != value)
     {
@@ -795,7 +830,7 @@ void GComponent::buildNativeDisplayList()
     }
 }
 
-cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
+cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2& pt)
 {
     int cnt = (int)_children.size();
     if (cnt == 0)
@@ -855,7 +890,7 @@ cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
                     GObject* prev = _children.at(i - 1);
                     if (ret.x < prev->getX() + prev->getWidth() / 2) // top half part
                         ret.x = prev->getX();
-                    else//bottom half part
+                    else //bottom half part
                         ret.x = obj->getX();
                     break;
                 }
@@ -868,12 +903,12 @@ cocos2d::Vec2 GComponent::getSnappingPosition(const cocos2d::Vec2 & pt)
     return ret;
 }
 
-GObject* GComponent::hitTest(const Vec2 &worldPoint, const Camera* camera)
+GObject* GComponent::hitTest(const Vec2& worldPoint, const Camera* camera)
 {
     if (_touchDisabled || !_touchable || !_displayObject->isVisible() || !_displayObject->getParent())
         return nullptr;
 
-    GObject * target = nullptr;
+    GObject* target = nullptr;
     if (_maskOwner)
     {
         if (_maskOwner->hitTest(worldPoint, camera) != nullptr)
@@ -1007,10 +1042,7 @@ void GComponent::setupOverflow(OverflowType overflow)
     if (overflow == OverflowType::HIDDEN)
     {
         ((FUIContainer*)_displayObject)->setClippingEnabled(true);
-        ((FUIContainer*)_displayObject)->setClippingRegion(
-            Rect(_margin.left, _margin.top,
-                _size.width - _margin.left - _margin.right,
-                _size.height - _margin.top - _margin.bottom));
+        ((FUIContainer*)_displayObject)->setClippingRegion(Rect(_margin.left, _margin.top, _size.width - _margin.left - _margin.right, _size.height - _margin.top - _margin.bottom));
     }
 
     _container->setPosition2(_margin.left, _margin.top);
@@ -1035,10 +1067,7 @@ void GComponent::handleSizeChanged()
         _maskOwner->handlePositionChanged();
 
     if (((FUIContainer*)_displayObject)->isClippingEnabled())
-        ((FUIContainer*)_displayObject)->setClippingRegion(
-            Rect(_margin.left, _margin.top,
-                _size.width - _margin.left - _margin.right,
-                _size.height - _margin.top - _margin.bottom));
+        ((FUIContainer*)_displayObject)->setClippingRegion(Rect(_margin.left, _margin.top, _size.width - _margin.left - _margin.right, _size.height - _margin.top - _margin.bottom));
 
     if (_hitArea)
     {
@@ -1059,7 +1088,7 @@ void GComponent::handleGrayedChanged()
         cc->setSelectedIndex(isGrayed() ? 1 : 0);
     else
     {
-        for (auto &child : _children)
+        for (auto& child : _children)
             child->handleGrayedChanged();
     }
 }
@@ -1078,7 +1107,7 @@ void GComponent::onEnter()
 
     if (!_transitions.empty())
     {
-        for (auto &trans : _transitions)
+        for (auto& trans : _transitions)
             trans->onOwnerAddedToStage();
     }
 }
@@ -1089,7 +1118,7 @@ void GComponent::onExit()
 
     if (!_transitions.empty())
     {
-        for (auto &trans : _transitions)
+        for (auto& trans : _transitions)
             trans->onOwnerRemovedFromStage();
     }
 }
@@ -1108,62 +1137,62 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     }
 
     ByteBuffer* buffer = _packageItem->rawData;
-    buffer->Seek(0, 0);
+    buffer->seek(0, 0);
 
     _underConstruct = true;
 
-    sourceSize.width = buffer->ReadInt();
-    sourceSize.height = buffer->ReadInt();
+    sourceSize.width = buffer->readInt();
+    sourceSize.height = buffer->readInt();
     initSize = sourceSize;
 
     setSize(sourceSize.width, sourceSize.height);
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
-        minSize.width = buffer->ReadInt();
-        maxSize.width = buffer->ReadInt();
-        minSize.height = buffer->ReadInt();
-        maxSize.height = buffer->ReadInt();
+        minSize.width = buffer->readInt();
+        maxSize.width = buffer->readInt();
+        minSize.height = buffer->readInt();
+        maxSize.height = buffer->readInt();
     }
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
-        float f1 = buffer->ReadFloat();
-        float f2 = buffer->ReadFloat();
-        setPivot(f1, f2, buffer->ReadBool());
+        float f1 = buffer->readFloat();
+        float f2 = buffer->readFloat();
+        setPivot(f1, f2, buffer->readBool());
     }
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
-        _margin.top = buffer->ReadInt();
-        _margin.bottom = buffer->ReadInt();
-        _margin.left = buffer->ReadInt();
-        _margin.right = buffer->ReadInt();
+        _margin.top = buffer->readInt();
+        _margin.bottom = buffer->readInt();
+        _margin.left = buffer->readInt();
+        _margin.right = buffer->readInt();
     }
 
-    OverflowType overflow = (OverflowType)buffer->ReadByte();
+    OverflowType overflow = (OverflowType)buffer->readByte();
     if (overflow == OverflowType::SCROLL)
     {
-        int savedPos = buffer->position;
-        buffer->Seek(0, 7);
+        int savedPos = buffer->getPos();
+        buffer->seek(0, 7);
         setupScroll(buffer);
-        buffer->position = savedPos;
+        buffer->setPos(savedPos);
     }
     else
         setupOverflow(overflow);
 
-    if (buffer->ReadBool()) //clipsoft
-        buffer->Skip(8);
+    if (buffer->readBool()) //clipsoft
+        buffer->skip(8);
 
     _buildingDisplayList = true;
 
-    buffer->Seek(0, 1);
+    buffer->seek(0, 1);
 
-    int controllerCount = buffer->ReadShort();
+    int controllerCount = buffer->readShort();
     for (int i = 0; i < controllerCount; i++)
     {
-        int nextPos = buffer->ReadShort();
-        nextPos += buffer->position;
+        int nextPos = buffer->readShort();
+        nextPos += buffer->getPos();
 
         GController* controller = new GController();
         _controllers.pushBack(controller);
@@ -1171,27 +1200,27 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         controller->setup(buffer);
         controller->release();
 
-        buffer->position = nextPos;
+        buffer->setPos(nextPos);
     }
 
-    buffer->Seek(0, 2);
+    buffer->seek(0, 2);
 
     GObject* child;
-    int childCount = buffer->ReadShort();
+    int childCount = buffer->readShort();
     for (int i = 0; i < childCount; i++)
     {
-        int dataLen = buffer->ReadShort();
-        int curPos = buffer->position;
+        int dataLen = buffer->readShort();
+        int curPos = buffer->getPos();
 
         if (objectPool != nullptr)
             child = (*objectPool)[poolIndex + i];
         else
         {
-            buffer->Seek(curPos, 0);
+            buffer->seek(curPos, 0);
 
-            ObjectType type = (ObjectType)buffer->ReadByte();
-            const string& src = buffer->ReadS();
-            const string& pkgId = buffer->ReadS();
+            ObjectType type = (ObjectType)buffer->readByte();
+            const string& src = buffer->readS();
+            const string& pkgId = buffer->readS();
 
             PackageItem* pi = nullptr;
             if (!src.empty())
@@ -1220,77 +1249,80 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
         child->_parent = this;
         _children.pushBack(child);
 
-        buffer->position = curPos + dataLen;
+        buffer->setPos(curPos + dataLen);
     }
 
-    buffer->Seek(0, 3);
+    buffer->seek(0, 3);
     _relations->setup(buffer, true);
 
-    buffer->Seek(0, 2);
-    buffer->Skip(2);
+    buffer->seek(0, 2);
+    buffer->skip(2);
 
     for (int i = 0; i < childCount; i++)
     {
-        int nextPos = buffer->ReadShort();
-        nextPos += buffer->position;
+        int nextPos = buffer->readShort();
+        nextPos += buffer->getPos();
 
-        buffer->Seek(buffer->position, 3);
+        buffer->seek(buffer->getPos(), 3);
         _children.at(i)->relations()->setup(buffer, false);
 
-        buffer->position = nextPos;
+        buffer->setPos(nextPos);
     }
 
-    buffer->Seek(0, 2);
-    buffer->Skip(2);
+    buffer->seek(0, 2);
+    buffer->skip(2);
 
     for (int i = 0; i < childCount; i++)
     {
-        int nextPos = buffer->ReadShort();
-        nextPos += buffer->position;
+        int nextPos = buffer->readShort();
+        nextPos += buffer->getPos();
 
         child = _children.at(i);
-        child->setup_afterAdd(buffer, buffer->position);
+        child->setup_afterAdd(buffer, buffer->getPos());
         child->_underConstruct = false;
 
-        buffer->position = nextPos;
+        buffer->setPos(nextPos);
     }
 
-    buffer->Seek(0, 4);
+    buffer->seek(0, 4);
 
-    buffer->Skip(2); //customData
-    _opaque = buffer->ReadBool();
-    int maskId = buffer->ReadShort();
+    buffer->skip(2); //customData
+    _opaque = buffer->readBool();
+    int maskId = buffer->readShort();
     if (maskId != -1)
     {
-        bool inverted = buffer->ReadBool();
+        bool inverted = buffer->readBool();
         setMask(getChildAt(maskId)->displayObject(), inverted);
     }
-    const string& hitTestId = buffer->ReadS();
+
+    const string& hitTestId = buffer->readS();
+    int i1 = buffer->readInt();
+    int i2 = buffer->readInt();
     if (!hitTestId.empty())
     {
         PackageItem* pi = _packageItem->owner->getItem(hitTestId);
         if (pi != nullptr && pi->pixelHitTestData != nullptr)
-        {
-            int i1 = buffer->ReadInt();
-            int i2 = buffer->ReadInt();
             setHitArea(new PixelHitTest(pi->pixelHitTestData, i1, i2));
-        }
+    }
+    else if (i1 != 0 && i2 != -1)
+    {
+        //setHitArea(new ChildHitArea(getChildAt(i2)));
     }
 
-    buffer->Seek(0, 5);
+    buffer->seek(0, 5);
 
-    int transitionCount = buffer->ReadShort();
+    int transitionCount = buffer->readShort();
     for (int i = 0; i < transitionCount; i++)
     {
-        int nextPos = buffer->ReadShort();
-        nextPos += buffer->position;
+        int nextPos = buffer->readShort();
+        nextPos += buffer->getPos();
 
         Transition* trans = new Transition(this);
         trans->setup(buffer);
         _transitions.pushBack(trans);
         trans->release();
 
-        buffer->position = nextPos;
+        buffer->setPos(nextPos);
     }
 
     applyAllControllers();
@@ -1319,21 +1351,34 @@ void GComponent::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
     GObject::setup_afterAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 4);
+    buffer->seek(beginPos, 4);
 
-    int pageController = buffer->ReadShort();
+    int pageController = buffer->readShort();
     if (pageController != -1 && _scrollPane != nullptr && _scrollPane->isPageMode())
         _scrollPane->setPageController(_parent->getControllerAt(pageController));
 
-    int cnt = buffer->ReadShort();
+    int cnt = buffer->readShort();
     for (int i = 0; i < cnt; i++)
     {
-        GController* cc = getController(buffer->ReadS());
-        const string& pageId = buffer->ReadS();
+        GController* cc = getController(buffer->readS());
+        const string& pageId = buffer->readS();
         if (cc)
             cc->setSelectedPageId(pageId);
+    }
+
+    if (buffer->version >= 2)
+    {
+        cnt = buffer->readShort();
+        for (int i = 0; i < cnt; i++)
+        {
+            std::string target = buffer->readS();
+            ObjectPropID propId = (ObjectPropID)buffer->readShort();
+            std::string value = buffer->readS();
+            GObject* obj = getChildByPath(target);
+            if (obj != nullptr)
+                obj->setProp(propId, Value(value));
+        }
     }
 }
 
 NS_FGUI_END
-

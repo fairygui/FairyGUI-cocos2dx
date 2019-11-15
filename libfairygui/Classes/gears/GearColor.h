@@ -10,13 +10,6 @@ NS_FGUI_BEGIN
 class GObject;
 class GTweener;
 
-class IColorGear
-{
-public:
-    virtual cocos2d::Color3B getColor() const = 0;
-    virtual void setColor(const cocos2d::Color3B& value) = 0;
-};
-
 class GearColor : public GearBase
 {
 public:
