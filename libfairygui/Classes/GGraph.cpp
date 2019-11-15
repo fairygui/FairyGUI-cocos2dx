@@ -164,7 +164,7 @@ void GGraph::updateShape()
         float dist;
         for (int i = 0; i < _sides; i++)
         {
-            if (_distances != nullptr && i < _distances->size())
+            if (_distances != nullptr && i < (int)_distances->size())
                 dist = (*_distances)[i];
             else
                 dist = 1;
@@ -264,7 +264,11 @@ void GGraph::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
             float h = getHeight();
             _polygonPointOffset = h;
             for (int i = 0; i < cnt; i++)
-                (*_polygonPoints)[i] = Vec2(buffer->readFloat(), h - buffer->readFloat());
+            {
+                float f1 = buffer->readFloat();
+                float f2 = h - buffer->readFloat();
+                (*_polygonPoints)[i] = Vec2(f1, f2);
+            }
         }
         else if (_type == 4)
         {

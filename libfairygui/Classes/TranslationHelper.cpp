@@ -1,8 +1,8 @@
 #include "TranslationHelper.h"
 #include "PackageItem.h"
 #include "UIPackage.h"
-#include "utils/ByteBuffer.h"
 #include "tinyxml2/tinyxml2.h"
+#include "utils/ByteBuffer.h"
 
 USING_NS_CC;
 NS_FGUI_BEGIN
@@ -11,7 +11,7 @@ using namespace std;
 
 std::unordered_map<std::string, std::unordered_map<std::string, std::string>> TranslationHelper::strings;
 
-void TranslationHelper::loadFromXML(const char *xmlString, size_t nBytes)
+void TranslationHelper::loadFromXML(const char* xmlString, size_t nBytes)
 {
     strings.clear();
 
@@ -39,7 +39,7 @@ void TranslationHelper::loadFromXML(const char *xmlString, size_t nBytes)
     delete xml;
 }
 
-void TranslationHelper::translateComponent(PackageItem * item)
+void TranslationHelper::translateComponent(PackageItem* item)
 {
     if (strings.empty())
         return;
@@ -62,7 +62,9 @@ void TranslationHelper::translateComponent(PackageItem * item)
 
         buffer->seek(curPos, 0);
 
-        ObjectType type = (ObjectType)buffer->readByte();
+        ObjectType baseType = (ObjectType)buffer->readByte();
+        ObjectType type = baseType;
+
         buffer->skip(4);
         const string& elementId = buffer->readS();
 
@@ -88,7 +90,7 @@ void TranslationHelper::translateComponent(PackageItem * item)
 
             if (buffer->readByte() == 6) //gearText
             {
-                buffer->skip(2);//controller
+                buffer->skip(2); //controller
                 int valueCnt = buffer->readShort();
                 for (int k = 0; k < valueCnt; k++)
                 {
@@ -107,6 +109,26 @@ void TranslationHelper::translateComponent(PackageItem * item)
             }
 
             buffer->setPos(nextPos);
+        }
+
+        if (baseType == ObjectType::COMPONENT && buffer->version >= 2)
+        {
+            buffer->seek(curPos, 4);
+
+            buffer->skip(2); //pageController
+
+            buffer->skip(4 * buffer->readShort());
+
+            int cpCount = buffer->readShort();
+            for (int k = 0; k < cpCount; k++)
+            {
+                std::string target = buffer->readS();
+                int propertyId = buffer->readShort();
+                if (propertyId == 0 && (it = strings.find(elementId + "-cp-" + target)) != strings.end())
+                    buffer->writeS(it->second);
+                else
+                    buffer->skip(2);
+            }
         }
 
         switch (type)
@@ -135,16 +157,42 @@ void TranslationHelper::translateComponent(PackageItem * item)
             int itemCount = buffer->readShort();
             for (int j = 0; j < itemCount; j++)
             {
-                int nextPos = buffer->readShort();
+                int nextPos = buffer->readUshort();
                 nextPos += buffer->getPos();
 
                 buffer->skip(2); //url
+                if (type == ObjectType::TREE)
+                    buffer->skip(2);
+
+                //title
                 if ((it = strings.find(elementId + "-" + Value(j).asString())) != strings.end())
                     buffer->writeS(it->second);
                 else
                     buffer->skip(2);
+
+                //selected title
                 if ((it = strings.find(elementId + "-" + Value(j).asString() + "-0")) != strings.end())
                     buffer->writeS(it->second);
+                else
+                    buffer->skip(2);
+
+                if (buffer->version >= 2)
+                {
+                    buffer->skip(6);
+                    buffer->skip(buffer->readShort() * 4); //controllers
+
+                    int cpCount = buffer->readShort();
+                    for (int k = 0; k < cpCount; k++)
+                    {
+                        std::string target = buffer->readS();
+                        int propertyId = buffer->readShort();
+                        if (propertyId == 0 && (it = strings.find(elementId + "-" + Value(j).asString() + "-" + target)) != strings.end())
+                            buffer->writeS(it->second);
+                        else
+                            buffer->skip(2);
+                    }
+                }
+
                 buffer->setPos(nextPos);
             }
             break;

@@ -24,7 +24,7 @@ public:
 
     int getIndent() const { return _indent; }
     void setIndent(int value) { _indent = value; }
-    bool getClickToExpand() const { return _clickToExpand; }
+    int getClickToExpand() const { return _clickToExpand; }
     void setClickToExpand(int value) { _clickToExpand = value; }
 
     GTreeNode* getRootNode() const { return _rootNode; }

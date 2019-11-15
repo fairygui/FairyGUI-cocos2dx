@@ -148,8 +148,8 @@ public:
 
 TweenConfig::TweenConfig()
     : startValue(nullptr),
-      endValue(nullptr),
-      path(nullptr)
+    endValue(nullptr),
+    path(nullptr)
 {
     easeType = EaseType::QuadOut;
     startValue = new TValue();
@@ -185,12 +185,12 @@ public:
 
 TransitionItem::TransitionItem(TransitionActionType aType)
     : time(0),
-      type(aType),
-      hook(nullptr),
-      tweenConfig(nullptr),
-      tweener(nullptr),
-      target(nullptr),
-      displayLockToken(0)
+    type(aType),
+    hook(nullptr),
+    tweenConfig(nullptr),
+    tweener(nullptr),
+    target(nullptr),
+    displayLockToken(0)
 {
     switch (type)
     {
@@ -258,21 +258,21 @@ TransitionItem::~TransitionItem()
 
 Transition::Transition(GComponent* owner)
     : _owner(owner),
-      _totalTimes(0),
-      _totalTasks(0),
-      _playing(false),
-      _paused(false),
-      _ownerBaseX(0),
-      _ownerBaseY(0),
-      _onComplete(nullptr),
-      _options(0),
-      _reversed(false),
-      _totalDuration(0),
-      _autoPlay(false),
-      _autoPlayDelay(0),
-      _timeScale(1),
-      _startTime(0),
-      _endTime(0)
+    _totalTimes(0),
+    _totalTasks(0),
+    _playing(false),
+    _paused(false),
+    _ownerBaseX(0),
+    _ownerBaseY(0),
+    _onComplete(nullptr),
+    _options(0),
+    _reversed(false),
+    _totalDuration(0),
+    _autoPlay(false),
+    _autoPlayDelay(0),
+    _timeScale(1),
+    _startTime(0),
+    _endTime(0)
 {
 }
 
@@ -462,7 +462,7 @@ void Transition::stopItem(TransitionItem* item, bool setToComplete)
         item->tweener->kill(setToComplete);
         item->tweener = nullptr;
 
-        if (item->type == TransitionActionType::Shake && !setToComplete) //�𶯱����λ�������´ξ�Խ��ԽԶ�ˡ�
+        if (item->type == TransitionActionType::Shake && !setToComplete)
         {
             item->target->_gearLocked = true;
             item->target->setPosition(item->target->getX() - ((TValue_Shake*)item->value)->lastOffset.x, item->target->getY() - ((TValue_Shake*)item->value)->lastOffset.y);
@@ -887,12 +887,12 @@ void Transition::playItem(TransitionItem* item)
             value->lastOffset.setZero();
             value->offset.setZero();
             item->tweener = GTween::shake(Vec2::ZERO, value->amplitude, value->duration)
-                                ->setDelay(time)
-                                ->setTimeScale(_timeScale)
-                                ->setTargetAny(item)
-                                ->onStart(CC_CALLBACK_1(Transition::onTweenStart, this))
-                                ->onUpdate(CC_CALLBACK_1(Transition::onTweenUpdate, this))
-                                ->onComplete1(CC_CALLBACK_1(Transition::onTweenComplete, this));
+                ->setDelay(time)
+                ->setTimeScale(_timeScale)
+                ->setTargetAny(item)
+                ->onStart(CC_CALLBACK_1(Transition::onTweenStart, this))
+                ->onUpdate(CC_CALLBACK_1(Transition::onTweenUpdate, this))
+                ->onComplete1(CC_CALLBACK_1(Transition::onTweenComplete, this));
 
             if (_endTime >= 0)
                 item->tweener->setBreakpoint(_endTime - item->time);
@@ -916,9 +916,9 @@ void Transition::playItem(TransitionItem* item)
         {
             _totalTasks++;
             item->tweener = GTween::delayedCall(time)
-                                ->setTimeScale(_timeScale)
-                                ->setTargetAny(item)
-                                ->onComplete1(CC_CALLBACK_1(Transition::onDelayedPlayItem, this));
+                ->setTimeScale(_timeScale)
+                ->setTargetAny(item)
+                ->onComplete1(CC_CALLBACK_1(Transition::onDelayedPlayItem, this));
         }
     }
 
@@ -1132,7 +1132,7 @@ void Transition::onTweenComplete(GTweener* tweener)
     item->tweener = nullptr;
     _totalTasks--;
 
-    if (tweener->allCompleted()) //�����岥�Ž���ʱ�������tween���м�ʱ��Ӧ�õ��ý�β����
+    if (tweener->allCompleted())
         callHook(item, true);
 
     checkAllComplete();
@@ -1399,24 +1399,35 @@ void Transition::setup(ByteBuffer* buffer)
                     std::vector<GPathPoint>& pts = helperPoints;
                     pts.clear();
 
+                    Vec3 v0, v1, v2;
+
                     for (int j = 0; j < pathLen; j++)
                     {
                         GPathPoint::CurveType curveType = (GPathPoint::CurveType)buffer->readByte();
                         switch (curveType)
                         {
                         case GPathPoint::CurveType::Bezier:
-                            pts.push_back(GPathPoint(Vec3(buffer->readFloat(), buffer->readFloat(), 0),
-                                                     Vec3(buffer->readFloat(), buffer->readFloat(), 0)));
+                            v0.x = buffer->readFloat();
+                            v0.y = buffer->readFloat();
+                            v1.x = buffer->readFloat();
+                            v1.y = buffer->readFloat();
+                            pts.push_back(GPathPoint(v0, v1));
                             break;
 
                         case GPathPoint::CurveType::CubicBezier:
-                            pts.push_back(GPathPoint(Vec3(buffer->readFloat(), buffer->readFloat(), 0),
-                                                     Vec3(buffer->readFloat(), buffer->readFloat(), 0),
-                                                     Vec3(buffer->readFloat(), buffer->readFloat(), 0)));
+                            v0.x = buffer->readFloat();
+                            v0.y = buffer->readFloat();
+                            v1.x = buffer->readFloat();
+                            v1.y = buffer->readFloat();
+                            v2.x = buffer->readFloat();
+                            v2.y = buffer->readFloat();
+                            pts.push_back(GPathPoint(v0, v1, v2));
                             break;
 
                         default:
-                            pts.push_back(GPathPoint(Vec3(buffer->readFloat(), buffer->readFloat(), 0), curveType));
+                            v0.x = buffer->readFloat();
+                            v0.y = buffer->readFloat();
+                            pts.push_back(GPathPoint(v0, curveType));
                             break;
                         }
                     }

@@ -7,9 +7,10 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GMovieClip::GMovieClip() : _playAction(nullptr),
-                           _content(nullptr),
-                           _playing(true)
+GMovieClip::GMovieClip()
+    : _playAction(nullptr),
+    _content(nullptr),
+    _playing(true)
 {
     _sizeImplType = 1;
     _touchDisabled = true;
@@ -173,19 +174,19 @@ void GMovieClip::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 }
 
 ActionMovieClip::ActionMovieClip() : _animation(nullptr),
-                                     _frame(0),
-                                     _frameElapsed(0),
-                                     _repeatedCount(0),
-                                     _repeatDelay(0),
-                                     _start(0),
-                                     _end(0),
-                                     _times(0),
-                                     _endAt(0),
-                                     _status(0),
-                                     _displayFrame(-1),
-                                     _swing(false),
-                                     _reversed(false),
-                                     _timeScale(1)
+_frame(0),
+_frameElapsed(0),
+_repeatedCount(0),
+_repeatDelay(0),
+_start(0),
+_end(0),
+_times(0),
+_endAt(0),
+_status(0),
+_displayFrame(-1),
+_swing(false),
+_reversed(false),
+_timeScale(1)
 {
 }
 
@@ -401,10 +402,10 @@ void ActionMovieClip::advance(float time)
             }
         }
 
-        if (_frame == beginFrame && _reversed == beginReversed) //����һ����
+        if (_frame == beginFrame && _reversed == beginReversed)
         {
-            float roundTime = backupTime - time;              //�����һ����Ҫ��ʱ��
-            time -= (int)floor(time / roundTime) * roundTime; //����
+            float roundTime = backupTime - time;
+            time -= (int)floor(time / roundTime) * roundTime;
         }
     }
 }

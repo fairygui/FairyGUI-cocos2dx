@@ -7,7 +7,9 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearXY::GearXY(GObject* owner) : GearBase(owner)
+GearXY::GearXY(GObject* owner) 
+    : GearBase(owner),
+    positionsInPercent(false)
 {
 }
 

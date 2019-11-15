@@ -463,8 +463,7 @@ bool UIPackage::loadPackage(ByteBuffer* buffer)
 
         if (ver2)
         {
-        std:
-            string str = buffer->readS(); //branch
+            std::string str = buffer->readS(); //branch
             if (!str.empty())
                 pi->name = str + "/" + pi->name;
 

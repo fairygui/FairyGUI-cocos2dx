@@ -152,6 +152,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\BagScene.cpp" />
     <ClCompile Include="..\Classes\BagWindow.cpp" />
     <ClCompile Include="..\Classes\BasicsScene.cpp" />
+    <ClCompile Include="..\Classes\CooldownScene.cpp" />
     <ClCompile Include="..\Classes\DemoScene.cpp" />
     <ClCompile Include="..\Classes\ChatScene.cpp" />
     <ClCompile Include="..\Classes\EmojiParser.cpp" />
@@ -178,6 +179,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\BagScene.h" />
     <ClInclude Include="..\Classes\BagWindow.h" />
     <ClInclude Include="..\Classes\BasicsScene.h" />
+    <ClInclude Include="..\Classes\CooldownScene.h" />
     <ClInclude Include="..\Classes\DemoScene.h" />
     <ClInclude Include="..\Classes\ChatScene.h" />
     <ClInclude Include="..\Classes\EmojiParser.h" />

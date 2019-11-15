@@ -19,9 +19,6 @@
     <Filter Include="src\controller_action">
       <UniqueIdentifier>{25bf4a94-95ee-40cb-b00d-ca3dcd2fc55c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\treeview">
-      <UniqueIdentifier>{62d47ed6-2e8e-4e97-8175-5504550149cc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\tween">
       <UniqueIdentifier>{b7cfd7cb-ec46-4881-bd61-5ec0975a74e8}</UniqueIdentifier>
     </Filter>
@@ -213,12 +210,6 @@
     <ClInclude Include="..\Classes\display\FUIInput.h">
       <Filter>src\display</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\treeview\TreeNode.h">
-      <Filter>src\treeview</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\treeview\TreeView.h">
-      <Filter>src\treeview</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\display\TextFormat.h">
       <Filter>src\display</Filter>
     </ClInclude>
@@ -248,6 +239,21 @@
     </ClInclude>
     <ClInclude Include="..\Classes\utils\ByteBuffer.h">
       <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearDisplay2.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\gears\GearFontSize.h">
+      <Filter>src\gears</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\tween\GPath.h">
+      <Filter>src\tween</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GTree.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GTreeNode.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -425,12 +431,6 @@
     <ClCompile Include="..\Classes\display\FUIInput.cpp">
       <Filter>src\display</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\treeview\TreeView.cpp">
-      <Filter>src\treeview</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\treeview\TreeNode.cpp">
-      <Filter>src\treeview</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\display\TextFormat.cpp">
       <Filter>src\display</Filter>
     </ClCompile>
@@ -457,6 +457,21 @@
     </ClCompile>
     <ClCompile Include="..\Classes\utils\ByteBuffer.cpp">
       <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearDisplay2.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\gears\GearFontSize.cpp">
+      <Filter>src\gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\tween\GPath.cpp">
+      <Filter>src\tween</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GTree.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GTreeNode.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

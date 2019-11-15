@@ -53,7 +53,6 @@ public:
 private:
     void createSplineSegment();
     cocos2d::Vec3 onCRSplineCurve(int ptStart, int ptCount, float t);
-
     cocos2d::Vec3 onBezierCurve(int ptStart, int ptCount, float t);
 
     std::vector<Segment> _segments;
