@@ -126,38 +126,49 @@
 		44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A541FC3CCCD00C33C88 /* PlayTransitionAction.cpp */; };
 		44905A6B1FC4367600C33C88 /* FUIInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A691FC4367600C33C88 /* FUIInput.cpp */; };
 		44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A691FC4367600C33C88 /* FUIInput.cpp */; };
-		44905A8E1FC574BC00C33C88 /* TreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8A1FC574BC00C33C88 /* TreeNode.cpp */; };
-		44905A8F1FC574BC00C33C88 /* TreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8A1FC574BC00C33C88 /* TreeNode.cpp */; };
-		44905A911FC574BC00C33C88 /* TreeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8C1FC574BC00C33C88 /* TreeView.cpp */; };
-		44905A921FC574BC00C33C88 /* TreeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A8C1FC574BC00C33C88 /* TreeView.cpp */; };
 		44905A9A1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
 		44905A9B1FC809AA00C33C88 /* TextFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44905A981FC809AA00C33C88 /* TextFormat.cpp */; };
 		44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 44905A991FC809AA00C33C88 /* TextFormat.h */; };
-		4496999321416A9700B6412E /* EaseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998621416A9700B6412E /* EaseManager.cpp */; };
-		4496999421416A9700B6412E /* EaseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998621416A9700B6412E /* EaseManager.cpp */; };
-		4496999521416A9700B6412E /* EaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998721416A9700B6412E /* EaseManager.h */; };
-		4496999621416A9700B6412E /* EaseType.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998821416A9700B6412E /* EaseType.h */; };
-		4496999721416A9700B6412E /* GTween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998921416A9700B6412E /* GTween.cpp */; };
-		4496999821416A9700B6412E /* GTween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998921416A9700B6412E /* GTween.cpp */; };
-		4496999921416A9700B6412E /* GTween.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998A21416A9700B6412E /* GTween.h */; };
-		4496999A21416A9700B6412E /* GTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998B21416A9700B6412E /* GTweener.cpp */; };
-		4496999B21416A9700B6412E /* GTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998B21416A9700B6412E /* GTweener.cpp */; };
-		4496999C21416A9700B6412E /* GTweener.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998C21416A9700B6412E /* GTweener.h */; };
-		4496999D21416A9700B6412E /* TweenManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998D21416A9700B6412E /* TweenManager.cpp */; };
-		4496999E21416A9700B6412E /* TweenManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998D21416A9700B6412E /* TweenManager.cpp */; };
-		4496999F21416A9700B6412E /* TweenManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496998E21416A9700B6412E /* TweenManager.h */; };
-		449699A021416A9700B6412E /* TweenPropType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998F21416A9700B6412E /* TweenPropType.cpp */; };
-		449699A121416A9700B6412E /* TweenPropType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496998F21416A9700B6412E /* TweenPropType.cpp */; };
-		449699A221416A9700B6412E /* TweenPropType.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496999021416A9700B6412E /* TweenPropType.h */; };
-		449699A321416A9700B6412E /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496999121416A9700B6412E /* TweenValue.cpp */; };
-		449699A421416A9700B6412E /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4496999121416A9700B6412E /* TweenValue.cpp */; };
-		449699A521416A9700B6412E /* TweenValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4496999221416A9700B6412E /* TweenValue.h */; };
-		449699AB2141749C00B6412E /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699A92141749C00B6412E /* ByteBuffer.cpp */; };
-		449699AC2141749C00B6412E /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699A92141749C00B6412E /* ByteBuffer.cpp */; };
-		449699AD2141749C00B6412E /* ByteBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 449699AA2141749C00B6412E /* ByteBuffer.h */; };
-		449699B02141785900B6412E /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699AE2141785900B6412E /* TranslationHelper.cpp */; };
-		449699B12141785900B6412E /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449699AE2141785900B6412E /* TranslationHelper.cpp */; };
-		449699B22141785900B6412E /* TranslationHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 449699AF2141785900B6412E /* TranslationHelper.h */; };
+		7D0EA2C42373EC5C008942A9 /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2C22373EC5C008942A9 /* ByteBuffer.cpp */; };
+		7D0EA2C52373EC5C008942A9 /* ByteBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2C22373EC5C008942A9 /* ByteBuffer.cpp */; };
+		7D0EA2C62373EC5C008942A9 /* ByteBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2C32373EC5C008942A9 /* ByteBuffer.h */; };
+		7D0EA2D72373EFF3008942A9 /* EaseManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2CA2373EFF3008942A9 /* EaseManager.h */; };
+		7D0EA2D82373EFF3008942A9 /* TweenManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2CB2373EFF3008942A9 /* TweenManager.cpp */; };
+		7D0EA2D92373EFF3008942A9 /* TweenManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2CB2373EFF3008942A9 /* TweenManager.cpp */; };
+		7D0EA2DA2373EFF3008942A9 /* TweenManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2CC2373EFF3008942A9 /* TweenManager.h */; };
+		7D0EA2DB2373EFF3008942A9 /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2CD2373EFF3008942A9 /* TweenValue.cpp */; };
+		7D0EA2DC2373EFF3008942A9 /* TweenValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2CD2373EFF3008942A9 /* TweenValue.cpp */; };
+		7D0EA2DD2373EFF3008942A9 /* GTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2CE2373EFF3008942A9 /* GTweener.cpp */; };
+		7D0EA2DE2373EFF3008942A9 /* GTweener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2CE2373EFF3008942A9 /* GTweener.cpp */; };
+		7D0EA2DF2373EFF3008942A9 /* GTween.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2CF2373EFF3008942A9 /* GTween.h */; };
+		7D0EA2E02373EFF4008942A9 /* GTweener.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2D02373EFF3008942A9 /* GTweener.h */; };
+		7D0EA2E12373EFF4008942A9 /* EaseType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2D12373EFF3008942A9 /* EaseType.h */; };
+		7D0EA2E22373EFF4008942A9 /* EaseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2D22373EFF3008942A9 /* EaseManager.cpp */; };
+		7D0EA2E32373EFF4008942A9 /* EaseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2D22373EFF3008942A9 /* EaseManager.cpp */; };
+		7D0EA2E42373EFF4008942A9 /* TweenPropType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2D32373EFF3008942A9 /* TweenPropType.h */; };
+		7D0EA2E52373EFF4008942A9 /* TweenPropType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2D42373EFF3008942A9 /* TweenPropType.cpp */; };
+		7D0EA2E62373EFF4008942A9 /* TweenPropType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2D42373EFF3008942A9 /* TweenPropType.cpp */; };
+		7D0EA2E72373EFF4008942A9 /* TweenValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2D52373EFF3008942A9 /* TweenValue.h */; };
+		7D0EA2E82373EFF4008942A9 /* GTween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2D62373EFF3008942A9 /* GTween.cpp */; };
+		7D0EA2E92373EFF4008942A9 /* GTween.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2D62373EFF3008942A9 /* GTween.cpp */; };
+		7D0EA2EC2373F172008942A9 /* TranslationHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D0EA2EA2373F172008942A9 /* TranslationHelper.h */; };
+		7D0EA2ED2373F172008942A9 /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */; };
+		7D0EA2EE2373F172008942A9 /* TranslationHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */; };
+		7DCFF2C1237E3EF20031E954 /* GPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C0237E3EF20031E954 /* GPath.cpp */; };
+		7DCFF2C2237E3EF20031E954 /* GPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C0237E3EF20031E954 /* GPath.cpp */; };
+		7DCFF2C7237E3F410031E954 /* GearFontSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */; };
+		7DCFF2C8237E3F410031E954 /* GearFontSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */; };
+		7DCFF2C9237E3F410031E954 /* GearDisplay2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */; };
+		7DCFF2CA237E3F410031E954 /* GearDisplay2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */; };
+		7DCFF2CB237E3F410031E954 /* GearFontSize.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2C5237E3F410031E954 /* GearFontSize.h */; };
+		7DCFF2CC237E3F410031E954 /* GearDisplay2.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2C6237E3F410031E954 /* GearDisplay2.h */; };
+		7DCFF2CE237E3F490031E954 /* GPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2CD237E3F490031E954 /* GPath.h */; };
+		7DCFF2D3237E40370031E954 /* GTreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2CF237E40360031E954 /* GTreeNode.cpp */; };
+		7DCFF2D4237E40370031E954 /* GTreeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2CF237E40360031E954 /* GTreeNode.cpp */; };
+		7DCFF2D5237E40370031E954 /* GTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2D0237E40370031E954 /* GTreeNode.h */; };
+		7DCFF2D6237E40370031E954 /* GTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DCFF2D1237E40370031E954 /* GTree.h */; };
+		7DCFF2D7237E40370031E954 /* GTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2D2237E40370031E954 /* GTree.cpp */; };
+		7DCFF2D8237E40370031E954 /* GTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7DCFF2D2237E40370031E954 /* GTree.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -300,29 +311,35 @@
 		44905A551FC3CCCD00C33C88 /* PlayTransitionAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayTransitionAction.h; sourceTree = "<group>"; };
 		44905A691FC4367600C33C88 /* FUIInput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FUIInput.cpp; sourceTree = "<group>"; };
 		44905A6A1FC4367600C33C88 /* FUIInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FUIInput.h; sourceTree = "<group>"; };
-		44905A8A1FC574BC00C33C88 /* TreeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TreeNode.cpp; sourceTree = "<group>"; };
-		44905A8B1FC574BC00C33C88 /* TreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeNode.h; sourceTree = "<group>"; };
-		44905A8C1FC574BC00C33C88 /* TreeView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TreeView.cpp; sourceTree = "<group>"; };
-		44905A8D1FC574BC00C33C88 /* TreeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TreeView.h; sourceTree = "<group>"; };
 		44905A981FC809AA00C33C88 /* TextFormat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextFormat.cpp; sourceTree = "<group>"; };
 		44905A991FC809AA00C33C88 /* TextFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFormat.h; sourceTree = "<group>"; };
-		4496998621416A9700B6412E /* EaseManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EaseManager.cpp; sourceTree = "<group>"; };
-		4496998721416A9700B6412E /* EaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EaseManager.h; sourceTree = "<group>"; };
-		4496998821416A9700B6412E /* EaseType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EaseType.h; sourceTree = "<group>"; };
-		4496998921416A9700B6412E /* GTween.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTween.cpp; sourceTree = "<group>"; };
-		4496998A21416A9700B6412E /* GTween.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTween.h; sourceTree = "<group>"; };
-		4496998B21416A9700B6412E /* GTweener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTweener.cpp; sourceTree = "<group>"; };
-		4496998C21416A9700B6412E /* GTweener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTweener.h; sourceTree = "<group>"; };
-		4496998D21416A9700B6412E /* TweenManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenManager.cpp; sourceTree = "<group>"; };
-		4496998E21416A9700B6412E /* TweenManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenManager.h; sourceTree = "<group>"; };
-		4496998F21416A9700B6412E /* TweenPropType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenPropType.cpp; sourceTree = "<group>"; };
-		4496999021416A9700B6412E /* TweenPropType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenPropType.h; sourceTree = "<group>"; };
-		4496999121416A9700B6412E /* TweenValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenValue.cpp; sourceTree = "<group>"; };
-		4496999221416A9700B6412E /* TweenValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenValue.h; sourceTree = "<group>"; };
-		449699A92141749C00B6412E /* ByteBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ByteBuffer.cpp; sourceTree = "<group>"; };
-		449699AA2141749C00B6412E /* ByteBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ByteBuffer.h; sourceTree = "<group>"; };
-		449699AE2141785900B6412E /* TranslationHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TranslationHelper.cpp; sourceTree = "<group>"; };
-		449699AF2141785900B6412E /* TranslationHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslationHelper.h; sourceTree = "<group>"; };
+		7D0EA2C22373EC5C008942A9 /* ByteBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ByteBuffer.cpp; sourceTree = "<group>"; };
+		7D0EA2C32373EC5C008942A9 /* ByteBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ByteBuffer.h; sourceTree = "<group>"; };
+		7D0EA2CA2373EFF3008942A9 /* EaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EaseManager.h; sourceTree = "<group>"; };
+		7D0EA2CB2373EFF3008942A9 /* TweenManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenManager.cpp; sourceTree = "<group>"; };
+		7D0EA2CC2373EFF3008942A9 /* TweenManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenManager.h; sourceTree = "<group>"; };
+		7D0EA2CD2373EFF3008942A9 /* TweenValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenValue.cpp; sourceTree = "<group>"; };
+		7D0EA2CE2373EFF3008942A9 /* GTweener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTweener.cpp; sourceTree = "<group>"; };
+		7D0EA2CF2373EFF3008942A9 /* GTween.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTween.h; sourceTree = "<group>"; };
+		7D0EA2D02373EFF3008942A9 /* GTweener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTweener.h; sourceTree = "<group>"; };
+		7D0EA2D12373EFF3008942A9 /* EaseType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EaseType.h; sourceTree = "<group>"; };
+		7D0EA2D22373EFF3008942A9 /* EaseManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EaseManager.cpp; sourceTree = "<group>"; };
+		7D0EA2D32373EFF3008942A9 /* TweenPropType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenPropType.h; sourceTree = "<group>"; };
+		7D0EA2D42373EFF3008942A9 /* TweenPropType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TweenPropType.cpp; sourceTree = "<group>"; };
+		7D0EA2D52373EFF3008942A9 /* TweenValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweenValue.h; sourceTree = "<group>"; };
+		7D0EA2D62373EFF3008942A9 /* GTween.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTween.cpp; sourceTree = "<group>"; };
+		7D0EA2EA2373F172008942A9 /* TranslationHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslationHelper.h; sourceTree = "<group>"; };
+		7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TranslationHelper.cpp; sourceTree = "<group>"; };
+		7DCFF2C0237E3EF20031E954 /* GPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPath.cpp; sourceTree = "<group>"; };
+		7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GearFontSize.cpp; sourceTree = "<group>"; };
+		7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GearDisplay2.cpp; sourceTree = "<group>"; };
+		7DCFF2C5237E3F410031E954 /* GearFontSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GearFontSize.h; sourceTree = "<group>"; };
+		7DCFF2C6237E3F410031E954 /* GearDisplay2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GearDisplay2.h; sourceTree = "<group>"; };
+		7DCFF2CD237E3F490031E954 /* GPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPath.h; sourceTree = "<group>"; };
+		7DCFF2CF237E40360031E954 /* GTreeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTreeNode.cpp; sourceTree = "<group>"; };
+		7DCFF2D0237E40370031E954 /* GTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTreeNode.h; sourceTree = "<group>"; };
+		7DCFF2D1237E40370031E954 /* GTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTree.h; sourceTree = "<group>"; };
+		7DCFF2D2237E40370031E954 /* GTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GTree.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -365,8 +382,6 @@
 		445402381FB3E9E400869375 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				4496998521416A9700B6412E /* tween */,
-				44905A891FC574BC00C33C88 /* treeview */,
 				44905A4F1FC3CCCD00C33C88 /* controller_action */,
 				445402391FB3E9E400869375 /* Controller.cpp */,
 				4454023A1FB3E9E400869375 /* Controller.h */,
@@ -381,8 +396,6 @@
 				4454025A1FB3E9E400869375 /* GButton.h */,
 				4454025B1FB3E9E400869375 /* GComboBox.cpp */,
 				4454025C1FB3E9E400869375 /* GComboBox.h */,
-				449699AE2141785900B6412E /* TranslationHelper.cpp */,
-				449699AF2141785900B6412E /* TranslationHelper.h */,
 				4454025D1FB3E9E400869375 /* GComponent.cpp */,
 				4454025E1FB3E9E400869375 /* GComponent.h */,
 				4454025F1FB3E9E400869375 /* gears */,
@@ -418,6 +431,10 @@
 				4454028F1FB3E9E400869375 /* GTextField.h */,
 				445402901FB3E9E400869375 /* GTextInput.cpp */,
 				445402911FB3E9E400869375 /* GTextInput.h */,
+				7DCFF2D2237E40370031E954 /* GTree.cpp */,
+				7DCFF2D1237E40370031E954 /* GTree.h */,
+				7DCFF2CF237E40360031E954 /* GTreeNode.cpp */,
+				7DCFF2D0237E40370031E954 /* GTreeNode.h */,
 				445402921FB3E9E400869375 /* Margin.cpp */,
 				445402931FB3E9E400869375 /* Margin.h */,
 				445402941FB3E9E400869375 /* PackageItem.cpp */,
@@ -432,6 +449,9 @@
 				4454029D1FB3E9E400869375 /* ScrollPane.h */,
 				4454029E1FB3E9E400869375 /* Transition.cpp */,
 				4454029F1FB3E9E400869375 /* Transition.h */,
+				7D0EA2EB2373F172008942A9 /* TranslationHelper.cpp */,
+				7D0EA2EA2373F172008942A9 /* TranslationHelper.h */,
+				7D0EA2C92373EFF3008942A9 /* tween */,
 				445402A01FB3E9E400869375 /* UIConfig.cpp */,
 				445402A11FB3E9E400869375 /* UIConfig.h */,
 				445402A21FB3E9E400869375 /* UIObjectFactory.cpp */,
@@ -488,6 +508,10 @@
 		4454025F1FB3E9E400869375 /* gears */ = {
 			isa = PBXGroup;
 			children = (
+				7DCFF2C4237E3F410031E954 /* GearDisplay2.cpp */,
+				7DCFF2C6237E3F410031E954 /* GearDisplay2.h */,
+				7DCFF2C3237E3F410031E954 /* GearFontSize.cpp */,
+				7DCFF2C5237E3F410031E954 /* GearFontSize.h */,
 				445402601FB3E9E400869375 /* GearAnimation.cpp */,
 				445402611FB3E9E400869375 /* GearAnimation.h */,
 				445402621FB3E9E400869375 /* GearBase.cpp */,
@@ -513,11 +537,11 @@
 		445402A61FB3E9E400869375 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				7D0EA2C22373EC5C008942A9 /* ByteBuffer.cpp */,
+				7D0EA2C32373EC5C008942A9 /* ByteBuffer.h */,
 				44905A4A1FC2D5E600C33C88 /* WeakPtr.cpp */,
 				44905A4B1FC2D5E600C33C88 /* WeakPtr.h */,
 				445402AA1FB3E9E400869375 /* ToolSet.cpp */,
-				449699A92141749C00B6412E /* ByteBuffer.cpp */,
-				449699AA2141749C00B6412E /* ByteBuffer.h */,
 				445402AB1FB3E9E400869375 /* ToolSet.h */,
 				445402AC1FB3E9E400869375 /* UBBParser.cpp */,
 				445402AD1FB3E9E400869375 /* UBBParser.h */,
@@ -557,33 +581,24 @@
 			path = controller_action;
 			sourceTree = "<group>";
 		};
-		44905A891FC574BC00C33C88 /* treeview */ = {
+		7D0EA2C92373EFF3008942A9 /* tween */ = {
 			isa = PBXGroup;
 			children = (
-				44905A8A1FC574BC00C33C88 /* TreeNode.cpp */,
-				44905A8B1FC574BC00C33C88 /* TreeNode.h */,
-				44905A8C1FC574BC00C33C88 /* TreeView.cpp */,
-				44905A8D1FC574BC00C33C88 /* TreeView.h */,
-			);
-			path = treeview;
-			sourceTree = "<group>";
-		};
-		4496998521416A9700B6412E /* tween */ = {
-			isa = PBXGroup;
-			children = (
-				4496998621416A9700B6412E /* EaseManager.cpp */,
-				4496998721416A9700B6412E /* EaseManager.h */,
-				4496998821416A9700B6412E /* EaseType.h */,
-				4496998921416A9700B6412E /* GTween.cpp */,
-				4496998A21416A9700B6412E /* GTween.h */,
-				4496998B21416A9700B6412E /* GTweener.cpp */,
-				4496998C21416A9700B6412E /* GTweener.h */,
-				4496998D21416A9700B6412E /* TweenManager.cpp */,
-				4496998E21416A9700B6412E /* TweenManager.h */,
-				4496998F21416A9700B6412E /* TweenPropType.cpp */,
-				4496999021416A9700B6412E /* TweenPropType.h */,
-				4496999121416A9700B6412E /* TweenValue.cpp */,
-				4496999221416A9700B6412E /* TweenValue.h */,
+				7DCFF2CD237E3F490031E954 /* GPath.h */,
+				7DCFF2C0237E3EF20031E954 /* GPath.cpp */,
+				7D0EA2CA2373EFF3008942A9 /* EaseManager.h */,
+				7D0EA2CB2373EFF3008942A9 /* TweenManager.cpp */,
+				7D0EA2CC2373EFF3008942A9 /* TweenManager.h */,
+				7D0EA2CD2373EFF3008942A9 /* TweenValue.cpp */,
+				7D0EA2CE2373EFF3008942A9 /* GTweener.cpp */,
+				7D0EA2CF2373EFF3008942A9 /* GTween.h */,
+				7D0EA2D02373EFF3008942A9 /* GTweener.h */,
+				7D0EA2D12373EFF3008942A9 /* EaseType.h */,
+				7D0EA2D22373EFF3008942A9 /* EaseManager.cpp */,
+				7D0EA2D32373EFF3008942A9 /* TweenPropType.h */,
+				7D0EA2D42373EFF3008942A9 /* TweenPropType.cpp */,
+				7D0EA2D52373EFF3008942A9 /* TweenValue.h */,
+				7D0EA2D62373EFF3008942A9 /* GTween.cpp */,
 			);
 			path = tween;
 			sourceTree = "<group>";
@@ -595,18 +610,23 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4496999521416A9700B6412E /* EaseManager.h in Headers */,
-				4496999C21416A9700B6412E /* GTweener.h in Headers */,
-				449699AD2141749C00B6412E /* ByteBuffer.h in Headers */,
-				4496999F21416A9700B6412E /* TweenManager.h in Headers */,
-				449699B22141785900B6412E /* TranslationHelper.h in Headers */,
-				4496999621416A9700B6412E /* EaseType.h in Headers */,
+				7D0EA2DA2373EFF3008942A9 /* TweenManager.h in Headers */,
+				7DCFF2CB237E3F410031E954 /* GearFontSize.h in Headers */,
+				7D0EA2E02373EFF4008942A9 /* GTweener.h in Headers */,
+				7D0EA2C62373EC5C008942A9 /* ByteBuffer.h in Headers */,
 				445402FB1FB3EFFA00869375 /* libfairygui_MAC.hpp in Headers */,
+				7D0EA2EC2373F172008942A9 /* TranslationHelper.h in Headers */,
+				7D0EA2DF2373EFF3008942A9 /* GTween.h in Headers */,
+				7DCFF2D6237E40370031E954 /* GTree.h in Headers */,
+				7D0EA2E42373EFF4008942A9 /* TweenPropType.h in Headers */,
 				44905A9C1FC809AA00C33C88 /* TextFormat.h in Headers */,
-				449699A221416A9700B6412E /* TweenPropType.h in Headers */,
-				4496999921416A9700B6412E /* GTween.h in Headers */,
-				449699A521416A9700B6412E /* TweenValue.h in Headers */,
+				7DCFF2CE237E3F490031E954 /* GPath.h in Headers */,
+				7DCFF2CC237E3F410031E954 /* GearDisplay2.h in Headers */,
+				7D0EA2D72373EFF3008942A9 /* EaseManager.h in Headers */,
 				445402FD1FB3EFFA00869375 /* libfairygui_MACPriv.hpp in Headers */,
+				7D0EA2E72373EFF4008942A9 /* TweenValue.h in Headers */,
+				7DCFF2D5237E40370031E954 /* GTreeNode.h in Headers */,
+				7D0EA2E12373EFF4008942A9 /* EaseType.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -653,7 +673,7 @@
 		445402181FB3E8D500869375 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 1110;
 				TargetAttributes = {
 					4454021F1FB3E8D500869375 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -665,10 +685,11 @@
 			};
 			buildConfigurationList = 4454021B1FB3E8D500869375 /* Build configuration list for PBXProject "fairygui" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 445402171FB3E8D500869375;
 			productRefGroup = 445402211FB3E8D500869375 /* Products */;
@@ -691,18 +712,19 @@
 				44905A4C1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */,
 				445402B51FB3E9E400869375 /* FUIRichText.cpp in Sources */,
 				445402E21FB3E9E400869375 /* UIPackage.cpp in Sources */,
-				4496999721416A9700B6412E /* GTween.cpp in Sources */,
-				4496999A21416A9700B6412E /* GTweener.cpp in Sources */,
 				445402DE1FB3E9E400869375 /* ScrollPane.cpp in Sources */,
+				7D0EA2DD2373EFF3008942A9 /* GTweener.cpp in Sources */,
 				445402B71FB3E9E400869375 /* DragDropManager.cpp in Sources */,
+				7DCFF2C9237E3F410031E954 /* GearDisplay2.cpp in Sources */,
 				445402D11FB3E9E400869375 /* GObjectPool.cpp in Sources */,
+				7D0EA2E82373EFF4008942A9 /* GTween.cpp in Sources */,
 				445402C01FB3E9E400869375 /* GearAnimation.cpp in Sources */,
 				44905A6B1FC4367600C33C88 /* FUIInput.cpp in Sources */,
 				445402B31FB3E9E400869375 /* FUIContainer.cpp in Sources */,
 				445402D81FB3E9E400869375 /* GTextInput.cpp in Sources */,
-				44905A911FC574BC00C33C88 /* TreeView.cpp in Sources */,
 				445402E11FB3E9E400869375 /* UIObjectFactory.cpp in Sources */,
 				445402E61FB3E9E400869375 /* Window.cpp in Sources */,
+				7DCFF2D7237E40370031E954 /* GTree.cpp in Sources */,
 				44905A591FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */,
 				445402C11FB3E9E400869375 /* GearBase.cpp in Sources */,
 				445402DF1FB3E9E400869375 /* Transition.cpp in Sources */,
@@ -712,36 +734,36 @@
 				445402CC1FB3E9E400869375 /* GLabel.cpp in Sources */,
 				445402DD1FB3E9E400869375 /* Relations.cpp in Sources */,
 				445402B61FB3E9E400869375 /* FUISprite.cpp in Sources */,
-				44905A8E1FC574BC00C33C88 /* TreeNode.cpp in Sources */,
 				445402C51FB3E9E400869375 /* GearLook.cpp in Sources */,
 				445402C21FB3E9E400869375 /* GearColor.cpp in Sources */,
-				4496999321416A9700B6412E /* EaseManager.cpp in Sources */,
 				445402E41FB3E9E400869375 /* ToolSet.cpp in Sources */,
 				445402D41FB3E9E400869375 /* GRoot.cpp in Sources */,
 				445402D71FB3E9E400869375 /* GTextField.cpp in Sources */,
 				445402C71FB3E9E400869375 /* GearText.cpp in Sources */,
+				7D0EA2D82373EFF3008942A9 /* TweenManager.cpp in Sources */,
 				445402B01FB3E9E400869375 /* Controller.cpp in Sources */,
 				445402BA1FB3E9E400869375 /* InputEvent.cpp in Sources */,
 				445402CF1FB3E9E400869375 /* GMovieClip.cpp in Sources */,
 				445402E01FB3E9E400869375 /* UIConfig.cpp in Sources */,
 				445402B81FB3E9E400869375 /* EventContext.cpp in Sources */,
 				445402DB1FB3E9E400869375 /* PopupMenu.cpp in Sources */,
+				7DCFF2C1237E3EF20031E954 /* GPath.cpp in Sources */,
 				445402BE1FB3E9E400869375 /* GComboBox.cpp in Sources */,
 				445402BF1FB3E9E400869375 /* GComponent.cpp in Sources */,
 				445402C91FB3E9E400869375 /* GGraph.cpp in Sources */,
-				449699A321416A9700B6412E /* TweenValue.cpp in Sources */,
 				44905A561FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
 				445402D31FB3E9E400869375 /* GRichTextField.cpp in Sources */,
-				449699B02141785900B6412E /* TranslationHelper.cpp in Sources */,
 				445402CB1FB3E9E400869375 /* GImage.cpp in Sources */,
+				7D0EA2ED2373F172008942A9 /* TranslationHelper.cpp in Sources */,
+				7DCFF2D3237E40370031E954 /* GTreeNode.cpp in Sources */,
 				445402C31FB3E9E400869375 /* GearDisplay.cpp in Sources */,
+				7D0EA2C42373EC5C008942A9 /* ByteBuffer.cpp in Sources */,
 				445402E51FB3E9E400869375 /* UBBParser.cpp in Sources */,
-				4496999D21416A9700B6412E /* TweenManager.cpp in Sources */,
 				445402B91FB3E9E400869375 /* HitTest.cpp in Sources */,
 				445402C41FB3E9E400869375 /* GearIcon.cpp in Sources */,
-				449699A021416A9700B6412E /* TweenPropType.cpp in Sources */,
-				449699AB2141749C00B6412E /* ByteBuffer.cpp in Sources */,
 				445402BD1FB3E9E400869375 /* GButton.cpp in Sources */,
+				7D0EA2E22373EFF4008942A9 /* EaseManager.cpp in Sources */,
+				7D0EA2E52373EFF4008942A9 /* TweenPropType.cpp in Sources */,
 				445402D91FB3E9E400869375 /* Margin.cpp in Sources */,
 				445402C61FB3E9E400869375 /* GearSize.cpp in Sources */,
 				445402BC1FB3E9E400869375 /* UIEventDispatcher.cpp in Sources */,
@@ -749,12 +771,14 @@
 				445402D51FB3E9E400869375 /* GScrollBar.cpp in Sources */,
 				44905A5C1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
 				445402D21FB3E9E400869375 /* GProgressBar.cpp in Sources */,
+				7DCFF2C7237E3F410031E954 /* GearFontSize.cpp in Sources */,
 				445402DC1FB3E9E400869375 /* RelationItem.cpp in Sources */,
 				445402CD1FB3E9E400869375 /* GList.cpp in Sources */,
 				445402B21FB3E9E400869375 /* BitmapFont.cpp in Sources */,
 				445402CE1FB3E9E400869375 /* GLoader.cpp in Sources */,
 				445402BB1FB3E9E400869375 /* InputProcessor.cpp in Sources */,
 				44905A9A1FC809AA00C33C88 /* TextFormat.cpp in Sources */,
+				7D0EA2DB2373EFF3008942A9 /* TweenValue.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -762,9 +786,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4496999B21416A9700B6412E /* GTweener.cpp in Sources */,
+				7D0EA2DE2373EFF3008942A9 /* GTweener.cpp in Sources */,
 				445403761FB4098900869375 /* Controller.cpp in Sources */,
-				44905A921FC574BC00C33C88 /* TreeView.cpp in Sources */,
 				445403781FB4098900869375 /* BitmapFont.cpp in Sources */,
 				445403791FB4098900869375 /* FUIContainer.cpp in Sources */,
 				4454037A1FB4098900869375 /* FUILabel.cpp in Sources */,
@@ -779,12 +802,13 @@
 				445403821FB4098900869375 /* UIEventDispatcher.cpp in Sources */,
 				445403831FB4098900869375 /* GButton.cpp in Sources */,
 				445403841FB4098900869375 /* GComboBox.cpp in Sources */,
+				7DCFF2D8237E40370031E954 /* GTree.cpp in Sources */,
 				445403851FB4098900869375 /* GComponent.cpp in Sources */,
 				445403861FB4098900869375 /* GearAnimation.cpp in Sources */,
-				449699B12141785900B6412E /* TranslationHelper.cpp in Sources */,
+				7D0EA2EE2373F172008942A9 /* TranslationHelper.cpp in Sources */,
 				445403871FB4098900869375 /* GearBase.cpp in Sources */,
 				445403881FB4098900869375 /* GearColor.cpp in Sources */,
-				44905A8F1FC574BC00C33C88 /* TreeNode.cpp in Sources */,
+				7D0EA2E92373EFF4008942A9 /* GTween.cpp in Sources */,
 				445403891FB4098900869375 /* GearDisplay.cpp in Sources */,
 				4454038A1FB4098900869375 /* GearIcon.cpp in Sources */,
 				4454038B1FB4098900869375 /* GearLook.cpp in Sources */,
@@ -795,9 +819,9 @@
 				445403901FB4098900869375 /* GGroup.cpp in Sources */,
 				44905A4D1FC2D5E600C33C88 /* WeakPtr.cpp in Sources */,
 				445403911FB4098900869375 /* GImage.cpp in Sources */,
-				449699AC2141749C00B6412E /* ByteBuffer.cpp in Sources */,
 				445403921FB4098900869375 /* GLabel.cpp in Sources */,
 				445403931FB4098900869375 /* GList.cpp in Sources */,
+				7D0EA2E32373EFF4008942A9 /* EaseManager.cpp in Sources */,
 				445403941FB4098900869375 /* GLoader.cpp in Sources */,
 				445403951FB4098900869375 /* GMovieClip.cpp in Sources */,
 				445403961FB4098900869375 /* GObject.cpp in Sources */,
@@ -807,31 +831,34 @@
 				4454039A1FB4098900869375 /* GRoot.cpp in Sources */,
 				4454039B1FB4098900869375 /* GScrollBar.cpp in Sources */,
 				44905A5A1FC3CCCD00C33C88 /* ControllerAction.cpp in Sources */,
+				7DCFF2C8237E3F410031E954 /* GearFontSize.cpp in Sources */,
 				44905A5D1FC3CCCD00C33C88 /* PlayTransitionAction.cpp in Sources */,
 				4454039C1FB4098900869375 /* GSlider.cpp in Sources */,
 				4454039D1FB4098900869375 /* GTextField.cpp in Sources */,
 				4454039E1FB4098900869375 /* GTextInput.cpp in Sources */,
-				449699A421416A9700B6412E /* TweenValue.cpp in Sources */,
+				7D0EA2DC2373EFF3008942A9 /* TweenValue.cpp in Sources */,
 				4454039F1FB4098900869375 /* Margin.cpp in Sources */,
 				445403A01FB4098900869375 /* PackageItem.cpp in Sources */,
-				4496999821416A9700B6412E /* GTween.cpp in Sources */,
 				445403A11FB4098900869375 /* PopupMenu.cpp in Sources */,
 				445403A21FB4098900869375 /* RelationItem.cpp in Sources */,
+				7DCFF2C2237E3EF20031E954 /* GPath.cpp in Sources */,
 				445403A31FB4098900869375 /* Relations.cpp in Sources */,
 				445403A41FB4098900869375 /* ScrollPane.cpp in Sources */,
 				445403A51FB4098900869375 /* Transition.cpp in Sources */,
 				445403A61FB4098900869375 /* UIConfig.cpp in Sources */,
+				7D0EA2C52373EC5C008942A9 /* ByteBuffer.cpp in Sources */,
 				445403A71FB4098900869375 /* UIObjectFactory.cpp in Sources */,
 				445403A81FB4098900869375 /* UIPackage.cpp in Sources */,
-				4496999E21416A9700B6412E /* TweenManager.cpp in Sources */,
+				7D0EA2E62373EFF4008942A9 /* TweenPropType.cpp in Sources */,
+				7DCFF2CA237E3F410031E954 /* GearDisplay2.cpp in Sources */,
 				44905A6C1FC4367600C33C88 /* FUIInput.cpp in Sources */,
-				449699A121416A9700B6412E /* TweenPropType.cpp in Sources */,
-				4496999421416A9700B6412E /* EaseManager.cpp in Sources */,
 				445403AA1FB4098900869375 /* ToolSet.cpp in Sources */,
 				445403AB1FB4098900869375 /* UBBParser.cpp in Sources */,
+				7DCFF2D4237E40370031E954 /* GTreeNode.cpp in Sources */,
 				445403AC1FB4098900869375 /* Window.cpp in Sources */,
 				44905A571FC3CCCD00C33C88 /* ChangePageAction.cpp in Sources */,
 				445402FF1FB3EFFA00869375 /* libfairygui_MAC.cpp in Sources */,
+				7D0EA2D92373EFF3008942A9 /* TweenManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -841,19 +868,29 @@
 		445402271FB3E8D500869375 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -896,19 +933,29 @@
 		445402281FB3E8D500869375 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

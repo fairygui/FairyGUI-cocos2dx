@@ -1,7 +1,7 @@
 {
-	"defaultResolution":"1136,640",
 	"designResolutionX":0,
 	"designResolutionY":0,
+	"devices":[],
 	"scaleMode":"ConstantPixelSize",
 	"screenMathMode":"MatchWidthOrHeight"
 }

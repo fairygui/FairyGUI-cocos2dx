@@ -254,7 +254,7 @@ void FUIXMLVisitor::startElement(void* /*ctx*/, const char *elementName, const c
         auto it = tagAttrValueMap.find("color");
         if (it != tagAttrValueMap.end())
         {
-            _format.color = (Color3B)ToolSet::convertFromHtmlColor(it->second.asString().c_str());
+            _format.color = (Color3B)ToolSet::hexToColor(it->second.asString().c_str());
             _format._hasColor = true;
         }
     }

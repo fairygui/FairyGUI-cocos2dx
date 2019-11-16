@@ -4,6 +4,7 @@
 #include "GTextInput.h"
 #include "PackageItem.h"
 #include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -91,6 +92,50 @@ GTextField * GLabel::getTextField() const
         return nullptr;
 }
 
+cocos2d::Value GLabel::getProp(ObjectPropID propId)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        return Value(ToolSet::colorToInt(getTitleColor()));
+    case ObjectPropID::OutlineColor:
+    {
+        GTextField* tf = getTextField();
+        if (tf != nullptr)
+            return Value(ToolSet::colorToInt(tf->getOutlineColor()));
+        else
+            return Value::Null;
+    }
+    case ObjectPropID::FontSize:
+        return Value(getTitleFontSize());
+    default:
+        return GComponent::getProp(propId);
+    }
+}
+
+void GLabel::setProp(ObjectPropID propId, const cocos2d::Value& value)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        setTitleColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    case ObjectPropID::OutlineColor:
+    {
+        GTextField* tf = getTextField();
+        if (tf != nullptr)
+            tf->setOutlineColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    }
+    case ObjectPropID::FontSize:
+        setTitleFontSize(value.asInt());
+        break;
+    default:
+        GComponent::setProp(propId, value);
+        break;
+    }
+}
+
 void GLabel::constructExtension(ByteBuffer* buffer)
 {
     _titleObject = getChild("title");
@@ -101,44 +146,44 @@ void GLabel::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 {
     GComponent::setup_afterAdd(buffer, beginPos);
 
-    if (!buffer->Seek(beginPos, 6))
+    if (!buffer->seek(beginPos, 6))
         return;
 
-    if ((ObjectType)buffer->ReadByte() != _packageItem->objectType)
+    if ((ObjectType)buffer->readByte() != _packageItem->objectType)
         return;
 
     const std::string* str;
 
-    if ((str = buffer->ReadSP()))
+    if ((str = buffer->readSP()))
         setTitle(*str);
-    if ((str = buffer->ReadSP()))
+    if ((str = buffer->readSP()))
         setIcon(*str);
-    if (buffer->ReadBool())
-        setTitleColor((Color3B)buffer->ReadColor());
-    int iv = buffer->ReadInt();
+    if (buffer->readBool())
+        setTitleColor((Color3B)buffer->readColor());
+    int iv = buffer->readInt();
     if (iv != 0)
         setTitleFontSize(iv);
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
         GTextInput* input = dynamic_cast<GTextInput*>(getTextField());
         if (input)
         {
-            if ((str = buffer->ReadSP()))
+            if ((str = buffer->readSP()))
                 input->setPrompt(*str);
-            if ((str = buffer->ReadSP()))
+            if ((str = buffer->readSP()))
                 input->setRestrict(*str);
-            iv = buffer->ReadInt();
+            iv = buffer->readInt();
             if (iv != 0)
                 input->setMaxLength(iv);
-            iv = buffer->ReadInt();
+            iv = buffer->readInt();
             if (iv != 0)
                 input->setKeyboardType(iv);
-            if (buffer->ReadBool())
+            if (buffer->readBool())
                 input->setPassword(true);
         }
         else
-            buffer->Skip(13);
+            buffer->skip(13);
     }
 }
 

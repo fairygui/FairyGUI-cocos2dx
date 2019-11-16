@@ -1,15 +1,15 @@
-#include "TreeNode.h"
-#include "TreeView.h"
+#include "GTreeNode.h"
 #include "GComponent.h"
+#include "GTree.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-TreeNode * TreeNode::create(bool isFolder)
+GTreeNode* GTreeNode::create(bool isFolder, const std::string& resURL)
 {
-    TreeNode* pRet = new (std::nothrow) TreeNode();
+    GTreeNode* pRet = new (std::nothrow) GTreeNode();
 
-    if (pRet != nullptr && pRet->init(isFolder))
+    if (pRet != nullptr && pRet->init(isFolder, resURL))
     {
         pRet->autorelease();
     }
@@ -21,21 +21,22 @@ TreeNode * TreeNode::create(bool isFolder)
     return pRet;
 }
 
-TreeNode::TreeNode() :
-    _root(nullptr),
-    _parent(nullptr),
-    _cell(nullptr),
-    _level(0),
-    _expanded(false),
-    _isFolder(false),
-    _isRootNode(false)
+GTreeNode::GTreeNode()
+    : _tree(nullptr),
+      _parent(nullptr),
+      _cell(nullptr),
+      _level(0),
+      _expanded(false),
+      _isFolder(false)
 {
 }
 
-TreeNode::~TreeNode()
+GTreeNode::~GTreeNode()
 {
-    for (auto &it : _children)
+    for (auto& it : _children)
         it->_parent = nullptr;
+
+    _children.clear();
 
     if (_parent)
         _parent->removeChild(this);
@@ -43,14 +44,15 @@ TreeNode::~TreeNode()
     CC_SAFE_RELEASE(_cell);
 }
 
-bool TreeNode::init(bool isFolder)
+bool GTreeNode::init(bool isFolder, const std::string& resURL)
 {
     _isFolder = isFolder;
+    _resURL = resURL;
 
     return true;
 }
 
-void TreeNode::setExpaned(bool value)
+void GTreeNode::setExpaned(bool value)
 {
     if (!_isFolder)
         return;
@@ -58,32 +60,51 @@ void TreeNode::setExpaned(bool value)
     if (_expanded != value)
     {
         _expanded = value;
-        if (_root != nullptr)
+        if (_tree != nullptr)
         {
             if (_expanded)
-                _root->afterExpanded(this);
+                _tree->afterExpanded(this);
             else
-                _root->afterCollapsed(this);
+                _tree->afterCollapsed(this);
         }
     }
 }
 
-const std::string & TreeNode::getText() const
+const std::string& GTreeNode::getText() const
 {
-    if (_cell)
+    if (_cell != nullptr)
         return _cell->getText();
     else
         return STD_STRING_EMPTY;
 }
 
+void GTreeNode::setText(const std::string& value)
+{
+    if (_cell != nullptr)
+        return _cell->setText(value);
+}
 
-TreeNode* TreeNode::addChild(TreeNode* child)
+const std::string& GTreeNode::getIcon() const
+{
+    if (_cell != nullptr)
+        return _cell->getIcon();
+    else
+        return STD_STRING_EMPTY;
+}
+
+void GTreeNode::setIcon(const std::string& value)
+{
+    if (_cell != nullptr)
+        return _cell->setIcon(value);
+}
+
+GTreeNode* GTreeNode::addChild(GTreeNode* child)
 {
     addChildAt(child, (int)_children.size());
     return child;
 }
 
-TreeNode* TreeNode::addChildAt(TreeNode* child, int index)
+GTreeNode* GTreeNode::addChildAt(GTreeNode* child, int index)
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
@@ -106,14 +127,14 @@ TreeNode* TreeNode::addChildAt(TreeNode* child, int index)
         child->release();
 
         child->_level = _level + 1;
-        child->setRoot(_root);
-        if (_isRootNode || (_cell != nullptr && _cell->getParent() != nullptr && _expanded))
-            _root->afterInserted(child);
+        child->setTree(_tree);
+        if ((_tree != nullptr && this == _tree->getRootNode()) || (_cell != nullptr && _cell->getParent() != nullptr && _expanded))
+            _tree->afterInserted(child);
     }
     return child;
 }
 
-void TreeNode::removeChild(TreeNode* child)
+void GTreeNode::removeChild(GTreeNode* child)
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
@@ -122,20 +143,22 @@ void TreeNode::removeChild(TreeNode* child)
         removeChildAt(childIndex);
 }
 
-void TreeNode::removeChildAt(int index)
+void GTreeNode::removeChildAt(int index)
 {
-    TreeNode* child = _children.at(index);
+    CCASSERT(index >= 0 && index < _children.size(), "Invalid child index");
+
+    GTreeNode* child = _children.at(index);
     child->_parent = nullptr;
     _children.erase(index);
 
-    if (_root != nullptr)
+    if (_tree != nullptr)
     {
-        child->setRoot(nullptr);
-        _root->afterRemoved(child);
+        child->setTree(nullptr);
+        _tree->afterRemoved(child);
     }
 }
 
-void TreeNode::removeChildren(int beginIndex, int endIndex)
+void GTreeNode::removeChildren(int beginIndex, int endIndex)
 {
     if (endIndex < 0 || endIndex >= _children.size())
         endIndex = (int)_children.size() - 1;
@@ -144,43 +167,45 @@ void TreeNode::removeChildren(int beginIndex, int endIndex)
         removeChildAt(beginIndex);
 }
 
-TreeNode* TreeNode::getChildAt(int index) const
+GTreeNode* GTreeNode::getChildAt(int index) const
 {
+    CCASSERT(index >= 0 && index < _children.size(), "Invalid child index");
+
     return _children.at(index);
 }
 
-TreeNode * TreeNode::getPrevSibling() const
+GTreeNode* GTreeNode::getPrevSibling() const
 {
     if (_parent == nullptr)
         return nullptr;
 
-    ssize_t i = _parent->_children.getIndex((TreeNode*)this);
+    ssize_t i = _parent->_children.getIndex((GTreeNode*)this);
     if (i <= 0)
         return nullptr;
 
     return _parent->_children.at(i - 1);
 }
 
-TreeNode * TreeNode::getNextSibling() const
+GTreeNode* GTreeNode::getNextSibling() const
 {
     if (_parent == nullptr)
         return nullptr;
 
-    ssize_t i = _parent->_children.getIndex((TreeNode*)this);
+    ssize_t i = _parent->_children.getIndex((GTreeNode*)this);
     if (i < 0 || i >= _parent->_children.size() - 1)
         return nullptr;
 
     return _parent->_children.at(i + 1);
 }
 
-int TreeNode::getChildIndex(const TreeNode* child) const
+int GTreeNode::getChildIndex(const GTreeNode* child) const
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
-    return (int)_children.getIndex((TreeNode*)child);
+    return (int)_children.getIndex((GTreeNode*)child);
 }
 
-void TreeNode::setChildIndex(TreeNode* child, int index)
+void GTreeNode::setChildIndex(GTreeNode* child, int index)
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
@@ -190,7 +215,7 @@ void TreeNode::setChildIndex(TreeNode* child, int index)
     moveChild(child, oldIndex, index);
 }
 
-int TreeNode::setChildIndexBefore(TreeNode* child, int index)
+int GTreeNode::setChildIndexBefore(GTreeNode* child, int index)
 {
     CCASSERT(child != nullptr, "Argument must be non-nil");
 
@@ -203,7 +228,7 @@ int TreeNode::setChildIndexBefore(TreeNode* child, int index)
         return moveChild(child, oldIndex, index);
 }
 
-int TreeNode::moveChild(TreeNode* child, int oldIndex, int index)
+int GTreeNode::moveChild(GTreeNode* child, int oldIndex, int index)
 {
     int cnt = (int)_children.size();
     if (index > cnt)
@@ -219,13 +244,13 @@ int TreeNode::moveChild(TreeNode* child, int oldIndex, int index)
     else
         _children.insert(index, child);
     child->release();
-    if (_cell != nullptr && _cell->getParent() != nullptr && _expanded)
-        _root->afterMoved(child);
+    if ((_tree != nullptr && this == _tree->getRootNode()) || (_cell != nullptr && _cell->getParent() != nullptr && _expanded))
+        _tree->afterMoved(child);
 
     return index;
 }
 
-void TreeNode::swapChildren(TreeNode* child1, TreeNode* child2)
+void GTreeNode::swapChildren(GTreeNode* child1, GTreeNode* child2)
 {
     CCASSERT(child1 != nullptr, "Argument1 must be non-nil");
     CCASSERT(child2 != nullptr, "Argument2 must be non-nil");
@@ -239,37 +264,37 @@ void TreeNode::swapChildren(TreeNode* child1, TreeNode* child2)
     swapChildrenAt(index1, index2);
 }
 
-void TreeNode::swapChildrenAt(int index1, int index2)
+void GTreeNode::swapChildrenAt(int index1, int index2)
 {
-    TreeNode* child1 = _children.at(index1);
-    TreeNode* child2 = _children.at(index2);
+    GTreeNode* child1 = _children.at(index1);
+    GTreeNode* child2 = _children.at(index2);
 
     setChildIndex(child1, index2);
     setChildIndex(child2, index1);
 }
 
-int TreeNode::numChildren() const
+int GTreeNode::numChildren() const
 {
     return (int)_children.size();
 }
 
-void TreeNode::setRoot(TreeView* value)
+void GTreeNode::setTree(GTree* value)
 {
-    _root = value;
-    if (_root != nullptr && _root->treeNodeWillExpand != nullptr && _expanded)
-        _root->treeNodeWillExpand(this, true);
+    _tree = value;
+    if (_tree != nullptr && _tree->treeNodeWillExpand != nullptr && _expanded)
+        _tree->treeNodeWillExpand(this, true);
 
     if (_isFolder)
     {
-        for (auto &child : _children)
+        for (auto& child : _children)
         {
             child->_level = _level + 1;
-            child->setRoot(value);
+            child->setTree(value);
         }
     }
 }
 
-void TreeNode::setCell(GComponent * value)
+void GTreeNode::setCell(GComponent* value)
 {
     if (_cell != value)
     {

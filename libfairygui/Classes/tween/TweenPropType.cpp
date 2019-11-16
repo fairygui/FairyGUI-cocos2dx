@@ -119,7 +119,7 @@ void TweenPropTypeUtils::setProps(cocos2d::Node * target, TweenPropType propType
         break;
 
     case TweenPropType::Progress:
-        g->as<GProgressBar>()->setValue(value.d);
+        g->as<GProgressBar>()->update(value.d);
         break;
     default:
         break;

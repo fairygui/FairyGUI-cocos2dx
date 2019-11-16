@@ -3,15 +3,15 @@
 NS_FGUI_BEGIN
 using namespace std;
 
-ByteBuffer::ByteBuffer(char* buffer, int offset, int len, bool transferOwnerShip = false) :
-    _buffer(buffer),
-    position(0),
-    _offset(offset),
-    _length(len),
-    _littleEndian(false),
-    _ownsBuffer(transferOwnerShip),
-    stringTable(nullptr),
-    version(0)
+ByteBuffer::ByteBuffer(char* buffer, int offset, int len, bool transferOwnerShip = false)
+    : _buffer(buffer),
+      _position(0),
+      _offset(offset),
+      _length(len),
+      _littleEndian(false),
+      _ownsBuffer(transferOwnerShip),
+      _stringTable(nullptr),
+      version(0)
 {
 }
 
@@ -23,33 +23,34 @@ ByteBuffer::~ByteBuffer()
 
 int ByteBuffer::getBytesAvailable() const
 {
-    return _length - position;
+    return _length - _position;
 }
 
-char ByteBuffer::ReadByte()
+char ByteBuffer::readByte()
 {
-    signed char val = _buffer[_offset + position];
+    signed char val = _buffer[_offset + _position];
     if (val > 127)
         val = val - 255;
-    position += 1;
+    _position += 1;
     return val;
 }
 
-unsigned char ByteBuffer::ReadUbyte() {
-    unsigned char val = _buffer[_offset + position];
-    position += 1;
+unsigned char ByteBuffer::readUbyte()
+{
+    unsigned char val = _buffer[_offset + _position];
+    _position += 1;
     return val;
 }
 
-bool ByteBuffer::ReadBool()
+bool ByteBuffer::readBool()
 {
-    return ReadByte() == 1;
+    return readByte() == 1;
 }
 
-short ByteBuffer::ReadShort()
+short ByteBuffer::readShort()
 {
-    int startIndex = _offset + position;
-    position += 2;
+    int startIndex = _offset + _position;
+    _position += 2;
     unsigned char* pbyte = (unsigned char*)(_buffer + startIndex);
     if (_littleEndian)
         return (short)((*pbyte) | (*(pbyte + 1) << 8));
@@ -57,15 +58,15 @@ short ByteBuffer::ReadShort()
         return (short)((*pbyte << 8) | (*(pbyte + 1)));
 }
 
-unsigned short ByteBuffer::ReadUshort()
+unsigned short ByteBuffer::readUshort()
 {
-    return (unsigned short)ReadShort();
+    return (unsigned short)readShort();
 }
 
-int ByteBuffer::ReadInt()
+int ByteBuffer::readInt()
 {
-    int startIndex = _offset + position;
-    position += 4;
+    int startIndex = _offset + _position;
+    _position += 4;
     unsigned char* pbyte = (unsigned char*)(_buffer + startIndex);
     if (_littleEndian)
         return (*pbyte) | (*(pbyte + 1) << 8) | (*(pbyte + 2) << 16) | (*(pbyte + 3) << 24);
@@ -73,30 +74,30 @@ int ByteBuffer::ReadInt()
         return (*pbyte << 24) | (*(pbyte + 1) << 16) | (*(pbyte + 2) << 8) | (*(pbyte + 3));
 }
 
-unsigned int ByteBuffer::ReadUint()
+unsigned int ByteBuffer::readUint()
 {
-    return (unsigned int)ReadInt();
+    return (unsigned int)readInt();
 }
 
-float ByteBuffer::ReadFloat()
+float ByteBuffer::readFloat()
 {
-    int val = ReadInt();
+    int val = readInt();
     return *(float*)&val;
 }
 
-std::string ByteBuffer::ReadString()
+std::string ByteBuffer::readString()
 {
-    int len = ReadUshort();
-    return ReadString(len);
+    int len = readUshort();
+    return readString(len);
 }
 
-std::string ByteBuffer::ReadString(int len)
+std::string ByteBuffer::readString(int len)
 {
     char* value = new char[len + 1];
 
     value[len] = '\0';
-    memcpy(value, _buffer + position, len);
-    position += len;
+    memcpy(value, _buffer + _position, len);
+    _position += len;
 
     string str(value);
     delete[] value;
@@ -105,18 +106,18 @@ std::string ByteBuffer::ReadString(int len)
     return str;
 }
 
-const std::string& ByteBuffer::ReadS()
+const std::string& ByteBuffer::readS()
 {
-    int index = ReadUshort();
+    int index = readUshort();
     if (index == 65534 || index == 65533)
         return cocos2d::STD_STRING_EMPTY;
     else
-        return (*stringTable)[index];
+        return (*_stringTable)[index];
 }
 
-bool ByteBuffer::ReadS(std::string& result)
+bool ByteBuffer::readS(std::string& result)
 {
-    int index = ReadUshort();
+    int index = readUshort();
     if (index == 65534) //null
         return false;
     else if (index == 65533)
@@ -126,87 +127,93 @@ bool ByteBuffer::ReadS(std::string& result)
     }
     else
     {
-        result = (*stringTable)[index];
+        result = (*_stringTable)[index];
         return true;
     }
 }
 
-const string* ByteBuffer::ReadSP()
+const string* ByteBuffer::readSP()
 {
-    int index = ReadUshort();
+    int index = readUshort();
     if (index == 65534) //null
         return nullptr;
     else if (index == 65533)
         return &cocos2d::STD_STRING_EMPTY;
     else
-        return &(*stringTable)[index];
+        return &(*_stringTable)[index];
 }
 
-void ByteBuffer::WriteS(const std::string& value)
+void ByteBuffer::readSArray(std::vector<std::string>& arr, int count)
 {
-    int index = ReadUshort();
+    for (int i = 0; i < count; i++)
+        arr.push_back(readS());
+}
+
+void ByteBuffer::writeS(const std::string& value)
+{
+    int index = readUshort();
     if (index != 65534 && index != 65533)
-        (*stringTable)[index] = value;
+        (*_stringTable)[index] = value;
 }
 
-cocos2d::Color4B ByteBuffer::ReadColor()
+cocos2d::Color4B ByteBuffer::readColor()
 {
-    int startIndex = _offset + position;
+    int startIndex = _offset + _position;
     GLubyte r = _buffer[startIndex];
     GLubyte g = _buffer[startIndex + 1];
     GLubyte b = _buffer[startIndex + 2];
     GLubyte a = _buffer[startIndex + 3];
-    position += 4;
+    _position += 4;
 
     return cocos2d::Color4B(r, g, b, a);
 }
 
-ByteBuffer* ByteBuffer::ReadBuffer()
+ByteBuffer* ByteBuffer::readBuffer()
 {
-    int count = ReadInt();
+    int count = readInt();
     char* p = (char*)malloc(count);
-    memcpy(p, _buffer + position, count);
+    memcpy(p, _buffer + _position, count);
     ByteBuffer* ba = new ByteBuffer(p, 0, count, true);
-    ba->stringTable = stringTable;
+    ba->_stringTable = _stringTable;
     ba->version = version;
-    position += count;
+    _position += count;
     return ba;
 }
 
-bool ByteBuffer::Seek(int indexTablePos, int blockIndex)
+bool ByteBuffer::seek(int indexTablePos, int blockIndex)
 {
-    int tmp = position;
-    position = indexTablePos;
-    int segCount = _buffer[_offset + position++];
+    int tmp = _position;
+    _position = indexTablePos;
+    int segCount = _buffer[_offset + _position++];
     if (blockIndex < segCount)
     {
-        bool useShort = _buffer[_offset + position++] == 1;
+        bool useShort = _buffer[_offset + _position++] == 1;
         int newPos;
         if (useShort)
         {
-            position += 2 * blockIndex;
-            newPos = ReadShort();
+            _position += 2 * blockIndex;
+            newPos = readShort();
         }
         else
         {
-            position += 4 * blockIndex;
-            newPos = ReadInt();
+            _position += 4 * blockIndex;
+            newPos = readInt();
         }
 
         if (newPos > 0)
         {
-            position = indexTablePos + newPos;
+            _position = indexTablePos + newPos;
             return true;
         }
         else
         {
-            position = tmp;
+            _position = tmp;
             return false;
         }
     }
     else
     {
-        position = tmp;
+        _position = tmp;
         return false;
     }
 }

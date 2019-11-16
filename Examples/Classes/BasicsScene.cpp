@@ -32,11 +32,11 @@ void BasicsScene::continueInit()
     }
 }
 
-BasicsScene::BasicsScene() :
-    _winA(nullptr),
-    _winB(nullptr),
-    _pm(nullptr),
-    _popupCom(nullptr)
+BasicsScene::BasicsScene()
+    : _winA(nullptr),
+      _winB(nullptr),
+      _pm(nullptr),
+      _popupCom(nullptr)
 {
 }
 
@@ -82,18 +82,18 @@ void BasicsScene::runDemo(EventContext* context)
         playDragDrop();
     else if (type == "Popup")
         playPopup();
+    else if (type == "ProgressBar")
+        playProgress();
 }
 
 void BasicsScene::playText()
 {
     GComponent* obj = _demoObjects.at("Text");
-    obj->getChild("n12")->addEventListener(UIEventType::ClickLink, [this](EventContext* context)
-    {
+    obj->getChild("n12")->addEventListener(UIEventType::ClickLink, [this](EventContext* context) {
         GRichTextField* t = dynamic_cast<GRichTextField*>(context->getSender());
         t->setText("[img]ui://Basics/pet[/img][color=#FF0000]You click the link[/color]:" + context->getDataValue().asString());
     });
-    obj->getChild("n25")->addClickListener([this, obj](EventContext* context)
-    {
+    obj->getChild("n25")->addClickListener([this, obj](EventContext* context) {
         obj->getChild("n24")->setText(obj->getChild("n22")->getText());
     });
 }
@@ -117,18 +117,15 @@ void BasicsScene::playPopup()
         _popupCom->center();
     }
     GComponent* obj = _demoObjects.at("Popup");
-    obj->getChild("n0")->addClickListener([this](EventContext* context)
-    {
+    obj->getChild("n0")->addClickListener([this](EventContext* context) {
         _pm->show((GObject*)context->getSender(), PopupDirection::DOWN);
     });
 
-    obj->getChild("n1")->addClickListener([this](EventContext* context)
-    {
+    obj->getChild("n1")->addClickListener([this](EventContext* context) {
         UIRoot->showPopup(_popupCom);
     });
 
-    obj->addEventListener(UIEventType::RightClick, [this](EventContext* context)
-    {
+    obj->addEventListener(UIEventType::RightClick, [this](EventContext* context) {
         _pm->show();
     });
 }
@@ -150,13 +147,11 @@ void BasicsScene::playWindow()
         _winB = Window2::create();
         _winB->retain();
 
-        obj->getChild("n0")->addClickListener([this](EventContext*)
-        {
+        obj->getChild("n0")->addClickListener([this](EventContext*) {
             _winA->show();
         });
 
-        obj->getChild("n1")->addClickListener([this](EventContext*)
-        {
+        obj->getChild("n1")->addClickListener([this](EventContext*) {
             _winB->show();
         });
     }
@@ -186,18 +181,17 @@ void BasicsScene::playDepth()
     }
     startPos = fixedObj->getPosition();
 
-    obj->getChild("btn0")->addClickListener([obj](EventContext*)
-    {
+    obj->getChild("btn0")->addClickListener([obj](EventContext*) {
         GGraph* graph = GGraph::create();
         startPos.x += 10;
         startPos.y += 10;
         graph->setPosition(startPos.x, startPos.y);
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::RED);
         obj->getChild("n22")->as<GComponent>()->addChild(graph);
-    }, EventTag(this)); //avoid duplicate register
+    },
+                                            EventTag(this)); //avoid duplicate register
 
-    obj->getChild("btn1")->addClickListener([obj](EventContext*)
-    {
+    obj->getChild("btn1")->addClickListener([obj](EventContext*) {
         GGraph* graph = GGraph::create();
         startPos.x += 10;
         startPos.y += 10;
@@ -205,7 +199,8 @@ void BasicsScene::playDepth()
         graph->drawRect(150, 150, 1, Color4F::BLACK, Color4F::GREEN);
         graph->setSortingOrder(200);
         obj->getChild("n22")->as<GComponent>()->addChild(graph);
-    }, EventTag(this));
+    },
+                                            EventTag(this));
 }
 
 void BasicsScene::playDragDrop()
@@ -215,8 +210,7 @@ void BasicsScene::playDragDrop()
 
     GButton* b = obj->getChild("b")->as<GButton>();
     b->setDraggable(true);
-    b->addEventListener(UIEventType::DragStart, [b](EventContext* context)
-    {
+    b->addEventListener(UIEventType::DragStart, [b](EventContext* context) {
         //Cancel the original dragging, and start a new one with a agent.
         context->preventDefault();
 
@@ -225,8 +219,7 @@ void BasicsScene::playDragDrop()
 
     GButton* c = obj->getChild("c")->as<GButton>();
     c->setIcon("");
-    c->addEventListener(UIEventType::Drop, [c](EventContext* context)
-    {
+    c->addEventListener(UIEventType::Drop, [c](EventContext* context) {
         c->setIcon(context->getDataValue().asString());
     });
 
@@ -234,10 +227,36 @@ void BasicsScene::playDragDrop()
     Rect rect = bounds->transformRect(Rect(Vec2::ZERO, bounds->getSize()), _groot);
 
     //---!!Because at this time the container is on the right side of the stage and beginning to move to left(transition), so we need to caculate the final position
-    rect.origin.x -= obj->getParent()->getX();;
+    rect.origin.x -= obj->getParent()->getX();
     //----
 
     GButton* d = obj->getChild("d")->as<GButton>();
     d->setDraggable(true);
     d->setDragBounds(rect);
+}
+
+void BasicsScene::playProgress()
+{
+    GComponent* obj = _demoObjects.at("ProgressBar");
+    cocos2d::Director::getInstance()->getScheduler()->schedule(
+        CC_SCHEDULE_SELECTOR(BasicsScene::onPlayProgress), this, 0.02f, false);
+    obj->addEventListener(UIEventType::Exit, [this](EventContext*) {
+        cocos2d::Director::getInstance()->getScheduler()->unschedule(CC_SCHEDULE_SELECTOR(BasicsScene::onPlayProgress), this);
+    });
+}
+
+void BasicsScene::onPlayProgress(float dt)
+{
+    GComponent* obj = _demoObjects.at("ProgressBar");
+    int cnt = obj->numChildren();
+    for (int i = 0; i < cnt; i++)
+    {
+        GProgressBar* child = obj->getChildAt(i)->as<GProgressBar>();
+        if (child != nullptr)
+        {
+            child->setValue(child->getValue() + 1);
+            if (child->getValue() > child->getMax())
+                child->setValue(child->getMin());
+        }
+    }
 }

@@ -9,14 +9,15 @@ const char kProgressTextureCoords = 0x4b;
 
 Texture2D* FUISprite::_empty = nullptr;
 
-FUISprite::FUISprite() :
-    _fillMethod(FillMethod::None),
-    _fillOrigin(FillOrigin::Left),
-    _fillAmount(0),
-    _fillClockwise(false),
-    _vertexDataCount(0),
-    _vertexData(nullptr),
-    _fillGlProgramState(nullptr)
+FUISprite::FUISprite()
+    : _fillMethod(FillMethod::None),
+      _fillOrigin(FillOrigin::Left),
+      _fillAmount(0),
+      _fillClockwise(false),
+      _vertexDataCount(0),
+      _vertexData(nullptr),
+      _fillGlProgramState(nullptr),
+      _scaleByTile(false)
 {
 }
 
@@ -35,7 +36,7 @@ void FUISprite::clearContent()
     _empty = _texture;
 }
 
-void FUISprite::setScale9Grid(Rect * value)
+void FUISprite::setScale9Grid(Rect* value)
 {
     if (value == nullptr)
     {
@@ -46,11 +47,12 @@ void FUISprite::setScale9Grid(Rect * value)
     Rect insets = *value;
 
     // When Insets == Zero --> we should use a 1/3 of its untrimmed size
-    if (insets.equals(Rect::ZERO)) {
+    if (insets.equals(Rect::ZERO))
+    {
         insets = Rect(_originalContentSize.width / 3.0f,
-            _originalContentSize.height / 3.0f,
-            _originalContentSize.width / 3.0f,
-            _originalContentSize.height / 3.0f);
+                      _originalContentSize.height / 3.0f,
+                      _originalContentSize.width / 3.0f,
+                      _originalContentSize.height / 3.0f);
     }
 
     // emulate invalid insets. shouldn't be supported, but the original code supported it.
@@ -83,17 +85,22 @@ void FUISprite::setScale9Grid(Rect * value)
     // centerRect uses the trimmed frame origin as 0,0.
     // so, recenter inset rect
     insets.setRect(x1,
-        y1,
-        x2 - x1,
-        y2 - y1);
+                   y1,
+                   x2 - x1,
+                   y2 - y1);
 
     // Only update center rect while in slice mode.
     setCenterRect(insets);
 }
 
+void FUISprite::setScaleByTile(bool value)
+{
+    _scaleByTile = value;
+}
+
 void FUISprite::setGrayed(bool value)
 {
-    GLProgramState *glState = nullptr;
+    GLProgramState* glState = nullptr;
     if (value)
         glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, getTexture());
     else
@@ -104,7 +111,8 @@ void FUISprite::setGrayed(bool value)
 
 void FUISprite::setFillMethod(FillMethod value)
 {
-    if (_fillMethod != value) {
+    if (_fillMethod != value)
+    {
         _fillMethod = value;
 
         if (_fillMethod != FillMethod::None)
@@ -119,7 +127,8 @@ void FUISprite::setFillMethod(FillMethod value)
 
 void FUISprite::setFillOrigin(FillOrigin value)
 {
-    if (_fillOrigin != value) {
+    if (_fillOrigin != value)
+    {
         _fillOrigin = value;
 
         if (_fillMethod != FillMethod::None)
@@ -129,7 +138,8 @@ void FUISprite::setFillOrigin(FillOrigin value)
 
 void FUISprite::setFillClockwise(bool value)
 {
-    if (_fillClockwise != value) {
+    if (_fillClockwise != value)
+    {
         _fillClockwise = value;
 
         if (_fillMethod != FillMethod::None)
@@ -139,12 +149,21 @@ void FUISprite::setFillClockwise(bool value)
 
 void FUISprite::setFillAmount(float value)
 {
-    if (_fillAmount != value) {
+    if (_fillAmount != value)
+    {
         _fillAmount = value;
 
         if (_fillMethod != FillMethod::None)
             setupFill();
     }
+}
+
+void FUISprite::setContentSize(const Size& size)
+{
+    if (_scaleByTile)
+        setTextureRect(Rect(Vec2::ZERO, size));
+    else
+        Sprite::setContentSize(size);
 }
 
 void FUISprite::setupFill()
@@ -172,7 +191,8 @@ Tex2F FUISprite::textureCoordFromAlphaPoint(Vec2 alpha)
     Vec2 min(quad.bl.texCoords.u, quad.bl.texCoords.v);
     Vec2 max(quad.tr.texCoords.u, quad.tr.texCoords.v);
     //  Fix bug #1303 so that progress timer handles sprite frame texture rotation
-    if (isTextureRectRotated()) {
+    if (isTextureRectRotated())
+    {
         std::swap(alpha.x, alpha.y);
     }
     return Tex2F(min.x * (1.f - alpha.x) + max.x * alpha.x, min.y * (1.f - alpha.y) + max.y * alpha.y);
@@ -209,13 +229,13 @@ void FUISprite::updateColor(void)
 //    It now doesn't occur the cost of free/alloc data every update cycle.
 //    It also only changes the percentage point but no other points if they have not
 //    been modified.
-//    
+//
 //    It now deals with flipped texture. If you run into this problem, just use the
 //    sprite property and enable the methods flipX, flipY.
 ///
 void FUISprite::updateRadial(void)
 {
-    float angle = 2.f*((float)M_PI) * (_fillClockwise ? (1.0f - _fillAmount) : _fillAmount);
+    float angle = 2.f * ((float)M_PI) * (_fillClockwise ? (1.0f - _fillAmount) : _fillAmount);
 
     //    We find the vector to do a hit detection based on the percentage
     //    We know the first vector is the one @ 12 o'clock (top,mid) so we rotate
@@ -227,26 +247,30 @@ void FUISprite::updateRadial(void)
     int index = 0;
     Vec2 hit;
 
-    if (_fillAmount == 0.f) {
+    if (_fillAmount == 0.f)
+    {
         //    More efficient since we don't always need to check intersection
         //    If the alpha is zero then the hit point is top mid and the index is 0.
         hit = topMid;
         index = 0;
     }
-    else if (_fillAmount == 1.f) {
+    else if (_fillAmount == 1.f)
+    {
         //    More efficient since we don't always need to check intersection
         //    If the alpha is one then the hit point is top mid and the index is 4.
         hit = topMid;
         index = 4;
     }
-    else {
+    else
+    {
         //    We run a for loop checking the edges of the texture to find the
         //    intersection point
         //    We loop through five points since the top is split in half
 
         float min_t = FLT_MAX;
 
-        for (int i = 0; i <= kProgressTextureCoordsCount; ++i) {
+        for (int i = 0; i <= kProgressTextureCoordsCount; ++i)
+        {
             int pIndex = (i + (kProgressTextureCoordsCount - 1)) % kProgressTextureCoordsCount;
 
             Vec2 edgePtA = boundaryTexCoord(i % kProgressTextureCoordsCount);
@@ -254,10 +278,12 @@ void FUISprite::updateRadial(void)
 
             //    Remember that the top edge is split in half for the 12 o'clock position
             //    Let's deal with that here by finding the correct endpoints
-            if (i == 0) {
+            if (i == 0)
+            {
                 edgePtB = edgePtA.lerp(edgePtB, 1 - midpoint.x);
             }
-            else if (i == 4) {
+            else if (i == 4)
+            {
                 edgePtA = edgePtA.lerp(edgePtB, 1 - midpoint.x);
             }
 
@@ -268,18 +294,22 @@ void FUISprite::updateRadial(void)
 
                 //    Since our hit test is on rays we have to deal with the top edge
                 //    being in split in half so we have to test as a segment
-                if ((i == 0 || i == 4)) {
+                if ((i == 0 || i == 4))
+                {
                     //    s represents the point between edgePtA--edgePtB
-                    if (!(0.f <= s && s <= 1.f)) {
+                    if (!(0.f <= s && s <= 1.f))
+                    {
                         continue;
                     }
                 }
                 //    As long as our t isn't negative we are at least finding a
                 //    correct hitpoint from _midpoint to percentagePt.
-                if (t >= 0.f) {
+                if (t >= 0.f)
+                {
                     //    Because the percentage line and all the texture edges are
                     //    rays we should only account for the shortest intersection
-                    if (t < min_t) {
+                    if (t < min_t)
+                    {
                         min_t = t;
                         index = i;
                     }
@@ -295,20 +325,23 @@ void FUISprite::updateRadial(void)
     //    the 3 is for the _midpoint, 12 o'clock point and hitpoint position.
 
     bool sameIndexCount = true;
-    if (_vertexDataCount != index + 3) {
+    if (_vertexDataCount != index + 3)
+    {
         sameIndexCount = false;
         CC_SAFE_FREE(_vertexData);
         _vertexDataCount = 0;
     }
 
-    if (!_vertexData) {
+    if (!_vertexData)
+    {
         _vertexDataCount = index + 3;
         _vertexData = (V2F_C4B_T2F*)malloc(_vertexDataCount * sizeof(V2F_C4B_T2F));
         CCASSERT(_vertexData, "FUISprite. Not enough memory");
     }
     updateColor();
 
-    if (!sameIndexCount) {
+    if (!sameIndexCount)
+    {
 
         //    First we populate the array with the _midpoint, then all
         //    vertices/texcoords/colors of the 12 'o clock start and edges and the hitpoint
@@ -318,7 +351,8 @@ void FUISprite::updateRadial(void)
         _vertexData[1].texCoords = textureCoordFromAlphaPoint(topMid);
         _vertexData[1].vertices = vertexFromAlphaPoint(topMid);
 
-        for (int i = 0; i < index; ++i) {
+        for (int i = 0; i < index; ++i)
+        {
             Vec2 alphaPoint = boundaryTexCoord(i);
             _vertexData[i + 2].texCoords = textureCoordFromAlphaPoint(alphaPoint);
             _vertexData[i + 2].vertices = vertexFromAlphaPoint(alphaPoint);
@@ -335,7 +369,7 @@ void FUISprite::updateRadial(void)
 //    It now doesn't occur the cost of free/alloc data every update cycle.
 //    It also only changes the percentage point but no other points if they have not
 //    been modified.
-//    
+//
 //    It now deals with flipped texture. If you run into this problem, just use the
 //    sprite property and enable the methods flipX, flipY.
 ///
@@ -370,7 +404,8 @@ void FUISprite::updateBar(void)
         }
     }
 
-    if (!_vertexData) {
+    if (!_vertexData)
+    {
         _vertexDataCount = 4;
         _vertexData = (V2F_C4B_T2F*)malloc(_vertexDataCount * sizeof(V2F_C4B_T2F));
         CCASSERT(_vertexData, "FUISprite. Not enough memory");
@@ -396,18 +431,21 @@ void FUISprite::updateBar(void)
 
 Vec2 FUISprite::boundaryTexCoord(char index)
 {
-    if (index < kProgressTextureCoordsCount) {
-        if (!_fillClockwise) {
+    if (index < kProgressTextureCoordsCount)
+    {
+        if (!_fillClockwise)
+        {
             return Vec2((kProgressTextureCoords >> (7 - (index << 1))) & 1, (kProgressTextureCoords >> (7 - ((index << 1) + 1))) & 1);
         }
-        else {
+        else
+        {
             return Vec2((kProgressTextureCoords >> ((index << 1) + 1)) & 1, (kProgressTextureCoords >> (index << 1)) & 1);
         }
     }
     return Vec2::ZERO;
 }
 
-void FUISprite::onDraw(const Mat4 &transform, uint32_t /*flags*/)
+void FUISprite::onDraw(const Mat4& transform, uint32_t /*flags*/)
 {
     GLProgram* program = _fillGlProgramState->getGLProgram();
     program->use();
@@ -435,7 +473,7 @@ void FUISprite::onDraw(const Mat4 &transform, uint32_t /*flags*/)
     }
 }
 
-void FUISprite::draw(cocos2d::Renderer * renderer, const cocos2d::Mat4 & transform, uint32_t flags)
+void FUISprite::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags)
 {
     if (_texture == _empty)
         return;

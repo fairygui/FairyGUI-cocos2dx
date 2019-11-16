@@ -2,8 +2,8 @@
 #define __GEARSIZE_H__
 
 #include "FairyGUIMacros.h"
-#include "cocos2d.h"
 #include "GearBase.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -21,7 +21,7 @@ public:
     void updateFromRelations(float dx, float dy) override;
 
 protected:
-    void addStatus(const std::string&  pageId, ByteBuffer* buffer) override;
+    void addStatus(const std::string& pageId, ByteBuffer* buffer) override;
     void init() override;
 
 private:

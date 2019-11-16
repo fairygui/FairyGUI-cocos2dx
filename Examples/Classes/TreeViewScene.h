@@ -20,10 +20,11 @@ protected:
 
 private:
     void onClickNode(EventContext* context);
-    void renderTreeNode(TreeNode* node);
+    void renderTreeNode(GTreeNode* node, GComponent* obj);
 
     GComponent* _view;
-    TreeView* _treeView;
+    GTree* _tree1;
+    GTree* _tree2;
 };
 
 #endif

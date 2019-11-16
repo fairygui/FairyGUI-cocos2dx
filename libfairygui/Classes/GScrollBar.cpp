@@ -1,29 +1,29 @@
 #include "GScrollBar.h"
-#include "ScrollPane.h"
 #include "PackageItem.h"
+#include "ScrollPane.h"
 #include "utils/ByteBuffer.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GScrollBar::GScrollBar() :
-    _grip(nullptr),
-    _arrowButton1(nullptr),
-    _arrowButton2(nullptr),
-    _bar(nullptr),
-    _target(nullptr),
-    _vertical(false),
-    _scrollPerc(0),
-    _fixedGripSize(false)
+GScrollBar::GScrollBar()
+    : _grip(nullptr),
+      _arrowButton1(nullptr),
+      _arrowButton2(nullptr),
+      _bar(nullptr),
+      _target(nullptr),
+      _vertical(false),
+      _scrollPerc(0),
+      _fixedGripSize(false),
+      _gripDragging(false)
 {
 }
 
 GScrollBar::~GScrollBar()
 {
-
 }
 
-void GScrollBar::setScrollPane(ScrollPane * target, bool vertical)
+void GScrollBar::setScrollPane(ScrollPane* target, bool vertical)
 {
     _target = target;
     _vertical = vertical;
@@ -43,6 +43,8 @@ void GScrollBar::setDisplayPerc(float value)
             _grip->setWidth(floor(value * _bar->getWidth()));
         _grip->setX(round(_bar->getX() + (_bar->getWidth() - _grip->getWidth()) * _scrollPerc));
     }
+
+    _grip->setVisible(value != 0 && value != 1);
 }
 
 void GScrollBar::setScrollPerc(float value)
@@ -64,9 +66,9 @@ float GScrollBar::getMinSize()
 
 void GScrollBar::constructExtension(ByteBuffer* buffer)
 {
-    buffer->Seek(0, 6);
+    buffer->seek(0, 6);
 
-    _fixedGripSize = buffer->ReadBool();
+    _fixedGripSize = buffer->readBool();
 
     _grip = getChild("grip");
     CCASSERT(_grip != nullptr, "FairyGUI: should define grip");
@@ -78,6 +80,8 @@ void GScrollBar::constructExtension(ByteBuffer* buffer)
 
     _grip->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onGripTouchBegin, this));
     _grip->addEventListener(UIEventType::TouchMove, CC_CALLBACK_1(GScrollBar::onGripTouchMove, this));
+    _grip->addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GScrollBar::onGripTouchEnd, this));
+
     this->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onTouchBegin, this));
 
     if (_arrowButton1 != nullptr)
@@ -86,7 +90,7 @@ void GScrollBar::constructExtension(ByteBuffer* buffer)
         _arrowButton2->addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GScrollBar::onArrowButton2Click, this));
 }
 
-void GScrollBar::onTouchBegin(EventContext * context)
+void GScrollBar::onTouchBegin(EventContext* context)
 {
     context->stopPropagation();
 
@@ -108,7 +112,7 @@ void GScrollBar::onTouchBegin(EventContext * context)
     }
 }
 
-void GScrollBar::onGripTouchBegin(EventContext * context)
+void GScrollBar::onGripTouchBegin(EventContext* context)
 {
     if (_bar == nullptr)
         return;
@@ -116,10 +120,13 @@ void GScrollBar::onGripTouchBegin(EventContext * context)
     context->stopPropagation();
     context->captureTouch();
 
+    _gripDragging = true;
+    _target->updateScrollBarVisible();
+
     _dragOffset = globalToLocal(context->getInput()->getPosition()) - _grip->getPosition();
 }
 
-void GScrollBar::onGripTouchMove(EventContext * context)
+void GScrollBar::onGripTouchMove(EventContext* context)
 {
     Vec2 pt = globalToLocal(context->getInput()->getPosition());
 
@@ -143,7 +150,13 @@ void GScrollBar::onGripTouchMove(EventContext * context)
     }
 }
 
-void GScrollBar::onArrowButton1Click(EventContext * context)
+void GScrollBar::onGripTouchEnd(EventContext* context)
+{
+    _gripDragging = false;
+    _target->updateScrollBarVisible();
+}
+
+void GScrollBar::onArrowButton1Click(EventContext* context)
 {
     context->stopPropagation();
 
@@ -153,7 +166,7 @@ void GScrollBar::onArrowButton1Click(EventContext * context)
         _target->scrollLeft();
 }
 
-void GScrollBar::onArrowButton2Click(EventContext * context)
+void GScrollBar::onArrowButton2Click(EventContext* context)
 {
     context->stopPropagation();
 

@@ -31,6 +31,8 @@ private:
     void playDepth();
     void playText();
     void playPopup();
+    void playProgress();
+    void onPlayProgress(float dt);
 
     GComponent* _view;
     GObject* _backBtn;

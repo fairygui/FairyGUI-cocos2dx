@@ -5,13 +5,19 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GGroup::GGroup() :
-    _layout(GroupLayoutType::NONE),
-    _lineGap(0),
-    _columnGap(0),
-    _percentReady(false),
-    _boundsChanged(false),
-    _updating(false)
+GGroup::GGroup() : _layout(GroupLayoutType::NONE),
+                   _lineGap(0),
+                   _columnGap(0),
+                   _excludeInvisibles(false),
+                   _autoSizeDisabled(false),
+                   _mainGridIndex(-1),
+                   _mainGridMinSize(10),
+                   _mainChildIndex(-1),
+                   _totalSize(0),
+                   _numChildren(0),
+                   _percentReady(false),
+                   _boundsChanged(false),
+                   _updating(false)
 {
     _touchDisabled = true;
 }
@@ -48,11 +54,46 @@ void GGroup::setLineGap(int value)
     }
 }
 
-void GGroup::setBoundsChangedFlag(bool childSizeChanged)
+void GGroup::setExcludeInvisibles(bool value)
+{
+    if (_excludeInvisibles != value)
+    {
+        _excludeInvisibles = value;
+        setBoundsChangedFlag();
+    }
+}
+void GGroup::setAutoSizeDisabled(bool value)
+{
+    if (_autoSizeDisabled != value)
+    {
+        _autoSizeDisabled = value;
+        setBoundsChangedFlag();
+    }
+}
+
+void GGroup::setMainGridIndex(int value)
+{
+    if (_mainGridIndex != value)
+    {
+        _mainGridIndex = value;
+        setBoundsChangedFlag();
+    }
+}
+
+void GGroup::setMainGridMinSize(int value)
+{
+    if (_mainGridMinSize != value)
+    {
+        _mainGridMinSize = value;
+        setBoundsChangedFlag();
+    }
+}
+
+void GGroup::setBoundsChangedFlag(bool positionChangedOnly)
 {
     if (_updating == 0 && _parent != nullptr)
     {
-        if (childSizeChanged)
+        if (!positionChangedOnly)
             _percentReady = false;
 
         if (!_boundsChanged)
@@ -63,6 +104,124 @@ void GGroup::setBoundsChangedFlag(bool childSizeChanged)
                 CALL_LATER(GGroup, ensureBoundsCorrect);
         }
     }
+}
+
+void GGroup::ensureBoundsCorrect()
+{
+    if (_parent == nullptr || !_boundsChanged)
+        return;
+
+    CALL_LATER_CANCEL(GGroup, ensureBoundsCorrect);
+    _boundsChanged = false;
+
+    if (_autoSizeDisabled)
+        resizeChildren(0, 0);
+    else
+    {
+        handleLayout();
+        updateBounds();
+    }
+}
+
+void GGroup::updateBounds()
+{
+    int cnt = _parent->numChildren();
+    int i;
+    GObject* child;
+    float ax = FLT_MAX, ay = FLT_MAX;
+    float ar = FLT_MIN, ab = FLT_MIN;
+    float tmp;
+    bool empty = true;
+
+    for (i = 0; i < cnt; i++)
+    {
+        child = _parent->getChildAt(i);
+        if (child->_group != this)
+            continue;
+
+        tmp = child->getX();
+        if (tmp < ax)
+            ax = tmp;
+        tmp = child->getY();
+        if (tmp < ay)
+            ay = tmp;
+        tmp = child->getX() + child->getWidth();
+        if (tmp > ar)
+            ar = tmp;
+        tmp = child->getY() + child->getHeight();
+        if (tmp > ab)
+            ab = tmp;
+
+        empty = false;
+    }
+
+    float w;
+    float h;
+    if (!empty)
+    {
+        _updating |= 1;
+        setPosition(ax, ay);
+        _updating &= 2;
+
+        w = ar - ax;
+        h = ab - ay;
+    }
+    else
+        w = h = 0;
+
+    if ((_updating & 2) == 0)
+    {
+        _updating |= 2;
+        setSize(w, h);
+        _updating &= 1;
+    }
+    else
+    {
+        _updating &= 1;
+        resizeChildren(getWidth() - w, getHeight() - h);
+    }
+}
+
+void GGroup::handleLayout()
+{
+    _updating |= 1;
+
+    if (_layout == GroupLayoutType::HORIZONTAL)
+    {
+        float curX = getX();
+        int cnt = _parent->numChildren();
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _parent->getChildAt(i);
+            if (child->_group != this)
+                continue;
+            if (_excludeInvisibles && !child->internalVisible3())
+                continue;
+
+            child->setXMin(curX);
+            if (child->getWidth() != 0)
+                curX += child->getWidth() + _columnGap;
+        }
+    }
+    else if (_layout == GroupLayoutType::VERTICAL)
+    {
+        float curY = getY();
+        int cnt = _parent->numChildren();
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _parent->getChildAt(i);
+            if (child->_group != this)
+                continue;
+            if (_excludeInvisibles && !child->internalVisible3())
+                continue;
+
+            child->setYMin(curY);
+            if (child->getHeight() != 0)
+                curY += child->getHeight() + _lineGap;
+        }
+    }
+
+    _updating &= 2;
 }
 
 void GGroup::moveChildren(float dx, float dy)
@@ -94,312 +253,160 @@ void GGroup::resizeChildren(float dw, float dh)
 
     _updating |= 2;
 
-    if (!_percentReady)
-        updatePercent();
+    if (_boundsChanged)
+    {
+        _boundsChanged = false;
+        if (!_autoSizeDisabled)
+        {
+            updateBounds();
+            return;
+        }
+    }
 
     int cnt = _parent->numChildren();
-    int i;
-    int j;
-    GObject* child;
-    int last = -1;
-    int numChildren = 0;
-    float lineSize = 0;
-    float remainSize = 0;
-    bool found = false;
 
-    for (i = 0; i < cnt; i++)
+    if (!_percentReady)
     {
-        child = _parent->getChildAt(i);
-        if (child->_group != this)
-            continue;
+        _percentReady = true;
+        _numChildren = 0;
+        _totalSize = 0;
+        _mainChildIndex = -1;
 
-        last = i;
-        numChildren++;
+        int j = 0;
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _parent->getChildAt(i);
+            if (child->_group != this)
+                continue;
+
+            if (!_excludeInvisibles || child->internalVisible3())
+            {
+                if (j == _mainGridIndex)
+                    _mainChildIndex = i;
+
+                _numChildren++;
+
+                if (_layout == GroupLayoutType::HORIZONTAL)
+                    _totalSize += child->getWidth();
+                else
+                    _totalSize += child->getHeight();
+            }
+
+            j++;
+        }
+
+        if (_mainChildIndex != -1)
+        {
+            if (_layout == GroupLayoutType::HORIZONTAL)
+            {
+                GObject* child = _parent->getChildAt(_mainChildIndex);
+                _totalSize += _mainGridMinSize - child->getWidth();
+                child->_sizePercentInGroup = _mainGridMinSize / _totalSize;
+            }
+            else
+            {
+                GObject* child = _parent->getChildAt(_mainChildIndex);
+                _totalSize += _mainGridMinSize - child->getHeight();
+                child->_sizePercentInGroup = _mainGridMinSize / _totalSize;
+            }
+        }
+
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _parent->getChildAt(i);
+            if (child->_group != this)
+                continue;
+
+            if (i == _mainChildIndex)
+                continue;
+
+            if (_totalSize > 0)
+                child->_sizePercentInGroup = (_layout == GroupLayoutType::HORIZONTAL ? child->getWidth() : child->getHeight()) / _totalSize;
+            else
+                child->_sizePercentInGroup = 0;
+        }
     }
+
+    float remainSize = 0;
+    float remainPercent = 1;
+    bool priorHandled = false;
 
     if (_layout == GroupLayoutType::HORIZONTAL)
     {
-        remainSize = lineSize = _size.width - (numChildren - 1) * _columnGap;
-        float curX = 0;
-        bool started = false;
-        float nw;
-        for (i = 0; i < cnt; i++)
+        remainSize = getWidth() - (_numChildren - 1) * _columnGap;
+        if (_mainChildIndex != -1 && remainSize >= _totalSize)
         {
-            child = _parent->getChildAt(i);
+            GObject* child = _parent->getChildAt(_mainChildIndex);
+            child->setSize(remainSize - (_totalSize - _mainGridMinSize), child->_rawSize.height + dh, true);
+            remainSize -= child->getWidth();
+            remainPercent -= child->_sizePercentInGroup;
+            priorHandled = true;
+        }
+
+        float curX = getX();
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _parent->getChildAt(i);
             if (child->_group != this)
                 continue;
 
-            if (!started)
+            if (_excludeInvisibles && !child->internalVisible3())
             {
-                started = true;
-                curX = (int)child->getX();
+                child->setSize(child->_rawSize.width, child->_rawSize.height + dh, true);
+                continue;
             }
-            else
-                child->setX(curX);
-            if (last == i)
-                nw = remainSize;
-            else
-                nw = round(child->_sizePercentInGroup * lineSize);
-            child->setSize(nw, child->_rawSize.height + dh, true);
-            remainSize -= child->getWidth();
-            if (last == i)
-            {
-                if (remainSize >= 1)
-                {
-                    for (j = 0; j <= i; j++)
-                    {
-                        child = _parent->getChildAt(j);
-                        if (child->_group != this)
-                            continue;
 
-                        if (!found)
-                        {
-                            nw = child->getWidth() + remainSize;
-                            if ((child->maxSize.width == 0 || nw < child->maxSize.width)
-                                && (child->minSize.width == 0 || nw > child->minSize.width))
-                            {
-                                child->setSize(nw, child->getHeight(), true);
-                                found = true;
-                            }
-                        }
-                        else
-                            child->setX(child->getX() + remainSize);
-                    }
-                }
+            if (!priorHandled || i != _mainChildIndex)
+            {
+                child->setSize(round(child->_sizePercentInGroup / remainPercent * remainSize), child->_rawSize.height + dh, true);
+                remainPercent -= child->_sizePercentInGroup;
+                remainSize -= child->getWidth();
             }
-            else
-                curX += (child->getWidth() + _columnGap);
+
+            child->setXMin(curX);
+            if (child->getWidth() != 0)
+                curX += child->getWidth() + _columnGap;
         }
     }
-    else if (_layout == GroupLayoutType::VERTICAL)
+    else
     {
-        remainSize = lineSize = _size.height - (numChildren - 1) * _lineGap;
-        bool started = false;
-        float curY = 0;
-        float nh;
-        for (i = 0; i < cnt; i++)
+        remainSize = getHeight() - (_numChildren - 1) * _lineGap;
+        if (_mainChildIndex != -1 && remainSize >= _totalSize)
         {
-            child = _parent->getChildAt(i);
+            GObject* child = _parent->getChildAt(_mainChildIndex);
+            child->setSize(child->_rawSize.width + dw, remainSize - (_totalSize - _mainGridMinSize), true);
+            remainSize -= child->getHeight();
+            remainPercent -= child->_sizePercentInGroup;
+            priorHandled = true;
+        }
+
+        float curY = getY();
+        for (int i = 0; i < cnt; i++)
+        {
+            GObject* child = _parent->getChildAt(i);
             if (child->_group != this)
                 continue;
 
-            if (!started)
+            if (_excludeInvisibles && !child->internalVisible3())
             {
-                started = true;
-                curY = (int)child->getY();
+                child->setSize(child->_rawSize.width + dw, child->_rawSize.height, true);
+                continue;
             }
-            else
-                child->setY(curY);
-            if (last == i)
-                nh = remainSize;
-            else
-                nh = round(child->_sizePercentInGroup * lineSize);
-            child->setSize(child->_rawSize.width + dw, nh, true);
-            remainSize -= child->getHeight();
-            if (last == i)
-            {
-                if (remainSize >= 1)
-                {
-                    for (j = 0; j <= i; j++)
-                    {
-                        child = _parent->getChildAt(j);
-                        if (child->_group != this)
-                            continue;
 
-                        if (!found)
-                        {
-                            nh = child->getHeight() + remainSize;
-                            if ((child->maxSize.height == 0 || nh < child->maxSize.height)
-                                && (child->minSize.height == 0 || nh > child->minSize.height))
-                            {
-                                child->setSize(child->getWidth(), nh, true);
-                                found = true;
-                            }
-                        }
-                        else
-                            child->setY(child->getY() + remainSize);
-                    }
-                }
+            if (!priorHandled || i != _mainChildIndex)
+            {
+                child->setSize(child->_rawSize.width + dw, round(child->_sizePercentInGroup / remainPercent * remainSize), true);
+                remainPercent -= child->_sizePercentInGroup;
+                remainSize -= child->getHeight();
             }
-            else
-                curY += (child->getHeight() + _lineGap);
+
+            child->setYMin(curY);
+            if (child->getHeight() != 0)
+                curY += child->getHeight() + _lineGap;
         }
     }
 
     _updating &= 1;
-}
-
-void GGroup::ensureBoundsCorrect()
-{
-    if (_boundsChanged)
-        updateBounds();
-}
-
-void GGroup::updateBounds()
-{
-    _boundsChanged = false;
-
-    if (_parent == nullptr)
-        return;
-
-    handleLayout();
-
-    int cnt = _parent->numChildren();
-    int i;
-    GObject* child;
-    float ax = FLT_MAX, ay = FLT_MAX;
-    float ar = FLT_MIN, ab = FLT_MIN;
-    float tmp;
-    bool empty = true;
-
-    for (i = 0; i < cnt; i++)
-    {
-        child = _parent->getChildAt(i);
-        if (child->_group != this)
-            continue;
-
-        tmp = child->getX();
-        if (tmp < ax)
-            ax = tmp;
-        tmp = child->getY();
-        if (tmp < ay)
-            ay = tmp;
-        tmp = child->getX() + child->getWidth();
-        if (tmp > ar)
-            ar = tmp;
-        tmp = child->getY() + child->getHeight();
-        if (tmp > ab)
-            ab = tmp;
-
-        empty = false;
-    }
-
-    if (!empty)
-    {
-        _updating = 1;
-        setPosition(ax, ay);
-        _updating = 2;
-        setSize(ar - ax, ab - ay);
-    }
-    else
-    {
-        _updating = 2;
-        setSize(0, 0);
-    }
-
-    _updating = 0;
-}
-
-void GGroup::handleLayout()
-{
-    _updating |= 1;
-
-    if (_layout == GroupLayoutType::HORIZONTAL)
-    {
-        float curX = 0;
-        bool started = false;
-        int cnt = _parent->numChildren();
-        for (int i = 0; i < cnt; i++)
-        {
-            GObject* child = _parent->getChildAt(i);
-            if (child->_group != this)
-                continue;
-
-            if (!started)
-            {
-                started = true;
-                curX = (int)child->getX();
-            }
-            else
-                child->setX(curX);
-            if (child->getWidth() != 0)
-                curX += (int)(child->getWidth() + _columnGap);
-        }
-        if (!_percentReady)
-            updatePercent();
-    }
-    else if (_layout == GroupLayoutType::VERTICAL)
-    {
-        float curY = 0;
-        bool started = false;
-        int cnt = _parent->numChildren();
-        for (int i = 0; i < cnt; i++)
-        {
-            GObject* child = _parent->getChildAt(i);
-            if (child->_group != this)
-                continue;
-
-            if (!started)
-            {
-                started = true;
-                curY = (int)child->getY();
-            }
-            else
-                child->setY(curY);
-            if (child->getHeight() != 0)
-                curY += (int)(child->getHeight() + _lineGap);
-        }
-        if (!_percentReady)
-            updatePercent();
-    }
-
-    _updating &= 2;
-}
-
-void GGroup::updatePercent()
-{
-    _percentReady = true;
-
-    int cnt = _parent->numChildren();
-    int i;
-    GObject* child;
-    float size = 0;
-    if (_layout == GroupLayoutType::HORIZONTAL)
-    {
-        for (i = 0; i < cnt; i++)
-        {
-            child = _parent->getChildAt(i);
-            if (child->_group != this)
-                continue;
-
-            size += child->getWidth();
-        }
-
-        for (i = 0; i < cnt; i++)
-        {
-            child = _parent->getChildAt(i);
-            if (child->_group != this)
-                continue;
-
-            if (size > 0)
-                child->_sizePercentInGroup = child->getWidth() / size;
-            else
-                child->_sizePercentInGroup = 0;
-        }
-    }
-    else
-    {
-        for (i = 0; i < cnt; i++)
-        {
-            child = _parent->getChildAt(i);
-            if (child->_group != this)
-                continue;
-
-            size += child->getHeight();
-        }
-
-        for (i = 0; i < cnt; i++)
-        {
-            child = _parent->getChildAt(i);
-            if (child->_group != this)
-                continue;
-
-            if (size > 0)
-                child->_sizePercentInGroup = child->getHeight() / size;
-            else
-                child->_sizePercentInGroup = 0;
-        }
-    }
 }
 
 void GGroup::handleAlphaChanged()
@@ -436,11 +443,17 @@ void GGroup::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
     GObject::setup_beforeAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 5);
+    buffer->seek(beginPos, 5);
 
-    _layout = (GroupLayoutType)buffer->ReadByte();
-    _lineGap = buffer->ReadInt();
-    _columnGap = buffer->ReadInt();
+    _layout = (GroupLayoutType)buffer->readByte();
+    _lineGap = buffer->readInt();
+    _columnGap = buffer->readInt();
+    if (buffer->version >= 2)
+    {
+        _excludeInvisibles = buffer->readBool();
+        _autoSizeDisabled = buffer->readBool();
+        _mainChildIndex = buffer->readShort();
+    }
 }
 
 void GGroup::setup_afterAdd(ByteBuffer* buffer, int beginPos)

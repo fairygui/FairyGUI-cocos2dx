@@ -1,15 +1,12 @@
 #ifndef __GOBJECT_H__
 #define __GOBJECT_H__
 
-#include "cocos2d.h"
-#include "FairyGUIMacros.h"
-#include "event/UIEventDispatcher.h"
 #include "Controller.h"
+#include "FairyGUIMacros.h"
 #include "Relations.h"
+#include "cocos2d.h"
+#include "event/UIEventDispatcher.h"
 #include "gears/GearBase.h"
-#include "gears/GearDisplay.h"
-#include "gears/GearColor.h"
-#include "gears/GearAnimation.h"
 
 NS_FGUI_BEGIN
 
@@ -18,6 +15,7 @@ class GGroup;
 class ByteBuffer;
 class GRoot;
 class PackageItem;
+class GTreeNode;
 
 class GObject : public UIEventDispatcher
 {
@@ -33,7 +31,7 @@ public:
     void setX(float value);
     float getY() const { return _position.y; };
     void setY(float value);
-    const cocos2d::Vec2& getPosition()const { return _position; }
+    const cocos2d::Vec2& getPosition() const { return _position; }
     void setPosition(float xv, float yv);
     float getXMin() const;
     void setXMin(float value);
@@ -115,7 +113,7 @@ public:
 
     std::string getResourceURL() const;
 
-    PackageItem* getPackageItem()const { return _packageItem; }
+    PackageItem* getPackageItem() const { return _packageItem; }
 
     cocos2d::Vec2 globalToLocal(const cocos2d::Vec2& pt);
     cocos2d::Rect globalToLocal(const cocos2d::Rect& rect);
@@ -143,10 +141,16 @@ public:
     void addClickListener(const EventCallback& callback, const EventTag& tag) { addEventListener(UIEventType::Click, callback, tag); }
     void removeClickListener(const EventTag& tag) { removeEventListener(UIEventType::Click, tag); }
 
-    virtual void constructFromResource();
-    virtual GObject* hitTest(const cocos2d::Vec2 & worldPoint, const cocos2d::Camera * camera);
+    virtual cocos2d::Value getProp(ObjectPropID propId);
+    virtual void setProp(ObjectPropID propId, const cocos2d::Value& value);
 
-    template<typename T> T* as();
+    virtual void constructFromResource();
+    virtual GObject* hitTest(const cocos2d::Vec2& worldPoint, const cocos2d::Camera* camera);
+
+    template <typename T>
+    T* as();
+
+    GTreeNode* treeNode() const { return _treeNode; }
 
     std::string id;
     std::string name;
@@ -205,6 +209,7 @@ protected:
 private:
     bool internalVisible() const;
     bool internalVisible2() const;
+    bool internalVisible3() const;
     void updateGearFromRelations(int index, float dx, float dy);
     void transformRectPoint(const cocos2d::Vec2& pt, float rect[], GObject* targetSpace);
 
@@ -227,12 +232,13 @@ private:
     GGroup* _group;
     float _sizePercentInGroup;
     Relations* _relations;
-    GearBase* _gears[8];
-    void * _data;
+    GearBase* _gears[10];
+    void* _data;
     cocos2d::Value _customData;
     cocos2d::Vec2 _dragTouchStartPos;
     cocos2d::Rect* _dragBounds;
     bool _dragTesting;
+    GTreeNode* _treeNode;
 
     uint64_t _uid;
     size_t _weakPtrRef;
@@ -245,14 +251,14 @@ private:
     friend class UIObjectFactory;
     friend class WeakPtr;
     friend class UIPackage;
+    friend class GTree;
 };
 
-template<typename T>
+template <typename T>
 inline T* GObject::as()
 {
     return dynamic_cast<T*>(this);
 }
-
 
 NS_FGUI_END
 

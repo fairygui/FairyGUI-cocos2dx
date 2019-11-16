@@ -17,6 +17,7 @@
 #include "GComboBox.h"
 #include "GScrollBar.h"
 #include "GGroup.h"
+#include "GTree.h"
 
 NS_FGUI_BEGIN
 
@@ -101,6 +102,9 @@ GObject * UIObjectFactory::newObject(ObjectType type)
 
     case ObjectType::COMBOBOX:
         return GComboBox::create();
+
+    case ObjectType::TREE:
+        return GTree::create();
 
     default:
         return nullptr;

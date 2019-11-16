@@ -1,9 +1,9 @@
 #ifndef __SCROLLPANE_H__
 #define __SCROLLPANE_H__
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
 #include "Margin.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -15,6 +15,7 @@ class FUIInnerContainer;
 class GController;
 class EventContext;
 class ByteBuffer;
+class GTweener;
 
 class ScrollPane : public cocos2d::Ref
 {
@@ -98,7 +99,6 @@ public:
     static ScrollPane* getDraggingPane() { return _draggingPane; }
 
 private:
-
     void onOwnerSizeChanged();
     void adjustMaskContainer();
     void setContentSize(float wv, float hv);
@@ -111,15 +111,15 @@ private:
     void handleControllerChanged(GController* c);
     void updatePageController();
 
-    GObject* hitTest(const cocos2d::Vec2 &pt, const cocos2d::Camera* camera);
+    GObject* hitTest(const cocos2d::Vec2& pt, const cocos2d::Camera* camera);
 
     void posChanged(bool ani);
     CALL_LATER_FUNC(ScrollPane, refresh);
     void refresh2();
 
-    void syncScrollBar(bool end = false);
-    void showScrollBar(bool show);
-    CALL_LATER_FUNC(ScrollPane, onShowScrollBar);
+    void updateScrollBarPos();
+    void updateScrollBarVisible();
+    void updateScrollBarVisible2(GScrollBar* bar);
 
     float getLoopPartSize(float division, int axis);
     bool loopCheckingCurrent();
@@ -131,6 +131,7 @@ private:
     cocos2d::Vec2 updateTargetAndDuration(const cocos2d::Vec2& orignPos);
     float updateTargetAndDuration(float pos, int axis);
     void fixDuration(int axis, float oldChange);
+    void startTween(int type);
     void killTween();
     void tweenUpdate(float dt);
     float runTween(int axis, float dt);
@@ -143,6 +144,7 @@ private:
     void onMouseWheel(EventContext* context);
     void onRollOver(EventContext* context);
     void onRollOut(EventContext* context);
+    void onBarTweenComplete(GTweener* tweener);
 
     ScrollType _scrollType;
     float _scrollStep;
@@ -162,6 +164,7 @@ private:
     bool _inertiaDisabled;
     float _decelerationRate;
     bool _pageMode;
+    bool _floating;
 
     float _xPos;
     float _yPos;
@@ -178,11 +181,11 @@ private:
     cocos2d::Vec2 _velocity;
     float _velocityScale;
     clock_t _lastMoveTime;
-    bool _isMouseMoved;
+    bool _dragged;
     bool _isHoldAreaDone;
     int _aniFlag;
-    bool _scrollBarVisible;
     int _loop;
+    bool _hover;
 
     int _headerLockedSize;
     int _footerLockedSize;
@@ -207,6 +210,7 @@ private:
 
     friend class GComponent;
     friend class GList;
+    friend class GScrollBar;
 };
 
 NS_FGUI_END

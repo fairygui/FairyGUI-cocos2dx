@@ -5,7 +5,10 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GearDisplay::GearDisplay(GObject * owner) :GearBase(owner), _displayLockToken(1)
+GearDisplay::GearDisplay(GObject* owner)
+    : GearBase(owner),
+      _visible(0),
+      _displayLockToken(1)
 {
 }
 
@@ -35,7 +38,7 @@ void GearDisplay::updateState()
 {
 }
 
-void GearDisplay::addStatus(const std::string&  pageId, ByteBuffer* buffer)
+void GearDisplay::addStatus(const std::string& pageId, ByteBuffer* buffer)
 {
 }
 

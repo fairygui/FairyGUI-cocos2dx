@@ -42,15 +42,15 @@ void ControllerAction::setup(ByteBuffer * buffer)
 {
     int cnt;
 
-    cnt = buffer->ReadShort();
+    cnt = buffer->readShort();
     fromPage.resize(cnt);
     for (int i = 0; i < cnt; i++)
-        fromPage[i].assign(buffer->ReadS());
+        fromPage[i].assign(buffer->readS());
 
-    cnt = buffer->ReadShort();
+    cnt = buffer->readShort();
     toPage.resize(cnt);
     for (int i = 0; i < cnt; i++)
-        toPage[i].assign(buffer->ReadS());
+        toPage[i].assign(buffer->readS());
 }
 
 NS_FGUI_END

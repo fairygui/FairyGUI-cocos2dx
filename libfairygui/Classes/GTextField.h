@@ -8,7 +8,7 @@
 
 NS_FGUI_BEGIN
 
-class GTextField : public GObject, public IColorGear
+class GTextField : public GObject
 {
 public:
     GTextField();
@@ -31,8 +31,8 @@ public:
 
     virtual const cocos2d::Size& getTextSize() { return _displayObject->getContentSize(); }
 
-    cocos2d::Color3B getColor() const override { return getTextFormat()->color; }
-    void setColor(const cocos2d::Color3B& value) override;
+    cocos2d::Color3B getColor() const { return getTextFormat()->color; }
+    void setColor(const cocos2d::Color3B& value);
 
     float getFontSize() const { return getTextFormat()->fontSize; }
     void setFontSize(float value);
@@ -45,6 +45,9 @@ public:
 
     GTextField* setVar(const std::string& name, const cocos2d::Value& value);
     void flushVars();
+
+    virtual cocos2d::Value getProp(ObjectPropID propId) override;
+    virtual void setProp(ObjectPropID propId, const cocos2d::Value& value) override;
 
 protected:
     virtual void setTextFieldText() = 0;

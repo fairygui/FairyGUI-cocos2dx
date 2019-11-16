@@ -1,7 +1,7 @@
 #include "FUILabel.h"
+#include "BitmapFont.h"
 #include "UIConfig.h"
 #include "UIPackage.h"
-#include "BitmapFont.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
@@ -9,15 +9,14 @@ USING_NS_CC;
 static Color3B toGrayed(const Color3B& source)
 {
     Color3B c = source;
-    c.r = c.g = c.b = c.r*0.299f + c.g*0.587f + c.b*0.114f;
+    c.r = c.g = c.b = c.r * 0.299f + c.g * 0.587f + c.b * 0.114f;
     return c;
 }
 
-FUILabel::FUILabel() :
-    _fontSize(-1),
-    _bmFontCanTint(false),
-    _textFormat(new TextFormat()),
-    _grayed(false)
+FUILabel::FUILabel() : _fontSize(-1),
+                       _bmFontCanTint(false),
+                       _textFormat(new TextFormat()),
+                       _grayed(false)
 {
 }
 
@@ -26,7 +25,7 @@ FUILabel::~FUILabel()
     delete _textFormat;
 }
 
-void FUILabel::setText(const std::string & value)
+void FUILabel::setText(const std::string& value)
 {
     if (_fontSize < 0)
         applyTextFormat();
@@ -98,7 +97,7 @@ void FUILabel::applyTextFormat()
     else
         disableEffect(LabelEffect::ITALICS);
 
-    if (_textFormat->bold)
+    if (_textFormat->bold && _currentLabelType != LabelType::STRING_TEXTURE)
         enableBold();
     else
         disableEffect(LabelEffect::BOLD);
@@ -118,7 +117,7 @@ void FUILabel::applyTextFormat()
         disableEffect(LabelEffect::SHADOW);
 }
 
-bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 & imageOffset, float fontSize)
+bool FUILabel::setBMFontFilePath(const std::string& bmfontFilePath, const Vec2& imageOffset, float fontSize)
 {
     BitmapFont* bmFont = (BitmapFont*)UIPackage::getItemAssetByURL(bmfontFilePath, PackageItemType::FONT);
     if (bmFont == nullptr)
@@ -128,12 +127,14 @@ bool FUILabel::setBMFontFilePath(const std::string & bmfontFilePath, const Vec2 
     }
 
     //assign the default fontSize
-    if (std::abs(fontSize) < FLT_EPSILON) {
+    if (std::abs(fontSize) < FLT_EPSILON)
+    {
         float originalFontSize = bmFont->getOriginalFontSize();
         _bmFontSize = originalFontSize / CC_CONTENT_SCALE_FACTOR();
     }
 
-    if (fontSize > 0.0f && bmFont->isResizable()) {
+    if (fontSize > 0.0f && bmFont->isResizable())
+    {
         _bmFontSize = fontSize;
     }
 
@@ -168,12 +169,14 @@ void FUILabel::setGrayed(bool value)
 void FUILabel::updateBMFontScale()
 {
     auto font = _fontAtlas->getFont();
-    if (_currentLabelType == LabelType::BMFONT) {
-        BitmapFont *bmFont = (BitmapFont*)font;
+    if (_currentLabelType == LabelType::BMFONT)
+    {
+        BitmapFont* bmFont = (BitmapFont*)font;
         float originalFontSize = bmFont->getOriginalFontSize();
         _bmfontScale = _bmFontSize * CC_CONTENT_SCALE_FACTOR() / originalFontSize;
     }
-    else {
+    else
+    {
         _bmfontScale = 1.0f;
     }
 }

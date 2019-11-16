@@ -1,8 +1,8 @@
 #ifndef __PACKAGEITEM_H__
 #define __PACKAGEITEM_H__
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -20,6 +20,8 @@ public:
     virtual ~PackageItem();
 
     void load();
+    PackageItem* getBranch();
+    PackageItem* getHighResolution();
 
 public:
     UIPackage* owner;
@@ -32,6 +34,8 @@ public:
     int height;
     std::string file;
     ByteBuffer* rawData;
+    std::vector<std::string>* branches;
+    std::vector<std::string>* highResolution;
 
     //atlas
     cocos2d::Texture2D* texture;

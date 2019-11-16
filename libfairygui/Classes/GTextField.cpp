@@ -1,13 +1,14 @@
 #include "GTextField.h"
 #include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
 GTextField::GTextField()
-    :_templateVars(nullptr),
-    _ubbEnabled(false),
-    _autoSize(AutoSizeType::BOTH)
+    : _templateVars(nullptr),
+      _ubbEnabled(false),
+      _autoSize(AutoSizeType::BOTH)
 {
 }
 
@@ -16,7 +17,7 @@ GTextField::~GTextField()
     CC_SAFE_DELETE(_templateVars);
 }
 
-void GTextField::setText(const std::string & value)
+void GTextField::setText(const std::string& value)
 {
     _text = value;
     setTextFieldText();
@@ -34,22 +35,34 @@ void GTextField::setUBBEnabled(bool value)
     }
 }
 
-void GTextField::setColor(const cocos2d::Color3B & value)
+void GTextField::setColor(const cocos2d::Color3B& value)
 {
-    getTextFormat()->color = value;
-    applyTextFormat();
+    TextFormat* tf = getTextFormat();
+    if (tf->color != value)
+    {
+        tf->color = value;
+        applyTextFormat();
+    }
 }
 
 void GTextField::setFontSize(float value)
 {
-    getTextFormat()->fontSize = value;
-    applyTextFormat();
+    TextFormat* tf = getTextFormat();
+    if (tf->fontSize != value)
+    {
+        tf->fontSize = value;
+        applyTextFormat();
+    }
 }
 
-void GTextField::setOutlineColor(const cocos2d::Color3B & value)
+void GTextField::setOutlineColor(const cocos2d::Color3B& value)
 {
-    getTextFormat()->outlineColor = value;
-    applyTextFormat();
+    TextFormat* tf = getTextFormat();
+    if (tf->outlineColor != value)
+    {
+        tf->outlineColor = value;
+        applyTextFormat();
+    }
 }
 
 void GTextField::setTemplateVars(cocos2d::ValueMap* value)
@@ -89,45 +102,79 @@ void GTextField::updateSize()
 {
 }
 
+cocos2d::Value GTextField::getProp(ObjectPropID propId)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        return Value(ToolSet::colorToInt(getColor()));
+    case ObjectPropID::OutlineColor:
+        return Value(ToolSet::colorToInt(getOutlineColor()));
+    case ObjectPropID::FontSize:
+        return Value(getFontSize());
+    default:
+        return GObject::getProp(propId);
+    }
+}
+
+void GTextField::setProp(ObjectPropID propId, const cocos2d::Value& value)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        setColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    case ObjectPropID::OutlineColor:
+        setOutlineColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    case ObjectPropID::FontSize:
+        setFontSize(value.asInt());
+        break;
+    default:
+        GObject::setProp(propId, value);
+        break;
+    }
+}
+
 void GTextField::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
     GObject::setup_beforeAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 5);
+    buffer->seek(beginPos, 5);
 
     TextFormat* tf = getTextFormat();
 
-    tf->face = buffer->ReadS();
-    tf->fontSize = buffer->ReadShort();
-    tf->color = (Color3B)buffer->ReadColor();
-    tf->align = (TextHAlignment)buffer->ReadByte();
-    tf->verticalAlign = (TextVAlignment)buffer->ReadByte();
-    tf->lineSpacing = buffer->ReadShort();
-    tf->letterSpacing = buffer->ReadShort();
-    _ubbEnabled = buffer->ReadBool();
-    setAutoSize((AutoSizeType)buffer->ReadByte());
-    tf->underline = buffer->ReadBool();
-    tf->italics = buffer->ReadBool();
-    tf->bold = buffer->ReadBool();
-    if (buffer->ReadBool())
+    tf->face = buffer->readS();
+    tf->fontSize = buffer->readShort();
+    tf->color = (Color3B)buffer->readColor();
+    tf->align = (TextHAlignment)buffer->readByte();
+    tf->verticalAlign = (TextVAlignment)buffer->readByte();
+    tf->lineSpacing = buffer->readShort();
+    tf->letterSpacing = buffer->readShort();
+    _ubbEnabled = buffer->readBool();
+    setAutoSize((AutoSizeType)buffer->readByte());
+    tf->underline = buffer->readBool();
+    tf->italics = buffer->readBool();
+    tf->bold = buffer->readBool();
+    if (buffer->readBool())
         setSingleLine(true);
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
-        tf->outlineColor = (Color3B)buffer->ReadColor();
-        tf->outlineSize = buffer->ReadFloat();
+        tf->outlineColor = (Color3B)buffer->readColor();
+        tf->outlineSize = buffer->readFloat();
         tf->enableEffect(TextFormat::OUTLINE);
     }
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
     {
-        tf->shadowColor = (Color3B)buffer->ReadColor();
-        float f1 = buffer->ReadFloat();
-        float f2 = buffer->ReadFloat();
+        tf->shadowColor = (Color3B)buffer->readColor();
+        float f1 = buffer->readFloat();
+        float f2 = buffer->readFloat();
         tf->shadowOffset = Vec2(f1, -f2);
         tf->enableEffect(TextFormat::SHADOW);
     }
 
-    if (buffer->ReadBool())
+    if (buffer->readBool())
         _templateVars = new cocos2d::ValueMap();
 }
 
@@ -137,9 +184,9 @@ void GTextField::setup_afterAdd(ByteBuffer* buffer, int beginPos)
 
     applyTextFormat();
 
-    buffer->Seek(beginPos, 6);
+    buffer->seek(beginPos, 6);
 
-    const std::string& str = buffer->ReadS();
+    const std::string& str = buffer->readS();
     if (!str.empty())
         setText(str);
 }
@@ -216,9 +263,8 @@ std::string GTextField::parseTemplate(const char* text)
 
 //---------------------------
 
-GBasicTextField::GBasicTextField() :
-    _label(nullptr),
-    _updatingSize(false)
+GBasicTextField::GBasicTextField() : _label(nullptr),
+                                     _updatingSize(false)
 {
     _touchDisabled = true;
 }

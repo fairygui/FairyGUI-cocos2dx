@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="9leh0eyf" jpegQuality="80" compressPNG="true">
+<packageDescription id="9leh0eyf">
   <resources>
     <image id="rpmb1" name="VIP_png.png" path="/images/"/>
     <image id="rpmb2" name="a1_png.png" path="/images/"/>
@@ -139,26 +139,26 @@
     <component id="t9fj59" name="ProgressBar1.xml" path="/components/"/>
     <image id="t9fj5a" name="caiji2.png" path="/images/"/>
     <component id="t9fj5b" name="ProgressBar5.xml" path="/components/"/>
-    <image id="t9fj5c" name="loading.png.jpg" path="/images/" atlas="1"/>
+    <image id="t9fj5c" name="loading.png.jpg" path="/images/" duplicatePadding="true"/>
     <image id="t9fj5d" name="huawen1_png.png" path="/images/"/>
     <image id="t9fj5e" name="huawen2_png.png" path="/images/"/>
     <movieclip id="t9fj5f" name="pet.jta" path="/images/"/>
     <component id="t9fj5g" name="ProgressBar4.xml" path="/components/"/>
     <component id="t9fj5h" name="ProgressBar2.xml" path="/components/"/>
     <component id="i3s65i" name="ScrollBar_HZ.xml" path="/scrollbars/" exported="true"/>
-    <image id="i3s65j" name="s10.png.jpg" path="/images/" atlas="1"/>
+    <image id="i3s65j" name="s10.png.jpg" path="/images/" duplicatePadding="true"/>
     <component id="i3s65k" name="ScrollUpButton.xml" path="/scrollbars/"/>
-    <image id="i3s65l" name="s6.png.jpg" path="/images/" atlas="1"/>
-    <image id="i3s65m" name="s4.png.jpg" path="/images/" atlas="1"/>
-    <image id="i3s65n" name="s5.png.jpg" path="/images/" atlas="1"/>
+    <image id="i3s65l" name="s6.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65m" name="s4.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65n" name="s5.png.jpg" path="/images/" duplicatePadding="true"/>
     <component id="i3s65o" name="ScrollDownButton.xml" path="/scrollbars/"/>
-    <image id="i3s65p" name="s9.png.jpg" path="/images/" atlas="1"/>
-    <image id="i3s65q" name="s7.png.jpg" path="/images/" atlas="1"/>
-    <image id="i3s65r" name="s8.png.jpg" path="/images/" atlas="1"/>
+    <image id="i3s65p" name="s9.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65q" name="s7.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65r" name="s8.png.jpg" path="/images/" duplicatePadding="true"/>
     <component id="i3s65s" name="GripButton_HZ.xml" path="/scrollbars/"/>
-    <image id="i3s65t" name="s1.png.jpg" path="/images/" atlas="1"/>
-    <image id="i3s65u" name="s2.png.jpg" path="/images/" atlas="1"/>
-    <image id="i3s65v" name="s3.png.jpg" path="/images/" atlas="1"/>
+    <image id="i3s65t" name="s1.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65u" name="s2.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65v" name="s3.png.jpg" path="/images/" duplicatePadding="true"/>
     <component id="i3s65w" name="ScrollBar_VT.xml" path="/scrollbars/" exported="true"/>
     <component id="i3s65x" name="GripButton_VT.xml" path="/scrollbars/"/>
     <component id="kpev60" name="BagGridSub.xml" path="/components/"/>
@@ -223,9 +223,9 @@
     <component id="srct86" name="Slider2_grip.xml" path="/components/"/>
     <component id="srct87" name="Slider2.xml" path="/components/"/>
     <movieclip id="iwqq89" name="gz.jta" path="/images/"/>
+    <image id="e3bc8a" name="radial.png" path="/images/" scale=""/>
   </resources>
-  <publish name="Basics" packageCount="1">
+  <publish name="Basics">
     <atlas name="Default" index="0"/>
-    <atlas name="Point_Mode" index="1"/>
   </publish>
 </packageDescription>

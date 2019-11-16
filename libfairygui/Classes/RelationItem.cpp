@@ -7,8 +7,7 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-RelationItem::RelationItem(GObject* owner) :
-    _target(nullptr)
+RelationItem::RelationItem(GObject* owner) : _target(nullptr)
 {
     _owner = owner;
 }
@@ -18,7 +17,7 @@ RelationItem::~RelationItem()
     releaseRefTarget(_target.ptr());
 }
 
-void RelationItem::setTarget(GObject * value)
+void RelationItem::setTarget(GObject* value)
 {
     GObject* old = _target.ptr();
     if (old != value)
@@ -40,7 +39,7 @@ void RelationItem::add(RelationType relationType, bool usePercent)
         return;
     }
 
-    for (auto &it : _defs)
+    for (auto& it : _defs)
     {
         if (it.type == relationType)
             return;
@@ -64,8 +63,7 @@ void RelationItem::internalAdd(RelationType relationType, bool usePercent)
     info.axis = (relationType <= RelationType::Right_Right || relationType == RelationType::Width || (relationType >= RelationType::LeftExt_Left && relationType <= RelationType::RightExt_Right)) ? 0 : 1;
     _defs.push_back(info);
 
-    if (usePercent || relationType == RelationType::Left_Center || relationType == RelationType::Center_Center || relationType == RelationType::Right_Center
-        || relationType == RelationType::Top_Middle || relationType == RelationType::Middle_Middle || relationType == RelationType::Bottom_Middle)
+    if (usePercent || relationType == RelationType::Left_Center || relationType == RelationType::Center_Center || relationType == RelationType::Right_Center || relationType == RelationType::Top_Middle || relationType == RelationType::Middle_Middle || relationType == RelationType::Bottom_Middle)
         _owner->setPixelSnapping(true);
 }
 
@@ -93,7 +91,7 @@ void RelationItem::copyFrom(const RelationItem& source)
     setTarget(source._target.ptr());
 
     _defs.clear();
-    for (auto &it : source._defs)
+    for (auto& it : source._defs)
         _defs.push_back(it);
 }
 
@@ -110,7 +108,7 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight, bool appl
     float ox = _owner->_position.x;
     float oy = _owner->_position.y;
 
-    for (auto &it : _defs)
+    for (auto& it : _defs)
     {
         switch (it.type)
         {
@@ -149,7 +147,7 @@ void RelationItem::applyOnSelfSizeChanged(float dWidth, float dHeight, bool appl
         if (_owner->_parent != nullptr)
         {
             const Vector<Transition*>& arr = _owner->_parent->getTransitions();
-            for (auto &it : arr)
+            for (auto& it : arr)
                 it->updateFromRelations(_owner->id, ox, oy);
         }
     }
@@ -187,30 +185,50 @@ void RelationItem::applyOnXYChanged(GObject* target, const RelationDef& info, fl
 
     case RelationType::LeftExt_Left:
     case RelationType::LeftExt_Right:
-        tmp = _owner->getXMin();
-        _owner->setWidth(_owner->_rawSize.width - dx);
-        _owner->setXMin(tmp + dx);
+        if (_owner != target->getParent())
+        {
+            tmp = _owner->getXMin();
+            _owner->setWidth(_owner->_rawSize.width - dx);
+            _owner->setXMin(tmp + dx);
+        }
+        else
+            _owner->setWidth(_owner->_rawSize.width - dx);
         break;
 
     case RelationType::RightExt_Left:
     case RelationType::RightExt_Right:
-        tmp = _owner->getXMin();
-        _owner->setWidth(_owner->_rawSize.width + dx);
-        _owner->setXMin(tmp);
+        if (_owner != target->getParent())
+        {
+            tmp = _owner->getXMin();
+            _owner->setWidth(_owner->_rawSize.width + dx);
+            _owner->setXMin(tmp);
+        }
+        else
+            _owner->setWidth(_owner->_rawSize.width + dx);
         break;
 
     case RelationType::TopExt_Top:
     case RelationType::TopExt_Bottom:
-        tmp = _owner->getYMin();
-        _owner->setHeight(_owner->_rawSize.height - dy);
-        _owner->setYMin(tmp + dy);
+        if (_owner != target->getParent())
+        {
+            tmp = _owner->getYMin();
+            _owner->setHeight(_owner->_rawSize.height - dy);
+            _owner->setYMin(tmp + dy);
+        }
+        else
+            _owner->setHeight(_owner->_rawSize.height - dy);
         break;
 
     case RelationType::BottomExt_Top:
     case RelationType::BottomExt_Bottom:
-        tmp = _owner->getYMin();
-        _owner->setHeight(_owner->_rawSize.height + dy);
-        _owner->setYMin(tmp);
+        if (_owner != target->getParent())
+        {
+            tmp = _owner->getYMin();
+            _owner->setHeight(_owner->_rawSize.height + dy);
+            _owner->setYMin(tmp);
+        }
+        else
+            _owner->setHeight(_owner->_rawSize.height + dy);
         break;
 
     default:
@@ -424,7 +442,7 @@ void RelationItem::applyOnSizeChanged(GObject* target, const RelationDef& info)
             {
                 if (_owner->_underConstruct)
                     _owner->setWidth(pos + target->_size.width - target->_size.width * pivot +
-                    (_owner->sourceSize.width - pos - target->initSize.width + target->initSize.width * pivot) * delta);
+                                     (_owner->sourceSize.width - pos - target->initSize.width + target->initSize.width * pivot) * delta);
                 else
                     _owner->setWidth(pos + (_owner->_rawSize.width - pos) * delta);
             }
@@ -487,7 +505,7 @@ void RelationItem::applyOnSizeChanged(GObject* target, const RelationDef& info)
             {
                 if (_owner->_underConstruct)
                     _owner->setHeight(pos + target->_size.height - target->_size.height * pivot +
-                    (_owner->sourceSize.height - pos - target->initSize.height + target->initSize.height * pivot) * delta);
+                                      (_owner->sourceSize.height - pos - target->initSize.height + target->initSize.height * pivot) * delta);
                 else
                     _owner->setHeight(pos + (_owner->_rawSize.height - pos) * delta);
             }
@@ -547,8 +565,7 @@ void RelationItem::releaseRefTarget(GObject* target)
 void RelationItem::onTargetXYChanged(EventContext* context)
 {
     GObject* target = (GObject*)context->getSender();
-    if (_owner->relations()->handling != nullptr
-        || (_owner->_group != nullptr && _owner->_group->_updating != 0))
+    if (_owner->relations()->handling != nullptr || (_owner->_group != nullptr && _owner->_group->_updating != 0))
     {
         _targetData.x = target->_position.x;
         _targetData.y = target->_position.y;
@@ -562,7 +579,7 @@ void RelationItem::onTargetXYChanged(EventContext* context)
     float dx = target->_position.x - _targetData.x;
     float dy = target->_position.y - _targetData.y;
 
-    for (auto &it : _defs)
+    for (auto& it : _defs)
         applyOnXYChanged(target, it, dx, dy);
 
     _targetData.x = target->_position.x;
@@ -578,7 +595,7 @@ void RelationItem::onTargetXYChanged(EventContext* context)
         if (_owner->_parent != nullptr)
         {
             const Vector<Transition*>& arr = _owner->_parent->getTransitions();
-            for (auto &it : arr)
+            for (auto& it : arr)
                 it->updateFromRelations(_owner->id, ox, oy);
         }
     }
@@ -589,8 +606,7 @@ void RelationItem::onTargetXYChanged(EventContext* context)
 void RelationItem::onTargetSizeChanged(EventContext* context)
 {
     GObject* target = (GObject*)context->getSender();
-    if (_owner->relations()->handling != nullptr
-        || (_owner->_group != nullptr && _owner->_group->_updating != 0))
+    if (_owner->relations()->handling != nullptr || (_owner->_group != nullptr && _owner->_group->_updating != 0))
     {
         _targetData.z = target->_size.width;
         _targetData.w = target->_size.height;
@@ -604,7 +620,7 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
     float ow = _owner->_rawSize.width;
     float oh = _owner->_rawSize.height;
 
-    for (auto &it : _defs)
+    for (auto& it : _defs)
         applyOnSizeChanged(target, it);
 
     _targetData.z = target->_size.width;
@@ -620,7 +636,7 @@ void RelationItem::onTargetSizeChanged(EventContext* context)
         if (_owner->_parent != nullptr)
         {
             const Vector<Transition*>& arr = _owner->_parent->getTransitions();
-            for (auto &it : arr)
+            for (auto& it : arr)
                 it->updateFromRelations(_owner->id, ox, oy);
         }
     }

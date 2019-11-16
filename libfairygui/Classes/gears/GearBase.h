@@ -43,10 +43,11 @@ public:
 
     void setup(ByteBuffer* buffer);
 
+    static GearBase* create(GObject* owner, int index);
     static bool disableAllTweenEffect;
 
 protected:
-    virtual void addStatus(const std::string&  pageId, ByteBuffer* buffer);
+    virtual void addStatus(const std::string& pageId, ByteBuffer* buffer);
     virtual void init();
 
     GObject* _owner;

@@ -36,7 +36,8 @@ enum class ObjectType
     COMBOBOX,
     PROGRESSBAR,
     SLIDER,
-    SCROLLBAR
+    SCROLLBAR,
+    TREE
 };
 
 enum class ButtonMode
@@ -177,6 +178,19 @@ enum class FillOrigin
     Bottom,
     Left,
     Right
+};
+
+enum class ObjectPropID {
+    Text,
+    Icon,
+    Color,
+    OutlineColor,
+    Playing,
+    Frame,
+    DeltaTime,
+    TimeScale,
+    FontSize,
+    Selected
 };
 
 NS_FGUI_END

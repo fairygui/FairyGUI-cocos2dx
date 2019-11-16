@@ -9,6 +9,8 @@
 
 NS_FGUI_BEGIN
 
+class GPath;
+
 class GTweener : public cocos2d::Ref
 {
 public:
@@ -34,6 +36,7 @@ public:
     GTweener* setTarget(cocos2d::Ref* target, TweenPropType propType);
     void* getTarget() const { return _target; }
     GTweener* setUserData(const cocos2d::Value& value);
+    GTweener* setPath(GPath* path);
     const cocos2d::Value& getUserData() const { return _userData; }
     GTweener* onUpdate(GTweenCallback callback);
     GTweener* onStart(GTweenCallback callback);
@@ -87,6 +90,7 @@ private:
     bool _snapping;
     cocos2d::Value _userData;
     int _valueSize;
+    GPath* _path;
 
     GTweenCallback _onUpdate;
     GTweenCallback _onStart;

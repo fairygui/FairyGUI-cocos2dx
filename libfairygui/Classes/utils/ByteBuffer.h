@@ -1,8 +1,8 @@
 #ifndef __BYTEBUFFER_H_
 #define __BYTEBUFFER_H_
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -20,29 +20,33 @@ public:
     int getBytesAvailable() const;
     int getLength() const { return _length; }
 
-    void Skip(int count) { position += count; }
+    int getPos() const { return _position; }
+    void setPos(int value) { _position = value; }
+    void skip(int count) { _position += count; }
 
-    char ReadByte();
-    unsigned char ReadUbyte();
-    bool ReadBool();
-    short ReadShort();
-    unsigned short ReadUshort();
-    int ReadInt();
-    unsigned int ReadUint();
-    float ReadFloat();
-    std::string ReadString();
-    std::string ReadString(int len);
-    const std::string& ReadS();
-    bool ReadS(std::string& result);
-    const std::string* ReadSP();
-    void WriteS(const std::string& value);
-    cocos2d::Color4B ReadColor();
-    ByteBuffer* ReadBuffer();
-    bool Seek(int indexTablePos, int blockIndex);
+    char readByte();
+    unsigned char readUbyte();
+    bool readBool();
+    short readShort();
+    unsigned short readUshort();
+    int readInt();
+    unsigned int readUint();
+    float readFloat();
+    std::string readString();
+    std::string readString(int len);
+    const std::string& readS();
+    void readSArray(std::vector<std::string>& arr, int count);
+    bool readS(std::string& result);
+    const std::string* readSP();
+    void writeS(const std::string& value);
+    cocos2d::Color4B readColor();
+    ByteBuffer* readBuffer();
+    bool seek(int indexTablePos, int blockIndex);
 
-    std::vector<std::string>* stringTable;
+    std::vector<std::string>* getStringTable() const { return _stringTable; }
+    void setStringTable(std::vector<std::string>* value) { _stringTable = value; }
+
     int version;
-    int position;
 
 private:
     char* _buffer;
@@ -50,6 +54,8 @@ private:
     int _length;
     bool _littleEndian;
     bool _ownsBuffer;
+    int _position;
+    std::vector<std::string>* _stringTable;
 };
 
 NS_FGUI_END

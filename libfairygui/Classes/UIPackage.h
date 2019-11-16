@@ -1,10 +1,10 @@
 #ifndef __UIPACKAGE_H__
 #define __UIPACKAGE_H__
 
-#include "cocos2d.h"
 #include "FairyGUIMacros.h"
-#include "PackageItem.h"
 #include "GObject.h"
+#include "PackageItem.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -38,11 +38,16 @@ public:
     PackageItem* getItemByName(const std::string& itemName);
     void* getItemAsset(PackageItem* item);
 
+    static const std::string& getBranch() { return _branch; }
+    static void setBranch(const std::string& value);
+    static const std::string& getVar(const std::string& key);
+    static void setVar(const std::string& key, const std::string& value);
+
     static int _constructing;
     static const std::string URL_PREFIX;
 
 private:
-    bool loadPackage(ByteBuffer* buffer, const std::string& assetPath);
+    bool loadPackage(ByteBuffer* buffer);
     void loadAtlas(PackageItem* item);
     AtlasSprite* getSprite(const std::string& spriteId);
     cocos2d::SpriteFrame* createSpriteTexture(AtlasSprite* sprite);
@@ -63,13 +68,20 @@ private:
     std::unordered_map<std::string, PackageItem*> _itemsByName;
     std::unordered_map<std::string, AtlasSprite*> _sprites;
     std::string _customId;
-    std::vector<std::string> stringTable;
+    std::vector<std::string> _stringTable;
+    std::vector<std::unordered_map<std::string, std::string>> _dependencies;
+    std::vector<std::string> _branches;
+    int _branchIndex;
 
     static std::unordered_map<std::string, UIPackage*> _packageInstById;
     static std::unordered_map<std::string, UIPackage*> _packageInstByName;
     static std::vector<UIPackage*> _packageList;
+    static std::unordered_map<std::string, std::string> _vars;
+    static std::string _branch;
 
     static cocos2d::Texture2D* _emptyTexture;
+
+    friend class PackageItem;
 };
 
 NS_FGUI_END

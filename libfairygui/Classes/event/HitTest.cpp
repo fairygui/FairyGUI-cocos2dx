@@ -20,13 +20,13 @@ PixelHitTestData::~PixelHitTestData()
 
 void PixelHitTestData::load(ByteBuffer* buffer)
 {
-    buffer->Skip(4);
-    pixelWidth = buffer->ReadInt();
-    scale = 1.0f / buffer->ReadByte();
-    pixelsLength = buffer->ReadInt();
+    buffer->skip(4);
+    pixelWidth = buffer->readInt();
+    scale = 1.0f / buffer->readByte();
+    pixelsLength = buffer->readInt();
     pixels = new unsigned char[pixelsLength];
     for (size_t i = 0; i < pixelsLength; i++)
-        pixels[i] = buffer->ReadByte();
+        pixels[i] = buffer->readByte();
 }
 
 PixelHitTest::PixelHitTest(PixelHitTestData * data, int offsetX, int offsetY) :

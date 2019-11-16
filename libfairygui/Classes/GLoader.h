@@ -11,7 +11,7 @@ class GComponent;
 class ActionMovieClip;
 class FUISprite;
 
-class GLoader : public GObject, public IColorGear, public IAnimationGear
+class GLoader : public GObject
 {
 public:
     GLoader();
@@ -42,19 +42,14 @@ public:
 
     const cocos2d::Size& getContentSize() { return _contentSize; }
 
-    cocos2d::Color3B getColor() const override;
-    void setColor(const cocos2d::Color3B& value) override;
+    cocos2d::Color3B getColor() const;
+    void setColor(const cocos2d::Color3B& value);
 
-    bool isPlaying() const override { return _playing; }
-    void setPlaying(bool value) override;
+    bool isPlaying() const { return _playing; }
+    void setPlaying(bool value);
 
-    int getFrame() const override;
-    void setFrame(int value) override;
-
-    float getTimeScale() const override;
-    void setTimeScale(float value) override;
-
-    void advance(float time) override;
+    int getFrame() const;
+    void setFrame(int value);
 
     FillMethod getFillMethod() const;
     void setFillMethod(FillMethod value);
@@ -69,6 +64,9 @@ public:
     void setFillAmount(float value);
 
     GComponent* getComponent() const { return _content2; }
+
+    virtual cocos2d::Value getProp(ObjectPropID propId) override;
+    virtual void setProp(ObjectPropID propId, const cocos2d::Value& value) override;
 
 protected:
     virtual void handleInit() override;

@@ -39,6 +39,8 @@
     <ClInclude Include="..\Classes\gears\GearBase.h" />
     <ClInclude Include="..\Classes\gears\GearColor.h" />
     <ClInclude Include="..\Classes\gears\GearDisplay.h" />
+    <ClInclude Include="..\Classes\gears\GearDisplay2.h" />
+    <ClInclude Include="..\Classes\gears\GearFontSize.h" />
     <ClInclude Include="..\Classes\gears\GearIcon.h" />
     <ClInclude Include="..\Classes\gears\GearLook.h" />
     <ClInclude Include="..\Classes\gears\GearSize.h" />
@@ -60,6 +62,8 @@
     <ClInclude Include="..\Classes\GSlider.h" />
     <ClInclude Include="..\Classes\GTextField.h" />
     <ClInclude Include="..\Classes\GTextInput.h" />
+    <ClInclude Include="..\Classes\GTree.h" />
+    <ClInclude Include="..\Classes\GTreeNode.h" />
     <ClInclude Include="..\Classes\Margin.h" />
     <ClInclude Include="..\Classes\PackageItem.h" />
     <ClInclude Include="..\Classes\PopupMenu.h" />
@@ -68,10 +72,9 @@
     <ClInclude Include="..\Classes\ScrollPane.h" />
     <ClInclude Include="..\Classes\Transition.h" />
     <ClInclude Include="..\Classes\TranslationHelper.h" />
-    <ClInclude Include="..\Classes\treeview\TreeNode.h" />
-    <ClInclude Include="..\Classes\treeview\TreeView.h" />
     <ClInclude Include="..\Classes\tween\EaseManager.h" />
     <ClInclude Include="..\Classes\tween\EaseType.h" />
+    <ClInclude Include="..\Classes\tween\GPath.h" />
     <ClInclude Include="..\Classes\tween\GTween.h" />
     <ClInclude Include="..\Classes\tween\GTweener.h" />
     <ClInclude Include="..\Classes\tween\TweenManager.h" />
@@ -111,6 +114,8 @@
     <ClCompile Include="..\Classes\gears\GearBase.cpp" />
     <ClCompile Include="..\Classes\gears\GearColor.cpp" />
     <ClCompile Include="..\Classes\gears\GearDisplay.cpp" />
+    <ClCompile Include="..\Classes\gears\GearDisplay2.cpp" />
+    <ClCompile Include="..\Classes\gears\GearFontSize.cpp" />
     <ClCompile Include="..\Classes\gears\GearIcon.cpp" />
     <ClCompile Include="..\Classes\gears\GearLook.cpp" />
     <ClCompile Include="..\Classes\gears\GearSize.cpp" />
@@ -132,6 +137,8 @@
     <ClCompile Include="..\Classes\GSlider.cpp" />
     <ClCompile Include="..\Classes\GTextField.cpp" />
     <ClCompile Include="..\Classes\GTextInput.cpp" />
+    <ClCompile Include="..\Classes\GTree.cpp" />
+    <ClCompile Include="..\Classes\GTreeNode.cpp" />
     <ClCompile Include="..\Classes\Margin.cpp" />
     <ClCompile Include="..\Classes\PackageItem.cpp" />
     <ClCompile Include="..\Classes\PopupMenu.cpp" />
@@ -140,9 +147,8 @@
     <ClCompile Include="..\Classes\ScrollPane.cpp" />
     <ClCompile Include="..\Classes\Transition.cpp" />
     <ClCompile Include="..\Classes\TranslationHelper.cpp" />
-    <ClCompile Include="..\Classes\treeview\TreeNode.cpp" />
-    <ClCompile Include="..\Classes\treeview\TreeView.cpp" />
     <ClCompile Include="..\Classes\tween\EaseManager.cpp" />
+    <ClCompile Include="..\Classes\tween\GPath.cpp" />
     <ClCompile Include="..\Classes\tween\GTween.cpp" />
     <ClCompile Include="..\Classes\tween\GTweener.cpp" />
     <ClCompile Include="..\Classes\tween\TweenManager.cpp" />

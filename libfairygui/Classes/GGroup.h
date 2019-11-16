@@ -24,7 +24,19 @@ public:
     int getLineGap() { return _lineGap; }
     void setLineGap(int value);
 
-    void setBoundsChangedFlag(bool childSizeChanged = false);
+    bool isExcludeInvisibles() { return _excludeInvisibles; }
+    void setExcludeInvisibles(bool value);
+    
+    bool isAutoSizeDisabled() { return _autoSizeDisabled; }
+    void setAutoSizeDisabled(bool value);
+
+    int getMainGridIndex() { return _mainGridIndex; }
+    void setMainGridIndex(int value);
+
+    int getMainGridMinSize() { return _mainGridMinSize; }
+    void setMainGridMinSize(int value);
+
+    void setBoundsChangedFlag(bool positionChangedOnly = false);
     void moveChildren(float dx, float dy);
     void resizeChildren(float dw, float dh);
 
@@ -39,14 +51,22 @@ protected:
 private:
     void updateBounds();
     void handleLayout();
-    void updatePercent();
     CALL_LATER_FUNC(GGroup, ensureBoundsCorrect);
 
     GroupLayoutType _layout;
     int _lineGap;
     int _columnGap;
+    bool _excludeInvisibles;
+    bool _autoSizeDisabled;
+    int _mainGridIndex;
+    int _mainGridMinSize;
+
     bool _percentReady;
     bool _boundsChanged;
+    int _mainChildIndex;
+    float _totalSize;
+    int _numChildren;
+
 };
 
 NS_FGUI_END

@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Classes",
+                "${workspaceFolder}/../Examples/cocos2d",
+                "${workspaceFolder}/../Examples/cocos2d/cocos",
+                "${workspaceFolder}/../Examples/cocos2d/external",
+                "${workspaceFolder}/../Examples/cocos2d/extensions",
+                "${workspaceFolder}/../Examples/cocos2d/external/glfw3/include/mac",
+                "${workspaceFolder}/../Examples/cocos2d/external/chipmunk/include/chipmunk"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

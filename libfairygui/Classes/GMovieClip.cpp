@@ -1,13 +1,14 @@
 #include "GMovieClip.h"
 #include "PackageItem.h"
-#include "utils/ByteBuffer.h"
 #include "display/FUISprite.h"
+#include "utils/ByteBuffer.h"
+#include "utils/ToolSet.h"
 
 NS_FGUI_BEGIN
 USING_NS_CC;
 
-GMovieClip::GMovieClip() :
-    _playAction(nullptr),
+GMovieClip::GMovieClip()
+    : _playAction(nullptr),
     _content(nullptr),
     _playing(true)
 {
@@ -89,7 +90,7 @@ void GMovieClip::setFlip(FlipType value)
     _content->setFlippedY(value == FlipType::VERTICAL || value == FlipType::BOTH);
 }
 
-void GMovieClip::setColor(const cocos2d::Color3B & value)
+void GMovieClip::setColor(const cocos2d::Color3B& value)
 {
     _content->setColor(value);
 }
@@ -101,15 +102,59 @@ void GMovieClip::handleGrayedChanged()
     ((FUISprite*)_content)->setGrayed(_finalGrayed);
 }
 
+cocos2d::Value GMovieClip::getProp(ObjectPropID propId)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        return Value(ToolSet::colorToInt(getColor()));
+    case ObjectPropID::Playing:
+        return Value(isPlaying());
+    case ObjectPropID::Frame:
+        return Value(getFrame());
+    case ObjectPropID::TimeScale:
+        return Value(_playAction->getTimeScale());
+    default:
+        return GObject::getProp(propId);
+    }
+}
+
+void GMovieClip::setProp(ObjectPropID propId, const cocos2d::Value& value)
+{
+    switch (propId)
+    {
+    case ObjectPropID::Color:
+        setColor(ToolSet::intToColor(value.asUnsignedInt()));
+        break;
+    case ObjectPropID::Playing:
+        setPlaying(value.asBool());
+        break;
+    case ObjectPropID::Frame:
+        setFrame(value.asInt());
+        break;
+    case ObjectPropID::TimeScale:
+        _playAction->setTimeScale(value.asFloat());
+        break;
+    case ObjectPropID::DeltaTime:
+        _playAction->advance(value.asFloat());
+        break;
+    default:
+        GObject::setProp(propId, value);
+        break;
+    }
+}
+
 void GMovieClip::constructFromResource()
 {
-    _packageItem->load();
-
-    sourceSize.width = _packageItem->width;
-    sourceSize.height = _packageItem->height;
+    PackageItem* contentItem = _packageItem->getBranch();
+    sourceSize.width = contentItem->width;
+    sourceSize.height = contentItem->height;
     initSize = sourceSize;
 
-    _playAction->setAnimation(_packageItem->animation, _packageItem->repeatDelay, _packageItem->swing);
+    contentItem = contentItem->getHighResolution();
+    contentItem->load();
+
+    _playAction->setAnimation(contentItem->animation, contentItem->repeatDelay, contentItem->swing);
     _content->runAction(_playAction);
 
     setSize(sourceSize.width, sourceSize.height);
@@ -119,30 +164,29 @@ void GMovieClip::setup_beforeAdd(ByteBuffer* buffer, int beginPos)
 {
     GObject::setup_beforeAdd(buffer, beginPos);
 
-    buffer->Seek(beginPos, 5);
+    buffer->seek(beginPos, 5);
 
-    if (buffer->ReadBool())
-        setColor((Color3B)buffer->ReadColor());
-    setFlip((FlipType)buffer->ReadByte());
-    setFrame(buffer->ReadInt());
-    setPlaying(buffer->ReadBool());
+    if (buffer->readBool())
+        setColor((Color3B)buffer->readColor());
+    setFlip((FlipType)buffer->readByte());
+    setFrame(buffer->readInt());
+    setPlaying(buffer->readBool());
 }
 
-ActionMovieClip::ActionMovieClip() :
-    _animation(nullptr),
-    _frame(0),
-    _frameElapsed(0),
-    _repeatedCount(0),
-    _repeatDelay(0),
-    _start(0),
-    _end(0),
-    _times(0),
-    _endAt(0),
-    _status(0),
-    _displayFrame(-1),
-    _swing(false),
-    _reversed(false),
-    _timeScale(1)
+ActionMovieClip::ActionMovieClip() : _animation(nullptr),
+_frame(0),
+_frameElapsed(0),
+_repeatedCount(0),
+_repeatDelay(0),
+_start(0),
+_end(0),
+_times(0),
+_endAt(0),
+_status(0),
+_displayFrame(-1),
+_swing(false),
+_reversed(false),
+_timeScale(1)
 {
 }
 
@@ -151,9 +195,9 @@ ActionMovieClip::~ActionMovieClip()
     CC_SAFE_RELEASE(_animation);
 }
 
-ActionMovieClip* ActionMovieClip::create(cocos2d::Animation *animation, float repeatDelay, bool swing)
+ActionMovieClip* ActionMovieClip::create(cocos2d::Animation* animation, float repeatDelay, bool swing)
 {
-    ActionMovieClip *action = new (std::nothrow) ActionMovieClip();
+    ActionMovieClip* action = new (std::nothrow) ActionMovieClip();
     if (action)
     {
         action->setAnimation(animation, repeatDelay, swing);
@@ -187,7 +231,7 @@ void ActionMovieClip::step(float dt)
         dt *= _timeScale;
 
     _frameElapsed += dt;
-    float tt = (frames.at(_frame)->getDelayUnits() + ((_frame == 0 && _repeatedCount > 0) ? _repeatDelay : 0))*_animation->getDelayPerUnit();
+    float tt = (frames.at(_frame)->getDelayUnits() + ((_frame == 0 && _repeatedCount > 0) ? _repeatDelay : 0)) * _animation->getDelayPerUnit();
     if (_frame == 0 && _repeatedCount > 0)
         tt += _repeatDelay;
     if (_frameElapsed < tt)
@@ -253,7 +297,7 @@ void ActionMovieClip::step(float dt)
             {
                 _times--;
                 if (_times == 0)
-                    _status = 2;  //ending
+                    _status = 2; //ending
                 else
                     _status = 1; //new loop
             }
@@ -265,20 +309,20 @@ void ActionMovieClip::step(float dt)
     drawFrame();
 }
 
-void ActionMovieClip::startWithTarget(Node * target)
+void ActionMovieClip::startWithTarget(Node* target)
 {
     Action::startWithTarget(target);
 
     drawFrame();
 }
 
-ActionMovieClip * ActionMovieClip::reverse() const
+ActionMovieClip* ActionMovieClip::reverse() const
 {
     CC_ASSERT(0);
     return nullptr;
 }
 
-ActionMovieClip * ActionMovieClip::clone() const
+ActionMovieClip* ActionMovieClip::clone() const
 {
     return ActionMovieClip::create(_animation->clone(), _repeatDelay, _swing);
 }
@@ -314,7 +358,7 @@ void ActionMovieClip::advance(float time)
     float backupTime = time;
     while (true)
     {
-        float tt = (frames.at(_frame)->getDelayUnits() + ((_frame == 0 && _repeatedCount > 0) ? _repeatDelay : 0))*_animation->getDelayPerUnit();
+        float tt = (frames.at(_frame)->getDelayUnits() + ((_frame == 0 && _repeatedCount > 0) ? _repeatDelay : 0)) * _animation->getDelayPerUnit();
         if (_frame == 0 && _repeatedCount > 0)
             tt += _repeatDelay;
         if (time < tt)
@@ -358,10 +402,10 @@ void ActionMovieClip::advance(float time)
             }
         }
 
-        if (_frame == beginFrame && _reversed == beginReversed) //走了一轮了
+        if (_frame == beginFrame && _reversed == beginReversed)
         {
-            float roundTime = backupTime - time; //这就是一轮需要的时间
-            time -= (int)floor(time / roundTime) * roundTime; //跳过
+            float roundTime = backupTime - time;
+            time -= (int)floor(time / roundTime) * roundTime;
         }
     }
 }
@@ -385,7 +429,7 @@ void ActionMovieClip::setPlaySettings(int start, int end, int times, int endAt, 
     setFrame(start);
 }
 
-void ActionMovieClip::setAnimation(cocos2d::Animation *animation, float repeatDelay, bool swing)
+void ActionMovieClip::setAnimation(cocos2d::Animation* animation, float repeatDelay, bool swing)
 {
     if (_animation != animation)
     {

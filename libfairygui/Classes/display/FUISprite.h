@@ -30,6 +30,11 @@ public:
     float getFillAmount() const { return _fillAmount; }
     void setFillAmount(float value);
 
+    bool isScaleByTile() const { return _scaleByTile; }
+    void setScaleByTile(bool value);
+
+    virtual void setContentSize(const cocos2d::Size& size) override;
+
 protected:
     virtual void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t flags) override;
 
@@ -49,6 +54,7 @@ private:
     FillOrigin _fillOrigin;
     float _fillAmount;
     bool _fillClockwise;
+    bool _scaleByTile;
     cocos2d::CustomCommand _customCommand;
     int _vertexDataCount;
     cocos2d::V2F_C4B_T2F *_vertexData;
