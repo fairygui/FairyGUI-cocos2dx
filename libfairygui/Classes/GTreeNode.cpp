@@ -149,13 +149,14 @@ void GTreeNode::removeChildAt(int index)
 
     GTreeNode* child = _children.at(index);
     child->_parent = nullptr;
-    _children.erase(index);
 
     if (_tree != nullptr)
     {
         child->setTree(nullptr);
         _tree->afterRemoved(child);
     }
+
+    _children.erase(index);
 }
 
 void GTreeNode::removeChildren(int beginIndex, int endIndex)
