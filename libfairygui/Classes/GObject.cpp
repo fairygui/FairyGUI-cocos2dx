@@ -343,7 +343,7 @@ bool GObject::internalVisible2() const
 
 bool GObject::internalVisible3() const
 {
-    return _visible && (_group == nullptr || _group->internalVisible2());
+    return _visible && _internalVisible;
 }
 
 void GObject::setTouchable(bool value)
