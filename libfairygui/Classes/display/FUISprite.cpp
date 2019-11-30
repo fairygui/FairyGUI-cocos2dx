@@ -16,7 +16,7 @@ FUISprite::FUISprite()
       _fillClockwise(false),
       _vertexDataCount(0),
       _vertexData(nullptr),
-      _fillGlProgramState(nullptr),
+      _vertexIndex(nullptr),
       _scaleByTile(false)
 {
 }
@@ -24,7 +24,7 @@ FUISprite::FUISprite()
 FUISprite::~FUISprite()
 {
     CC_SAFE_FREE(_vertexData);
-    CC_SAFE_RELEASE(_fillGlProgramState);
+    CC_SAFE_FREE(_vertexIndex);
 }
 
 void FUISprite::clearContent()
@@ -100,6 +100,14 @@ void FUISprite::setScaleByTile(bool value)
 
 void FUISprite::setGrayed(bool value)
 {
+#if COCOS2DX_VERSION >= 0x00040000
+    auto isETC1 = getTexture() && getTexture()->getAlphaTextureName();
+    if (value) {
+        Sprite::updateShaders(positionTextureColor_vert, (isETC1)?etc1Gray_frag:grayScale_frag);
+    } else {
+        Sprite::updateShaders(positionTextureColor_vert, (isETC1)?etc1_frag:positionTextureColor_frag);
+    }
+#else
     GLProgramState* glState = nullptr;
     if (value)
         glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, getTexture());
@@ -107,6 +115,7 @@ void FUISprite::setGrayed(bool value)
         glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, getTexture());
 
     setGLProgramState(glState);
+#endif
 }
 
 void FUISprite::setFillMethod(FillMethod value)
@@ -120,7 +129,7 @@ void FUISprite::setFillMethod(FillMethod value)
         else
         {
             CC_SAFE_FREE(_vertexData);
-            CC_SAFE_RELEASE_NULL(_fillGlProgramState);
+            CC_SAFE_FREE(_vertexIndex);
         }
     }
 }
@@ -168,11 +177,6 @@ void FUISprite::setContentSize(const Size& size)
 
 void FUISprite::setupFill()
 {
-    if (!_fillGlProgramState)
-    {
-        _fillGlProgramState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR, getTexture());
-        CC_SAFE_RETAIN(_fillGlProgramState);
-    }
     if (_fillMethod == FillMethod::Horizontal || _fillMethod == FillMethod::Vertical)
         updateBar();
     else
@@ -198,9 +202,9 @@ Tex2F FUISprite::textureCoordFromAlphaPoint(Vec2 alpha)
     return Tex2F(min.x * (1.f - alpha.x) + max.x * alpha.x, min.y * (1.f - alpha.y) + max.y * alpha.y);
 }
 
-Vec2 FUISprite::vertexFromAlphaPoint(Vec2 alpha)
+Vec3 FUISprite::vertexFromAlphaPoint(Vec2 alpha)
 {
-    Vec2 ret(0.0f, 0.0f);
+    Vec3 ret(0.0f, 0.0f, 0.0f);
 
     V3F_C4B_T2F_Quad quad = getQuad();
     Vec2 min(quad.bl.vertices.x, quad.bl.vertices.y);
@@ -325,17 +329,21 @@ void FUISprite::updateRadial(void)
     //    the 3 is for the _midpoint, 12 o'clock point and hitpoint position.
 
     bool sameIndexCount = true;
+    int triangleCount = 0;
     if (_vertexDataCount != index + 3)
     {
         sameIndexCount = false;
         CC_SAFE_FREE(_vertexData);
+        CC_SAFE_FREE(_vertexIndex);
         _vertexDataCount = 0;
     }
 
     if (!_vertexData)
     {
         _vertexDataCount = index + 3;
-        _vertexData = (V2F_C4B_T2F*)malloc(_vertexDataCount * sizeof(V2F_C4B_T2F));
+        triangleCount = _vertexDataCount - 2;
+        _vertexData = (V3F_C4B_T2F*)malloc(_vertexDataCount * sizeof(*_vertexData));
+        _vertexIndex = (unsigned short *)malloc(triangleCount * 3 * sizeof(*_vertexIndex));
         CCASSERT(_vertexData, "FUISprite. Not enough memory");
     }
     updateColor();
@@ -362,6 +370,17 @@ void FUISprite::updateRadial(void)
     //    hitpoint will go last
     _vertexData[_vertexDataCount - 1].texCoords = textureCoordFromAlphaPoint(hit);
     _vertexData[_vertexDataCount - 1].vertices = vertexFromAlphaPoint(hit);
+    
+    for (int i = 0; i < triangleCount; i++) {
+        _vertexIndex[i * 3] = 0;
+        _vertexIndex[i * 3 + 1] = i + 1;
+        _vertexIndex[i * 3 + 2] = i + 2;
+    }
+    
+    _fillTriangles.verts = _vertexData;
+    _fillTriangles.vertCount = _vertexDataCount;
+    _fillTriangles.indices = _vertexIndex;
+    _fillTriangles.indexCount = triangleCount * 3;
 }
 
 ///
@@ -407,7 +426,8 @@ void FUISprite::updateBar(void)
     if (!_vertexData)
     {
         _vertexDataCount = 4;
-        _vertexData = (V2F_C4B_T2F*)malloc(_vertexDataCount * sizeof(V2F_C4B_T2F));
+        _vertexData = (V3F_C4B_T2F*)malloc(_vertexDataCount * sizeof(*_vertexData));
+        _vertexIndex = (unsigned short*)malloc(6 * sizeof(*_vertexIndex));
         CCASSERT(_vertexData, "FUISprite. Not enough memory");
     }
     //    TOPLEFT
@@ -425,6 +445,18 @@ void FUISprite::updateBar(void)
     //    BOTRIGHT
     _vertexData[3].texCoords = textureCoordFromAlphaPoint(Vec2(max.x, min.y));
     _vertexData[3].vertices = vertexFromAlphaPoint(Vec2(max.x, min.y));
+    
+    _vertexIndex[0] = 0;
+    _vertexIndex[1] = 1;
+    _vertexIndex[2] = 2;
+    _vertexIndex[3] = 2;
+    _vertexIndex[4] = 1;
+    _vertexIndex[5] = 3;
+    
+    _fillTriangles.verts = _vertexData;
+    _fillTriangles.vertCount = 4;
+    _fillTriangles.indices = _vertexIndex;
+    _fillTriangles.indexCount = 6;
 
     updateColor();
 }
@@ -445,34 +477,6 @@ Vec2 FUISprite::boundaryTexCoord(char index)
     return Vec2::ZERO;
 }
 
-void FUISprite::onDraw(const Mat4& transform, uint32_t /*flags*/)
-{
-    GLProgram* program = _fillGlProgramState->getGLProgram();
-    program->use();
-    program->setUniformsForBuiltins(transform);
-
-    GL::blendFunc(getBlendFunc().src, getBlendFunc().dst);
-
-    GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-
-    GL::bindTexture2D(getTexture());
-
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(_vertexData[0]), &_vertexData[0].vertices);
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(_vertexData[0]), &_vertexData[0].texCoords);
-    glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(_vertexData[0]), &_vertexData[0].colors);
-
-    if (_fillMethod == FillMethod::Horizontal || _fillMethod == FillMethod::Vertical)
-    {
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, _vertexDataCount);
-        CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, _vertexDataCount);
-    }
-    else
-    {
-        glDrawArrays(GL_TRIANGLE_FAN, 0, _vertexDataCount);
-        CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, _vertexDataCount);
-    }
-}
-
 void FUISprite::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t flags)
 {
     if (_texture == _empty)
@@ -482,9 +486,41 @@ void FUISprite::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform
         Sprite::draw(renderer, transform, flags);
     else
     {
-        _customCommand.init(_globalZOrder, transform, flags);
-        _customCommand.func = CC_CALLBACK_0(FUISprite::onDraw, this, transform, flags);
-        renderer->addCommand(&_customCommand);
+#if COCOS2DX_VERSION >= 0x00040000
+        setMVPMatrixUniform();
+#endif
+
+#if CC_USE_CULLING
+        // Don't calculate the culling if the transform was not updated
+        auto visitingCamera = Camera::getVisitingCamera();
+        auto defaultCamera = Camera::getDefaultCamera();
+        if (visitingCamera == nullptr) {
+            _insideBounds = true;
+        }
+        else if (visitingCamera == defaultCamera) {
+            _insideBounds = ((flags & FLAGS_TRANSFORM_DIRTY) || visitingCamera->isViewProjectionUpdated()) ? renderer->checkVisibility(transform, _contentSize) : _insideBounds;
+        }
+        else
+        {
+            // XXX: this always return true since
+            _insideBounds = renderer->checkVisibility(transform, _contentSize);
+        }
+
+        if(_insideBounds)
+#endif
+        {
+            _trianglesCommand.init(_globalZOrder,
+                                   _texture,
+#if COCOS2DX_VERSION < 0x00040000
+                                   getGLProgramState(),
+#endif
+                                   _blendFunc,
+                                   _fillTriangles,
+                                   transform,
+                                   flags);
+
+            renderer->addCommand(&_trianglesCommand);
+        }
     }
 }
 

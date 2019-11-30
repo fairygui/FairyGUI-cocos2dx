@@ -673,7 +673,12 @@ void UIPackage::loadImage(PackageItem* item)
     }
     if (item->scaleByTile)
     {
+#if COCOS2DX_VERSION >= 0x00040000
+        Texture2D::TexParams tp(backend::SamplerFilter::LINEAR, backend::SamplerFilter::LINEAR,
+            backend::SamplerAddressMode::REPEAT, backend::SamplerAddressMode::REPEAT);
+#else
         Texture2D::TexParams tp = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+#endif
         item->spriteFrame->getTexture()->setTexParameters(tp);
     }
 }
