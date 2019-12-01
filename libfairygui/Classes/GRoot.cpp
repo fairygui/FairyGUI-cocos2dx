@@ -6,6 +6,10 @@
 NS_FGUI_BEGIN
 USING_NS_CC;
 
+#if COCOS2DX_VERSION < 0x00040000
+using namespace cocos2d::experimental;
+#endif
+
 GRoot* GRoot::_inst = nullptr;
 bool GRoot::_soundEnabled = true;
 float GRoot::_soundVolumeScale = 1.0f;
@@ -463,7 +467,7 @@ void GRoot::playSound(const std::string& url, float volumnScale)
 
     PackageItem* pi = UIPackage::getItemByURL(url);
     if (pi)
-        experimental::AudioEngine::play2d(pi->file, false, _soundVolumeScale * volumnScale);
+        AudioEngine::play2d(pi->file, false, _soundVolumeScale * volumnScale);
 }
 
 void GRoot::setSoundEnabled(bool value)
