@@ -160,7 +160,7 @@ void FUIContainer::setStencil(cocos2d::Node * stencil)
 #endif
 }
 
-GLfloat FUIContainer::getAlphaThreshold() const
+float FUIContainer::getAlphaThreshold() const
 {
     if (_stencilClippingSupport != nullptr)
         return _stencilClippingSupport->_stencilStateManager->getAlphaThreshold();
@@ -168,7 +168,7 @@ GLfloat FUIContainer::getAlphaThreshold() const
         return 1;
 }
 
-void FUIContainer::setAlphaThreshold(GLfloat alphaThreshold)
+void FUIContainer::setAlphaThreshold(float alphaThreshold)
 {
     if (_stencilClippingSupport == nullptr)
         _stencilClippingSupport = new StencilClippingSupport();

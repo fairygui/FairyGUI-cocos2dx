@@ -66,8 +66,8 @@ public:
 
     cocos2d::Node* getStencil() const;
     void setStencil(cocos2d::Node* stencil);
-    GLfloat getAlphaThreshold() const;
-    void setAlphaThreshold(GLfloat alphaThreshold);
+    float getAlphaThreshold() const;
+    void setAlphaThreshold(float alphaThreshold);
     bool isInverted() const;
     void setInverted(bool inverted);
 
