@@ -136,7 +136,7 @@ void GGroup::updateBounds()
     for (i = 0; i < cnt; i++)
     {
         child = _parent->getChildAt(i);
-        if (child->_group != this || _excludeInvisibles && !child->internalVisible3())
+        if (child->_group != this || (_excludeInvisibles && !child->internalVisible3()))
             continue;
 
         tmp = child->getX();
