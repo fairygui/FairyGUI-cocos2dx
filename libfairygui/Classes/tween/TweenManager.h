@@ -2,8 +2,8 @@
 #define __TWEENMANAGER_H__
 
 #include "FairyGUIMacros.h"
-#include "cocos2d.h"
 #include "TweenPropType.h"
+#include "cocos2d.h"
 
 NS_FGUI_BEGIN
 
@@ -21,6 +21,8 @@ public:
     static void init();
 
 private:
+    static void reset(cocos2d::EventCustom*);
+
     static GTweener** _activeTweens;
     static std::vector<GTweener*> _tweenerPool;
     static int _totalActiveTweens;

@@ -50,7 +50,7 @@ GTweener* TweenManager::createTween()
     return tweener;
 }
 
-bool TweenManager::isTweening(cocos2d::Ref * target, TweenPropType propType)
+bool TweenManager::isTweening(cocos2d::Ref* target, TweenPropType propType)
 {
     if (target == nullptr)
         return false;
@@ -59,15 +59,14 @@ bool TweenManager::isTweening(cocos2d::Ref * target, TweenPropType propType)
     for (int i = 0; i < _totalActiveTweens; i++)
     {
         GTweener* tweener = _activeTweens[i];
-        if (tweener != nullptr && tweener->_target == target && !tweener->_killed
-            && (anyType || tweener->_propType == propType))
+        if (tweener != nullptr && tweener->_target == target && !tweener->_killed && (anyType || tweener->_propType == propType))
             return true;
     }
 
     return false;
 }
 
-bool TweenManager::killTweens(cocos2d::Ref * target, TweenPropType propType, bool completed)
+bool TweenManager::killTweens(cocos2d::Ref* target, TweenPropType propType, bool completed)
 {
     if (target == nullptr)
         return false;
@@ -78,8 +77,7 @@ bool TweenManager::killTweens(cocos2d::Ref * target, TweenPropType propType, boo
     for (int i = 0; i < cnt; i++)
     {
         GTweener* tweener = _activeTweens[i];
-        if (tweener != nullptr && tweener->_target == target && !tweener->_killed
-            && (anyType || tweener->_propType == propType))
+        if (tweener != nullptr && tweener->_target == target && !tweener->_killed && (anyType || tweener->_propType == propType))
         {
             tweener->kill(completed);
             flag = true;
@@ -89,7 +87,7 @@ bool TweenManager::killTweens(cocos2d::Ref * target, TweenPropType propType, boo
     return flag;
 }
 
-GTweener * TweenManager::getTween(cocos2d::Ref * target, TweenPropType propType)
+GTweener* TweenManager::getTween(cocos2d::Ref* target, TweenPropType propType)
 {
     if (target == nullptr)
         return nullptr;
@@ -99,8 +97,7 @@ GTweener * TweenManager::getTween(cocos2d::Ref * target, TweenPropType propType)
     for (int i = 0; i < cnt; i++)
     {
         GTweener* tweener = _activeTweens[i];
-        if (tweener != nullptr && tweener->_target == target && !tweener->_killed
-            && (anyType || tweener->_propType == propType))
+        if (tweener != nullptr && tweener->_target == target && !tweener->_killed && (anyType || tweener->_propType == propType))
         {
             return tweener;
         }
@@ -170,10 +167,32 @@ void TweenManager::init()
 {
     _inited = true;
 
-    _arrayLength = 30;
-    _activeTweens = new GTweener*[_arrayLength];
+    if (_activeTweens == nullptr)
+    {
+        _arrayLength = 30;
+        _activeTweens = new GTweener*[_arrayLength];
+    }
 
     cocos2d::Director::getInstance()->getScheduler()->scheduleUpdate(&tweenEngine, INT_MIN + 10, false);
+    cocos2d::Director::getInstance()->getEventDispatcher()->addCustomEventListener(cocos2d::Director::EVENT_RESET, &reset);
+}
+
+void TweenManager::reset(cocos2d::EventCustom*)
+{
+    int cnt = _totalActiveTweens;
+    for (int i = 0; i < cnt; i++)
+    {
+        GTweener* tweener = _activeTweens[i];
+        if (tweener != nullptr)
+        {
+            tweener->_reset();
+            _tweenerPool.push_back(tweener);
+            _activeTweens[i] = nullptr;
+        }
+    }
+
+    _totalActiveTweens = 0;
+    _inited = false;
 }
 
 NS_FGUI_END
