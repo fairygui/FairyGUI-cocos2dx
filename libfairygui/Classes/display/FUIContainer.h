@@ -20,8 +20,14 @@ public:
     cocos2d::Rect _clippingRect;
     bool _clippingRectDirty;
 
+#if COCOS2DX_VERSION >= 0x00040000
+    cocos2d::GroupCommand _groupCommand;
+    cocos2d::CallbackCommand _beforeVisitCmdScissor;
+    cocos2d::CallbackCommand _afterVisitCmdScissor;
+#else
     cocos2d::CustomCommand _beforeVisitCmdScissor;
     cocos2d::CustomCommand _afterVisitCmdScissor;
+#endif
 };
 
 class StencilClippingSupport
@@ -30,12 +36,19 @@ public:
     StencilClippingSupport();
 
     cocos2d::Node* _stencil;
-    cocos2d::GLProgram* _originStencilProgram;
     cocos2d::StencilStateManager* _stencilStateManager;
     cocos2d::GroupCommand _groupCommand;
+#if COCOS2DX_VERSION >= 0x00040000
+    cocos2d::backend::ProgramState* _originStencilProgram;
+    cocos2d::CallbackCommand _beforeVisitCmd;
+    cocos2d::CallbackCommand _afterDrawStencilCmd;
+    cocos2d::CallbackCommand _afterVisitCmd;
+#else
+    cocos2d::GLProgram* _originStencilProgram;
     cocos2d::CustomCommand _beforeVisitCmd;
     cocos2d::CustomCommand _afterDrawStencilCmd;
     cocos2d::CustomCommand _afterVisitCmd;
+#endif
 };
 
 class FUIContainer : public cocos2d::Node
@@ -53,8 +66,8 @@ public:
 
     cocos2d::Node* getStencil() const;
     void setStencil(cocos2d::Node* stencil);
-    GLfloat getAlphaThreshold() const;
-    void setAlphaThreshold(GLfloat alphaThreshold);
+    float getAlphaThreshold() const;
+    void setAlphaThreshold(float alphaThreshold);
     bool isInverted() const;
     void setInverted(bool inverted);
 
@@ -75,6 +88,13 @@ private:
 
     RectClippingSupport* _rectClippingSupport;
     StencilClippingSupport* _stencilClippingSupport;
+    
+#if COCOS2DX_VERSION >= 0x00040000
+    void setProgramStateRecursively(Node* node, cocos2d::backend::ProgramState* programState);
+    void restoreAllProgramStates();
+    
+    std::unordered_map<Node*, cocos2d::backend::ProgramState*> _originalStencilProgramState;
+#endif
 };
 
 //internal use
