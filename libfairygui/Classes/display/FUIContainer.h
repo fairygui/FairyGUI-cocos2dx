@@ -20,7 +20,7 @@ public:
     cocos2d::Rect _clippingRect;
     bool _clippingRectDirty;
 
-#if COCOS2DX_VERSION >= 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
     cocos2d::GroupCommand _groupCommand;
     cocos2d::CallbackCommand _beforeVisitCmdScissor;
     cocos2d::CallbackCommand _afterVisitCmdScissor;
@@ -38,7 +38,7 @@ public:
     cocos2d::Node* _stencil;
     cocos2d::StencilStateManager* _stencilStateManager;
     cocos2d::GroupCommand _groupCommand;
-#if COCOS2DX_VERSION >= 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
     cocos2d::backend::ProgramState* _originStencilProgram;
     cocos2d::CallbackCommand _beforeVisitCmd;
     cocos2d::CallbackCommand _afterDrawStencilCmd;
@@ -89,7 +89,7 @@ private:
     RectClippingSupport* _rectClippingSupport;
     StencilClippingSupport* _stencilClippingSupport;
     
-#if COCOS2DX_VERSION >= 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
     void setProgramStateRecursively(Node* node, cocos2d::backend::ProgramState* programState);
     void restoreAllProgramStates();
     

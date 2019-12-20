@@ -19,10 +19,6 @@ void __FUNC__()
 if (!cocos2d::Director::getInstance()->getScheduler()->isScheduled(CC_SCHEDULE_SELECTOR(__TYPE__::__selector_##__FUNC__), this))\
     cocos2d::Director::getInstance()->getScheduler()->schedule(CC_SCHEDULE_SELECTOR(__TYPE__::__selector_##__FUNC__), this, (__VA_ARGS__+0), false)
 
-#ifndef COCOS2DX_VERSION
-#define COCOS2DX_VERSION COCOS2D_VERSION
-#endif
-
 #define CALL_LATER_CANCEL(__TYPE__,__FUNC__) \
 cocos2d::Director::getInstance()->getScheduler()->unschedule(CC_SCHEDULE_SELECTOR(__TYPE__::__selector_##__FUNC__), this)
 

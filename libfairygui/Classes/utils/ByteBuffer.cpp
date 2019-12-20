@@ -159,7 +159,7 @@ void ByteBuffer::writeS(const std::string& value)
 cocos2d::Color4B ByteBuffer::readColor()
 {
     int startIndex = _offset + _position;
-#if COCOS2DX_VERSION >= 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
     uint8_t r = _buffer[startIndex];
     uint8_t g = _buffer[startIndex + 1];
     uint8_t b = _buffer[startIndex + 2];
