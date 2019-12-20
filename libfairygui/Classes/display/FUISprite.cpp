@@ -100,7 +100,7 @@ void FUISprite::setScaleByTile(bool value)
 
 void FUISprite::setGrayed(bool value)
 {
-#if COCOS2DX_VERSION >= 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
     auto isETC1 = getTexture() && getTexture()->getAlphaTextureName();
     if (value) {
         Sprite::updateShaders(positionTextureColor_vert, (isETC1)?etc1Gray_frag:grayScale_frag);
@@ -486,7 +486,7 @@ void FUISprite::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform
         Sprite::draw(renderer, transform, flags);
     else
     {
-#if COCOS2DX_VERSION >= 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
         setMVPMatrixUniform();
 #endif
 
@@ -511,7 +511,7 @@ void FUISprite::draw(cocos2d::Renderer* renderer, const cocos2d::Mat4& transform
         {
             _trianglesCommand.init(_globalZOrder,
                                    _texture,
-#if COCOS2DX_VERSION < 0x00040000
+#if COCOS2D_VERSION < 0x00040000
                                    getGLProgramState(),
 #endif
                                    _blendFunc,
