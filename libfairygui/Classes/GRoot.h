@@ -39,6 +39,9 @@ public:
     InputProcessor* getInputProcessor() const { return _inputProcessor; }
     cocos2d::Vec2 getTouchPosition(int touchId);
     GObject* getTouchTarget();
+    
+    cocos2d::Vec2 worldToRoot(const cocos2d::Vec2 &pt);
+    cocos2d::Vec2 rootToWorld(const cocos2d::Vec2 &pt);
 
     void showPopup(GObject* popup);
     void showPopup(GObject* popup, GObject* target, PopupDirection dir);

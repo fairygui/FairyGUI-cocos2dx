@@ -320,7 +320,7 @@ bool InputProcessor::onTouchBegan(Touch *touch, Event* /*unusedEvent*/)
     _touchListener->setSwallowTouches(target != _owner);
 
     TouchInfo* ti = getTouch(touch->getID());
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
     setBegin(ti, target);
@@ -351,7 +351,7 @@ void InputProcessor::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
         target = _owner;
 
     TouchInfo* ti = getTouch(touch->getID());
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
 
@@ -396,7 +396,7 @@ void InputProcessor::onTouchEnded(Touch *touch, Event* /*unusedEvent*/)
         target = _owner;
 
     TouchInfo* ti = getTouch(touch->getID());
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->button = EventMouse::MouseButton::BUTTON_LEFT;
     ti->touch = touch;
     setEnd(ti, target);
@@ -512,7 +512,7 @@ void InputProcessor::onMouseDown(cocos2d::EventMouse * event)
     _touchListener->setSwallowTouches(target != _owner);
 
     TouchInfo* ti = getTouch(0);
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->button = event->getMouseButton();
     ti->touch = nullptr;
     setBegin(ti, target);
@@ -541,7 +541,7 @@ void InputProcessor::onMouseUp(cocos2d::EventMouse * event)
         target = _owner;
 
     TouchInfo* ti = getTouch(0);
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->button = event->getMouseButton();
     ti->touch = nullptr;
     setEnd(ti, target);
@@ -596,8 +596,9 @@ void InputProcessor::onMouseUp(cocos2d::EventMouse * event)
 void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
 {
     TouchInfo* ti = getTouch(0);
-    if (std::abs(ti->pos.x - event->getCursorX()) < 1
-        && std::abs(ti->pos.y - (UIRoot->getHeight() - event->getCursorY())) < 1)
+    Vec2 npos = UIRoot->worldToRoot(Vec2(event->getCursorX(), event->getCursorY()));
+    if (std::abs(ti->pos.x - npos.x) < 1
+        && std::abs(ti->pos.y - npos.y) < 1)
         return;
 
     auto camera = Camera::getVisitingCamera();
@@ -606,7 +607,7 @@ void InputProcessor::onMouseMove(cocos2d::EventMouse * event)
     if (!target)
         target = _owner;
 
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->touch = nullptr;
 
     updateRecentInput(ti, target);
@@ -650,7 +651,7 @@ void InputProcessor::onMouseScroll(cocos2d::EventMouse * event)
         target = _owner;
 
     TouchInfo* ti = getTouch(0);
-    ti->pos = Vec2(pt.x, UIRoot->getHeight() - pt.y);
+    ti->pos = UIRoot->worldToRoot(pt);
     ti->touch = nullptr;
     ti->mouseWheelDelta = MAX(event->getScrollX(), event->getScrollY());
 
