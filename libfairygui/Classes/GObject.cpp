@@ -461,8 +461,7 @@ Vec2 GObject::localToGlobal(const Vec2& pt)
     }
     pt2.y = _size.height - pt2.y;
     pt2 = _displayObject->convertToWorldSpace(pt2);
-    pt2.y = UIRoot->getHeight() - pt2.y;
-    return pt2;
+    return UIRoot->worldToRoot(pt2);
 }
 
 cocos2d::Rect GObject::localToGlobal(const cocos2d::Rect& rect)
@@ -479,8 +478,7 @@ cocos2d::Rect GObject::localToGlobal(const cocos2d::Rect& rect)
 
 Vec2 GObject::globalToLocal(const Vec2& pt)
 {
-    Vec2 pt2 = pt;
-    pt2.y = UIRoot->getHeight() - pt2.y;
+    Vec2 pt2 = UIRoot->rootToWorld(pt);
     pt2 = _displayObject->convertToNodeSpace(pt2);
     pt2.y = _size.height - pt2.y;
     if (_pivotAsAnchor)
