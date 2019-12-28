@@ -323,7 +323,6 @@ GObject* UIPackage::createObject(PackageItem* item)
         return nullptr;
 
     _constructing++;
-    g->_packageItem = item;
     g->constructFromResource();
     _constructing--;
     return g;

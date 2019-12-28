@@ -1,23 +1,23 @@
 #include "UIObjectFactory.h"
+#include "GButton.h"
+#include "GComboBox.h"
+#include "GComponent.h"
+#include "GGraph.h"
+#include "GGroup.h"
+#include "GImage.h"
+#include "GLabel.h"
+#include "GList.h"
+#include "GLoader.h"
+#include "GMovieClip.h"
+#include "GProgressBar.h"
+#include "GRichTextField.h"
+#include "GScrollBar.h"
+#include "GSlider.h"
+#include "GTextField.h"
+#include "GTextInput.h"
+#include "GTree.h"
 #include "UIPackage.h"
 #include "utils/ToolSet.h"
-#include "GComponent.h"
-#include "GImage.h"
-#include "GMovieClip.h"
-#include "GTextField.h"
-#include "GRichTextField.h"
-#include "GTextInput.h"
-#include "GLoader.h"
-#include "GGraph.h"
-#include "GList.h"
-#include "GLabel.h"
-#include "GButton.h"
-#include "GProgressBar.h"
-#include "GSlider.h"
-#include "GComboBox.h"
-#include "GScrollBar.h"
-#include "GGroup.h"
-#include "GTree.h"
 
 NS_FGUI_BEGIN
 
@@ -40,15 +40,20 @@ void UIObjectFactory::setPackageItemExtension(const string& url, GComponentCreat
     _packageItemExtensions[url] = creator;
 }
 
-GObject * UIObjectFactory::newObject(PackageItem * pi)
+GObject* UIObjectFactory::newObject(PackageItem* pi)
 {
+    GObject* obj;
     if (pi->extensionCreator != nullptr)
-        return pi->extensionCreator();
+        obj = pi->extensionCreator();
     else
-        return newObject(pi->objectType);
+        obj = newObject(pi->objectType);
+    if (obj != nullptr)
+        obj->_packageItem = pi;
+
+    return obj;
 }
 
-GObject * UIObjectFactory::newObject(ObjectType type)
+GObject* UIObjectFactory::newObject(ObjectType type)
 {
     switch (type)
     {
@@ -116,7 +121,7 @@ void UIObjectFactory::setLoaderExtension(GLoaderCreator creator)
     _loaderCreator = creator;
 }
 
-void UIObjectFactory::resolvePackageItemExtension(PackageItem * pi)
+void UIObjectFactory::resolvePackageItemExtension(PackageItem* pi)
 {
     auto it = _packageItemExtensions.find(UIPackage::URL_PREFIX + pi->owner->getId() + pi->id);
     if (it != _packageItemExtensions.end())
@@ -134,5 +139,3 @@ void UIObjectFactory::resolvePackageItemExtension(PackageItem * pi)
 }
 
 NS_FGUI_END
-
-

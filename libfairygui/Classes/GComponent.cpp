@@ -1130,13 +1130,15 @@ void GComponent::constructFromResource()
 
 void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int poolIndex)
 {
-    if (!_packageItem->translated)
+    PackageItem* contentItem = _packageItem->getBranch();
+
+    if (!contentItem->translated)
     {
-        _packageItem->translated = true;
-        TranslationHelper::translateComponent(_packageItem);
+        contentItem->translated = true;
+        TranslationHelper::translateComponent(contentItem);
     }
 
-    ByteBuffer* buffer = _packageItem->rawData;
+    ByteBuffer* buffer = contentItem->rawData;
     buffer->seek(0, 0);
 
     _underConstruct = true;
@@ -1229,7 +1231,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
                 if (!pkgId.empty())
                     pkg = UIPackage::getById(pkgId);
                 else
-                    pkg = _packageItem->owner;
+                    pkg = contentItem->owner;
 
                 pi = pkg != nullptr ? pkg->getItem(src) : nullptr;
             }
@@ -1237,7 +1239,6 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
             if (pi != nullptr)
             {
                 child = UIObjectFactory::newObject(pi);
-                child->_packageItem = pi;
                 child->constructFromResource();
             }
             else
@@ -1300,7 +1301,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     int i2 = buffer->readInt();
     if (!hitTestId.empty())
     {
-        PackageItem* pi = _packageItem->owner->getItem(hitTestId);
+        PackageItem* pi = contentItem->owner->getItem(hitTestId);
         if (pi != nullptr && pi->pixelHitTestData != nullptr)
             setHitArea(new PixelHitTest(pi->pixelHitTestData, i1, i2));
     }
@@ -1333,7 +1334,7 @@ void GComponent::constructFromResource(std::vector<GObject*>* objectPool, int po
     buildNativeDisplayList();
     setBoundsChangedFlag();
 
-    if (_packageItem->objectType != ObjectType::COMPONENT)
+    if (contentItem->objectType != ObjectType::COMPONENT)
         constructExtension(buffer);
 
     onConstruct();
