@@ -2,16 +2,14 @@ FairyGUI Cocos2dx SDK
 ====
 
 A flexible UI framework for Cocos2dx, working with the FREE professional Game UI Editor: FairyGUI Editor.  
-Download the editor from here: [www.fairygui.com](http://www.fairygui.com/product)  
+Download the editor from here: [www.fairygui.com](https://www.fairygui.com/)  
 
 FairyGUI编辑器操作简单，使用习惯与Adobe系列软件保持一致，策划和美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity，Cocos2dx, Starling, Egret, LayaAir, Pixi, Haxe, Flash等多个主流应用和游戏平台。
 
-下载UI编辑器：[www.fairygui.com](http://www.fairygui.com/product)
+下载UI编辑器：[www.fairygui.com](https://www.fairygui.com/)
 
 Get Started
 ====
-
-![](http://www.fairygui.com/images/20171111214132.png)
 
 目录结构：
 - libfairygui 这里是fairygui库的源码。
@@ -27,15 +25,9 @@ Get Started
 Learn
 ====
 
-- 下载FairyGUI编辑器。  
-- 下载Examples工程，浏览一遍FairyGUI的例子。  
-- 解压Examples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。  
-- 观看视频教程：[强大的UI编辑器 - FairyGUI入门教程](http://www.sikiedu.com/course/139)  
-- 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/guide)  
-- FAQ：[问答社区](http://ask.fairygui.com)  
-- 进群与小伙伴一起交流：一群 434866637（已满） 二群 614444599   
+[教程](https://www.fairygui.com/docs/guide/index.html)  
 
 License
 ====
-MIT 你可以自由使用FairyGUI在你的商业和非商业项目。  
-如果觉得FairyGUI好用，请[赞助作者](http://fairygui.com/about/donate.html)
+
+MIT
