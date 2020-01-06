@@ -521,6 +521,7 @@ bool UIPackage::loadPackage(ByteBuffer* buffer)
         }
         else
         {
+            sprite->offset.setZero();
             sprite->originalSize.width = sprite->rect.size.width;
             sprite->originalSize.height = sprite->rect.size.height;
         }
@@ -655,7 +656,9 @@ SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite* sprite)
 
     //not using createWithTexture for saving a autorelease call.
     SpriteFrame* spriteFrame = new SpriteFrame();
-    spriteFrame->initWithTexture(sprite->atlas->texture, sprite->rect, sprite->rotated, sprite->offset, sprite->originalSize);
+    spriteFrame->initWithTexture(sprite->atlas->texture, sprite->rect, sprite->rotated,
+                                 Vec2(sprite->offset.x - (sprite->originalSize.width - sprite->rect.size.width) / 2, -(sprite->offset.y - (sprite->originalSize.height - sprite->rect.size.height) / 2)),
+                                 sprite->originalSize);
 
     return spriteFrame;
 }
@@ -674,7 +677,7 @@ void UIPackage::loadImage(PackageItem* item)
     {
 #if COCOS2D_VERSION >= 0x00040000
         Texture2D::TexParams tp(backend::SamplerFilter::LINEAR, backend::SamplerFilter::LINEAR,
-            backend::SamplerAddressMode::REPEAT, backend::SamplerAddressMode::REPEAT);
+                                backend::SamplerAddressMode::REPEAT, backend::SamplerAddressMode::REPEAT);
 #else
         Texture2D::TexParams tp = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
 #endif
