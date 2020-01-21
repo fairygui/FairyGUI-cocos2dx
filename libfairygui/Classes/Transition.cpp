@@ -712,15 +712,19 @@ void Transition::updateFromRelations(const std::string& targetId, float dx, floa
         {
             if (item->tweenConfig != nullptr)
             {
-                item->tweenConfig->startValue->f1 += dx;
-                item->tweenConfig->startValue->f2 += dy;
-                item->tweenConfig->endValue->f1 += dx;
-                item->tweenConfig->endValue->f2 += dy;
+                if(!item->tweenConfig->startValue->b3){
+                    item->tweenConfig->startValue->f1 += dx;
+                    item->tweenConfig->startValue->f2 += dy;
+                    item->tweenConfig->endValue->f1 += dx;
+                    item->tweenConfig->endValue->f2 += dy;
+                }
             }
             else
             {
-                ((TValue*)item->value)->f1 += dx;
-                ((TValue*)item->value)->f2 += dy;
+                if(!item->tweenConfig->startValue->b3){
+                    ((TValue*)item->value)->f1 += dx;
+                    ((TValue*)item->value)->f2 += dy;
+                }
             }
         }
     }
