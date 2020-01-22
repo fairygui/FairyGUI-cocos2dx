@@ -721,7 +721,7 @@ void Transition::updateFromRelations(const std::string& targetId, float dx, floa
             }
             else
             {
-                if(!item->tweenConfig->startValue->b3){
+                if(!((TValue*)item->value)->b3){
                     ((TValue*)item->value)->f1 += dx;
                     ((TValue*)item->value)->f2 += dy;
                 }
