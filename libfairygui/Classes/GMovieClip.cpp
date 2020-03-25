@@ -341,6 +341,7 @@ void ActionMovieClip::setFrame(int value)
     _frame = value;
     _frameElapsed = 0;
     _displayFrame = -1;
+    drawFrame();
 }
 
 void ActionMovieClip::advance(float time)
