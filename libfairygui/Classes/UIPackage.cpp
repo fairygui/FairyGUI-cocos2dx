@@ -482,7 +482,7 @@ bool UIPackage::loadPackage(ByteBuffer* buffer)
             if (highResCnt > 0)
             {
                 pi->highResolution = new std::vector<std::string>();
-                buffer->readSArray(*pi->highResolution, branchCnt);
+                buffer->readSArray(*pi->highResolution, highResCnt);
             }
         }
 
