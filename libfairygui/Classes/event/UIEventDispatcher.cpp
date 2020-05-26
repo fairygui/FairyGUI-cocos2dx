@@ -41,7 +41,7 @@ EventTag & EventTag::operator=(const EventTag & other)
     return *this;
 }
 
-EventTag & EventTag::operator=(EventTag && other)
+EventTag & EventTag::operator=(EventTag && other) noexcept
 {
     if (this != &other)
     {
@@ -63,19 +63,9 @@ EventTag & EventTag::operator=(int v)
     return *this;
 }
 
-bool EventTag::operator!=(const EventTag & v)
-{
-    return _value != v._value;
-}
-
 bool EventTag::operator!=(const EventTag & v) const
 {
     return _value != v._value;
-}
-
-bool EventTag::operator==(const EventTag & v)
-{
-    return _value == v._value;
 }
 
 bool EventTag::operator==(const EventTag & v) const

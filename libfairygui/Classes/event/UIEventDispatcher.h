@@ -16,20 +16,18 @@ public:
     static const EventTag None;
 
     EventTag();
-    explicit EventTag(void* ptr);
-    explicit EventTag(int value);
-    explicit EventTag(const EventTag& other);
-    explicit EventTag(EventTag&& other);
+    EventTag(void* ptr);
+    EventTag(int value);
+    EventTag(const EventTag& other);
+    EventTag(EventTag&& other);
     ~EventTag();
 
     EventTag& operator= (const EventTag& other);
-    EventTag& operator= (EventTag&& other);
+    EventTag& operator= (EventTag&& other) noexcept;
     EventTag& operator= (void* ptr);
     EventTag& operator= (int v);
 
-    bool operator!= (const EventTag& v);
     bool operator!= (const EventTag& v) const;
-    bool operator== (const EventTag& v);
     bool operator== (const EventTag& v) const;
 
     bool isNone() const { return _value == 0; }
