@@ -294,7 +294,7 @@ void GButton::constructExtension(ByteBuffer* buffer)
     addEventListener(UIEventType::TouchBegin, CC_CALLBACK_1(GButton::onTouchBegin, this));
     addEventListener(UIEventType::TouchEnd, CC_CALLBACK_1(GButton::onTouchEnd, this));
     addEventListener(UIEventType::Click, CC_CALLBACK_1(GButton::onClick, this));
-    addEventListener(UIEventType::Exit, CC_CALLBACK_1(GButton::onExit, this));
+    addEventListener(UIEventType::Exit, CC_CALLBACK_1(GButton::onExit2, this));
 }
 
 void GButton::setup_afterAdd(ByteBuffer* buffer, int beginPos)
@@ -444,7 +444,7 @@ void GButton::onClick(EventContext* context)
     }
 }
 
-void GButton::onExit(EventContext* context)
+void GButton::onExit2(EventContext* context)
 {
     if (_over)
         onRollOut(context);
