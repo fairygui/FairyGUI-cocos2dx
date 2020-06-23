@@ -346,6 +346,11 @@ void FUISprite::updateRadial(void)
         _vertexIndex = (unsigned short *)malloc(triangleCount * 3 * sizeof(*_vertexIndex));
         CCASSERT(_vertexData, "FUISprite. Not enough memory");
     }
+    else
+    {
+        triangleCount = _vertexDataCount - 2;
+    }
+    
     updateColor();
 
     if (!sameIndexCount)
