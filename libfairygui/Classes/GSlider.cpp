@@ -69,7 +69,7 @@ void GSlider::setValue(double value)
 
 void GSlider::setWholeNumbers(bool value)
 {
-    if (_value != value)
+    if (_wholeNumbers != value)
     {
         _wholeNumbers = value;
         update();
