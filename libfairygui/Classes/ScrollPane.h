@@ -165,6 +165,7 @@ private:
     float _decelerationRate;
     bool _pageMode;
     bool _floating;
+    bool _dontClipMargin;
 
     float _xPos;
     float _yPos;
