@@ -16,16 +16,16 @@ Color4B ToolSet::hexToColor(const char* str)
     if (len == 9)
     {
         return Color4B(strtol(strncpy(temp, str + 3, 2), NULL, 16),
-                       strtol(strncpy(temp, str + 5, 2), NULL, 16),
-                       strtol(strncpy(temp, str + 7, 2), NULL, 16),
-                       strtol(strncpy(temp, str + 1, 2), NULL, 16));
+            strtol(strncpy(temp, str + 5, 2), NULL, 16),
+            strtol(strncpy(temp, str + 7, 2), NULL, 16),
+            strtol(strncpy(temp, str + 1, 2), NULL, 16));
     }
     else
     {
         return Color4B(strtol(strncpy(temp, str + 1, 2), NULL, 16),
-                       strtol(strncpy(temp, str + 3, 2), NULL, 16),
-                       strtol(strncpy(temp, str + 5, 2), NULL, 16),
-                       255);
+            strtol(strncpy(temp, str + 3, 2), NULL, 16),
+            strtol(strncpy(temp, str + 5, 2), NULL, 16),
+            255);
     }
 }
 
@@ -62,6 +62,15 @@ int ToolSet::findInStringArray(const std::vector<std::string>& arr, const std::s
         return (int)(iter - arr.begin());
 
     return -1;
+}
+
+bool ToolSet::isFileExist(const std::string & fileName)
+{
+    bool tmp = FileUtils::getInstance()->isPopupNotify();
+    FileUtils::getInstance()->setPopupNotify(false);
+    bool ret = FileUtils::getInstance()->isFileExist(fileName);
+    FileUtils::getInstance()->setPopupNotify(tmp);
+    return ret;
 }
 
 FastSplitter::FastSplitter() : data(nullptr), dataLength(-1), delimiter('\0')

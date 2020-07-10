@@ -59,6 +59,9 @@ public:
 
     //font
     BitmapFont* bitmapFont;
+
+    //skeleton
+    cocos2d::Vec2* skeletonAnchor;
 };
 
 NS_FGUI_END

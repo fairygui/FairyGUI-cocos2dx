@@ -1,5 +1,5 @@
-#ifndef __GLOADER_H__
-#define __GLOADER_H__
+#ifndef __GLOADER3D_H__
+#define __GLOADER3D_H__
 
 #include "cocos2d.h"
 #include "FairyGUIMacros.h"
@@ -8,16 +8,15 @@
 NS_FGUI_BEGIN
 
 class GComponent;
-class ActionMovieClip;
-class FUISprite;
+class FUIContainer;
 
-class GLoader : public GObject
+class GLoader3D : public GObject
 {
 public:
-    GLoader();
-    virtual ~GLoader();
+    GLoader3D();
+    virtual ~GLoader3D();
 
-    CREATE_FUNC(GLoader);
+    CREATE_FUNC(GLoader3D);
 
     const std::string& getURL() const { return _url; }
     void setURL(const std::string& value);
@@ -40,7 +39,8 @@ public:
     bool isShrinkOnly() const { return _shrinkOnly; }
     void setShrinkOnly(bool value);
 
-    const cocos2d::Size& getContentSize();
+    const cocos2d::Node* getContent() { return _content; }
+    void setContent(cocos2d::Node* value);
 
     cocos2d::Color3B getColor() const;
     void setColor(const cocos2d::Color3B& value);
@@ -51,19 +51,14 @@ public:
     int getFrame() const;
     void setFrame(int value);
 
-    FillMethod getFillMethod() const;
-    void setFillMethod(FillMethod value);
+    const std::string& getAnimationName() const { return _animationName; }
+    void setAnimationName(const std::string& value);
 
-    FillOrigin getFillOrigin() const;
-    void setFillOrigin(FillOrigin value);
+    const std::string& getSkinName() const { return _skinName; }
+    void setSkinName(const std::string& value);
 
-    bool isFillClockwise() const;
-    void setFillClockwise(bool value);
-
-    float getFillAmount() const;
-    void setFillAmount(float value);
-
-    GComponent* getComponent() const { return _content2; }
+    bool getLoop() const { return _loop; }
+    void setLoop(bool value);
 
     virtual cocos2d::Value getProp(ObjectPropID propId) override;
     virtual void setProp(ObjectPropID propId, const cocos2d::Value& value) override;
@@ -79,6 +74,9 @@ protected:
     virtual void freeExternal(cocos2d::SpriteFrame* spriteFrame);
     void onExternalLoadSuccess(cocos2d::SpriteFrame* spriteFrame);
     void onExternalLoadFailed();
+
+    void onChange();
+    void onChangeSpine();
 
 private:
     void loadContent();
@@ -96,13 +94,15 @@ private:
     bool _shrinkOnly;
     bool _updatingLayout;
     PackageItem* _contentItem;
-    int _contentStatus;
     bool _playing;
     int _frame;
+    bool _loop;
+    std::string _animationName;
+    std::string _skinName;
+    cocos2d::Color3B _color;
 
-    FUISprite* _content;
-    GComponent* _content2;
-    ActionMovieClip* _playAction;
+    FUIContainer* _container;
+    cocos2d::Node* _content;
 };
 
 NS_FGUI_END

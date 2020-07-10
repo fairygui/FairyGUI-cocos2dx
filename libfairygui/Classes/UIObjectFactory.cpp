@@ -16,6 +16,7 @@
 #include "GTextField.h"
 #include "GTextInput.h"
 #include "GTree.h"
+#include "GLoader3D.h"
 #include "UIPackage.h"
 #include "utils/ToolSet.h"
 
@@ -110,6 +111,9 @@ GObject* UIObjectFactory::newObject(ObjectType type)
 
     case ObjectType::TREE:
         return GTree::create();
+
+    case ObjectType::LOADER3D:
+        return GLoader3D::create();
 
     default:
         return nullptr;

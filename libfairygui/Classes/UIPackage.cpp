@@ -15,7 +15,7 @@ int UIPackage::_constructing = 0;
 std::string UIPackage::_branch;
 std::unordered_map<std::string, std::string> UIPackage::_vars;
 
-const unsigned char* emptyTextureData = new unsigned char[16]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+const unsigned char* emptyTextureData = new unsigned char[16]{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstById;
 std::unordered_map<std::string, UIPackage*> UIPackage::_packageInstByName;
@@ -310,8 +310,8 @@ GObject* UIPackage::createObject(const string& resName)
 {
     PackageItem* pi = getItemByName(resName);
     CCASSERT(pi, StringUtils::format("FairyGUI: resource not found - %s in  %s",
-                                     resName.c_str(), _name.c_str())
-                     .c_str());
+        resName.c_str(), _name.c_str())
+        .c_str());
 
     return createObject(pi);
 }
@@ -381,7 +381,10 @@ bool UIPackage::loadPackage(ByteBuffer* buffer)
     buffer->seek(indexTablePos, 1);
 
     PackageItem* pi;
-    string assetNamePrefix = _assetPath + "_";
+    string path = _assetPath;
+    size_t pos = path.find('/');
+    string shortPath = pos == -1 ? STD_STRING_EMPTY : path.substr(0, pos + 1);
+    path += "_";
 
     cnt = buffer->readShort();
     for (int i = 0; i < cnt; i++)
@@ -453,9 +456,20 @@ bool UIPackage::loadPackage(ByteBuffer* buffer)
         case PackageItemType::SOUND:
         case PackageItemType::MISC:
         {
-            pi->file = assetNamePrefix + pi->file;
+            pi->file = path + pi->file;
             break;
         }
+
+        case PackageItemType::SPINE:
+        case PackageItemType::DRAGONBONES:
+        {
+            pi->file = shortPath + pi->file;
+            pi->skeletonAnchor = new Vec2();
+            pi->skeletonAnchor->x = buffer->readFloat();
+            pi->skeletonAnchor->y = buffer->readFloat();
+            break;
+        }
+
         default:
             break;
         }
@@ -619,10 +633,7 @@ void UIPackage::loadAtlas(PackageItem* item)
     else
         alphaFilePath = item->file + "!a" + ext;
 
-    bool tmp = FileUtils::getInstance()->isPopupNotify();
-    FileUtils::getInstance()->setPopupNotify(false);
-    bool hasAlphaTexture = FileUtils::getInstance()->isFileExist(alphaFilePath);
-    FileUtils::getInstance()->setPopupNotify(tmp);
+    bool hasAlphaTexture = ToolSet::isFileExist(alphaFilePath);
     if (hasAlphaTexture)
     {
         image = new Image();
@@ -657,8 +668,8 @@ SpriteFrame* UIPackage::createSpriteTexture(AtlasSprite* sprite)
     //not using createWithTexture for saving a autorelease call.
     SpriteFrame* spriteFrame = new SpriteFrame();
     spriteFrame->initWithTexture(sprite->atlas->texture, sprite->rect, sprite->rotated,
-                                 Vec2(sprite->offset.x - (sprite->originalSize.width - sprite->rect.size.width) / 2, -(sprite->offset.y - (sprite->originalSize.height - sprite->rect.size.height) / 2)),
-                                 sprite->originalSize);
+        Vec2(sprite->offset.x - (sprite->originalSize.width - sprite->rect.size.width) / 2, -(sprite->offset.y - (sprite->originalSize.height - sprite->rect.size.height) / 2)),
+        sprite->originalSize);
 
     return spriteFrame;
 }
@@ -677,12 +688,12 @@ void UIPackage::loadImage(PackageItem* item)
     {
 #if COCOS2D_VERSION >= 0x00040000
         Texture2D::TexParams tp(backend::SamplerFilter::LINEAR, backend::SamplerFilter::LINEAR,
-                                backend::SamplerAddressMode::REPEAT, backend::SamplerAddressMode::REPEAT);
+            backend::SamplerAddressMode::REPEAT, backend::SamplerAddressMode::REPEAT);
 #else
-        Texture2D::TexParams tp = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+        Texture2D::TexParams tp = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
 #endif
         item->spriteFrame->getTexture()->setTexParameters(tp);
-    }
+}
 }
 
 void UIPackage::loadMovieClip(PackageItem* item)

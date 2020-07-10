@@ -255,6 +255,9 @@
     <ClInclude Include="..\Classes\GTreeNode.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\GLoader3D.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -471,6 +474,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\GTreeNode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GLoader3D.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

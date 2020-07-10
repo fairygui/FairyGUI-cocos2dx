@@ -15,7 +15,9 @@ enum class PackageItemType
     FONT,
     SWF,
     MISC,
-    UNKNOWN
+    UNKNOWN,
+    SPINE,
+    DRAGONBONES
 };
 
 enum class ObjectType
@@ -37,7 +39,8 @@ enum class ObjectType
     PROGRESSBAR,
     SLIDER,
     SCROLLBAR,
-    TREE
+    TREE,
+    LOADER3D
 };
 
 enum class ButtonMode

@@ -529,6 +529,9 @@ bool GRoot::initWithScene(cocos2d::Scene* scene, int zOrder)
     if (!GComponent::init())
         return false;
 
+    if (_inst == nullptr)
+        _inst = this;
+
     _inputProcessor = new InputProcessor(this);
     _inputProcessor->setCaptureCallback(CC_CALLBACK_1(GRoot::onTouchEvent, this));
 
