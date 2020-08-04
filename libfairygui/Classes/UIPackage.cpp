@@ -643,10 +643,15 @@ void UIPackage::loadAtlas(PackageItem* item)
             return;
         }
 
+#if defined(ENGINEX_VERSION)
+        if(image->getFileType() == Image::Format::ETC)
+            tex->updateWithImage(image, Texture2D::getDefaultAlphaPixelFormat(), 1, TextureFormatEXT::ETC1_ALPHA);
+#else
         tex = new Texture2D();
         tex->initWithImage(image);
         item->texture->setAlphaTexture(tex);
         tex->release();
+#endif
         delete image;
     }
 }

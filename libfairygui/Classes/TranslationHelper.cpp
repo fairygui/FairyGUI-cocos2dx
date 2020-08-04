@@ -1,7 +1,11 @@
 #include "TranslationHelper.h"
 #include "PackageItem.h"
 #include "UIPackage.h"
+#if defined(ENGINEX_VERSION)
+#include "pugixml/pugixml_imp.hpp"
+#else
 #include "tinyxml2/tinyxml2.h"
+#endif
 #include "utils/ByteBuffer.h"
 
 USING_NS_CC;
@@ -15,6 +19,28 @@ void TranslationHelper::loadFromXML(const char* xmlString, size_t nBytes)
 {
     strings.clear();
 
+#if defined(ENGINEX_VERSION)
+    pugi::xml_document doc;
+    if (doc.load_buffer(xmlString, nBytes)) {
+        auto root = doc.document_element();
+        auto ele = doc.child("string");
+        while (ele)
+        {
+            std::string key = ele.attribute("name").value();
+            std::string text = ele.text().as_string();
+            size_t i = key.find("-");
+            if (i == std::string::npos)
+                continue;
+
+            std::string key2 = key.substr(0, i);
+            std::string key3 = key.substr(i + 1);
+            std::unordered_map<std::string, std::string>& col = strings[key2];
+            col[key3] = text;
+
+            ele = ele.next_sibling("string");
+        }
+    }
+#else
     tinyxml2::XMLDocument* xml = new tinyxml2::XMLDocument();
     xml->Parse(xmlString, nBytes);
 
@@ -37,6 +63,7 @@ void TranslationHelper::loadFromXML(const char* xmlString, size_t nBytes)
     }
 
     delete xml;
+#endif
 }
 
 void TranslationHelper::translateComponent(PackageItem* item)
