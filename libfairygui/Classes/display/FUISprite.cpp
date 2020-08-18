@@ -100,7 +100,15 @@ void FUISprite::setScaleByTile(bool value)
 
 void FUISprite::setGrayed(bool value)
 {
-#if COCOS2D_VERSION >= 0x00040000
+#if defined(ENGINEX_VERSION)
+    auto isETC1 = getTexture() && getTexture()->getTextureFormatEXT() == TextureFormatEXT::ETC1_ALPHA;
+    if (value) {
+        Sprite::updateShaders(positionTextureColor_vert, (isETC1) ? etc1Gray_frag : grayScale_frag);
+    }
+    else {
+        Sprite::updateShaders(positionTextureColor_vert, (isETC1) ? etc1_frag : positionTextureColor_frag);
+    }
+#elif COCOS2D_VERSION >= 0x00040000
     auto isETC1 = getTexture() && getTexture()->getAlphaTextureName();
     if (value) {
         Sprite::updateShaders(positionTextureColor_vert, (isETC1)?etc1Gray_frag:grayScale_frag);
