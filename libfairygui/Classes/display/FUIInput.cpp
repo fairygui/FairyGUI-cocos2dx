@@ -72,8 +72,8 @@ void FUIInput::setPassword(bool value)
 
 void FUIInput::setKeyboardType(int value)
 {
-    //if (!_password)
-        //setInputMode((ui::EditBox::InputMode)value);
+    if (!_password)
+        setInputMode((ui::EditBox::InputMode)value);
 }
 
 void FUIInput::openKeyboard()

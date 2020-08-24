@@ -73,7 +73,7 @@ private:
     void onTouchBegin(EventContext* context);
     void onTouchEnd(EventContext* context);
     void onClick(EventContext* context);
-    void onExit(EventContext* context);
+    void onExit2(EventContext* context);
 
     ButtonMode _mode;
     GObject* _titleObject;
