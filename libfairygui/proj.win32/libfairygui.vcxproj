@@ -85,6 +85,9 @@
     <ClInclude Include="..\Classes\UIObjectFactory.h" />
     <ClInclude Include="..\Classes\UIPackage.h" />
     <ClInclude Include="..\Classes\utils\ByteBuffer.h" />
+    <ClInclude Include="..\Classes\utils\html\HtmlElement.h" />
+    <ClInclude Include="..\Classes\utils\html\HtmlObject.h" />
+    <ClInclude Include="..\Classes\utils\html\HtmlParser.h" />
     <ClInclude Include="..\Classes\utils\ToolSet.h" />
     <ClInclude Include="..\Classes\utils\UBBParser.h" />
     <ClInclude Include="..\Classes\utils\WeakPtr.h" />
@@ -160,6 +163,9 @@
     <ClCompile Include="..\Classes\UIObjectFactory.cpp" />
     <ClCompile Include="..\Classes\UIPackage.cpp" />
     <ClCompile Include="..\Classes\utils\ByteBuffer.cpp" />
+    <ClCompile Include="..\Classes\utils\html\HtmlElement.cpp" />
+    <ClCompile Include="..\Classes\utils\html\HtmlObject.cpp" />
+    <ClCompile Include="..\Classes\utils\html\HtmlParser.cpp" />
     <ClCompile Include="..\Classes\utils\ToolSet.cpp" />
     <ClCompile Include="..\Classes\utils\UBBParser.cpp" />
     <ClCompile Include="..\Classes\utils\WeakPtr.cpp" />

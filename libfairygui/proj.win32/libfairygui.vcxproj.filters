@@ -22,6 +22,9 @@
     <Filter Include="src\tween">
       <UniqueIdentifier>{b7cfd7cb-ec46-4881-bd61-5ec0975a74e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\utils\html">
+      <UniqueIdentifier>{6b1386fe-5855-4ff4-b554-e2d0938db4b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\GButton.h">
@@ -258,6 +261,15 @@
     <ClInclude Include="..\Classes\GLoader3D.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\utils\html\HtmlElement.h">
+      <Filter>src\utils\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\html\HtmlParser.h">
+      <Filter>src\utils\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\utils\html\HtmlObject.h">
+      <Filter>src\utils\html</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\GComboBox.cpp">
@@ -478,6 +490,15 @@
     </ClCompile>
     <ClCompile Include="..\Classes\GLoader3D.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\html\HtmlElement.cpp">
+      <Filter>src\utils\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\html\HtmlParser.cpp">
+      <Filter>src\utils\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\utils\html\HtmlObject.cpp">
+      <Filter>src\utils\html</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

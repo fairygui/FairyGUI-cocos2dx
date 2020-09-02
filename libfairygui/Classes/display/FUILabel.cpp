@@ -14,9 +14,9 @@ static Color3B toGrayed(const Color3B& source)
 }
 
 FUILabel::FUILabel() : _fontSize(-1),
-                       _bmFontCanTint(false),
-                       _textFormat(new TextFormat()),
-                       _grayed(false)
+_bmFontCanTint(false),
+_textFormat(new TextFormat()),
+_grayed(false)
 {
 }
 
@@ -82,10 +82,11 @@ void FUILabel::applyTextFormat()
         }
     }
 
-    if (_currentLabelType != LabelType::BMFONT)
-        setTextColor((Color4B)(_grayed ? toGrayed(_textFormat->color) : _textFormat->color));
-    else if (_bmFontCanTint)
+    if (_currentLabelType != LabelType::BMFONT || _bmFontCanTint)
+    {
+        //setTextColor((Color4B)(_grayed ? toGrayed(_textFormat->color) : _textFormat->color));
         setColor(_grayed ? toGrayed(_textFormat->color) : _textFormat->color);
+    }
 
     if (_textFormat->underline)
         enableUnderline();
@@ -179,6 +180,11 @@ void FUILabel::updateBMFontScale()
     {
         _bmfontScale = 1.0f;
     }
+}
+
+void FUILabel::setUnderlineColor(const cocos2d::Color3B& value)
+{
+    //NOT IMPLEMENTED
 }
 
 NS_FGUI_END
