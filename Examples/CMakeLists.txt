@@ -22,73 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ****************************************************************************/
-cmake_policy(SET CMP0017 NEW)
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.12)
 
-set(APP_NAME MyGame)
+set(APP_NAME FairyGUI_Examples)
 project (${APP_NAME})
-
-set(COCOS2D_ROOT ${CMAKE_SOURCE_DIR}/cocos2d)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${COCOS2D_ROOT}/cmake/Modules/")
-include(CocosBuildHelpers)
-
-
-# Some macro definitions
-if(WINDOWS)
-  if(BUILD_SHARED_LIBS)
-    ADD_DEFINITIONS (-D_USRDLL -D_EXPORT_DLL_ -D_USEGUIDLL -D_USREXDLL -D_USRSTUDIODLL)
-  else()
-    ADD_DEFINITIONS (-DCC_STATIC)
-  endif()
-
-  ADD_DEFINITIONS (-DCOCOS2DXWIN32_EXPORTS -D_WINDOWS -DWIN32 -D_WIN32)
-  set(PLATFORM_FOLDER win32)
-elseif(MACOSX OR APPLE)
-  ADD_DEFINITIONS (-DCC_TARGET_OS_MAC)
-  ADD_DEFINITIONS (-DUSE_FILE32API)
-  set(PLATFORM_FOLDER mac)
-elseif(LINUX)
-  ADD_DEFINITIONS(-DLINUX)
-  set(PLATFORM_FOLDER linux)
-elseif(ANDROID)
-  ADD_DEFINITIONS (-DUSE_FILE32API)
-  set(PLATFORM_FOLDER android)
-else()
-  message( FATAL_ERROR "Unsupported platform, CMake will exit" )
-endif()
-
-
-# Compiler options
-if(MSVC)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:msvcrt /NODEFAULTLIB:libcmt")
-  else()
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:libcmt")
-  endif()
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
-                  -wd4251 -wd4244 -wd4334 -wd4005 -wd4820 -wd4710
-                  -wd4514 -wd4056 -wd4996 -wd4099)
-else()
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	ADD_DEFINITIONS(-DCOCOS2D_DEBUG=1)
-  endif()
-  set(CMAKE_C_FLAGS_DEBUG "-g -Wall")
-  set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations -Wno-reorder")
-  if(CLANG)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-  endif()
-endif(MSVC)
-
-# libcocos2d
-set(BUILD_CPP_EMPTY_TEST OFF CACHE BOOL "turn off build cpp-empty-test")
-set(BUILD_CPP_TESTS OFF CACHE BOOL "turn off build cpp-tests")
-set(BUILD_LUA_LIBS OFF CACHE BOOL "turn off build lua related targets")
-set(BUILD_JS_LIBS OFF CACHE BOOL "turn off build js related targets")
-add_subdirectory(${COCOS2D_ROOT})
 
 if(ANDROID)
     set(PLATFORM_SPECIFIC_SRC proj.android/jni/main.cpp)
@@ -133,66 +71,10 @@ else()
 
 endif()
 
-include_directories(
-	/usr/local/include/GLFW
-	/usr/include/GLFW
-	${COCOS2D_ROOT}
-	${COCOS2D_ROOT}/cocos
-	${COCOS2D_ROOT}/external
-	${COCOS2D_ROOT}/cocos/platform
-	${COCOS2D_ROOT}/cocos/audio/include/
-	Classes
-)
-if ( WINDOWS )
-    include_directories(
-            ${COCOS2D_ROOT}/external/glfw3/include/${PLATFORM_FOLDER}
-            ${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/gles/include/OGLES
-    )
-elseif ( MACOSX OR APPLE )
-    include_directories(
-            ${COCOS2D_ROOT}/external/glfw3/include/mac
-    )
-endif ()
-
-set(GAME_SRC
-        ${PLATFORM_SPECIFIC_SRC}
-        Classes/AppDelegate.cpp
-        Classes/BasicsScene.cpp
-        Classes/DemoScene.cpp
-        Classes/GuideScene.cpp
-        Classes/HitTestScene.cpp
-        Classes/JoystickModule.cpp
-        Classes/JoystickScene.cpp
-        Classes/LoopListScene.cpp
-        Classes/MailItem.cpp
-        Classes/MenuScene.cpp
-        Classes/ModalWaitingScene.cpp
-        Classes/PullToRefreshScene.cpp
-        Classes/TransitionDemoScene.cpp
-        Classes/VirtualListScene.cpp
-        Classes/Window1.cpp
-        Classes/Window2.cpp
-        )
-
-set(GAME_HEADERS
-        ${PLATFORM_SPECIFIC_HEADERS}
-        Classes/AppDelegate.h
-        Classes/BasicsScene.h
-        Classes/DemoScene.h
-        Classes/GuideScene.h
-        Classes/HitTestScene.h
-        Classes/JoystickModule.h
-        Classes/JoystickScene.h
-        Classes/LoopListScene.h
-        Classes/MailItem.h
-        Classes/MenuScene.h
-        Classes/ModalWaitingScene.h
-        Classes/PullToRefreshScene.h
-        Classes/TransitionDemoScene.h
-        Classes/VirtualListScene.h
-        Classes/Window1.h
-        Classes/Window2.h
-        )
+file(GLOB_RECURSE GAME_SRC Classes/*.c Classes/*.cc Classes/*.cpp)
+file(GLOB_RECURSE GAME_HEADERS Classes/*.h Classes/*.hpp)
+list(APPEND GAME_SRC ${PLATFORM_SPECIFIC_SRC})
+list(APPEND GAME_HEADERS ${PLATFORM_SPECIFIC_HEADERS})
 
 # add the executable
 if(ANDROID)
@@ -206,62 +88,15 @@ else()
     add_executable(${APP_NAME} ${GAME_SRC} ${GAME_HEADERS})
 endif()
 
-target_link_libraries(${APP_NAME} cocos2d)
+target_link_libraries(${APP_NAME} fairygui cocos2d)
+target_include_directories(${APP_NAME} PRIVATE Classes)
 
+set_target_properties(${APP_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${APP_NAME}")
 
-if(MSVC)
-
-	set(APP_BIN_DIR "${CMAKE_BINARY_DIR}/bin/${PLATFORM_FOLDER}/$<CONFIG>")
-
-    #get our resources
-    add_custom_command(TARGET ${APP_NAME} PRE_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${APP_BIN_DIR})
-	    
-    # create a list of dlls to copy
-	file(GLOB THIRD_PARTY_DLLS
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/gles/prebuilt/glew32.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/zlib/prebuilt/zlib1.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/OggDecoder/prebuilt/libogg.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/OggDecoder/prebuilt/libvorbis.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/OggDecoder/prebuilt/libvorbisfile.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/MP3Decoder/prebuilt/libmpg123.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/OpenalSoft/prebuilt/OpenAL32.dll"
-		"${COCOS2D_ROOT}/external/${PLATFORM_FOLDER}-specific/icon/prebuilt/iconv.dll"
-		"${COCOS2D_ROOT}/external/tiff/prebuilt/${PLATFORM_FOLDER}/libtiff.dll"
-	)
-	
-	list(SORT THIRD_PARTY_DLLS)
-
-	# do the copying
-	foreach( file_i ${THIRD_PARTY_DLLS})
-		add_custom_command(TARGET ${APP_NAME} PRE_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy
-			${file_i} 
-			${APP_BIN_DIR}
-		)
-	endforeach( file_i )
-
-    #Visual Studio Defaults to wrong type
-    set_target_properties(${APP_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS"
-									RUNTIME_OUTPUT_DIRECTORY  "${APP_BIN_DIR}")
-
-elseif(MACOSX OR APPLE)
-    set_target_properties(${APP_NAME} PROPERTIES
-            MACOSX_BUNDLE 1
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<CONFIG>"
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<CONFIG>"
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>"
-            )
-
-else()
-
-    set(APP_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
-
-    set_target_properties(${APP_NAME} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY  "${APP_BIN_DIR}")
-    add_custom_command(TARGET ${APP_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/Resources $<TARGET_FILE_DIR:${APP_NAME}>${RES_PREFIX}
-            )
-
+if(APPLE)
+    # output macOS/iOS .app
+    set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE 1)
+elseif(MSVC)
+    # visual studio default is Console app, but we need Windows app
+    set_property(TARGET ${APP_NAME} APPEND PROPERTY LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 endif()
