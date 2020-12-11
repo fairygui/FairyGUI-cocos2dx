@@ -210,6 +210,7 @@ void GLoader3D::loadFromPackage()
             _container->addChild(_content);
 
             onChangeSpine();
+            updateLayout();
         }
         else
         {
