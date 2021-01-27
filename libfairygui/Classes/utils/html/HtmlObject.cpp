@@ -132,8 +132,8 @@ void HtmlObject::createImage()
     _ui = loader;
 
     loader->setSize(width, height);
-    loader->setFill(LoaderFillType::SCALE_FREE);
     loader->setURL(src);
+    loader->setFill(LoaderFillType::SCALE_FREE);
 }
 
 void HtmlObject::createButton()
