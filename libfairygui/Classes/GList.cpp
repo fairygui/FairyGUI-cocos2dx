@@ -56,6 +56,11 @@ GList::~GList()
     scrollItemToViewOnClick = false;
 }
 
+void GList::setDefaultItem(const std::string& value)
+{ 
+    _defaultItem = UIPackage::normalizeURL(value);
+}
+
 void GList::setLayout(ListLayoutType value)
 {
     if (_layout != value)
