@@ -2480,7 +2480,7 @@ void GList::readItems(ByteBuffer* buffer)
     int itemCount = buffer->readShort();
     for (int i = 0; i < itemCount; i++)
     {
-        int nextPos = buffer->readShort();
+        int nextPos = buffer->readUshort();
         nextPos += buffer->getPos();
 
         str = buffer->readSP();
