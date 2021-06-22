@@ -42,7 +42,7 @@ void FUILabel::applyTextFormat()
 
         if (_fontName.find("ui://") != -1)
         {
-            setBMFontFilePath(_fontName);
+            setBMFontFilePath(_fontName, Vec2(0, 0), 0);
         }
         else
         {
@@ -146,6 +146,21 @@ bool FUILabel::setBMFontFilePath(const std::string& bmfontFilePath, const Vec2& 
     setFontAtlas(bmFont->createFontAtlas());
 
     return true;
+}
+
+bool FUILabel::setBMFontFilePath(const std::string& bmfontFilePath, float fontSize)
+{
+    return setBMFontFilePath(bmfontFilePath, Vec2(0, 0), fontSize);
+}
+
+bool FUILabel::setBMFontFilePath(const std::string& bmfontFilePath, const Rect& imageRect, bool imageRotated, float fontSize)
+{
+    return setBMFontFilePath(bmfontFilePath, Vec2(0, 0), fontSize);
+}
+
+bool FUILabel::setBMFontFilePath(const std::string& bmfontFilePath, const std::string& subTextureKey, float fontSize)
+{
+    return setBMFontFilePath(bmfontFilePath, Vec2(0, 0), fontSize);
 }
 
 void FUILabel::setGrayed(bool value)
