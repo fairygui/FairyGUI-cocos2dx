@@ -42,26 +42,26 @@ static inline float sp_EaseFunc(float t, float d)
 
 ScrollPane::ScrollPane(GComponent* owner)
     : _vtScrollBar(nullptr),
-      _hzScrollBar(nullptr),
-      _header(nullptr),
-      _footer(nullptr),
-      _pageController(nullptr),
-      _needRefresh(false),
-      _refreshBarAxis(0),
-      _aniFlag(0),
-      _loop(0),
-      _headerLockedSize(0),
-      _footerLockedSize(0),
-      _vScrollNone(false),
-      _hScrollNone(false),
-      _tweening(0),
-      _xPos(0),
-      _yPos(0),
-      _floating(false),
-      _dontClipMargin(false),
-      _mouseWheelEnabled(true),
-      _hover(false),
-      _dragged(false)
+    _hzScrollBar(nullptr),
+    _header(nullptr),
+    _footer(nullptr),
+    _pageController(nullptr),
+    _needRefresh(false),
+    _refreshBarAxis(0),
+    _aniFlag(0),
+    _loop(0),
+    _headerLockedSize(0),
+    _footerLockedSize(0),
+    _vScrollNone(false),
+    _hScrollNone(false),
+    _tweening(0),
+    _xPos(0),
+    _yPos(0),
+    _floating(false),
+    _dontClipMargin(false),
+    _mouseWheelEnabled(true),
+    _hover(false),
+    _dragged(false)
 {
     _owner = owner;
 
@@ -723,13 +723,13 @@ void ScrollPane::changeContentSizeOnScrolling(float deltaWidth, float deltaHeigh
         if (deltaWidth != 0 && isRightmost)
         {
             _xPos = _overlapSize.width;
-            _container->setPositionX(_container->getPositionX() - _xPos);
+            _container->setPositionX(-_xPos);
         }
 
         if (deltaHeight != 0 && isBottom)
         {
             _yPos = _overlapSize.height;
-            _container->setPositionY2(_container->getPositionY2() - _yPos);
+            _container->setPositionY2(-_yPos);
         }
     }
 
@@ -804,10 +804,10 @@ void ScrollPane::handleSizeChanged()
         max += _footerLockedSize;
     if (_refreshBarAxis == 0)
         _container->setPosition2(clampf(_container->getPositionX(), -max, _headerLockedSize),
-                                 clampf(_container->getPositionY2(), -_overlapSize.height, 0));
+            clampf(_container->getPositionY2(), -_overlapSize.height, 0));
     else
         _container->setPosition2(clampf(_container->getPositionX(), -_overlapSize.width, 0),
-                                 clampf(_container->getPositionY2(), -max, _headerLockedSize));
+            clampf(_container->getPositionY2(), -max, _headerLockedSize));
 
     if (_header != nullptr)
     {
@@ -994,9 +994,9 @@ void ScrollPane::updateScrollBarVisible2(GScrollBar* bar)
     {
         if (bar->isVisible())
             GTween::to(1, 0, 0.5f)
-                ->setDelay(0.5f)
-                ->onComplete1(CC_CALLBACK_1(ScrollPane::onBarTweenComplete, this))
-                ->setTarget(bar, TweenPropType::Alpha);
+            ->setDelay(0.5f)
+            ->onComplete1(CC_CALLBACK_1(ScrollPane::onBarTweenComplete, this))
+            ->setTarget(bar, TweenPropType::Alpha);
     }
     else
     {
