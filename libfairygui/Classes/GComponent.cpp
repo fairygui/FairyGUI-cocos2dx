@@ -584,6 +584,13 @@ void GComponent::setHitArea(IHitTest* value)
     }
 }
 
+const std::string& GComponent::getBaseUserData() const
+{
+    ByteBuffer* buffer = _packageItem->rawData;
+    buffer->seek(0, 4);
+    return buffer->readS();
+}
+
 float GComponent::getViewWidth() const
 {
     if (_scrollPane != nullptr)
@@ -701,7 +708,7 @@ void GComponent::childStateChanged(GObject* child)
         }
     }
 
-    if (child->_displayObject == nullptr || child == _maskOwner)
+    if ((child->_displayObject == nullptr) || (child == _maskOwner))
         return;
 
     if (child->internalVisible())

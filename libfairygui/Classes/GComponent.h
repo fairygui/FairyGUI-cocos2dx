@@ -83,6 +83,8 @@ public:
     float getViewHeight() const;
     void setViewHeight(float value);
 
+    const std::string& getBaseUserData() const;
+
     void setBoundsChangedFlag();
     void ensureBoundsCorrect();
 
