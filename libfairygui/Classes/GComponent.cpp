@@ -718,6 +718,8 @@ void GComponent::childStateChanged(GObject* child)
             if (_childrenRenderOrder == ChildrenRenderOrder::ASCENT)
             {
                 int index = (int)_children.getIndex(child);
+                const int globalZOrder = _container->getGlobalZOrder();
+                child->_displayObject->setGlobalZOrder(globalZOrder);
                 _container->addChild(child->_displayObject, index);
                 size_t cnt = _children.size();
                 for (size_t i = index + 1; i < cnt; i++)
