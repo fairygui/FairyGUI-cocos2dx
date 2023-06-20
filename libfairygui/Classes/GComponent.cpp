@@ -742,6 +742,7 @@ void GComponent::childStateChanged(GObject* child)
             {
                 CALL_LATER(GComponent, buildNativeDisplayList);
             }
+            refreshChildrenDisplayOrder();
         }
     }
     else
@@ -1385,6 +1386,23 @@ void GComponent::setup_afterAdd(ByteBuffer* buffer, int beginPos)
             GObject* obj = getChildByPath(target);
             if (obj != nullptr)
                 obj->setProp(propId, Value(value));
+        }
+    }
+}
+
+void GComponent::refreshChildrenDisplayOrder() {
+    if (_childrenRenderOrder == ChildrenRenderOrder::ASCENT)
+    {
+        int count = (int)_children.size();
+        for (int i = 0; i < count; ++i) {
+            _children.at(i)->displayObject()->setLocalZOrder(i);
+        }
+    }
+    else if (_childrenRenderOrder == ChildrenRenderOrder::DESCENT)
+    {
+        int count = (int)_children.size();
+        for (int i = 0; i < count; ++i) {
+            _children.at(i)->displayObject()->setLocalZOrder(count - 1 - i);
         }
     }
 }
