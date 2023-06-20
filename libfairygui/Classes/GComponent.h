@@ -136,7 +136,8 @@ protected:
 private:
     int getInsertPosForSortingChild(GObject* target);
     int moveChild(GObject* child, int oldIndex, int index);
-
+    void refreshChildrenDisplayOrder();
+    
     CALL_LATER_FUNC(GComponent, doUpdateBounds);
     CALL_LATER_FUNC(GComponent, buildNativeDisplayList);
 
